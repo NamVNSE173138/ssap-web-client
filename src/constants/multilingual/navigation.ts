@@ -3,8 +3,8 @@ const navigation = {
     EVENTS: 'Events',
     BLOGS: 'Blogs',
     APPLICATION: 'Application',
-    LOGIN: 'navigation.login',
-    REGISTER: 'navigation.register',
+    LOGIN: 'Login',
+    REGISTER: 'Register',
     LANGUAGE: 'navigation.language.title',
     CHOOSE_LANGUAGE: 'navigation.language.choose_language',
 };
