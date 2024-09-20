@@ -2,6 +2,8 @@ import Background from "./components/Background";
 import ImageCarousel from "./components/Carousel";
 import attributes from "./data";
 import Attribute from "./components/Attribute";
+import Background2 from "./components/Background2";
+import { MdAgriculture } from "react-icons/md";
 
 const Home = () => {
   return (
@@ -48,6 +50,7 @@ const Home = () => {
       <div className="">
         <section className="relative ">
           <div className="absolute ">
+            <p>HOW TO APPLY</p>
             <ul className=" grid grid-cols-4 gap-20 px-12 py-10 text-center">
               {attributes.map((attribute, idx) => (
                 <Attribute
@@ -61,6 +64,96 @@ const Home = () => {
             </ul>
           </div>
           <Background />
+        </section>
+      </div>
+
+      {/** BROWSER BY DISCIPLINES */}
+      <div className="my-10">
+        <section className="relative ">
+          <p>BROWSE BY DISCIPLINE</p>
+          <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
+            <div className="relative w-[250px] h-[110px] bg-red-600 rounded-lg ">
+              <p className="text-center text-lg font-bold">Agriculture</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-pink-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Science</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-green-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Architecture</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-yellow-600 rounded-lg">
+              <p className="text-center text-lg font-bold">
+                Business & Management
+              </p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Computer Science</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">
+                Creative Art & Design
+              </p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">
+                Mechanism & Technology
+              </p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Public Health</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Humanities</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Law</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">
+                Social Science & Media
+              </p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
+              <p className="text-center text-lg font-bold">Tourism & Hotel</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                <MdAgriculture size={45} className="ml-3 mt-3" />
+              </div>
+            </div>
+          </div>
+          <Background2 />
         </section>
       </div>
     </>
