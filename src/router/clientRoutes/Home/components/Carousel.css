@@ -1,0 +1,37 @@
+/* App.css */
+
+@keyframes carousel {
+    0% {
+      transform: translateX(100%) scale(0.5);
+      opacity: 0;
+    }
+    10% {
+      transform: translateX(100%) scale(0.7);
+      opacity: 0.4;
+    }
+    20% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    30% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    40% {
+      transform: translateX(-100%) scale(0.7);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translateX(-100%) scale(0.5);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(-100%) scale(0.5);
+      opacity: 0;
+    }
+  }
+  
+  .animate-carousel {
+    animation: carousel 27s linear infinite;
+  }
+  

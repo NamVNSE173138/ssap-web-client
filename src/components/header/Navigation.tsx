@@ -31,7 +31,7 @@ const Navigation = () => {
   return (
     <nav>
       <div className="flex justify-between">
-        <ul className=" text-xl flex justify-around gap-10">
+        <ul className=" text-xl font-normal flex justify-around gap-10" style={{color: "#5559C7"}}>
           {navItems.map((item) => (
             <li key={item.text} className="group/nav">
               <Link to={item.to}>{item.text}</Link>
@@ -39,9 +39,6 @@ const Navigation = () => {
             </li>
           ))}
         </ul>
-        <div className="text-xl" style={{backgroundColor: "#5559C7"}}>
-          SignIn/SignUp
-        </div>
       </div>
       
     </nav>

@@ -1,16 +1,42 @@
-import Logo from "../logo"
-import Navigation from "./Navigation"
+import Logo from "../logo";
+import Navigation from "./Navigation";
+import RouteNames from "../../constants/routeNames";
+import navigation from "../../constants/multilingual/navigation";
+import AuthNavigation from "./AuthNavigation";
 
 const Header = () => {
   return (
-    <header className="flex justify-between items-center p-1 " style={{backgroundColor: "#BBD4EA"}}>
-        <Logo />
-        <div className="flex justify-between items-center" >
-          <Navigation/>
+    <header
+      className="flex justify-around items-center p-1 "
+      style={{ backgroundColor: "#BBD4EA" }}
+    >
+      <Logo />
+      <div className="flex justify-between items-center">
+        <Navigation />
+        {/* <div className="flex justify-between gap-8">
+                    {(!isLoading && !isAuthenticated)
+                        ? (
+                            <div className="flex justify-center">
+                                <AuthNavigation to={RouteNames.LOGIN} text={t(navigation.LOGIN)} />
+                                <p>/</p>
+                                <AuthNavigation to={RouteNames.REGISTER} text={t(navigation.REGISTER)} />
+                            </div>
+                        )
+                        : shouldNotShowNavigation
+                            ? <HeaderAvatar />
+                            : <></>
+                    }
+          </div> */}
+        <div className="flex justify-between gap-8">
+          <div className="flex justify-center ml-9 p-2 rounded-xl" style={{backgroundColor: "#5559C7"}}>
+            <AuthNavigation to={RouteNames.LOGIN} text={navigation.LOGIN} />
+            <p className="text-xl text-white">/</p>
+            <AuthNavigation to={RouteNames.REGISTER} text={navigation.REGISTER} />
+          </div>
         </div>
-        
+      </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
