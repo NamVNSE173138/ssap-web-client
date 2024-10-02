@@ -3,6 +3,8 @@ import { RouteObject } from 'react-router-dom';
 // import Login from './Login';
 // import Register from './Register';
 import NotFound from './404';
+import Login from './Login';
+import Register from './Register';
 // import UnauthenticatedRoute from '../UnauthenticatedRoute';
 // import GoogleOAuthCallback from './GoogleOAuthCallback';
 
@@ -24,6 +26,14 @@ const commonRoutes: RouteObject[] = [
     //         },
     //     ],
     // },
+    {
+        path: RouteNames.LOGIN,
+        element: <Login />,
+    },
+    {
+        path: RouteNames.REGISTER,
+        element: <Register />,
+    },
     {
         path: RouteNames.NOT_FOUND,
         element: <NotFound />,
