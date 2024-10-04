@@ -3,8 +3,8 @@ import { RouteObject } from 'react-router-dom';
 // import Login from './Login';
 // import Register from './Register';
 import NotFound from './404';
-import Login from './Login';
-import Register from './Register';
+import Login from './Login/Login';
+import Register from './Register/Register';
 // import UnauthenticatedRoute from '../UnauthenticatedRoute';
 // import GoogleOAuthCallback from './GoogleOAuthCallback';
 
