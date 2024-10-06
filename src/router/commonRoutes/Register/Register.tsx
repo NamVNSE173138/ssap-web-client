@@ -6,15 +6,43 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import ValidationErrorMessage from "../Login/components/ValidationErrorMessage";
+import { useToast } from "@/components/ui/use-toast";
 
+const formSchema = z.object({
+  username: z.string().min(1, { message: "Username is required" }),
+  email: z
+    .string()
+    .min(1, { message: "Email is required." })
+    .email("This is not a valid email."),
+  phoneNumber: z
+    .string()
+    .min(1, "Please is required")
+    .refine(
+      (value) => /^\d+$/.test(value) && value.length === 10,
+      "Phone number must be at least 10 numbers"
+    ),
+  fullName: z.string().min(1, "Full name is required"),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" })
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      { message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character." }
+    ),
+  role: z.string(),
+});
 
 const Register = () => {
   const navigate = useNavigate();
   //const token = useSelector((state: RootState) => state.token.token);
   const dispatch = useDispatch();
-
+  const {toast} = useToast();
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -23,41 +51,81 @@ const Register = () => {
   const [securePassword, setSecurePassword] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-
   const [error, setError] = useState("");
 
-  const handleRegisterSubmit = async (e: any) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: '',
+      email: '',
+      phoneNumber: '',
+      fullName: '',
+      password: '',
+      role:'0',
+    },
+  });
+
+  // const handleRegisterSubmit = async (data: any) => {
+  //   setIsLoading(true);
+  //   let user = null;
+  //   try {
+  //     user = await RegisterUser({
+  //       username: data.username,
+  //       email: data.email,
+  //       phoneNumber: data.phoneNumber,
+  //       fullName: data.fullName,
+  //       password: data.password,
+  //     });
+  //     setIsLoading(false);
+  //     setError("");
+  //   } catch (error: any) {
+  //     setIsLoading(false);
+  //     setError(error?.response?.data?.message || "An error occurred. Please try again later.");
+  //     return;
+  //   }
+  //   dispatch(setToken(user.token));
+  //   const userInfo = parseJwt(user.token);
+  //   dispatch(setUser(userInfo));
+  //   navigate("/");
+  // };
+
+  const handleRegisterSubmit = async (data: any) => {
     setIsLoading(true);
-    let user = null;
     try {
-      user = await RegisterUser({
-        username: userName,
-        email: email,
-        phoneNumber: phoneNumber,
-        fullName: fullName,
-        password: password,
+      
+      const user = await RegisterUser({
+        username: data.username,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        fullName: data.fullName,
+        password: data.password,
       });
+  
       setIsLoading(false);
       setError("");
+      
+      navigate(RouteNames.LOGIN);
+      toast({
+        title: "Registration Successful.",
+        description: "You can now log in with your credentials.",
+        duration: 5000,
+        variant: 'default',
+      });
     } catch (error: any) {
       setIsLoading(false);
-      if (error.response.data.message) {
-        // If the error response contains a message, set it as the error message
-        setError(error.response.data.message);
-      } else {
-        // If the error is something else, set a generic error message
-        setError("An error occurred. Please try again later.");
-      }
-      return;
+      const errorMessage = error?.response?.data?.message || "An error occurred. Please try again later.";
+      setError(errorMessage);
+      toast({
+        title: "Registration Failed.",
+        description: errorMessage,
+        duration: 5000,
+        variant: 'destructive',
+      });
     }
-    dispatch(setToken(user.token));
-    const userInfo = parseJwt(user.token);
-    dispatch(setUser(userInfo));
-    /*if (parseJwt(user.token).role === "Admin") {
-      navigate("/dashboard");
-  } else {*/
-    navigate("/");
   };
 
   return (
@@ -188,58 +256,64 @@ const Register = () => {
               </h3>
             </div>
 
-            <form action="#" method="POST" className="w-full md:mt-4 mt-0">
+            <form onSubmit={handleSubmit(handleRegisterSubmit)} className="w-full md:mt-4 mt-0">
               <div className="w-full flex flex-col mb-4 items-center">
                 <input
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  required
-                  autoComplete="username"
+                  // value={userName}
+                  // onChange={(e) => setUserName(e.target.value)}
+                  // required
+                  // autoComplete="username"
+                  {...register("username")}
                   placeholder="Username"
                   className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
                   aria-label="Email"
                 />
+                  {errors.username && <ValidationErrorMessage error={errors.username.message} />}
                 
                 <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
+                  // value={email}
+                  // onChange={(e) => setEmail(e.target.value)}
+                  // required
+                  // autoComplete="email"
+                  {...register("email")}
                   placeholder="Email"
                   className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
                   aria-label="Email"
                 />
+                {errors.email && <ValidationErrorMessage error={errors.email.message} />}
                 <input
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  required
+                  // value={phoneNumber}
+                  // onChange={(e) => setPhoneNumber(e.target.value)}
+                  // required
                   type="text"
-                  autoComplete="phone_number"
+                  // autoComplete="phone_number"
+                  {...register("phoneNumber")}
                   placeholder="Phone number"
                   className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
                   aria-label="Phone_number"
                 />
-               
+                {errors.phoneNumber && <ValidationErrorMessage error={errors.phoneNumber.message} />}
                 <input
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  autoComplete="full_name"
+                  // value={fullName}
+                  // onChange={(e) => setFullName(e.target.value)}
+                  // required
+                  // autoComplete="full_name"
+                  {...register("fullName")}
                   type="text"
                   placeholder="Full name"
                   className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
                   aria-label="Full_name"
                 />
-                
+                {errors.fullName && <ValidationErrorMessage error={errors.fullName.message} />}
                 <div className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none flex justify-between gap-2 items-center">
                   <input
-                    
                     type={securePassword ? "password" : "text"}
                     placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    // value={password}
+                    // onChange={(e) => setPassword(e.target.value)}
+                    // required
                     autoComplete="current-password"
+                    {...register("password")}
                     className="w-full bg-transparent focus:outline-none"
                     aria-label="Password"
                   />
@@ -255,14 +329,14 @@ const Register = () => {
                     />
                   )}
                 </div>
-                
+                {errors.password && <ValidationErrorMessage error={errors.password.message} />}
               </div>
 
-              {error && <p className="text-red-500">{error}</p>}
+              {/* {error && <p className="text-red-500">{error}</p>} */}
 
               <div className="w-full flex flex-col md:space-y-2 space-y-1 items-center">
                 <button
-                  onClick={handleRegisterSubmit}
+                  // onClick={handleRegisterSubmit}
                   type="submit"
                   className="w-[55%] text-lg text-white bg-blue-500 rounded-3xl py-3"
                 >
@@ -279,9 +353,7 @@ const Register = () => {
             </form>
             <div className="w-full flex justify-center md:mt-5 mt-10">
               <p className="text-black">
-                <p className="text-lg text-black">
-                  You already have account?
-                </p>
+                <p className="text-lg text-black">You already have account?</p>
                 <Link to={RouteNames.LOGIN}>
                   <span className="text-base font-semibold underline cursor-pointer">
                     Sign in

@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
 const Navigation = () => {
   return (
     <nav>
-      <div className="flex justify-between">
+      <div className="flex justify-between mr-10">
         <ul className=" text-xl font-normal flex justify-around gap-10" style={{color: "#5559C7"}}>
           {navItems.map((item) => (
             <li key={item.text} className="group/nav">

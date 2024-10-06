@@ -8,6 +8,18 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginImage from "../../../assets/login-image.jpg";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import ScreenSpinner from "../../../components/ScreenSpinner";
+import {z} from "zod";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import ValidationErrorMessage from "./components/ValidationErrorMessage";
+import { log } from "console";
+
+
+const formSchema = z.object({
+  email: z.string().min(1, { message: "Email is required." }).email("This is not a valid email."),
+  password: z.string().min(1, 'Password cannot be  empty'),
+  role: z.string(),
+});
 
 
 const Login = () => {
@@ -21,37 +33,92 @@ const Login = () => {
   const [securePassword, setSecurePassword] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
+//   const form = useForm({
+//     resolver: zodResolver(formSchema),
+//     defaultValues: {
+//         email: '',
+//         password: '',
+//         role: '0',
+//     },
+// });
 
-  const handleLoginSubmit = async (e: any) => {
-    e.preventDefault();
+const { register, handleSubmit, formState } = useForm({
+  resolver: zodResolver(formSchema),
+  defaultValues: {
+    email: '',
+    password: '',
+    role: '0',
+  },
+});
+
+const { errors } = formState;
+
+
+  // const handleLoginSubmit = async (e: any) => {
+  //   e.preventDefault();
+  //   setIsLoading(true);
+  //   let user = null;
+  //   try {
+  //     user = await LoginUser({
+  //       email: email,
+  //       password: password,
+  //     });
+  //     setIsLoading(false);
+  //     setError("");
+  //   } catch (error: any) {
+  //     setIsLoading(false);
+  //     if (error.response.data.message) {
+  //       // If the error response contains a message, set it as the error message
+  //       setError(error.response.data.message);
+  //     } else {
+  //       // If the error is something else, set a generic error message
+  //       setError("An error occurred. Please try again later.");
+  //     }
+  //     return;
+  //   }
+  //   dispatch(setToken(user.token));
+  //   const userInfo = parseJwt(user.token);
+  //   dispatch(setUser(userInfo));
+  //   /*if (parseJwt(user.token).role === "Admin") {
+  //     navigate("/dashboard");
+  // } else {*/
+  //   navigate("/");
+  // };
+
+
+  const handleLoginSubmit = async (data: any) => {
     setIsLoading(true);
-    let user = null;
+    setError(""); // Clear any previous errors
     try {
-      user = await LoginUser({
-        email: email,
-        password: password,
+      const user = await LoginUser({
+        email: data.email,
+        password: data.password,
       });
       setIsLoading(false);
-      setError("");
+      dispatch(setToken(user.token));
+      const userInfo = parseJwt(user.token);
+      dispatch(setUser(userInfo));
+      navigate("/");
     } catch (error: any) {
       setIsLoading(false);
-      if (error.response.data.message) {
-        // If the error response contains a message, set it as the error message
-        setError(error.response.data.message);
+  
+      // Check error response and set appropriate messages
+      if (error.response?.data?.message) {
+        console.log()
+        if (error.response.data.message === "Email not found") {
+          setError("Email not found");
+        } else if (error.response.data.message === "Wrong password") {
+          setError("Wrong password");
+        } else {
+          setError("An error occurred. Please try again later.");
+        }
       } else {
-        // If the error is something else, set a generic error message
         setError("An error occurred. Please try again later.");
       }
-      return;
     }
-    dispatch(setToken(user.token));
-    const userInfo = parseJwt(user.token);
-    dispatch(setUser(userInfo));
-    /*if (parseJwt(user.token).role === "Admin") {
-      navigate("/dashboard");
-  } else {*/
-    navigate("/");
   };
+  
+
 
   return (
     //  <>
@@ -152,29 +219,34 @@ const Login = () => {
               </h3>
             </div>
 
-            <form action="#" method="POST" className="w-full">
+            {/* <form action="#" method="POST" className="w-full"> */}
+            <form onSubmit={handleSubmit(handleLoginSubmit)} className="w-full">
               <div className="w-full flex flex-col mb-4 items-center">
                 <input
+                  {...register('email')}
                   id="email"
-                  name="email"
+                  // name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
+                  // value={email}
+                  // onChange={(e) => setEmail(e.target.value)}
+                  // required
+                  // autoComplete="email"
                   placeholder="Email"
                   className="w-[75%] py-2 mb-3 text-lg md:text-xl bg-transparent border-b border-black focus:outline-none text-black"
                   aria-label="Username"
                 />
+                
+                {errors.email && <ValidationErrorMessage error={errors.email.message} />}
                 <div className="w-[75%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none flex justify-between gap-2 items-center">
                   <input
                     type={securePassword ? 'password' : 'text'}
                     id="password"
-                    name="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    // name="password"
+                    // value={password}
+                    // onChange={(e) => setPassword(e.target.value)}
+                    // required
                     autoComplete="current-password"
+                    {...register('password')}
                     placeholder="Password"
                     className="w-full bg-transparent focus:outline-none"
                     aria-label="Password"
@@ -191,6 +263,7 @@ const Login = () => {
                     />
                   )}
                 </div>
+                {errors.password && <ValidationErrorMessage error={errors.password.message} />}
               </div>
               <div className="w-full flex justify-center mb-10">
                 <Link
@@ -201,11 +274,11 @@ const Login = () => {
                 </Link>
               </div>
 
-              {error && <p className="text-red-500">{error}</p>}
+              {/* {error && <p className="text-red-500">{error}</p>} */}
 
               <div className="w-full flex flex-col space-y-3 items-center">
                 <button
-                  onClick={handleLoginSubmit}
+                  // onClick={handleLoginSubmit}
                   type="submit"
                   className="w-[60%] text-lg text-white  bg-blue-500 rounded-3xl py-3"
                 >
