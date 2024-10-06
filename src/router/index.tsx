@@ -12,16 +12,6 @@ const router = createBrowserRouter([
     children: [...clientRoutes],
     errorElement: <NotFound />,
   },
-  // {
-  //     path: "/admin",
-  //     element: <AdminLayout />,
-  //     children: [...adminRoutes],
-  // },
-  // {
-  //     path: "/staff",
-  //     element: <StaffLayout />,
-  //     children: [...staffRoutes],
-  // },
   {
     element: <NoLayout />,
     children: [...commonRoutes],
