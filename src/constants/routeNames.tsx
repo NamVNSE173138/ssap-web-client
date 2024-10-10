@@ -9,7 +9,9 @@ const RouteNames = {
     REGISTER: '/register',
     NOT_FOUND: '/not-found',
     ACCOUNT_INFO: '/account-info',
+    DASHBOARD: '/admin',
     SCHOLARSHIP_PROGRAM:'scholarship-program',
+
 }
 
 export default RouteNames

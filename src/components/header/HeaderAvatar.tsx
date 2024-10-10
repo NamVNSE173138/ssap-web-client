@@ -10,6 +10,8 @@ import ScreenSpinner from '../ScreenSpinner';
 import RouteNames from '@/constants/routeNames';
 import { removeToken, removeUser } from "@/reducers/tokenSlice";
 import { useDispatch } from "react-redux";
+import { CgProfile } from "react-icons/cg";
+import Profile from '@/router/adminRoutes/Dashboard/pages/Profile';
 
 const HeaderAvatar = () => {
     const navigate = useNavigate();
@@ -43,7 +45,8 @@ const HeaderAvatar = () => {
                 <DropdownMenuContent>
                     <DropdownMenuLabel>Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleProfileClick}>Profile</DropdownMenuItem>
+                    <DropdownMenuItem  onClick={handleProfileClick}>
+                        <CgProfile className='mr-2'/> Profile</DropdownMenuItem>
                     <AlertDialog>
                         <AlertDialogTrigger>
                             <div className="flex items-center px-2 text-sm">
