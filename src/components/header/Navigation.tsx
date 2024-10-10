@@ -25,6 +25,10 @@ const navItems: NavItem[] = [
     text: navigation.APPLICATION,
     to: RouteNames.APPLICATION,
   },
+  {
+    text: navigation.SCHOLARSHIP_PROGRAM,
+    to: RouteNames.SCHOLARSHIP_PROGRAM,
+  },
 ];
 
 const Navigation = () => {
