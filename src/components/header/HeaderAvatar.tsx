@@ -3,15 +3,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
-// import { useAppDispatch } from '@/store';
-// import { clearAuth } from '@/store/authSlice';
 import { useState } from 'react';
 import ScreenSpinner from '../ScreenSpinner';
 import RouteNames from '@/constants/routeNames';
 import { removeToken, removeUser } from "@/reducers/tokenSlice";
 import { useDispatch } from "react-redux";
 import { CgProfile } from "react-icons/cg";
-import Profile from '@/router/adminRoutes/Dashboard/pages/Profile';
+import parseJwt from '@/services/parseJwt';
 
 const HeaderAvatar = () => {
     const navigate = useNavigate();
@@ -29,8 +27,16 @@ const HeaderAvatar = () => {
         }, 500); 
       };
 
-    const handleProfileClick = () => {
-        navigate(RouteNames.ACCOUNT_INFO);
+      const handleProfileClick = () => {
+        const token = localStorage.getItem('token'); 
+        const decodedToken = parseJwt(token); 
+        const userId = decodedToken ? decodedToken.id : null; 
+
+        if (userId) {
+            navigate(`${RouteNames.ACCOUNT_INFO}/${userId}`);
+        } else {
+            console.error("User ID not found in token");
+        }
     };
 
     return (
