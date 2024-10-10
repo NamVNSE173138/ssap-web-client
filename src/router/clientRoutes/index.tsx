@@ -8,6 +8,7 @@ import Events from "./Events";
 import BlogDetail from "./BlogDetail";
 import BlogList from "./BlogList";
 import Application from "./Application";
+import ScholarshipProgram from "./ScholarshipProgram";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -33,6 +34,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.APPLICATION,
     element: <Application />,
+  },
+  {
+    path: RouteNames.SCHOLARSHIP_PROGRAM,
+    element: <ScholarshipProgram/>,
   },
 ];
 const privateRoutes: RouteObject[] = [
