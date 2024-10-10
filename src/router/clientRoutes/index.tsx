@@ -36,15 +36,19 @@ const publicRoutes: RouteObject[] = [
     element: <Application />,
   },
   {
+    path: `${RouteNames.ACCOUNT_INFO}/:id`,
+    element: <AccountInfo />,
+  },
+  {
     path: RouteNames.SCHOLARSHIP_PROGRAM,
     element: <ScholarshipProgram/>,
   },
 ];
 const privateRoutes: RouteObject[] = [
-  {
-    path: RouteNames.ACCOUNT_INFO,
-    element: <AccountInfo />,
-  },
+  // {
+  //   path: `${RouteNames.ACCOUNT_INFO}/:id`,
+  //   element: <AccountInfo />,
+  // },
 ];
 const clientRoutes: RouteObject[] = [
   {
