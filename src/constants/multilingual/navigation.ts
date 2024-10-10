@@ -3,6 +3,7 @@ const navigation = {
     EVENTS: 'Events',
     BLOGS: 'Blogs',
     APPLICATION: 'Application',
+    SCHOLARSHIP_PROGRAM: 'Scholarship',
     LOGIN: 'Login',
     REGISTER: 'Register',
     LANGUAGE: 'navigation.language.title',

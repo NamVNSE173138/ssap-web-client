@@ -8,7 +8,8 @@ const RouteNames = {
     LOGIN: '/login',
     REGISTER: '/register',
     NOT_FOUND: '/not-found',
-    ACCOUNT_INFO: '/account-info'
+    ACCOUNT_INFO: '/account-info',
+    SCHOLARSHIP_PROGRAM:'scholarship-program',
 }
 
 export default RouteNames

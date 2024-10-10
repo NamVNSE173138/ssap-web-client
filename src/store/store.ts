@@ -1,4 +1,4 @@
-import tokenReducer from './reducers/tokenSlice';
+import tokenReducer from '../reducers/tokenSlice';
 import { configureStore } from '@reduxjs/toolkit';
 
 const store = configureStore({

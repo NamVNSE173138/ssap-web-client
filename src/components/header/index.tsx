@@ -4,7 +4,7 @@ import RouteNames from "../../constants/routeNames";
 import navigation from "../../constants/multilingual/navigation";
 import AuthNavigation from "./AuthNavigation";
 import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { RootState } from "@/store/store";
 import HeaderAvatar from "./HeaderAvatar";
 
 const Header = () => {
