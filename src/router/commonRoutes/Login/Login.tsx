@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ValidationErrorMessage from "./components/ValidationErrorMessage";
 import { log } from "console";
+import { useToast } from "@/components/ui/use-toast";
 
 
 const formSchema = z.object({
@@ -26,6 +27,7 @@ const Login = () => {
   const navigate = useNavigate();
   //const token = useSelector((state: RootState) => state.token.token);
   const dispatch = useDispatch();
+  const {toast} = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -99,10 +101,16 @@ const { errors } = formState;
       const userInfo = parseJwt(user.token);
       dispatch(setUser(userInfo));
       navigate("/");
+      toast({
+        title: "Login Successful.",
+        description: "Now you can....",
+        duration: 5000,
+        variant: 'default',
+      });
     } catch (error: any) {
       setIsLoading(false);
   
-      // Check error response and set appropriate messages
+      
       if (error.response?.data?.message) {
         console.log()
         if (error.response.data.message === "Email not found") {
@@ -114,6 +122,12 @@ const { errors } = formState;
         }
       } else {
         setError("An error occurred. Please try again later.");
+        toast({
+          title: "Login Failed.",
+          description: "Now you can ....",
+          duration: 5000,
+          variant: 'destructive',
+        });
       }
     }
   };

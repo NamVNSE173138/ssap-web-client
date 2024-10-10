@@ -47,10 +47,10 @@ const ScholarshipProgram = () => {
         <BreadcrumbList>
           <BreadcrumbItem>
             <Link
-              to={RouteNames.SCHOLARSHIP_PROGRAM}
+              to={RouteNames.HOME}
               className="md:text-xl text-lg"
             >
-              Dịch vụ
+              Home
             </Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
