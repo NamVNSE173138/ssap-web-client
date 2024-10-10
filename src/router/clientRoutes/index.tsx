@@ -43,22 +43,35 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.SCHOLARSHIP_PROGRAM,
     element: <ScholarshipProgram/>,
   },
+
+  //  {
+ //   path: RouteNames.ACCOUNT_INFO,
+  //  element: <AccountInfo />,
+  //},
+
 ];
-const privateRoutes: RouteObject[] = [
+//const privateRoutes: RouteObject[] = [
   // {
   //   path: `${RouteNames.ACCOUNT_INFO}/:id`,
   //   element: <AccountInfo />,
   // },
+
 ];
+// const privateRoutes: RouteObject[] = [
+//   {
+//     path: RouteNames.ACCOUNT_INFO,
+//     element: <AccountInfo />,
+//   },
+// ];
 const clientRoutes: RouteObject[] = [
   {
     path: "/",
     element: <Navigate to={RouteNames.HOME} replace />,
   },
-  {
-    element: <PrivateRoute />,
-    children: [...privateRoutes],
-  },
+  // {
+  //   element: <PrivateRoute />,
+  //   children: [...privateRoutes],
+  // },
   ...publicRoutes,
 ];
 
