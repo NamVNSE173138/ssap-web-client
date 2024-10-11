@@ -189,6 +189,7 @@ const AccountInfo = () => {
                 Address: profileData.address,
                 Avatar: profileData.avatar,
                 Gender: profileData.gender,
+                RoleId: profileData.roleId,
                 Status: profileData.status,
               }}
               onFinish={handleSave}
@@ -214,7 +215,8 @@ const AccountInfo = () => {
               </Form.Item>
               <Form.Item label="Address" name="Address">
                 <Input />
-              </Form.Item>
+              </Form.Item>  
+              
               <Form.Item label="Avatar URL" name="Avatar">
                 <Input />
               </Form.Item>
@@ -232,12 +234,14 @@ const AccountInfo = () => {
                   <Select.Option value="Suspended">Suspended</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Save
-                </Button>
-                <Button type="default" onClick={() => setIsEditing(false)} style={{ marginLeft: '10px' }}>
+              <Form.Item label="" name="RoleId" style={{ display: 'none' }}>
+              </Form.Item >
+              <Form.Item >
+                <Button type="default" onClick={() => setIsEditing(false)}>
                   Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" style={{ marginLeft: '10px' }}>
+                  Save
                 </Button>
               </Form.Item>
             </Form>

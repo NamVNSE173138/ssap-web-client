@@ -4,7 +4,7 @@ import PrivateRoute from "../PrivateRoute";
 import AdminDashboard from "./Dashboard";
 import ECommerce from "./Dashboard/pages/Dashboard/ECommerce";
 import { Calendar } from "antd";
-import Profile from "./Dashboard/pages/Profile";
+import AccountsManagement from "./Dashboard/pages/AccountsManagement";
 
 
 const publicRoutes: RouteObject[] = [
@@ -17,8 +17,8 @@ const publicRoutes: RouteObject[] = [
     element: <Calendar />,
   },
   {
-    path: "/admin/profile",
-    element: <Profile />,
+    path: "/admin/accountsmanagement",
+    element: <AccountsManagement />,
   }
 ];
 const privateRoutes: RouteObject[] = [
