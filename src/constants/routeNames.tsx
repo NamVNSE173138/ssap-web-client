@@ -11,6 +11,7 @@ const RouteNames = {
     ACCOUNT_INFO: '/account-info',
     DASHBOARD: '/admin',
     SCHOLARSHIP_PROGRAM:'scholarship-program',
+    ACTIVITY:'/activity',
 
 }
 
