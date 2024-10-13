@@ -61,7 +61,7 @@ const publicRoutes: RouteObject[] = [
   //   element: <AccountInfo />,
   // },
 
-//];
+
 // const privateRoutes: RouteObject[] = [
 //   {
 //     path: RouteNames.ACCOUNT_INFO,
