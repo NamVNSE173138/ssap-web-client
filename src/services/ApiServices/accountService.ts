@@ -12,6 +12,14 @@ export async function getAllAccounts() {
   return response.data;
 }
 
+export async function getAllAccountsWithRole() {
+  const response = await axios.get(
+    `${getEndpoint()}/api/accounts/with-role`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
 // Fetch an account by ID
 export async function getAccountById(id: number) {
   const response = await axios.get(

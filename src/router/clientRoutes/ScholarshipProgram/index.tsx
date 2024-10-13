@@ -70,7 +70,7 @@ const ScholarshipProgram = () => {
           </p>
         ) : data.length == 0 ? (
           <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
-            Chưa có dịch vụ nào
+            No scholarship programs found.
           </p>
         ) : (
           data.map((service: any) => (
