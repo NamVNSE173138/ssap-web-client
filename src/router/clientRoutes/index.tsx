@@ -1,6 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
-import PrivateRoute from "../PrivateRoute";
+// import PrivateRoute from "../PrivateRoute";
 import Home from "./Home";
 import AccountInfo from "./AccountInfo";
 import AboutUs from "./AboutUs";
