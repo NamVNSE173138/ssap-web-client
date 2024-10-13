@@ -9,6 +9,7 @@ import BlogDetail from "./BlogDetail";
 import BlogList from "./BlogList";
 import Application from "./Application";
 import ScholarshipProgram from "./ScholarshipProgram";
+import Activity from "./Activity";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -43,6 +44,10 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.SCHOLARSHIP_PROGRAM,
     element: <ScholarshipProgram/>,
   },
+  {
+    path: RouteNames.ACTIVITY,
+    element: <Activity/>,
+  },
 
   //  {
  //   path: RouteNames.ACCOUNT_INFO,
@@ -55,6 +60,7 @@ const publicRoutes: RouteObject[] = [
   //   path: `${RouteNames.ACCOUNT_INFO}/:id`,
   //   element: <AccountInfo />,
   // },
+
 
 // const privateRoutes: RouteObject[] = [
 //   {
