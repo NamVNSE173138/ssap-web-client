@@ -100,7 +100,6 @@ const AccountInfo = () => {
 
 
   return (
-
     <div className="grid grid-cols-12 h-full">
       <Sidebar className="col-start-1 col-end-3" />
       {isEditing ? (
@@ -252,89 +251,6 @@ const AccountInfo = () => {
                 />
               </div>
             </div>
-
-<!--     <Card title="Account Info" style={{ width: '100%', maxWidth: '600px', margin: '20px auto' }}>
-      <Row gutter={16}>
-        <Col span={6}>
-          <Avatar size={100} src={profileData.avatar} />
-        </Col>
-        <Col span={18}>
-          //{isEditing ? (
-            <Form
-              initialValues={{
-                Username: profileData.username,
-                FullName: profileData.fullName,
-                PhoneNumber: profileData.phoneNumber,
-                Email: profileData.email,
-                HashedPassword: profileData.hashedPassword,
-                Address: profileData.address,
-                Avatar: profileData.avatar,
-                Gender: profileData.gender,
-                RoleId: profileData.roleId,
-                Status: profileData.status,
-              }}
-              onFinish={handleSave}
-            >
-              <Form.Item label="Username" name="Username" rules={[{ required: true, message: 'Please input your username!' }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item label="Full Name" name="FullName" rules={[{ required: true, message: 'Please input your full name!' }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item label="Phone Number" name="PhoneNumber">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Email" name="Email" rules={[{ required: true, message: 'Please input your email!' }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item
-                label="Hashed Password"
-                name="HashedPassword"
-                rules={[{ required: true, message: 'Please input your password!' }]}
-              >
-                <Input.Password disabled />
-              </Form.Item>
-              <Form.Item label="Address" name="Address">
-                <Input />
-              </Form.Item>  
-              
-              <Form.Item label="Avatar URL" name="Avatar">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Gender" name="Gender" rules={[{ required: true, message: 'Please select your gender!' }]}>
-                <Select placeholder="Select your gender">
-                  <Select.Option value="Male">Male</Select.Option>
-                  <Select.Option value="Female">Female</Select.Option>
-                  <Select.Option value="Others">Others</Select.Option>
-                </Select>
-              </Form.Item>
-              <Form.Item label="Status" name="Status" rules={[{ required: true, message: 'Please select a status!' }]}>
-                <Select disabled>
-                  <Select.Option value="Active">Active</Select.Option>
-                  <Select.Option value="Inactive">Inactive</Select.Option>
-                  <Select.Option value="Suspended">Suspended</Select.Option>
-                </Select>
-              </Form.Item>
-              <Form.Item label="" name="RoleId" style={{ display: 'none' }}>
-              </Form.Item >
-              <Form.Item >
-                <Button type="default" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit" style={{ marginLeft: '10px' }}>
-                  Save
-                </Button>
-              </Form.Item>
-            </Form>
-          ) : (
-            <div>
-              <p><strong>Username:</strong> {profileData.username}</p>
-              <p><strong>Full Name:</strong> {profileData.fullName}</p>
-              <p><strong>Phone Number:</strong> {profileData.phoneNumber}</p>
-              <p><strong>Address:</strong> {profileData.address}</p>
-              <p><strong>Email:</strong> {profileData.email}</p>
-              <p><strong>Gender:</strong> {profileData.gender}</p> -->
-
 
             <div className="flex justify-center ">
               <button
