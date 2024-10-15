@@ -127,130 +127,96 @@ const AccountInfo = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label
-                  htmlFor="username"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Username:
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={formValues.username}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="columns-1">
-                <label
-                  htmlFor="fullName"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Full name:
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={formValues.fullName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label
-                  htmlFor="phoneNumber"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Phone number:
-                </label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={formValues.phoneNumber}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="columns-1">
-                <label
-                  htmlFor="email"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Email:
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={formValues.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="columns-1">
-                <label
-                  htmlFor="passowrd"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Password:
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl cursor-not-allowed"
-                  value={formValues.hashedPassword || ""}
-                  readOnly
-                />
-              </div>
-              <div className="columns-1">
-                <label
-                  htmlFor="gender"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Gender:
-                </label>
-                <select
-                  id="gender"
-                  name="gender"
-                  className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={formValues.gender}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select your gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Others">Others</option>
-                </select>
-              </div>
-            </div>
-            <div className="lg:mx-0 mx-2">
-              <div>
-                <label
-                  htmlFor="address"
-                  // className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Address:
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={formValues.address}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
+  <div className="columns-1">
+    <label htmlFor="username">Username:</label>
+    <input
+      type="text"
+      id="username"
+      name="username"
+      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.username}
+      onChange={handleInputChange}
+      required
+    />
+  </div>
+  <div className="columns-1">
+    <label htmlFor="fullName">Full name:</label>
+    <input
+      type="text"
+      id="fullName"
+      name="fullName"
+      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.fullName}
+      onChange={handleInputChange}
+      required
+    />
+  </div>
+</div>
+<div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
+  <div className="columns-1">
+    <label htmlFor="phoneNumber">Phone number:</label>
+    <input
+      type="text"
+      id="phoneNumber"
+      name="phoneNumber"
+      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.phoneNumber}
+      onChange={handleInputChange}
+    />
+  </div>
+  <div className="columns-1">
+    <label htmlFor="email">Email:</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.email}
+      onChange={handleInputChange}
+      required
+    />
+  </div>
+  <div className="columns-1">
+    <label htmlFor="password">Password:</label>
+    <input
+      type="password"
+      id="password"
+      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl cursor-not-allowed"
+      value={formValues.hashedPassword || ""}
+      readOnly
+    />
+  </div>
+  <div className="columns-1">
+    <label htmlFor="gender">Gender:</label>
+    <select
+      id="gender"
+      name="gender"
+      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.gender}
+      onChange={handleInputChange}
+      required
+    >
+      <option value="">Select your gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Others">Others</option>
+    </select>
+  </div>
+</div>
+<div className="lg:mx-0 mx-2">
+  <div>
+    <label htmlFor="address">Address:</label>
+    <input
+      type="text"
+      id="address"
+      name="address"
+      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.address}
+      onChange={handleInputChange}
+    />
+  </div>
+</div>
+
 
             <div className="flex justify-center ">
               <button
@@ -350,6 +316,23 @@ const AccountInfo = () => {
                   id="email"
                   className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
                   value={profileData?.email || ""}
+                  readOnly
+                />
+              </div>
+            </div>
+            <div className="lg:mx-0 mx-2">
+              <div>
+                <label
+                  htmlFor="gender"
+                  className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
+                >
+                  Gender:
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+                  value={profileData?.gender || ""}
                   readOnly
                 />
               </div>
