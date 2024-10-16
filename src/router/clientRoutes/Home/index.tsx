@@ -29,13 +29,6 @@ const Home = () => {
     }
   };
 
-  const colors = ["bg-red-600", "bg-pink-600", "bg-green-600", "bg-yellow-600", "bg-orange-600", "bg-blue-600"];
-
-  const getRandomColor = () => {
-      const randomIndex = Math.floor(Math.random() * colors.length);
-      return colors[randomIndex];
-  };
-
   const majorIcons: any = {
       Agriculture: <MdAgriculture size={45} className="ml-3 mt-3" />,
       Sciences: <FaMicroscope size={45} className="ml-3 mt-3" />,
@@ -126,7 +119,6 @@ const Home = () => {
             <Link to={`/major/${major.id}`} className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
               <p className="text-center text-white  text-lg font-bold">{major.name}</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                {/*<FaHotel size={45} className="ml-3 mt-3" />*/}
                 {majorIcons[major.name]}
               </div>
             </Link>

@@ -9,3 +9,10 @@ export async function getAllMajors() {
   return response.data;
 }
 
+export async function getMajor(id: string) {
+  const response = await axios.get(
+    `${getEndpoint()}/api/majors/${id}`,
+  );
+  return response.data;
+}
+
