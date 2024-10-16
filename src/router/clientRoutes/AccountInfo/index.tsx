@@ -170,10 +170,10 @@ const AccountInfo = () => {
       type="email"
       id="email"
       name="email"
-      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
       value={formValues.email}
       onChange={handleInputChange}
-      required
+      disabled
     />
   </div>
   <div className="columns-1">
