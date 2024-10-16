@@ -10,6 +10,8 @@ import BlogList from "./BlogList";
 import Application from "./Application";
 import ScholarshipProgram from "./ScholarshipProgram";
 import Activity from "./Activity";
+import ChangeEmail from "./ChangeEmail";
+import ChangePassword from "./ChangePassword";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -39,6 +41,13 @@ const publicRoutes: RouteObject[] = [
   {
     path: `${RouteNames.ACCOUNT_INFO}/:id`,
     element: <AccountInfo />,
+  },
+  {
+    path: RouteNames.CHANGE_EMAIL,
+    element: <ChangeEmail />,
+  },{
+    path: RouteNames.CHANGE_PASSWORD,
+    element: <ChangePassword />,
   },
   {
     path: RouteNames.SCHOLARSHIP_PROGRAM,
