@@ -12,6 +12,7 @@ import ScholarshipProgram from "./ScholarshipProgram";
 import Activity from "./Activity";
 import ChangeEmail from "./ChangeEmail";
 import ChangePassword from "./ChangePassword";
+import Major from "./Major";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -48,6 +49,11 @@ const publicRoutes: RouteObject[] = [
   },{
     path: RouteNames.CHANGE_PASSWORD,
     element: <ChangePassword />,
+    
+  },
+  {
+    path: `${RouteNames.MAJOR}/:id`,
+    element: <Major />,
   },
   {
     path: RouteNames.SCHOLARSHIP_PROGRAM,
