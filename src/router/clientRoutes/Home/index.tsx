@@ -3,9 +3,51 @@ import ImageCarousel from "./components/Carousel";
 import attributes from "./data";
 import Attribute from "./components/Attribute";
 import Background2 from "./components/Background2";
-import { MdAgriculture } from "react-icons/md";
+import { MdAgriculture, MdArchitecture, MdFormatPaint } from "react-icons/md";
+import { FaCamera, FaHotel, FaMedkit, FaMicroscope, FaUser } from "react-icons/fa";
+import { BsFillSuitcaseFill, BsFillSuitcaseLgFill, BsRulers, BsTerminal } from "react-icons/bs";
+import { GoLaw } from "react-icons/go";
+import { getAllMajors } from "@/services/ApiServices/majorService";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import ScreenSpinner from "@/components/ScreenSpinner";
+import { Spin } from "antd";
 
 const Home = () => {
+  const [majors, setMajors] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+
+  const fetchMajors = async () => {
+    try {
+      let majors = await getAllMajors();
+      setMajors(majors.data.items);
+    } catch (error: any) {
+      setErrorMessage(
+        error.response?.data?.message ||
+          "An error occurred. Please try again later."
+      );
+    }
+  };
+
+  const majorIcons: any = {
+      Agriculture: <MdAgriculture size={45} className="ml-3 mt-3" />,
+      Sciences: <FaMicroscope size={45} className="ml-3 mt-3" />,
+      Architecture: <MdArchitecture size={45} className="ml-3 mt-3" />,
+      "Business & Management": <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />,
+      "Computer Science": <BsTerminal size={45} className="ml-3 mt-3" />,
+      "Creative Art & Design": <MdFormatPaint size={45} className="ml-3 mt-3" />,
+      "Mechanism & Technology": <BsRulers size={45} className="ml-3 mt-3" />,
+      "Public Health": <FaMedkit size={45} className="ml-3 mt-3" />,
+      Humanities: <FaUser size={45} className="ml-3 mt-3" />,
+      Law: <GoLaw size={45} className="ml-3 mt-3" />,
+      "Social Science & Media": <FaCamera size={45} className="ml-3 mt-3" />,
+      "Tourism & Hotel": <FaHotel size={45} className="ml-3 mt-3" />
+  };
+
+  useEffect(() => {
+    fetchMajors()
+  }, [])
+
   return (
     <>
       <div
@@ -68,90 +110,99 @@ const Home = () => {
       </div>
 
       {/** BROWSER BY DISCIPLINES */}
+      {!majors && <Spin size="large" />}
       <div className="my-10">
         <section className="relative ">
           <p>BROWSE BY DISCIPLINE</p>
-          <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
-            <div className="relative w-[250px] h-[110px] bg-red-600 rounded-lg ">
-              <p className="text-center text-lg font-bold">Agriculture</p>
+          <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
+            {majors && majors.map((major: any) => (
+            <Link to={`/major/${major.id}`} className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">{major.name}</p>
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                {majorIcons[major.name]}
+              </div>
+            </Link>
+            ))}
+            {/*<div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-red-600 rounded-lg ">
+              <p className="text-center text-white text-lg font-bold">Agriculture</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
                 <MdAgriculture size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-pink-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Science</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-pink-600 rounded-lg">
+              <p className="text-center text-white text-lg font-bold">Sciences</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <FaMicroscope size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-green-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Architecture</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-green-600 rounded-lg">
+              <p className="text-center text-white text-lg font-bold">Architecture</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <MdArchitecture size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-yellow-600 rounded-lg">
-              <p className="text-center text-lg font-bold">
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-yellow-600 rounded-lg">
+              <p className="text-center text-white text-lg font-bold">
                 Business & Management
               </p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Computer Science</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">Computer Science</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <BsTerminal size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">
                 Creative Art & Design
               </p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <MdFormatPaint size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">
                 Mechanism & Technology
               </p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <BsRulers size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Public Health</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">Public Health</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <FaMedkit size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Humanities</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">Humanities</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <FaUser size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Law</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">Law</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <GoLaw size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">
                 Social Science & Media
               </p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <FaCamera size={45} className="ml-3 mt-3" />
               </div>
             </div>
-            <div className="relative w-[250px] h-[110px] bg-orange-600 rounded-lg">
-              <p className="text-center text-lg font-bold">Tourism & Hotel</p>
+            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+              <p className="text-center text-white  text-lg font-bold">Tourism & Hotel</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
+                <FaHotel size={45} className="ml-3 mt-3" />
               </div>
-            </div>
+            </div>*/}
           </div>
           <Background2 />
         </section>

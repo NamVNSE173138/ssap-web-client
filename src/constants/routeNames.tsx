@@ -12,6 +12,7 @@ const RouteNames = {
     DASHBOARD: '/admin',
     SCHOLARSHIP_PROGRAM:'scholarship-program',
     ACTIVITY:'/activity',
+    MAJOR:'/major',
 
 }
 
