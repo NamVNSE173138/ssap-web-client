@@ -11,3 +11,11 @@ export async function getAllScholarshipProgram() {
         throw error;
     }
 }
+
+// Fetch an applicant profile by ID
+export async function getAllScholarshipProgramByMajorId(id: number) {
+  const response = await axios.get(
+    `${getEndpoint()}/api/scholarship-programs/by-major-id/${id}`
+  );
+  return response.data;
+}
