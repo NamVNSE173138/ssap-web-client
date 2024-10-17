@@ -2,13 +2,17 @@ import { ScholarshipProgramType } from "../../router/clientRoutes/ScholarshipPro
 import { Separator } from "../ui/separator";
 import { Link } from "react-router-dom";
 // import formatCurrency from "../../lib/currency-formatter";
-import { FaStar } from "react-icons/fa";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { IoLocation } from "react-icons/io5";
+import { GiGraduateCap  } from "react-icons/gi";
+import { FaCalendar } from "react-icons/fa";
+import { RiMoneyDollarCircleFill } from "react-icons/ri";
+
 
 const truncateString = (str: string, num: number) => {
     if (str.length <= num) {
@@ -20,7 +24,7 @@ const truncateString = (str: string, num: number) => {
 const Card = (sholarshipProgram: ScholarshipProgramType) => {
     const truncatedDescription = truncateString(sholarshipProgram.description, 40);
   return (
-    <Link to={`/sholarship-program/${sholarshipProgram.id}`}>
+    <Link to={`/scholarship-program/${sholarshipProgram.id}`}>
       <div className="columns-1 flex flex-col justify-between gap-8 p-4 rounded-3xl shadow shadow-gray-400 cursor-pointer hover:bg-gray-200 hover:scale-105 hover:shadow-xl transition-all">
         {/* <img src={service.serviceImages} alt="service image" className='rounded-3xl' /> */}
         {/* {service.serviceImages.length > 0 && (
@@ -49,21 +53,21 @@ const Card = (sholarshipProgram: ScholarshipProgramType) => {
           <Separator orientation="horizontal" />
           <div className=" flex-row justify-between mt-5 ml-5">
             <div className="flex justify-start items-center gap-2 mb-4">
-              <FaStar color="#FFB142" size={24} />
+              <IoLocation color="#060606" size={24} /> 
               <p>{sholarshipProgram?.providerId}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <FaStar color="#FFB142" size={24} />
+              <GiGraduateCap color="#060606" size={24} />
               <p>{sholarshipProgram?.providerId}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <FaStar color="#FFB142" size={24} />
+              <FaCalendar color="#060606" size={24} />
               <p>28 Oct 2025</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <FaStar color="#FFB142" size={24} />
+              <RiMoneyDollarCircleFill color="#060606" size={24} />
               <p>{sholarshipProgram?.providerId}</p>
-            </div>
+            </div>  
             
             {/* <div className='w-[1px] bg-gray-400'></div>
                         <p>{sholarshipProgram.numberOfRenewals} Đã đặt</p>
