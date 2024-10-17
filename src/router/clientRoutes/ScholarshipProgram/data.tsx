@@ -11,6 +11,14 @@ export type ScholarshipProgramType = {
   createAt: Date;
   updateAt: Date;
   status: string;
+  categories: [
+    {
+      id: string;
+      name: string;
+      description: string;
+      status: string;
+    }
+  ]
 };
 
 export const scholarshipProgram: ScholarshipProgramType[] = [
