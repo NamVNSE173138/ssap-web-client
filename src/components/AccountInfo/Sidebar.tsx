@@ -64,10 +64,11 @@ const Sidebar = ({ className }: SidebarProps) => {
 
     const listItems: ListItemProps[] = [
         { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}/${id}`},
+        { Icon: AiOutlineBarChart, text: 'Change Email', link: ""},
+        { Icon: AiOutlineBarChart, text: 'Change Password', link: ""},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
         { Icon: AiOutlineHistory, text: 'History', link: ""},
-        { Icon: BsChatDots, text: 'Chat', link: ""},
-        { Icon: AiOutlineBarChart, text: 'Statistic', link: ""},
+        { Icon: BsChatDots, text: 'Chat', link: ""},    
         // { Icon: BiLogOutCircle, text: 'Đăng xuất', link: RouteNames.HOME},
     ];
 
