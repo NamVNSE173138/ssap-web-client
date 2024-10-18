@@ -12,6 +12,7 @@ import ScholarshipProgram from "./ScholarshipProgram";
 import Activity from "./Activity";
 import ChangePassword from "./ChangePassword";
 import Major from "./Major";
+import Chat from "./Chat";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -39,7 +40,7 @@ const publicRoutes: RouteObject[] = [
     element: <Application />,
   },
   {
-    path: `${RouteNames.ACCOUNT_INFO}/:id`,
+    path: `${RouteNames.ACCOUNT_INFO}`,
     element: <AccountInfo />,
   },
 {
@@ -58,6 +59,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.ACTIVITY,
     element: <Activity/>,
+  },
+  {
+    path: RouteNames.CHAT,
+    element: <Chat/>,
   },
 
   //  {

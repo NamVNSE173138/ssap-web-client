@@ -7,9 +7,11 @@ import {
 } from "@/services/ApiServices/accountService";
 import { Sidebar } from "@/components/AccountInfo";
 import { GoPencil } from "react-icons/go";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const AccountInfo = () => {
-  const { id } = useParams<{ id: string }>();
+  const user = useSelector((state: RootState) => state.token.user);
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,7 @@ const AccountInfo = () => {
     address: "",
     gender: "",
     status: "",
+    roleId: "",
   });
 
   useEffect(() => {
@@ -30,7 +33,7 @@ const AccountInfo = () => {
 
     const fetchProfile = async () => {
       try {
-        const data = await getAccountById(Number(id));
+        const data = await getAccountById(Number(user?.id));
         if (isMounted) {
           setProfileData(data);
           setFormValues({
@@ -42,6 +45,7 @@ const AccountInfo = () => {
             address: data.address,
             gender: data.gender,
             status: data.status,
+            roleId: data.roleId,
           });
         }
       } catch (error) {
@@ -60,7 +64,7 @@ const AccountInfo = () => {
     return () => {
       isMounted = false; 
     };
-  }, [id]);
+  }, [user?.id]);
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); 
@@ -122,7 +126,7 @@ const AccountInfo = () => {
               <div className="flex flex-col gap-2">
                 <p className="text-xl font-semibold">{profileData?.username}</p>
                 <p className="text-sm lg:text-base">
-                  Ho Chi Minh City, Viet Nam
+                  {user?.role}
                 </p>
               </div>
             </div>
@@ -252,7 +256,7 @@ const AccountInfo = () => {
               <div className="flex flex-col gap-2">
                 <p className="text-xl font-semibold">{profileData?.username}</p>
                 <p className="text-sm lg:text-base">
-                  Ho Chi Minh City, Viet Nam
+                  {user?.role}
                 </p>
               </div>
             </div>

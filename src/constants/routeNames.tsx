@@ -14,7 +14,8 @@ const RouteNames = {
     ACTIVITY:'/activity',
     CHANGE_PASSWORD: '/change-password',
     MAJOR:'/major',
-
+    FORGOT_PASSWORD: '/forgot-password',
+    CHAT: '/chat',
 }
 
 export default RouteNames
