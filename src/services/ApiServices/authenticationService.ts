@@ -15,3 +15,23 @@ export async function RegisterUser(credentials: any) {
   const response = await axios.post(`${getEndpoint()}/api/Authentication/Register`, credentials);
   return response.data;
 }
+
+export async function ChangedPassword(credentials: any) {
+  const response = await axios.post(`${getEndpoint()}/api/Authentication/ChangePassword`, credentials);
+  return response.data;
+}
+
+export async function ForgotPassword(credentials: any) {
+  const response = await axios.post(`${getEndpoint()}/api/Authentication/ForgotPassword`, credentials);
+  return response.data;
+}
+
+export async function VerifyOtp(credentials: any) {
+  const response = await axios.post(`${getEndpoint()}/api/Authentication/VerifyOtp`, credentials);
+  return response.data;
+}
+
+export async function ResetPassword(credentials: any) {
+  const response = await axios.post(`${getEndpoint()}/api/Authentication/ResetPassword`, credentials);
+  return response.data;
+}
