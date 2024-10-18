@@ -115,7 +115,7 @@ const AccountInfo = () => {
             <div className="flex justify-start items-center gap-8">
               <div className="relative cursor-pointer">
                 <img
-                  src="https://via.placeholder.com/150"
+                  src={profileData?.avatar || "https://via.placeholder.com/150"}
                   alt="avatar"
                   className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
                 />
@@ -245,7 +245,7 @@ const AccountInfo = () => {
             <div className="flex justify-start items-center gap-8">
               <div className="relative cursor-pointer">
                 <img
-                  src="https://via.placeholder.com/150"
+                  src={profileData?.avatar || "https://via.placeholder.com/150"}
                   alt="avatar"
                   className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
                 />

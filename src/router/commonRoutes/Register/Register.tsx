@@ -1,6 +1,6 @@
 import RouteNames from "@/constants/routeNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
-import { RegisterUser, RegisterFunder, RegisterProvider } from "@/services/ApiServices/authenticationService";
+import {GoogleAuth, RegisterUser, RegisterFunder, RegisterProvider } from "@/services/ApiServices/authenticationService";
 import parseJwt from "@/services/parseJwt";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -45,6 +45,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [securePassword, setSecurePassword] = useState(true);
   const [selectedRole, setSelectedRole] = useState("applicant");
+  const [error, setError] = useState(null);
 
   const {
     register,
@@ -100,6 +101,18 @@ const Register = () => {
         duration: 5000,
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      let data = await GoogleAuth();
+      window.location = data.url;
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message ||
+          "An error occurred. Please try again later."
+      );
     }
   };
 
@@ -218,6 +231,7 @@ const Register = () => {
                   Sign up
                 </button>
                 <button
+                  onClick={handleGoogleLogin}
                   type="button"
                   className="w-[55%] text-blue-500 bg-white border border-blue-500 rounded-3xl py-3"
                 >

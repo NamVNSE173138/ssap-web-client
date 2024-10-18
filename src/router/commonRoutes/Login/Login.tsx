@@ -1,6 +1,6 @@
 import RouteNames from "@/constants/routeNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
-import { LoginUser } from "@/services/ApiServices/authenticationService";
+import { GoogleAuth, LoginUser } from "@/services/ApiServices/authenticationService";
 import parseJwt from "@/services/parseJwt";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ValidationErrorMessage from "./components/ValidationErrorMessage";
 import { log } from "console";
 import { useToast } from "@/components/ui/use-toast";
+import { Google } from "@mui/icons-material";
 
 
 const formSchema = z.object({
@@ -132,7 +133,17 @@ const { errors } = formState;
     }
   };
   
-
+  const handleGoogleLogin = async () => {
+    try {
+      let data = await GoogleAuth();
+      window.location = data.url;
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message ||
+          "An error occurred. Please try again later."
+      );
+    }
+  };
 
   return (
     //  <>
@@ -299,6 +310,7 @@ const { errors } = formState;
                   Log In
                 </button>
                 <button
+                  onClick={handleGoogleLogin}
                   type="button"
                   className="w-[60%] text-blue-500 bg-white border border-blue-500 rounded-3xl py-3"
                 >

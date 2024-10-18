@@ -9,17 +9,25 @@ import { getMajor } from "@/services/ApiServices/majorService";
 import { Container } from "@mui/material";
 import { Spin } from "antd";
 import { useEffect, useState } from "react";
-import { FaMicroscope } from "react-icons/fa";
+import { FaCamera, FaHotel, FaMedkit, FaMicroscope, FaUser } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
-import { text } from "stream/consumers";
+import { getAllScholarshipProgramByMajorId } from "@/services/ApiServices/scholarshipProgramService";
+import { Card } from "@/components/ScholarshipProgram";
+import ScholarshipProgramSkeleton from "../ScholarshipProgram/ScholarshipProgramSkeleton";
+import { MdAgriculture, MdArchitecture, MdFormatPaint } from "react-icons/md";
+import { BsFillSuitcaseLgFill, BsRulers, BsTerminal } from "react-icons/bs";
+import { GoLaw } from "react-icons/go";
 
 const Major = () => {
   const { id } = useParams<{ id: string}>();
   const [major, setMajor] = useState<any>(null);
+  const [scholarships, setScholarships] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<any>(null);
+  const [scholarshipError, setScholarshipError] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchMajor = async () => {
     try {
@@ -33,6 +41,40 @@ const Major = () => {
       );
     }
   };
+
+  const fetchScholarshipByMajor = async (id: string | undefined) => {
+    try {
+      if(!id) return;
+      let majorId = parseInt(id);
+      setLoading(true);
+      let scholars = await getAllScholarshipProgramByMajorId(majorId);
+      setScholarships(scholars.data);
+      setLoading(false);
+    } catch (error: any) {
+      setScholarshipError(
+        error.response?.data?.message ||
+          "An error occurred. Please try again later."
+      );
+      setLoading(false);
+    }
+  };
+
+  const majorIcons: any = {
+      Agriculture: <MdAgriculture size={75} className="ml-3 mt-3" />,
+      Sciences: <FaMicroscope size={75} className="ml-3 mt-3" />,
+      Architecture: <MdArchitecture size={75} className="ml-3 mt-3" />,
+      "Business & Management": <BsFillSuitcaseLgFill size={75} className="ml-3 mt-3" />,
+      "Computer Science": <BsTerminal size={75} className="ml-3 mt-3" />,
+      "Creative Art & Design": <MdFormatPaint size={75} className="ml-3 mt-3" />,
+      "Mechanism & Technology": <BsRulers size={75} className="ml-3 mt-3" />,
+      "Public Health": <FaMedkit size={75} className="ml-3 mt-3" />,
+      Humanities: <FaUser size={75} className="ml-3 mt-3" />,
+      Law: <GoLaw size={75} className="ml-3 mt-3" />,
+      "Social Science & Media": <FaCamera size={75} className="ml-3 mt-3" />,
+      "Tourism & Hotel": <FaHotel size={75} className="ml-3 mt-3" />
+  };
+
+
 
   const transformToMarkdown = (text: string) => {
       return text.replace(/\\n/gi, "\n").replace(/\n/gi, "<br/>");
@@ -48,6 +90,7 @@ const Major = () => {
 
   useEffect(() => {
     fetchMajor();
+    fetchScholarshipByMajor(id);
   }, []);
 
   if(!major){ 
@@ -87,7 +130,7 @@ const Major = () => {
       <div
         className="flex justify-center items-center"
       >
-        <FaMicroscope size={75} className="ml-3 mt-3" />
+        {majorIcons[major.name]}
       </div>
       <div
         className="flex justify-center items-center"
@@ -96,7 +139,7 @@ const Major = () => {
       </div>
       
     </div>
-    <Container className="w-full p-15 bg-white mb-8" maxWidth="lg">
+    <Container className="w-full p-15 bg-white" maxWidth="lg">
         {/*<p className="text-lg">{major.description}</p>*/}
         <ReactMarkdown 
             components={{ a: CustomLink }}
@@ -105,6 +148,30 @@ const Major = () => {
             remarkPlugins={[remarkGfm]}
         ></ReactMarkdown>
     </Container>
+    <Container className="w-full p-15 mb-8" maxWidth="lg">
+        <h1 className="text-3xl font-bold text-center mb-4">Interesting programmes for you</h1>
+        <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-between items-start gap-10 mt-6">
+        {loading ? (
+          <ScholarshipProgramSkeleton />
+        ) : scholarshipError ? (
+          <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
+            Error loading scholarship programs.
+          </p>
+        ) : scholarships.length == 0 ? (
+          <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
+            No scholarship programs found.
+          </p>
+        ) : (
+          scholarships.map((service: any) => (
+            <li key={service.id}>
+              <Card {...service} />
+            </li>
+          ))
+        )}
+      </menu>
+
+    </Container>
+
     </>
   )
 }

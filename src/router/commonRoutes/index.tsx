@@ -6,6 +6,8 @@ import NotFound from './404';
 import Login from './Login/Login';
 import Register from './Register/Register';
 import ForgetPassword from './ForgotPassword/ForgetPassword';
+import { GoogleAuth } from '@/services/ApiServices/authenticationService';
+import GoogleLogin from './GoogleAuth';
 // import UnauthenticatedRoute from '../UnauthenticatedRoute';
 // import GoogleOAuthCallback from './GoogleOAuthCallback';
 
@@ -42,6 +44,10 @@ const commonRoutes: RouteObject[] = [
     {
         path: RouteNames.NOT_FOUND,
         element: <NotFound />,
+    },
+    {
+        path: RouteNames.GOOGLE,
+        element: <GoogleLogin/>,
     },
 ];
 
