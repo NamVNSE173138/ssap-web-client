@@ -13,7 +13,6 @@ const RouteNames = {
     SCHOLARSHIP_PROGRAM:'scholarship-program',
     ACTIVITY:'/activity',
     CHANGE_PASSWORD: '/change-password',
-    CHANGE_EMAIL: '/change-email',
     MAJOR:'/major',
 
 }
