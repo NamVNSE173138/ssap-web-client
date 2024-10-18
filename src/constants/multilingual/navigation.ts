@@ -8,6 +8,7 @@ const navigation = {
     REGISTER: 'Register',
     LANGUAGE: 'navigation.language.title',
     CHOOSE_LANGUAGE: 'navigation.language.choose_language',
+    CHAT: 'Chat',
 };
 
 export default navigation;

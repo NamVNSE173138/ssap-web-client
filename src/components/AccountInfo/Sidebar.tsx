@@ -63,7 +63,7 @@ const Sidebar = ({ className }: SidebarProps) => {
     const id = user?.id;
 
     const listItems: ListItemProps[] = [
-        { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}/${id}`},
+        { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}`},
         { Icon: AiOutlineBarChart, text: 'Change Password', link: RouteNames.CHANGE_PASSWORD},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
         { Icon: AiOutlineHistory, text: 'History', link: ""},

@@ -292,7 +292,7 @@ const { errors } = formState;
               </div>
               <div className="w-full flex justify-center mb-10">
                 <Link
-                  to=""
+                  to="/forgot-password"
                   className="text-sm font-medium underline cursor-pointer"
                 >
                   Forgot Password
