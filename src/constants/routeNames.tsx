@@ -4,7 +4,7 @@ const RouteNames = {
     EVENTS: '/events',
     BLOGS_LIST: '/blogs-list',
     BLOGS_DETAIL: '/blogs-detail',
-    APPLICATION: '/application',
+    APPLICATION: '/scholarship-program/:id/application',
     LOGIN: '/login',
     REGISTER: '/register',
     GOOGLE: '/login-google',
