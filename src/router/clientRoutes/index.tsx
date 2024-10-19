@@ -10,9 +10,11 @@ import BlogList from "./BlogList";
 import Application from "./Application";
 import ScholarshipProgram from "./ScholarshipProgram";
 import Activity from "./Activity";
-import ChangeEmail from "./ChangeEmail";
 import ChangePassword from "./ChangePassword";
 import Major from "./Major";
+import Chat from "./Chat";
+import ScholarshipProgramDetail from "./ScholarshipProgramDetail";
+import ApplyScholarship from "./ApplyScholarship";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -37,16 +39,13 @@ const publicRoutes: RouteObject[] = [
   },
   {
     path: RouteNames.APPLICATION,
-    element: <Application />,
+    element: <ApplyScholarship/>,
   },
   {
-    path: `${RouteNames.ACCOUNT_INFO}/:id`,
+    path: `${RouteNames.ACCOUNT_INFO}`,
     element: <AccountInfo />,
   },
-  {
-    path: RouteNames.CHANGE_EMAIL,
-    element: <ChangeEmail />,
-  },{
+{
     path: RouteNames.CHANGE_PASSWORD,
     element: <ChangePassword />,
     
@@ -60,8 +59,16 @@ const publicRoutes: RouteObject[] = [
     element: <ScholarshipProgram/>,
   },
   {
+    path: RouteNames.SCHOLARSHIP_PROGRAM_DETAIL,
+    element: <ScholarshipProgramDetail/>,
+  },
+  {
     path: RouteNames.ACTIVITY,
     element: <Activity/>,
+  },
+  {
+    path: RouteNames.CHAT,
+    element: <Chat/>,
   },
 
   //  {

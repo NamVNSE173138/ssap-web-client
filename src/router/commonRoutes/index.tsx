@@ -5,6 +5,7 @@ import { RouteObject } from 'react-router-dom';
 import NotFound from './404';
 import Login from './Login/Login';
 import Register from './Register/Register';
+import ForgetPassword from './ForgotPassword/ForgetPassword';
 import { GoogleAuth } from '@/services/ApiServices/authenticationService';
 import GoogleLogin from './GoogleAuth';
 // import UnauthenticatedRoute from '../UnauthenticatedRoute';
@@ -35,6 +36,10 @@ const commonRoutes: RouteObject[] = [
     {
         path: RouteNames.REGISTER,
         element: <Register />,
+    },
+    {
+        path: RouteNames.FORGOT_PASSWORD,
+        element: <ForgetPassword />,
     },
     {
         path: RouteNames.NOT_FOUND,
