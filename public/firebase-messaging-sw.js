@@ -30,10 +30,10 @@ messaging.onBackgroundMessage((payload) => {
 
   //console.log('Displaying notification with ID:', payload.messageId || 'default-tag');
   //self.registration.showNotification(notificationTitle, notificationOptions);
-  clients.matchAll().then((clientList) => {
+  /*clients.matchAll().then((clientList) => {
     clientList.forEach((client) => {
       client.postMessage(payload);
     });
-  });
+  });*/
 });
 
