@@ -33,7 +33,7 @@ const HeaderAvatar = () => {
         const userId = decodedToken ? decodedToken.id : null; 
 
         if (userId) {
-            navigate(`${RouteNames.ACCOUNT_INFO}/${userId}`);
+            navigate(`${RouteNames.ACCOUNT_INFO}`);
         } else {
             console.error("User ID not found in token");
         }

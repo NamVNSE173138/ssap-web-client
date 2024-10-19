@@ -4,7 +4,7 @@ const RouteNames = {
     EVENTS: '/events',
     BLOGS_LIST: '/blogs-list',
     BLOGS_DETAIL: '/blogs-detail',
-    APPLICATION: '/application',
+    APPLICATION: '/scholarship-program/:id/application',
     LOGIN: '/login',
     REGISTER: '/register',
     GOOGLE: '/login-google',
@@ -16,7 +16,8 @@ const RouteNames = {
     ACTIVITY:'/activity',
     CHANGE_PASSWORD: '/change-password',
     MAJOR:'/major',
-
+    FORGOT_PASSWORD: '/forgot-password',
+    CHAT: '/chat',
 }
 
 export default RouteNames

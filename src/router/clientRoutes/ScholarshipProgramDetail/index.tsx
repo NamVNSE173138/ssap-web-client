@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,12 +16,14 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
+import SchoolLogo from "./logo";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<ScholarshipProgramType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,40 +48,40 @@ const ScholarshipProgramDetail = () => {
 
   //   if (loading) return <Spinner size='large' />;
   //   if (error) return <p>Error: {error}</p>;
-  if (!data) return <p>No scholarship data available</p>;
+  if (!data) return <Spinner size="large" />;
 
   return (
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex justify-start items-center z-10">
-          <div>
-            <Breadcrumb className=" px-20 mt-[-30%]">
-              <BreadcrumbList className="text-white">
-                <BreadcrumbItem>
-                  <Link to="/" className="md:text-xl text-lg">
-                    Home
-                  </Link>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <Link
-                    to="/scholarship-program"
-                    className=" text-white md:text-xl text-lg"
-                  >
-                    Scholarship Program
-                  </Link>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <p className="text-white md:text-xl text-lg">{data.name}</p>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
+        <div>
+          <Breadcrumb className="">
+            <BreadcrumbList className="text-white">
+              <BreadcrumbItem>
+                <Link to="/" className="md:text-xl text-lg">
+                  Home
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <Link
+                  to="/scholarship-program"
+                  className=" text-white md:text-xl text-lg"
+                >
+                  Scholarship Program
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <p className="text-white md:text-xl text-lg">{data.name}</p>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           </div>
-          <div className="mt-[15%] ml-[-38%]">
-            <div className="lg:flex-row items-start lg:items-center flex-col flex gap-[20px] ">
-              <img src="" alt="school logo" />
+          <div className="">
+            <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
+              <SchoolLogo imageUrl={data.imageUrl} />
               <div>
                 <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
                   {data.name}
@@ -89,10 +91,16 @@ const ScholarshipProgramDetail = () => {
                 </p>
               </div>
             </div>
-
-            <button className=" text-white  text-center flex w-full h-[50px] gap-[12px] lg:gap-[20px] mt-[16px] lg:mt-[32px] bg-blue-700 rounded-[25px] ">
-              Apply now
-            </button>
+            <div className="text-white text-center flex h-[50px] mt-[26px] ">
+              <button
+                onClick={() =>
+                  navigate(`/scholarship-program/${id}/application`)
+                }
+                className=" text-xl w-[50%] bg-blue-700 rounded-[25px]"
+              >
+                Apply now{" "}
+              </button>
+            </div>
           </div>
         </div>
       </div>
