@@ -10,6 +10,8 @@ import { removeToken, removeUser } from "@/reducers/tokenSlice";
 import { useDispatch } from "react-redux";
 import { CgProfile } from "react-icons/cg";
 import parseJwt from '@/services/parseJwt';
+import { messaging } from '@/services/firebase';
+import { deleteToken } from 'firebase/messaging';
 
 const HeaderAvatar = () => {
     const navigate = useNavigate();
@@ -18,6 +20,7 @@ const HeaderAvatar = () => {
 
     const handleLogout = () => {
         setIsLoading(true); 
+        deleteToken(messaging);
         setTimeout(() => {
           dispatch(removeToken()); 
           dispatch(removeUser());  
