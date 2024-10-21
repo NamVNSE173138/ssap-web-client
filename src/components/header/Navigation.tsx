@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import navigation from "../../constants/multilingual/navigation";
 import RouteNames from "../../constants/routeNames";
+import DropdownNotification from "@/router/adminRoutes/Dashboard/components/Header/DropdownNotification";
+import DropdownMessage from "@/router/adminRoutes/Dashboard/components/Header/DropdownMessage";
 
 type NavItem = {
   text: string;
@@ -46,6 +48,7 @@ const Navigation = () => {
               <div className="h-[2px] bg-blue-700 scale-x-0 group-hover/nav:scale-x-100 transition" />
             </li>
           ))}
+          <DropdownNotification/>
         </ul>
       </div>
       
