@@ -1,11 +1,63 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
+import { GetAllNotisFromUserId, ReadNotisWithId } from '@/services/ApiServices/notification';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { Badge } from 'antd';
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
 
+  const user = useSelector((state: RootState) => state.token.user);
+
+  const [notis, setNotis] = useState<any>(null);
+  const [unreadNotis, setUnreadNotis] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+
+  const [title, setTitle] = useState("Scholarship Portal");
+
+  const fetchNotis = async () => {
+    try {
+      if(!user) return;
+      let majors = await GetAllNotisFromUserId(parseInt(user.id));
+      setNotis(majors.data.items);
+      let unread = majors.data.items.filter((noti : any) => noti.status === "UNREAD").length
+      setUnreadNotis(unread);
+      if(unread > 0) document.title = `(${unread}) ${title}`
+      else document.title = title
+    } catch (error: any) {
+      setErrorMessage(
+        error.response?.data?.message ||
+          "An error occurred. Please try again later."
+      );
+    }
+  }; 
+
+  const readNotis = async (noti : any) => {
+    try {
+      if(noti.status === "READ") return;
+      noti.status = "READ";
+      let res = await ReadNotisWithId(noti.id);
+      await fetchNotis();
+    } catch (error: any) {
+      setErrorMessage(
+        error.response?.data?.message ||
+          "An error occurred. Please try again later."
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchNotis();
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        fetchNotis();
+    });
+  }, [])
+
+
+  if(!user) return <></>;
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <li>
@@ -18,11 +70,12 @@ const DropdownNotification = () => {
           className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
         >
           <span
-            className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-meta-1 ${
-              notifying === false ? 'hidden' : 'inline'
-            }`}
+            className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full 
+            `}
           >
-            <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
+            <span className="absolute -z-1 inline-flex h-full w-full rounded-full opacity-75"></span>
+
+            <Badge className='absolute ' size='small' count={unreadNotis}/>
           </span>
 
           <svg
@@ -42,16 +95,39 @@ const DropdownNotification = () => {
 
         {dropdownOpen && (
           <div
-            className={`absolute -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80`}
+            className={`absolute z-99 -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80`}
           >
             <div className="px-4.5 py-3">
               <h5 className="text-sm font-medium text-bodydark2">
                 Notification
               </h5>
             </div>
+            {notis.length === 0 && <h6 className="text-lg flex justify-center font-medium text-bodydark">No notification</h6>}
+            {notis && <ul className="flex h-auto flex-col overflow-y-auto">
+              {notis.map((noti: any) => (
+                  <li onClick={async () => await readNotis(noti) } key={noti.id}>
+                      <Link to={noti.link} className='flex items-center border-t border-stroke '>
+                        <div
+                          className="w-11/12 flex flex-col gap-2.5 px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
+                        >
+                          <p className="text-sm">
+                            <span className="text-black dark:text-white">
+                                {noti.title}
+                            </span>{' '}
+                            {noti.body}
+                          </p>
 
-            <ul className="flex h-auto flex-col overflow-y-auto">
-              <li>
+                          <p className="text-xs">{noti.time}</p>
+
+                        </div>
+
+                        {noti.status == "UNREAD" && <div className='h-3 w-3 rounded-full bg-blue-500'></div>}
+
+                      </Link>
+                  </li>
+              ))}
+              
+              {/*<li>
                 <Link
                   className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                   to="#"
@@ -113,8 +189,8 @@ const DropdownNotification = () => {
 
                   <p className="text-xs">01 Dec, 2024</p>
                 </Link>
-              </li>
-            </ul>
+              </li>*/}
+            </ul>}
           </div>
         )}
       </li>

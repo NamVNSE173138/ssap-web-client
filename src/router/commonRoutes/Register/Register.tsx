@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ValidationErrorMessage from "../Login/components/ValidationErrorMessage";
 import { useToast } from "@/components/ui/use-toast";
+import { NotifyNewUser } from "@/services/ApiServices/notification";
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -92,6 +93,7 @@ const Register = () => {
         duration: 5000,
         variant: 'default',
       });
+      await NotifyNewUser(userInfo.id);
     } catch (error: any) {
       setIsLoading(false);
       const errorMessage = error?.response?.data?.message || "An error occurred. Please try again later.";

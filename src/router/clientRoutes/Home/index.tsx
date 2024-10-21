@@ -116,7 +116,7 @@ const Home = () => {
           <p>BROWSE BY DISCIPLINE</p>
           <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
             {majors && majors.map((major: any) => (
-            <Link to={`/major/${major.id}`} className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
+            <Link key={major.id} to={`/major/${major.id}`} className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
               <p className="text-center text-white  text-lg font-bold">{major.name}</p>
               <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
                 {majorIcons[major.name]}

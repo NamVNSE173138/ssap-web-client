@@ -4,7 +4,12 @@
 // import { useEffect } from 'react';
 // import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
-const PrivateRoute = () => {
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
+import { Navigate, Outlet } from "react-router-dom";
+import NotFound from "./commonRoutes/404";
+
+const PrivateRoute = ({ role }: { role: string[] }) => {
     // const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
     // const dispatch = useAppDispatch();
     // const location = useLocation();
@@ -16,11 +21,11 @@ const PrivateRoute = () => {
     // if (isLoading) return <Spinner size='large' />;
 
     // return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
-    return (
-        <>
-            <div>Private Route</div>
-        </>
-    )
+    
+    const user = useSelector((state: RootState) => state.token.user);
+    if(!user) return <Navigate to="/login" replace />
+    if(!role.includes(user?.role)) return <NotFound />
+    return <Outlet />
 };
 
 export default PrivateRoute;

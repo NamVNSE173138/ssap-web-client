@@ -5,9 +5,10 @@ import AdminDashboard from "./Dashboard";
 import ECommerce from "./Dashboard/pages/Dashboard/ECommerce";
 import { Calendar } from "antd";
 import AccountsManagement from "./Dashboard/pages/AccountsManagement";
+import RoleNames from "@/constants/roleNames";
 
 
-const publicRoutes: RouteObject[] = [
+const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.DASHBOARD,
     element: <ECommerce />,
@@ -21,7 +22,7 @@ const publicRoutes: RouteObject[] = [
     element: <AccountsManagement />,
   }
 ];
-const privateRoutes: RouteObject[] = [
+const publicRoutes: RouteObject[] = [
 //   {
 //     path: RouteNames.ACCOUNT_INFO,
 //     element: <Dashboard />,
@@ -29,7 +30,11 @@ const privateRoutes: RouteObject[] = [
 ];
 const adminRoutes: RouteObject[] = [
   {
-    element: <PrivateRoute />,
+    path: "/admin",
+    element: <Navigate to={RouteNames.DASHBOARD} replace />,
+  },
+  {
+    element: <PrivateRoute role={[RoleNames.ADMIN]}/>,
     children: [...privateRoutes],
   },
   ...publicRoutes,

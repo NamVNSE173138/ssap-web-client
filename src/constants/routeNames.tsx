@@ -10,7 +10,7 @@ const RouteNames = {
     GOOGLE: '/login-google',
     NOT_FOUND: '/not-found',
     ACCOUNT_INFO: '/account-info',
-    DASHBOARD: '/admin',
+    DASHBOARD: '/admin/dashboard',
     SCHOLARSHIP_PROGRAM:'/scholarship-program',
     SCHOLARSHIP_PROGRAM_DETAIL:'/scholarship-program/:id',
     ACTIVITY:'/activity',

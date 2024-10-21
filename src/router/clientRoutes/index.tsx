@@ -45,7 +45,7 @@ const publicRoutes: RouteObject[] = [
     path: `${RouteNames.ACCOUNT_INFO}`,
     element: <AccountInfo />,
   },
-{
+  {
     path: RouteNames.CHANGE_PASSWORD,
     element: <ChangePassword />,
     

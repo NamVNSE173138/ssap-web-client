@@ -15,6 +15,7 @@ import ValidationErrorMessage from "./components/ValidationErrorMessage";
 import { log } from "console";
 import { useToast } from "@/components/ui/use-toast";
 import { Google } from "@mui/icons-material";
+import RoleNames from "@/constants/roleNames";
 
 
 const formSchema = z.object({
@@ -101,7 +102,21 @@ const { errors } = formState;
       dispatch(setToken(user.token));
       const userInfo = parseJwt(user.token);
       dispatch(setUser(userInfo));
-      navigate("/");
+      if(userInfo.role === RoleNames.ADMIN) {
+        navigate("/admin");
+      }
+      else if(userInfo.role === RoleNames.FUNDER) {
+        navigate("/funder");
+      }
+      else if(userInfo.role === RoleNames.PROVIDER) {
+        navigate("/provider");
+      }
+      else if(userInfo.role === RoleNames.EXPERT) {
+        navigate("/expert");
+      }
+      else {
+        navigate("/");
+      }
       toast({
         title: "Login Successful.",
         description: "Now you can....",
