@@ -1,4 +1,6 @@
+import RoleNames from "@/constants/roleNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
+import { NotifyNewUser } from "@/services/ApiServices/notification";
 import parseJwt from "@/services/parseJwt";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -13,6 +15,7 @@ const GoogleLogin = () => {
   // Extract query parameters
   const queryParams = new URLSearchParams(location.search);
   const result = queryParams.get('result');
+  const isNewUser = queryParams.get('isNewUser');
   const jwt = queryParams.get('jwt');
 
   useEffect(() => {
@@ -23,7 +26,24 @@ const GoogleLogin = () => {
       dispatch(setToken(jwt));
       const userInfo = parseJwt(jwt);
       dispatch(setUser(userInfo)); 
-      navigate("/");
+      if(userInfo.role === RoleNames.ADMIN) {
+        navigate("/admin");
+      }
+      else if(userInfo.role === RoleNames.FUNDER) {
+        navigate("/funder");
+      }
+      else if(userInfo.role === RoleNames.PROVIDER) {
+        navigate("/provider");
+      }
+      else if(userInfo.role === RoleNames.EXPERT) {
+        navigate("/expert");
+      }
+      else {
+        navigate("/");
+      }
+      if(isNewUser === 'true') {
+          NotifyNewUser(userInfo.id);
+      }
     }
     else {
       navigate("/login");
