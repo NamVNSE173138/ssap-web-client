@@ -23,7 +23,7 @@ const DropdownNotification = () => {
       if(!user) return;
       let majors = await GetAllNotisFromUserId(parseInt(user.id));
       setNotis(majors.data.items);
-      let unread = majors.data.items.filter((noti : any) => noti.status === "UNREAD").length
+      let unread = majors.data.items.filter((noti : any) => !noti.isRead).length
       setUnreadNotis(unread);
       if(unread > 0) document.title = `(${unread}) ${title}`
       else document.title = title
@@ -37,8 +37,8 @@ const DropdownNotification = () => {
 
   const readNotis = async (noti : any) => {
     try {
-      if(noti.status === "READ") return;
-      noti.status = "READ";
+      if(noti.isRead) return;
+      noti.isRead = true;
       let res = await ReadNotisWithId(noti.id);
       await fetchNotis();
     } catch (error: any) {
@@ -106,22 +106,22 @@ const DropdownNotification = () => {
             {notis && <ul className="flex h-auto flex-col overflow-y-auto">
               {notis.map((noti: any) => (
                   <li onClick={async () => await readNotis(noti) } key={noti.id}>
-                      <Link to={noti.link} className='flex items-center border-t border-stroke '>
+                      <Link to={"/"} className='flex items-center border-t border-stroke '>
                         <div
                           className="w-11/12 flex flex-col gap-2.5 px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                         >
                           <p className="text-sm">
                             <span className="text-black dark:text-white">
-                                {noti.title}
+                                {/*noti.title*/}
                             </span>{' '}
-                            {noti.body}
+                            {noti.message}
                           </p>
 
-                          <p className="text-xs">{noti.time}</p>
+                          <p className="text-xs">{noti.sentDate}</p>
 
                         </div>
 
-                        {noti.status == "UNREAD" && <div className='h-3 w-3 rounded-full bg-blue-500'></div>}
+                        {!noti.isRead && <div className='h-3 w-3 rounded-full bg-blue-500'></div>}
 
                       </Link>
                   </li>

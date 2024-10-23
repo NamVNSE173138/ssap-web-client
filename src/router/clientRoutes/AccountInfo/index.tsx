@@ -18,14 +18,13 @@ const AccountInfo = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [formValues, setFormValues] = useState({
     username: "",
-    fullName: "",
     phoneNumber: "",
     email: "",
     hashedPassword: "",
     address: "",
-    gender: "",
     status: "",
     roleId: "",
+    avatarUrl: "",
   });
 
   useEffect(() => {
@@ -38,14 +37,13 @@ const AccountInfo = () => {
           setProfileData(data);
           setFormValues({
             username: data.username,
-            fullName: data.fullName,
             phoneNumber: data.phoneNumber,
             email: data.email,
             hashedPassword: data.hashedPassword,
             address: data.address,
-            gender: data.gender,
             status: data.status,
             roleId: data.roleId,
+            avatarUrl: data.avatarUrl,
           });
         }
       } catch (error) {
@@ -113,16 +111,21 @@ const AccountInfo = () => {
             onSubmit={handleSave}
           >
             <div className="flex justify-start items-center gap-8">
-              <div className="relative cursor-pointer">
+              <label className="relative cursor-pointer">
+               <input
+                type="file"
+                name="avatarUrl"
+                className="hidden"
+                />
                 <img
-                  src={profileData?.avatar || "https://via.placeholder.com/150"}
+                  src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
                   alt="avatar"
                   className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
                 />
                 <div className="bg-[#FFB142] rounded-full w-fit p-1 absolute lg:right-2 right-0 lg:bottom-4 bottom-0">
                   <GoPencil size={24} color="white" />
                 </div>
-              </div>
+              </label>
               <div className="flex flex-col gap-2">
                 <p className="text-xl font-semibold">{profileData?.username}</p>
                 <p className="text-sm lg:text-base">
@@ -144,15 +147,15 @@ const AccountInfo = () => {
     />
   </div>
   <div className="columns-1">
-    <label htmlFor="fullName">Full name:</label>
+    <label htmlFor="email">Email:</label>
     <input
-      type="text"
-      id="fullName"
-      name="fullName"
-      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
-      value={formValues.fullName}
+      type="email"
+      id="email"
+      name="email"
+      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+      value={formValues.email}
       onChange={handleInputChange}
-      required
+      disabled
     />
   </div>
 </div>
@@ -169,18 +172,17 @@ const AccountInfo = () => {
     />
   </div>
   <div className="columns-1">
-    <label htmlFor="email">Email:</label>
+    <label htmlFor="address">Address:</label>
     <input
-      type="email"
-      id="email"
-      name="email"
-      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-      value={formValues.email}
+      type="text"
+      id="address"
+      name="address"
+      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+      value={formValues.address}
       onChange={handleInputChange}
-      disabled
     />
   </div>
-  <div className="columns-1">
+  {/*<div className="columns-1">
     <label htmlFor="password">Password:</label>
     <input
       type="password"
@@ -189,8 +191,8 @@ const AccountInfo = () => {
       value={formValues.hashedPassword || ""}
       readOnly
     />
-  </div>
-  <div className="columns-1">
+  </div>*/}
+  {/*<div className="columns-1">
     <label htmlFor="gender">Gender:</label>
     <select
       id="gender"
@@ -205,19 +207,11 @@ const AccountInfo = () => {
       <option value="Female">Female</option>
       <option value="Others">Others</option>
     </select>
-  </div>
+  </div>*/}
 </div>
 <div className="lg:mx-0 mx-2">
   <div>
-    <label htmlFor="address">Address:</label>
-    <input
-      type="text"
-      id="address"
-      name="address"
-      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
-      value={formValues.address}
-      onChange={handleInputChange}
-    />
+    
   </div>
 </div>
 
@@ -243,16 +237,21 @@ const AccountInfo = () => {
         <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5 ">
           <form className="lg:px-28 flex flex-col gap-12">
             <div className="flex justify-start items-center gap-8">
-              <div className="relative cursor-pointer">
+              <label className="relative cursor-pointer">
+               <input
+                type="file"
+                //name="avatarUrl"
+                className="hidden"
+                />
                 <img
-                  src={profileData?.avatar || "https://via.placeholder.com/150"}
+                  src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
                   alt="avatar"
                   className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
                 />
                 <div className="bg-[#FFB142] rounded-full w-fit p-1 absolute lg:right-2 right-0 lg:bottom-4 bottom-0">
                   <GoPencil size={24} color="white" />
                 </div>
-              </div>
+              </label>
               <div className="flex flex-col gap-2">
                 <p className="text-xl font-semibold">{profileData?.username}</p>
                 <p className="text-sm lg:text-base">
@@ -278,19 +277,20 @@ const AccountInfo = () => {
               </div>
               <div className="columns-1">
                 <label
-                  htmlFor="fullName"
+                  htmlFor="email"
                   className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
                 >
-                  Full name:
+                  Email:
                 </label>
                 <input
-                  type="text"
-                  id="fullName"
-                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={profileData?.fullName || ""}
+                  type="email"
+                  id="email"
+                  className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+                  value={profileData?.email || ""}
                   readOnly
                 />
               </div>
+
             </div>
             <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
               <div className="columns-1">
@@ -310,23 +310,6 @@ const AccountInfo = () => {
               </div>
               <div className="columns-1">
                 <label
-                  htmlFor="email"
-                  className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
-                >
-                  Email:
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-                  value={profileData?.email || ""}
-                  readOnly
-                />
-              </div>
-            </div>
-            <div className="lg:mx-0 mx-2">
-              <div>
-                <label
                   htmlFor="address"
                   className="{(accInfoStyle.label.large, accInfoStyle.label.small)}"
                 >
@@ -341,6 +324,7 @@ const AccountInfo = () => {
                 />
               </div>
             </div>
+            
             <div className="flex justify-center">
               <button
                 type="button"
