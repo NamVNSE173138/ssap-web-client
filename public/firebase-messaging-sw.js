@@ -19,7 +19,6 @@ const messaging = firebase.messaging();
 // Handle background messages
 messaging.onBackgroundMessage((payload) => {
   //console.log('Received background message: ', payload);
-
   const notificationTitle = payload.notification?.title || 'Notification Title';
   const notificationOptions = {
     body: payload.notification?.body || 'Notification Body',
@@ -29,7 +28,7 @@ messaging.onBackgroundMessage((payload) => {
   };
 
   //console.log('Displaying notification with ID:', payload.messageId || 'default-tag');
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  //self.registration.showNotification(notificationTitle, notificationOptions);
   clients.matchAll().then((clientList) => {
     clientList.forEach((client) => {
       client.postMessage(payload);

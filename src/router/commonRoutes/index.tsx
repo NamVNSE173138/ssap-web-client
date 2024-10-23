@@ -8,6 +8,7 @@ import Register from './Register/Register';
 import ForgetPassword from './ForgotPassword/ForgetPassword';
 import { GoogleAuth } from '@/services/ApiServices/authenticationService';
 import GoogleLogin from './GoogleAuth';
+import Chat from '../clientRoutes/Chat';
 // import UnauthenticatedRoute from '../UnauthenticatedRoute';
 // import GoogleOAuthCallback from './GoogleOAuthCallback';
 
@@ -49,6 +50,7 @@ const commonRoutes: RouteObject[] = [
         path: RouteNames.GOOGLE,
         element: <GoogleLogin/>,
     },
+    
 ];
 
 export default commonRoutes;
