@@ -17,16 +17,18 @@ const ClientLayout = () => {
         if(user != null)
             requestNotify(user.id);
         navigator.serviceWorker.addEventListener('message', (event) => {
-            toast({
-                title: event.data.notification.title,
-                description: event.data.notification.body,
-                duration: 5000,
-                variant: 'default',
-                onClickCapture: () => {
-                    navigate(event.data.data.link);
-                    //console.log("decrementUnread");
-                },
-            });
+            if(event.data.notification){
+                toast({
+                    title: event.data.notification.title,
+                    description: event.data.notification.body,
+                    duration: 5000,
+                    variant: 'default',
+                    onClickCapture: () => {
+                        navigate(event.data.data.link);
+                        //console.log("decrementUnread");
+                    },
+                });
+            }
         });
     }, [user]);
 

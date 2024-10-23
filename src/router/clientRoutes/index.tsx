@@ -69,7 +69,8 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.CHAT,
     element: <Chat/>,
-  },
+  }
+  
 
   //  {
  //   path: RouteNames.ACCOUNT_INFO,
