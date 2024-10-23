@@ -29,30 +29,31 @@ const Chat: React.FC = () => {
   const token = useSelector((state: RootState) => state.token.token);
   const connectionRef = useRef<signalR.HubConnection | null>(null); // Reference to SignalR connection
 
+  const fetchAccounts = async () => {
+    if (user == null) {
+      return;
+    }
+    const response = await getAllAccounts();
+    const accountsWithCount = response.map((account: Account) => ({ ...account, unreadCount: 0 }));
+
+    const allMessagesResponse = await getAllMessages(parseInt(user.id));
+    const allMessages = allMessagesResponse.data;
+
+    const updatedAccounts = accountsWithCount.map((account: any) => {
+      const unreadMessages = allMessages.filter((message: any) =>
+        message.senderId === account.id && !message.isRead
+      ).length;
+
+      return {
+        ...account,
+        unreadCount: unreadMessages
+      };
+    });
+
+    setAccounts(updatedAccounts);
+  };
   useEffect(() => {
-    const fetchAccounts = async () => {
-      if (user == null) {
-        return;
-      }
-      const response = await getAllAccounts();
-      const accountsWithCount = response.map((account: Account) => ({ ...account, unreadCount: 0 }));
-
-      const allMessagesResponse = await getAllMessages(parseInt(user.id));
-      const allMessages = allMessagesResponse.data;
-
-      const updatedAccounts = accountsWithCount.map((account: any) => {
-        const unreadMessages = allMessages.filter((message: any) =>
-          message.senderId === account.id && !message.isRead
-        ).length;
-
-        return {
-          ...account,
-          unreadCount: unreadMessages
-        };
-      });
-
-      setAccounts(updatedAccounts);
-    };
+    
     fetchAccounts();
   }, [user]);
 
@@ -105,6 +106,7 @@ const Chat: React.FC = () => {
 
       connection.on("ReceiveMessage", (senderId: number, message: string) => {
           //console.log("AAAA");
+          fetchAccounts();
         if (selectedUser && selectedUser.id === senderId) {
           setChatHistory((prevMessages) => [
             ...prevMessages,
