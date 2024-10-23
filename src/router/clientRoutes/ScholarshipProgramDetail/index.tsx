@@ -17,6 +17,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 import SchoolLogo from "./logo";
+import { useSelector } from "react-redux";
+import RouteNames from "@/constants/routeNames";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +26,8 @@ const ScholarshipProgramDetail = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const user = useSelector((state: any) => state.token.user);
+  const isApplicant = user?.role;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +50,22 @@ const ScholarshipProgramDetail = () => {
     fetchData();
   }, [id]);
 
+  const deleteScholarship = async () => {
+    try {
+      const response = await axios.delete(`http://localhost:5254/api/scholarship-programs/${id}`)
+      if (response.data.statusCode == 200) {
+        setData(response.data.data)
+        navigate(RouteNames.ACTIVITY)
+      } else {
+        setError("Failed to delete scholarship")
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   //   if (loading) return <Spinner size='large' />;
   //   if (error) return <p>Error: {error}</p>;
   if (!data) return <Spinner size="large" />;
@@ -55,29 +75,29 @@ const ScholarshipProgramDetail = () => {
       <div className="relative">
         <ScholarshipProgramBackground />
         <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
-        <div>
-          <Breadcrumb className="">
-            <BreadcrumbList className="text-white">
-              <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">
-                  Home
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <Link
-                  to="/scholarship-program"
-                  className=" text-white md:text-xl text-lg"
-                >
-                  Scholarship Program
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <p className="text-white md:text-xl text-lg">{data.name}</p>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <div>
+            <Breadcrumb className="">
+              <BreadcrumbList className="text-white">
+                <BreadcrumbItem>
+                  <Link to="/" className="md:text-xl text-lg">
+                    Home
+                  </Link>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <Link
+                    to="/scholarship-program"
+                    className=" text-white md:text-xl text-lg"
+                  >
+                    Scholarship Program
+                  </Link>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <p className="text-white md:text-xl text-lg">{data.name}</p>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
           <div className="">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
@@ -92,14 +112,37 @@ const ScholarshipProgramDetail = () => {
               </div>
             </div>
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
-              <button
-                onClick={() =>
-                  navigate(`/scholarship-program/${id}/application`)
-                }
-                className=" text-xl w-[50%] bg-blue-700 rounded-[25px]"
-              >
-                Apply now{" "}
-              </button>
+              {isApplicant == "APPLICANT" ? (
+                <button
+                  onClick={() =>
+                    navigate(`/scholarship-program/${id}/application`)
+                  }
+                  className=" text-xl w-full bg-blue-700 rounded-[25px]"
+                >
+                  Apply now{" "}
+                </button>
+              ) : (
+                <div className="flex justify-between w-full gap-10">
+                  <button
+                    onClick={() => navigate("")}
+                    className=" text-xl w-full  bg-blue-700 rounded-[25px]"
+                  >
+                    Edit{" "}
+                  </button>
+                  <button
+                    onClick={deleteScholarship}
+                    className=" text-xl w-full  bg-red-900 rounded-[25px]"
+                  >
+                    Delete{" "}
+                  </button>
+                  <button
+                    onClick={() => navigate("")}
+                    className=" text-xl w-full bg-green-700 rounded-[25px]"
+                  >
+                    View application{" "}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
