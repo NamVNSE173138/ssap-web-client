@@ -18,6 +18,8 @@ const RouteNames = {
     MAJOR:'/major',
     FORGOT_PASSWORD: '/forgot-password',
     CHAT: '/chat',
+    INFORMATION: '/information',
+    SKILLS: '/skills',
 }
 
 export default RouteNames
