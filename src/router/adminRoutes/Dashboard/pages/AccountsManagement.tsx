@@ -21,7 +21,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import { getAllAccountsWithRole, updateAccount } from "@/services/ApiServices/accountService";
+import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 const AccountsManagement = () => {
@@ -32,12 +32,12 @@ const AccountsManagement = () => {
   const [status, setStatus] = useState("");
 
   const TABLE_HEAD = [
-    "ID", "Username", "Full Name", "Phone Number", "Email", "Address", "Avatar", "Gender", "Status", "Actions"
+    "ID", "Username", "Phone Number", "Email", "Address", "Avatar", "Status", "Actions"
   ];
 
   const fetchAccounts = () => {
     setLoading(true);
-    getAllAccountsWithRole()
+    getAllAccounts()
       .then((data) => {
         setAccounts(data);
       })
@@ -55,8 +55,8 @@ const AccountsManagement = () => {
 
   const handleEditAccount = (account: AccountWithRole) => {
     setCurrentAccount(account);
-    setStatus(account.status || ""); // Get current status
-    setOpenEditDialog(true); // Open dialog
+    setStatus(account.status || "");
+    setOpenEditDialog(true);
   };
 
   const handleDeleteAccount = async (id: string) => {
@@ -67,14 +67,12 @@ const AccountsManagement = () => {
         await updateAccount({
           id: account.id,
           username: account.username,
-          fullName: account.fullName,
           phoneNumber: account.phoneNumber,
           email: account.email,
           hashedPassword: account.hashedPassword,
           roleId: account.roleId,
           address: account.address,
-          avatar: account.avatar,
-          gender: account.gender,
+          avatarUrl: account.avatarUrl,
           status: "INACTIVE", 
           roleName: account.roleName,
         });
@@ -93,10 +91,10 @@ const AccountsManagement = () => {
       try {
         await updateAccount({
           ...currentAccount,
-          status, // Update with new status
+          status, 
         });
-        fetchAccounts(); // Refresh account list
-        setOpenEditDialog(false); // Close dialog
+        fetchAccounts(); 
+        setOpenEditDialog(false); 
       } catch (error) {
         console.error("Error updating account status:", error);
       } finally {
@@ -126,14 +124,12 @@ const AccountsManagement = () => {
               <TableRow key={account.id}>
                 <TableCell>{account.id}</TableCell>
                 <TableCell>{account.username}</TableCell>
-                <TableCell>{account.fullName || "N/A"}</TableCell>
                 <TableCell>{account.phoneNumber || "N/A"}</TableCell>
                 <TableCell>{account.email || "N/A"}</TableCell>
                 <TableCell>{account.address || "N/A"}</TableCell>
                 <TableCell>
-                  <img src={account.avatar || "/default-avatar.png"} alt="Avatar" style={{ height: 40, width: 40, borderRadius: "50%" }} />
+                  <img src={account.avatarUrl || "/default-avatar.png"} alt="Avatar" style={{ height: 40, width: 40, borderRadius: "50%" }} />
                 </TableCell>
-                <TableCell>{account.gender || "N/A"}</TableCell>
                 <TableCell>{account.status || "N/A"}</TableCell>
                 <TableCell>
                   <Tooltip title="Edit Account">
@@ -195,14 +191,13 @@ export default AccountsManagement;
 type AccountWithRole = {
   id: string;
   username: string;
-  fullName?: string;
   phoneNumber?: string;
   email?: string;
   hashedPassword: string;
   roleId?: number;
   address?: string;
-  avatar?: string;
-  gender?: string;
+  loginWithGoogle: boolean;
+  avatarUrl?: string;
   status?: string;
   roleName: string;
 };

@@ -12,14 +12,6 @@ export async function getAllAccounts() {
   return response.data;
 }
 
-export async function getAllAccountsWithRole() {
-  const response = await axios.get(
-    `${getEndpoint()}/api/accounts/with-role`,
-    ngrokSkipWarning
-  );
-  return response.data;
-}
-
 export async function getAccountById(id: number) {
   const response = await axios.get(
     `${getEndpoint()}/api/accounts/${id}`,
@@ -39,7 +31,7 @@ export async function addAccount(accountData: any) {
 
 export async function updateAccount(accountData: any) {
   const response = await axios.put(
-    `${getEndpoint()}/api/accounts`,
+    `${getEndpoint()}/api/accounts/${accountData.id}`,
     accountData,
     ngrokSkipWarning
   );

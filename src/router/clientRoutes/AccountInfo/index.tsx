@@ -240,17 +240,14 @@ const AccountInfo = () => {
               <label className="relative cursor-pointer">
                 <input
                   type="file"
-                  //name="avatarUrl"
                   className="hidden"
+                  disabled
                 />
                 <img
                   src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
                   alt="avatar"
                   className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
                 />
-                <div className="bg-[#FFB142] rounded-full w-fit p-1 absolute lg:right-2 right-0 lg:bottom-4 bottom-0">
-                  <GoPencil size={24} color="white" />
-                </div>
               </label>
               <div className="flex flex-col gap-2">
                 <p className="text-xl font-semibold">{profileData?.username}</p>
