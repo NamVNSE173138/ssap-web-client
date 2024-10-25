@@ -1,5 +1,6 @@
 import axios from "axios";
 import getEndpoint from "../getEndpoint";
+// const BASE_URL = import.meta.env.API_URL as string;
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
