@@ -11,7 +11,7 @@ import { Card } from "@/components/ScholarshipProgram";
 import axios from "axios";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-
+import { BASE_URL } from "@/constants/api";
 const ScholarshipProgram = () => {
   const [data, setData] =
     useState<ScholarshipProgramType[]>(scholarshipProgram);
@@ -23,7 +23,7 @@ const ScholarshipProgram = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5254/api/scholarship-programs"
+          `${BASE_URL}/api/scholarship-programs`
         );
         if (response.data.statusCode === 200) {
           setData(response.data.data);
@@ -43,7 +43,7 @@ const ScholarshipProgram = () => {
   // useEffect(() => {
   //   const fetchCountriesData = async () => {
   //     try {
-  //       const response = await axios.get("http://localhost:5254/api/countries");
+  //       const response = await axios.get(`${BASE_URL}/api/countries`);
   //       console.log("Countries API Response:", response.data);
   //       if (response.data.statusCode === 200) {
   //         const countryNames = response.data.data.map(
