@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { useNavigate, useParams } from "react-router-dom";
+import { BASE_URL } from "@/constants/api";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const ApplyScholarship = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5254/api/applications/add",
+        `${BASE_URL}/api/applications/add`,
         {
           method: "POST",
           headers: {

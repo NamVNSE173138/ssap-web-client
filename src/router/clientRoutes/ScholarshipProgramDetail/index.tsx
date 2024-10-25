@@ -19,6 +19,7 @@ import Button from "@mui/material/Button";
 import SchoolLogo from "./logo";
 import { useSelector } from "react-redux";
 import RouteNames from "@/constants/routeNames";
+import { BASE_URL } from "@/constants/api";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,7 +34,7 @@ const ScholarshipProgramDetail = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5254/api/scholarship-programs/${id}`
+          `${BASE_URL}/api/scholarship-programs/${id}`
         );
         if (response.data.statusCode === 200) {
           setData(response.data.data);
@@ -52,7 +53,7 @@ const ScholarshipProgramDetail = () => {
 
   const deleteScholarship = async () => {
     try {
-      const response = await axios.delete(`http://localhost:5254/api/scholarship-programs/${id}`)
+      const response = await axios.delete(`${BASE_URL}/api/scholarship-programs/${id}`)
       if (response.data.statusCode == 200) {
         setData(response.data.data)
         navigate(RouteNames.ACTIVITY)

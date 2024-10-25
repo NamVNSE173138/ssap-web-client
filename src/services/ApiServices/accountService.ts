@@ -1,13 +1,12 @@
 import axios from "axios";
-import getEndpoint from "../getEndpoint";
-// const BASE_URL = import.meta.env.API_URL as string;
+import { BASE_URL } from "@/constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
 // Fetch all accounts
 export async function getAllAccounts() {
   const response = await axios.get(
-    `${getEndpoint()}/api/accounts`,
+    `${BASE_URL}/api/accounts`,
     ngrokSkipWarning
   );
   return response.data;
@@ -15,7 +14,7 @@ export async function getAllAccounts() {
 
 export async function getAccountById(id: number) {
   const response = await axios.get(
-    `${getEndpoint()}/api/accounts/${id}`,
+    `${BASE_URL}/api/accounts/${id}`,
     ngrokSkipWarning
   );
   return response.data;
@@ -23,7 +22,7 @@ export async function getAccountById(id: number) {
 
 export async function addAccount(accountData: any) {
   const response = await axios.post(
-    `${getEndpoint()}/api/accounts/Add`,
+    `${BASE_URL}/api/accounts/Add`,
     accountData,
     ngrokSkipWarning
   );
@@ -32,7 +31,7 @@ export async function addAccount(accountData: any) {
 
 export async function updateAccount(accountData: any) {
   const response = await axios.put(
-    `${getEndpoint()}/api/accounts/${accountData.id}`,
+    `${BASE_URL}/api/accounts/${accountData.id}`,
     accountData,
     ngrokSkipWarning
   );
@@ -41,7 +40,7 @@ export async function updateAccount(accountData: any) {
 
 export async function deleteAccount(id: number) {
   const response = await axios.delete(
-    `${getEndpoint()}/api/accounts/${id}`,
+    `${BASE_URL}/api/accounts/${id}`,
     ngrokSkipWarning
   );
   return response.data;
