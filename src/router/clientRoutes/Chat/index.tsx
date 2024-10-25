@@ -28,7 +28,7 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const user = useSelector((state: RootState) => state.token.user);
   const token = useSelector((state: RootState) => state.token.token);
-  const connectionRef = useRef<signalR.HubConnection | null>(null); // Reference to SignalR connection
+  const connectionRef = useRef<signalR.HubConnection | null>(null); 
 
   const fetchAccounts = async () => {
     if (user == null) {

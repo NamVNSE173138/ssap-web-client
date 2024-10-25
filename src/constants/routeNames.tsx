@@ -15,7 +15,7 @@ const RouteNames = {
     SCHOLARSHIP_PROGRAM_DETAIL:'/scholarship-program/:id',
     ACTIVITY:'/activity',
     CHANGE_PASSWORD: '/change-password',
-    MAJOR:'/major',
+    MAJOR:'/major/:id',
     FORGOT_PASSWORD: '/forgot-password',
     CHAT: '/chat',
     INFORMATION: '/information',

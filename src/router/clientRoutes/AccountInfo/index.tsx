@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Alert, Spin, message, } from "antd";
-import { useParams } from "react-router-dom";
 import {
   getAccountById,
   updateAccount,
