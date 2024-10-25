@@ -1,20 +1,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-// import { MdOutlinePerson } from 'react-icons/md';
-// import { CgNotes } from 'react-icons/cg';
-// import { PiClockCountdownLight } from 'react-icons/pi';
-// import { FiMessageSquare } from 'react-icons/fi';
-// import { FcStatistics } from 'react-icons/fc';
 import { BiLogOutCircle } from 'react-icons/bi';
 import { IconType } from 'react-icons';
 import { AiOutlineBarChart, AiOutlineHistory, AiOutlineBook, AiOutlineAudit } from 'react-icons/ai';
-import { BsChatDots } from 'react-icons/bs';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import RouteNames from '@/constants/routeNames';
-// import { useAppDispatch } from '@/store';
-// import { clearAuth } from '@/store/authSlice';
 import { AlertDialog } from '@radix-ui/react-alert-dialog';
 import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 import { useDispatch } from "react-redux";
@@ -56,7 +48,6 @@ const ListItem = ({ Icon, text, link }: ListItemProps) => {
 const Sidebar = ({ className }: SidebarProps) => {
     const isAboveMediumScreens = useMediaQuery('(min-width: 1060px)');
     const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
-    // const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = useSelector((state: any) => state.token.user); 
@@ -68,7 +59,7 @@ const Sidebar = ({ className }: SidebarProps) => {
         { Icon: AiOutlineBook, text: 'Skills', link: RouteNames.SKILLS},
         { Icon: AiOutlineBarChart, text: 'Change Password', link: RouteNames.CHANGE_PASSWORD},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
-        { Icon: AiOutlineHistory, text: 'History', link: ""},
+        { Icon: AiOutlineHistory, text: 'History', link: "/history"},
         // { Icon: BiLogOutCircle, text: 'Đăng xuất', link: RouteNames.HOME},
     ];
 

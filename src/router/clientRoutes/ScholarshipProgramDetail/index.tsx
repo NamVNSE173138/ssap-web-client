@@ -113,7 +113,7 @@ const ScholarshipProgramDetail = () => {
               </div>
             </div>
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
-              {isApplicant == "APPLICANT" ? (
+              {isApplicant == "APPLICANT" || !user ? (
                 <button
                   onClick={() =>
                     navigate(`/scholarship-program/${id}/application`)
