@@ -1,10 +1,12 @@
 import FptLogo from "../../assets/FPT_logo.jpg";
 import { ScholarshipProgramType } from "@/router/clientRoutes/ScholarshipProgram/data";
 import { FaStar } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const CreatedCard = (sholarshipProgram: ScholarshipProgramType) => {
   
   return (
+    <Link to={`/scholarship-program/${sholarshipProgram.id}`}>
     <div className="flex flex-row items-center w-[80%] h-full gap-8 p-4 bg-blue-100/80 rounded-[2rem] shadow-lg mt-2 ">
       <div className="w-full h-[90%] grid md:grid-rows-2 grid-rows-1 ">
         <div className="flex flex-row h-[40%]">
@@ -42,6 +44,7 @@ const CreatedCard = (sholarshipProgram: ScholarshipProgramType) => {
       </div>
       {/* <Actions service={service} bookingHubConnection={bookingHubConnection} refetch={refetch}/> */}
     </div>
+    </Link>
   );
 };
 

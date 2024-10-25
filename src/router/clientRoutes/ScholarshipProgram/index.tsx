@@ -17,6 +17,7 @@ const ScholarshipProgram = () => {
     useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [countries, setCountries] = useState<{ name: string }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,28 +40,77 @@ const ScholarshipProgram = () => {
     fetchData();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchCountriesData = async () => {
+  //     try {
+  //       const response = await axios.get("http://localhost:5254/api/countries");
+  //       console.log("Countries API Response:", response.data);
+  //       if (response.data.statusCode === 200) {
+  //         const countryNames = response.data.data.map(
+  //           (country: { name: string }) => ({
+  //             name: country.name,
+  //           })
+  //         );
+  //         setCountries(countryNames);
+  //       } else {
+  //         setError("Failed to fetch countries data");
+  //       }
+  //     } catch (err) {
+  //       setError((err as Error).message);
+  //     }
+  //   };
+
+  //   fetchCountriesData();
+  // }, []);
+
   return (
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] z-10">
-        <div>
-          <Breadcrumb className=" ">
-            <BreadcrumbList className="text-white">
-              <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">
-                  Home
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <p className="text-white md:text-xl text-lg">
-                  Scholarship Program
-                </p>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[70px] z-10">
+          <div>
+            <Breadcrumb className=" ">
+              <BreadcrumbList className="text-white">
+                <BreadcrumbItem>
+                  <Link to="/" className="md:text-xl text-lg">
+                    Home
+                  </Link>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <p className="text-white md:text-xl text-lg">
+                    Scholarship Program
+                  </p>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
+          <form action="" className="">
+            <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-[1fr_120px]">
+              <div className="flex gap-[16px] flex-col lg:flex-row">
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px]  cursor-pointer ">
+                  <label hidden>Study Level</label>
+                  <select className="">
+                    <option>Select study level</option>
+                  </select>
+                </div>
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px]  cursor-pointer">
+                  <label hidden>Study destination</label>
+                  <select>
+                    <option>Select a study destination</option>
+                    {countries.map((country, index) => (
+                      <option key={index} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className=" flex w-full text-white bg-blue-500 justify-center ">
+                <button>Search</button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
       <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-between items-start gap-10 mt-10 my-8  px-12">

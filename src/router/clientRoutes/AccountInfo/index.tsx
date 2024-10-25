@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Alert,Spin,message,} from "antd";
+import { Alert, Spin, message, } from "antd";
 import { useParams } from "react-router-dom";
 import {
   getAccountById,
@@ -60,12 +60,12 @@ const AccountInfo = () => {
     fetchProfile();
 
     return () => {
-      isMounted = false; 
+      isMounted = false;
     };
   }, [user?.id]);
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setIsEditing(true);
   };
 
@@ -112,10 +112,10 @@ const AccountInfo = () => {
           >
             <div className="flex justify-start items-center gap-8">
               <label className="relative cursor-pointer">
-               <input
-                type="file"
-                name="avatarUrl"
-                className="hidden"
+                <input
+                  type="file"
+                  name="avatarUrl"
+                  className="hidden"
                 />
                 <img
                   src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
@@ -134,55 +134,55 @@ const AccountInfo = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-  <div className="columns-1">
-    <label htmlFor="username">Username:</label>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
-      value={formValues.username}
-      onChange={handleInputChange}
-      required
-    />
-  </div>
-  <div className="columns-1">
-    <label htmlFor="email">Email:</label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
-      value={formValues.email}
-      onChange={handleInputChange}
-      disabled
-    />
-  </div>
-</div>
-<div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-  <div className="columns-1">
-    <label htmlFor="phoneNumber">Phone number:</label>
-    <input
-      type="text"
-      id="phoneNumber"
-      name="phoneNumber"
-      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
-      value={formValues.phoneNumber}
-      onChange={handleInputChange}
-    />
-  </div>
-  <div className="columns-1">
-    <label htmlFor="address">Address:</label>
-    <input
-      type="text"
-      id="address"
-      name="address"
-      className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
-      value={formValues.address}
-      onChange={handleInputChange}
-    />
-  </div>
-  {/*<div className="columns-1">
+              <div className="columns-1">
+                <label htmlFor="username">Username:</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+                  value={formValues.username}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="columns-1">
+                <label htmlFor="email">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+                  value={formValues.email}
+                  onChange={handleInputChange}
+                  disabled
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
+              <div className="columns-1">
+                <label htmlFor="phoneNumber">Phone number:</label>
+                <input
+                  type="text"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+                  value={formValues.phoneNumber}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="columns-1">
+                <label htmlFor="address">Address:</label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+                  value={formValues.address}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {/*<div className="columns-1">
     <label htmlFor="password">Password:</label>
     <input
       type="password"
@@ -192,7 +192,7 @@ const AccountInfo = () => {
       readOnly
     />
   </div>*/}
-  {/*<div className="columns-1">
+              {/*<div className="columns-1">
     <label htmlFor="gender">Gender:</label>
     <select
       id="gender"
@@ -208,12 +208,12 @@ const AccountInfo = () => {
       <option value="Others">Others</option>
     </select>
   </div>*/}
-</div>
-<div className="lg:mx-0 mx-2">
-  <div>
-    
-  </div>
-</div>
+            </div>
+            <div className="lg:mx-0 mx-2">
+              <div>
+
+              </div>
+            </div>
 
 
             <div className="flex justify-center ">
@@ -238,19 +238,16 @@ const AccountInfo = () => {
           <form className="lg:px-28 flex flex-col gap-12">
             <div className="flex justify-start items-center gap-8">
               <label className="relative cursor-pointer">
-               <input
-                type="file"
-                //name="avatarUrl"
-                className="hidden"
+                <input
+                  type="file"
+                  className="hidden"
+                  disabled
                 />
                 <img
                   src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
                   alt="avatar"
                   className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
                 />
-                <div className="bg-[#FFB142] rounded-full w-fit p-1 absolute lg:right-2 right-0 lg:bottom-4 bottom-0">
-                  <GoPencil size={24} color="white" />
-                </div>
               </label>
               <div className="flex flex-col gap-2">
                 <p className="text-xl font-semibold">{profileData?.username}</p>
@@ -324,7 +321,7 @@ const AccountInfo = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-center">
               <button
                 type="button"

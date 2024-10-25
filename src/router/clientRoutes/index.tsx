@@ -15,6 +15,7 @@ import Major from "./Major";
 import Chat from "./Chat";
 import ScholarshipProgramDetail from "./ScholarshipProgramDetail";
 import ApplyScholarship from "./ApplyScholarship";
+import Information from "./Information";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -39,7 +40,7 @@ const publicRoutes: RouteObject[] = [
   },
   {
     path: RouteNames.APPLICATION,
-    element: <ApplyScholarship/>,
+    element: <ApplyScholarship />,
   },
   {
     path: `${RouteNames.ACCOUNT_INFO}`,
@@ -48,7 +49,7 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.CHANGE_PASSWORD,
     element: <ChangePassword />,
-    
+
   },
   {
     path: `${RouteNames.MAJOR}/:id`,
@@ -56,33 +57,37 @@ const publicRoutes: RouteObject[] = [
   },
   {
     path: RouteNames.SCHOLARSHIP_PROGRAM,
-    element: <ScholarshipProgram/>,
+    element: <ScholarshipProgram />,
   },
   {
     path: RouteNames.SCHOLARSHIP_PROGRAM_DETAIL,
-    element: <ScholarshipProgramDetail/>,
+    element: <ScholarshipProgramDetail />,
   },
   {
     path: RouteNames.ACTIVITY,
-    element: <Activity/>,
+    element: <Activity />,
   },
   {
     path: RouteNames.CHAT,
-    element: <Chat/>,
+    element: <Chat />,
+  },
+  {
+    path: RouteNames.INFORMATION,
+    element: <Information />,
   }
-  
+
 
   //  {
- //   path: RouteNames.ACCOUNT_INFO,
+  //   path: RouteNames.ACCOUNT_INFO,
   //  element: <AccountInfo />,
   //},
 
 ];
 //const privateRoutes: RouteObject[] = [
-  // {
-  //   path: `${RouteNames.ACCOUNT_INFO}/:id`,
-  //   element: <AccountInfo />,
-  // },
+// {
+//   path: `${RouteNames.ACCOUNT_INFO}/:id`,
+//   element: <AccountInfo />,
+// },
 
 
 // const privateRoutes: RouteObject[] = [
