@@ -85,16 +85,16 @@ const ScholarshipProgram = () => {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <form action="" className="">
+          <form action="" className="w-full">
             <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-[1fr_120px]">
               <div className="flex gap-[16px] flex-col lg:flex-row">
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px]  cursor-pointer ">
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
                   <label hidden>Study Level</label>
                   <select className="">
                     <option>Select study level</option>
                   </select>
                 </div>
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px]  cursor-pointer">
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full cursor-pointer">
                   <label hidden>Study destination</label>
                   <select>
                     <option>Select a study destination</option>
@@ -106,7 +106,7 @@ const ScholarshipProgram = () => {
                   </select>
                 </div>
               </div>
-              <div className=" flex w-full text-white bg-blue-500 justify-center ">
+              <div className=" flex w-full text-white bg-blue-500 justify-center rounded-full">
                 <button>Search</button>
               </div>
             </div>
