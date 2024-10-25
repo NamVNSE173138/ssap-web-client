@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { z } from "zod";
+import { BASE_URL } from "@/constants/api";
 
 interface CreateScholarshipModalProps {
   isOpen: boolean;
@@ -53,7 +54,7 @@ const CreateScholarshipModal = ({
 //     setLoading(true);
 //     try {
 //       const response = await axios.get(
-//         `http://localhost:5254/api/scholarship-programs/by-funder-id/${funderId}`
+//         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
 //       );
 //       if (response.data.statusCode === 200) {
 //         setData(response.data.data);
@@ -93,7 +94,7 @@ const CreateScholarshipModal = ({
       };
 
       const response = await axios.post(
-        "http://localhost:5254/api/scholarship-programs",
+        `${BASE_URL}/api/scholarship-programs`,
         postData
       );
 
@@ -110,7 +111,7 @@ const CreateScholarshipModal = ({
   useEffect(() => {
     if (isOpen) {
       axios
-        .get("http://localhost:5254/api/categories")
+        .get(`${BASE_URL}/api/categories`)
         .then((response) => {
           setCategories(response.data.data);
         })

@@ -9,6 +9,7 @@ import axios from "axios";
 import scholarshipProgram, {
   ScholarshipProgramType,
 } from "../ScholarshipProgram/data";
+import { BASE_URL } from "@/constants/api";
 
 const Activity = () => {
   const user = useSelector((state: any) => state.token.user);
@@ -28,7 +29,7 @@ const Activity = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5254/api/scholarship-programs/by-funder-id/${funderId}`
+          `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
         );
         if (response.data.statusCode === 200) {
           setData(response.data.data);
