@@ -19,7 +19,8 @@ type User = {
 
 const initialState = {
   token: localStorage.getItem('token') || null,
-  user: parseJwt(localStorage.getItem('token')) as User | null
+  user: parseJwt(localStorage.getItem('token')) as User | null,
+  avatar: localStorage.getItem('avatar') || null,
 };
 
 const tokenSlice = createSlice({
@@ -36,10 +37,22 @@ const tokenSlice = createSlice({
     },
     setUser(state, action) {
       state.user = action.payload;
+      localStorage.setItem('avatar', action.payload.avatar);
+      state.avatar = action.payload.avatar;
     },
     removeUser(state) {
       state.user = null;
-    }
+      localStorage.removeItem('token');
+      state.avatar = null;
+    },
+    setAvatar(state, action) {
+      localStorage.setItem('avatar', action.payload);
+      state.avatar = action.payload;
+    },
+    removeAvatar(state) {
+      localStorage.removeItem('avatar');
+      state.avatar = null;
+    },
   }
 });
 

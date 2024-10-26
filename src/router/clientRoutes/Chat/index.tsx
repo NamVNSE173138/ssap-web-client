@@ -180,7 +180,7 @@ const Chat: React.FC = () => {
               <img
                 src={account.avatarUrl || "https://via.placeholder.com/40"}
                 alt={account.username}
-                style={{ borderRadius: "50%", marginRight: "20px", width: "40px", height: "40px" }}
+                style={{width:"40px", height:"40px", borderRadius: "50%", marginRight: "20px" }}
               />
               <span>{account.username}</span>
               {account.unreadCount > 0 && (

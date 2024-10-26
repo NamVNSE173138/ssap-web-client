@@ -15,7 +15,7 @@ import { deleteToken } from 'firebase/messaging';
 import { RootState } from '@/store/store';
 
 const HeaderAvatar = () => {
-    const user = useSelector((state: RootState) => state.token.user);
+    const avatar = useSelector((state: RootState) => state.token.avatar);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +49,7 @@ const HeaderAvatar = () => {
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Avatar>
-                        <AvatarImage src={user?.avatar != "" ? user?.avatar : "https://github.com/shadcn.png"} alt="@shadcn" />
+                        <AvatarImage src={avatar != null ? avatar : "https://github.com/shadcn.png"} alt="@shadcn" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
