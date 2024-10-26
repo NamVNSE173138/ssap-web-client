@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import navigation from "../../constants/multilingual/navigation";
 import RouteNames from "../../constants/routeNames";
 import DropdownNotification from "@/router/adminRoutes/Dashboard/components/Header/DropdownNotification";
-import DropdownMessage from "@/router/adminRoutes/Dashboard/components/Header/DropdownMessage";
 
 type NavItem = {
   text: string;
@@ -21,11 +20,6 @@ const navItems: NavItem[] = [
   {
     text: navigation.BLOGS,
     to: RouteNames.BLOGS_LIST,
-  },
-
-  {
-    text: navigation.APPLICATION,
-    to: RouteNames.APPLICATION,
   },
   {
     text: navigation.SCHOLARSHIP_PROGRAM,

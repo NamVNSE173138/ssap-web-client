@@ -1,8 +1,8 @@
 import axios from "axios";
-import getEndpoint from "../getEndpoint";
+import { BASE_URL } from "@/constants/api";
 
 export async function sendMessage(senderId: number, receiverId: number, message: string) {
-  const response = await axios.post(`${getEndpoint()}/api/chat/send-message`, {
+  const response = await axios.post(`${BASE_URL}/api/chats/send-message`, {
     senderId,
     receiverId,
     message,
@@ -11,7 +11,7 @@ export async function sendMessage(senderId: number, receiverId: number, message:
 }
 
 export async function getChatHistory(userId: number, contactId: number) {
-  const response = await axios.post(`${getEndpoint()}/api/chat/history`, {
+  const response = await axios.post(`${BASE_URL}/api/chats/history`, {
     userId,
     contactId,
   });
@@ -19,7 +19,7 @@ export async function getChatHistory(userId: number, contactId: number) {
 }
 
 export async function getAllMessages(receiverId: number) {
-    const response = await axios.get(`${getEndpoint()}/api/chat/all-messages/${receiverId}`);
+    const response = await axios.get(`${BASE_URL}/api/chats/all-messages/${receiverId}`);
     return response.data;
   }
   

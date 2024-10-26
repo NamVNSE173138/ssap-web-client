@@ -4,6 +4,7 @@ import { RootState } from "@/store/store";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import * as signalR from "@microsoft/signalr";
+import { BASE_URL } from "@/constants/api";
 
 interface Account {
   id: number;
@@ -27,7 +28,7 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const user = useSelector((state: RootState) => state.token.user);
   const token = useSelector((state: RootState) => state.token.token);
-  const connectionRef = useRef<signalR.HubConnection | null>(null); // Reference to SignalR connection
+  const connectionRef = useRef<signalR.HubConnection | null>(null); 
 
   const fetchAccounts = async () => {
     if (user == null) {
@@ -98,7 +99,7 @@ const Chat: React.FC = () => {
     const connectSignalR = async () => {
       if (user == null || token == null) return;
       const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`http://localhost:5254/chat?userId=${user.id}`, {
+        .withUrl(`${BASE_URL}/chat?userId=${user.id}`, {
           transport: signalR.HttpTransportType.WebSockets,
           withCredentials: true,
         })
@@ -179,7 +180,7 @@ const Chat: React.FC = () => {
               <img
                 src={account.avatarUrl || "https://via.placeholder.com/40"}
                 alt={account.username}
-                style={{ borderRadius: "50%", marginRight: "20px" }}
+                style={{ borderRadius: "50%", marginRight: "20px", width: "40px", height: "40px" }}
               />
               <span>{account.username}</span>
               {account.unreadCount > 0 && (

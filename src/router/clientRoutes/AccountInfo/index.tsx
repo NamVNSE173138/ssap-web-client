@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { Alert, Spin, message, } from "antd";
-import { useParams } from "react-router-dom";
 import {
+    changeAvatar,
   getAccountById,
   updateAccount,
 } from "@/services/ApiServices/accountService";
 import { Sidebar } from "@/components/AccountInfo";
 import { GoPencil } from "react-icons/go";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { log } from "console";
+import { setUser } from "@/reducers/tokenSlice";
 
 const AccountInfo = () => {
   const user = useSelector((state: RootState) => state.token.user);
+  const dispatch = useDispatch();
   const [profileData, setProfileData] = useState<any>(null);
+  const [avatarFile, setAvatarFile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -27,7 +31,9 @@ const AccountInfo = () => {
     avatarUrl: "",
   });
 
+
   useEffect(() => {
+
     let isMounted = true;
 
     const fetchProfile = async () => {
@@ -78,13 +84,36 @@ const AccountInfo = () => {
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      await updateAccount({ ...formValues, Id: profileData.id });
-      message.success("Profile updated successfully!");
+    try 
+    {
       setProfileData({ ...profileData, ...formValues });
+      //console.log(profileData);
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("File", avatarFile);
+        setAvatarFile(null);
+        setLoading(true);
+        await changeAvatar(profileData.id, formData);
+      }
+      var updated = await getAccountById(profileData.id);
+      dispatch(setUser({ ...user, avatar: updated.avatarUrl }));
+      await updateAccount({ ...formValues, avatarUrl: updated.avatarUrl, id: profileData.id });
+      setLoading(false);
+      message.success("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
+      setLoading(false);
       message.error("Failed to update profile.");
+    }
+  };
+
+  const handleAvatarChange = async (e: any) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        const fileUrl = URL.createObjectURL(file);
+        setFormValues({ ...formValues, avatarUrl: fileUrl });
+        setProfileData({ ...profileData, avatarUrl: fileUrl });
+        setAvatarFile(file);
     }
   };
 
@@ -115,12 +144,13 @@ const AccountInfo = () => {
                 <input
                   type="file"
                   name="avatarUrl"
+                  onChange={handleAvatarChange}
                   className="hidden"
                 />
                 <img
                   src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
                   alt="avatar"
-                  className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
+                  className="rounded-full lg:w-32 lg:h-32 w-24 h-24 ml-7 lg:ml-0"
                 />
                 <div className="bg-[#FFB142] rounded-full w-fit p-1 absolute lg:right-2 right-0 lg:bottom-4 bottom-0">
                   <GoPencil size={24} color="white" />
@@ -246,7 +276,7 @@ const AccountInfo = () => {
                 <img
                   src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
                   alt="avatar"
-                  className="rounded-full lg:w-32 w-24 ml-7 lg:ml-0"
+                  className="rounded-full lg:w-32 lg:h-32 w-24 h-24 ml-7 lg:ml-0"
                 />
               </label>
               <div className="flex flex-col gap-2">

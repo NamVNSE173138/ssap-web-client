@@ -1,11 +1,22 @@
 import Background from "./components/Background";
-import ImageCarousel from "./components/Carousel";
+import BackgroundImage from "./components/Carousel";
 import attributes from "./data";
 import Attribute from "./components/Attribute";
 import Background2 from "./components/Background2";
 import { MdAgriculture, MdArchitecture, MdFormatPaint } from "react-icons/md";
-import { FaCamera, FaHotel, FaMedkit, FaMicroscope, FaUser } from "react-icons/fa";
-import { BsFillSuitcaseFill, BsFillSuitcaseLgFill, BsRulers, BsTerminal } from "react-icons/bs";
+import {
+  FaCamera,
+  FaHotel,
+  FaMedkit,
+  FaMicroscope,
+  FaUser,
+} from "react-icons/fa";
+import {
+  BsFillSuitcaseFill,
+  BsFillSuitcaseLgFill,
+  BsRulers,
+  BsTerminal,
+} from "react-icons/bs";
 import { GoLaw } from "react-icons/go";
 import { getAllMajors } from "@/services/ApiServices/majorService";
 import { useEffect, useState } from "react";
@@ -30,31 +41,33 @@ const Home = () => {
   };
 
   const majorIcons: any = {
-      Agriculture: <MdAgriculture size={45} className="ml-3 mt-3" />,
-      Sciences: <FaMicroscope size={45} className="ml-3 mt-3" />,
-      Architecture: <MdArchitecture size={45} className="ml-3 mt-3" />,
-      "Business & Management": <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />,
-      "Computer Science": <BsTerminal size={45} className="ml-3 mt-3" />,
-      "Creative Art & Design": <MdFormatPaint size={45} className="ml-3 mt-3" />,
-      "Mechanism & Technology": <BsRulers size={45} className="ml-3 mt-3" />,
-      "Public Health": <FaMedkit size={45} className="ml-3 mt-3" />,
-      Humanities: <FaUser size={45} className="ml-3 mt-3" />,
-      Law: <GoLaw size={45} className="ml-3 mt-3" />,
-      "Social Science & Media": <FaCamera size={45} className="ml-3 mt-3" />,
-      "Tourism & Hotel": <FaHotel size={45} className="ml-3 mt-3" />
+    Agriculture: <MdAgriculture size={45} className="ml-3 mt-3" />,
+    Sciences: <FaMicroscope size={45} className="ml-3 mt-3" />,
+    Architecture: <MdArchitecture size={45} className="ml-3 mt-3" />,
+    "Business & Management": (
+      <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />
+    ),
+    "Computer Science": <BsTerminal size={45} className="ml-3 mt-3" />,
+    "Creative Art & Design": <MdFormatPaint size={45} className="ml-3 mt-3" />,
+    "Mechanism & Technology": <BsRulers size={45} className="ml-3 mt-3" />,
+    "Public Health": <FaMedkit size={45} className="ml-3 mt-3" />,
+    Humanities: <FaUser size={45} className="ml-3 mt-3" />,
+    Law: <GoLaw size={45} className="ml-3 mt-3" />,
+    "Social Science & Media": <FaCamera size={45} className="ml-3 mt-3" />,
+    "Tourism & Hotel": <FaHotel size={45} className="ml-3 mt-3" />,
   };
 
   useEffect(() => {
-    fetchMajors()
-  }, [])
+    fetchMajors();
+  }, []);
 
   return (
     <>
-      <div
+      {/* <div
         className="max-h-full max-w-full mt-[2px]"
         style={{ backgroundColor: "#BBD4EA" }}
       >
-        {/** LANDING PAGE */}
+        
         <section className="flex justify-around flex-row mx-32">
           <section className="p-14">
             <p className="w-[65%] text-3xl text-center text-white font-semibold drop-shadow-lg my-10">
@@ -86,6 +99,42 @@ const Home = () => {
             <ImageCarousel />
           </section>
         </section>
+      </div> */}
+      <div className="relative">
+        <BackgroundImage />
+        <div className="absolute inset-0 flex flex-col justify-center text-white max-w-[85%] m-auto">
+          <div className="text-center max-w-[60%] items-start">
+            <p className="text-3xl font-semibold drop-shadow-lg my-10">
+              THE FUTURE BELONGS TO THOSE WHO BELIEVE IN THE BEAUTY OF THEIR
+              DREAMS
+            </p>
+            <p className="text-2xl font-semibold drop-shadow-lg">
+              Create Your Own Tomorrow
+            </p>
+            <p className="text-lg font-semibold drop-shadow-lg">
+              Discover thousands of Master's degrees worldwide!
+            </p>
+          </div>
+          <div className="flex items-center pt-10">
+  <input
+    className="h-14 px-4"
+    type="text"
+    placeholder="What to study"
+  />
+  <input
+    className="h-14 px-4"
+    type="text"
+    placeholder="Where to study"
+  />
+  <button
+    className="h-14 w-[20%] text-white"
+    style={{ backgroundColor: "#5559C7" }}
+  >
+    Find scholarship
+  </button>
+</div>
+
+        </div>
       </div>
 
       {/** HOW TO APPLY */}
@@ -115,94 +164,21 @@ const Home = () => {
         <section className="relative ">
           <p>BROWSE BY DISCIPLINE</p>
           <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
-            {majors && majors.map((major: any) => (
-            <Link key={major.id} to={`/major/${major.id}`} className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">{major.name}</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                {majorIcons[major.name]}
-              </div>
-            </Link>
-            ))}
-            {/*<div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-red-600 rounded-lg ">
-              <p className="text-center text-white text-lg font-bold">Agriculture</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdAgriculture size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-pink-600 rounded-lg">
-              <p className="text-center text-white text-lg font-bold">Sciences</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <FaMicroscope size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-green-600 rounded-lg">
-              <p className="text-center text-white text-lg font-bold">Architecture</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdArchitecture size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-yellow-600 rounded-lg">
-              <p className="text-center text-white text-lg font-bold">
-                Business & Management
-              </p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">Computer Science</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <BsTerminal size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">
-                Creative Art & Design
-              </p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <MdFormatPaint size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">
-                Mechanism & Technology
-              </p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <BsRulers size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">Public Health</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <FaMedkit size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">Humanities</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <FaUser size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">Law</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <GoLaw size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">
-                Social Science & Media
-              </p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <FaCamera size={45} className="ml-3 mt-3" />
-              </div>
-            </div>
-            <div className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg">
-              <p className="text-center text-white  text-lg font-bold">Tourism & Hotel</p>
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                <FaHotel size={45} className="ml-3 mt-3" />
-              </div>
-            </div>*/}
+            {majors &&
+              majors.map((major: any) => (
+                <Link
+                  key={major.id}
+                  to={`/major/${major.id}`}
+                  className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg"
+                >
+                  <p className="text-center text-white  text-lg font-bold">
+                    {major.name}
+                  </p>
+                  <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
+                    {majorIcons[major.name]}
+                  </div>
+                </Link>
+              ))}
           </div>
           <Background2 />
         </section>

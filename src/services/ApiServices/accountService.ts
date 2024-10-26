@@ -1,12 +1,12 @@
 import axios from "axios";
-import getEndpoint from "../getEndpoint";
+import { BASE_URL } from "@/constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
 // Fetch all accounts
 export async function getAllAccounts() {
   const response = await axios.get(
-    `${getEndpoint()}/api/accounts`,
+    `${BASE_URL}/api/accounts`,
     ngrokSkipWarning
   );
   return response.data;
@@ -14,7 +14,7 @@ export async function getAllAccounts() {
 
 export async function getAccountById(id: number) {
   const response = await axios.get(
-    `${getEndpoint()}/api/accounts/${id}`,
+    `${BASE_URL}/api/accounts/${id}`,
     ngrokSkipWarning
   );
   return response.data;
@@ -22,16 +22,29 @@ export async function getAccountById(id: number) {
 
 export async function addAccount(accountData: any) {
   const response = await axios.post(
-    `${getEndpoint()}/api/accounts/Add`,
+    `${BASE_URL}/api/accounts/Add`,
     accountData,
     ngrokSkipWarning
   );
   return response.data;
 }
 
+export async function changeAvatar(id: number, accountData: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/accounts/${id}/change-avatar`,
+    accountData,
+    {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    }
+  );
+  return response.data;
+}
+
 export async function updateAccount(accountData: any) {
   const response = await axios.put(
-    `${getEndpoint()}/api/accounts/${accountData.id}`,
+    `${BASE_URL}/api/accounts/${accountData.id}`,
     accountData,
     ngrokSkipWarning
   );
@@ -40,7 +53,7 @@ export async function updateAccount(accountData: any) {
 
 export async function deleteAccount(id: number) {
   const response = await axios.delete(
-    `${getEndpoint()}/api/accounts/${id}`,
+    `${BASE_URL}/api/accounts/${id}`,
     ngrokSkipWarning
   );
   return response.data;

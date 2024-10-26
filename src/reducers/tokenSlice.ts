@@ -5,6 +5,7 @@ type User = {
     aud: string,
     username: string,
     fullname: string,
+    avatar: string,
     email: string,
     exp: number,
     iat: number,
