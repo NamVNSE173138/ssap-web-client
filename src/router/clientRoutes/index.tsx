@@ -15,6 +15,7 @@ import ScholarshipProgramDetail from "./ScholarshipProgramDetail";
 import ApplyScholarship from "./ApplyScholarship";
 import Information from "./Information";
 import PrivateRoute from "../PrivateRoute";
+import SkillInformation from "./Skills";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -82,6 +83,10 @@ const privateRoutes: RouteObject[] = [
     path: RouteNames.CHAT,
     element: <Chat />,
   },
+  {
+    path: RouteNames.SKILLS,
+    element: <SkillInformation />,
+  }
 ];
 
 const clientRoutes: RouteObject[] = [
