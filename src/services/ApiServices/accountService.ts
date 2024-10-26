@@ -29,6 +29,19 @@ export async function addAccount(accountData: any) {
   return response.data;
 }
 
+export async function changeAvatar(id: number, accountData: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/accounts/${id}/change-avatar`,
+    accountData,
+    {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    }
+  );
+  return response.data;
+}
+
 export async function updateAccount(accountData: any) {
   const response = await axios.put(
     `${BASE_URL}/api/accounts/${accountData.id}`,
