@@ -39,8 +39,12 @@ const DropdownNotification = () => {
     try {
       if(noti.isRead) return;
       noti.isRead = true;
+      let unread = notis.filter((noti : any) => !noti.isRead).length
+      setUnreadNotis(unread);
+      if(unread > 0) document.title = `(${unread}) ${title}`
+      else document.title = title
       let res = await ReadNotisWithId(noti.id);
-      await fetchNotis();
+      //await fetchNotis();
     } catch (error: any) {
       setErrorMessage(
         error.response?.data?.message ||

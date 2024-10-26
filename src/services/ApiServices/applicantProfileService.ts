@@ -22,7 +22,7 @@ export async function getApplicantProfileById(id: number) {
 export async function getAllApplicantProfilesByApplicant(id: number) {
 
   const response = await axios.get(
-    `${BASE_URL}/api/applicants/byapplicant/${id}`,
+    `${BASE_URL}/api/applicants/${id}`,
     ngrokSkipWarning
   );
   return response.data;
@@ -31,16 +31,6 @@ export async function getAllApplicantProfilesByApplicant(id: number) {
 export async function addApplicantProfile(profileData: any) {
 
   const response = await axios.post(
-    `${BASE_URL}/api/applicants/Add`,
-    profileData,
-    ngrokSkipWarning
-  );
-  return response.data;
-}
-
-export async function updateApplicantProfile(profileData: any) {
-
-  const response = await axios.put(
     `${BASE_URL}/api/applicants`,
     profileData,
     ngrokSkipWarning
@@ -48,10 +38,10 @@ export async function updateApplicantProfile(profileData: any) {
   return response.data;
 }
 
-export async function addOrUpdateApplicantProfile(profileData: any) {
+export async function updateApplicantProfile(id: number, profileData: any) {
 
-  const response = await axios.post(
-    `${BASE_URL}/api/applicants/addorupdateprofile`,
+  const response = await axios.put(
+    `${BASE_URL}/api/applicants/${id}`,
     profileData,
     ngrokSkipWarning
   );
@@ -69,7 +59,7 @@ export async function deleteApplicantProfile(id: number) {
 
 export async function exportApplicantProfileToPdf(id: number) {
   const response = await axios.get(
-    `${BASE_URL}/api/applicants/${id}/export-pdf`,
+    `${BASE_URL}/api/applicants/${id}/profile/pdf`,
     {
       responseType: 'blob',
       ...ngrokSkipWarning

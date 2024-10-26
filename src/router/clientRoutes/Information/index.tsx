@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, DatePicker, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
-import { addOrUpdateApplicantProfile, getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf } from "@/services/ApiServices/applicantProfileService";
+import { addOrUpdateApplicantProfile, getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
 import { GoPencil } from "react-icons/go";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -13,6 +13,7 @@ const Information = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isAdd, setIsAdd] = useState<boolean>(false);
   const [formValues, setFormValues] = useState({
     firstName: "",
     lastName: "",
@@ -30,7 +31,8 @@ const Information = () => {
 
     const fetchProfile = async () => {
       try {
-        const data = await getAllApplicantProfilesByApplicant(Number(id || user?.id));
+        let data = await getAllApplicantProfilesByApplicant(Number(id || user?.id));
+        data = data.data
         if (isMounted) {
           setProfileData(data);
           setFormValues({
@@ -72,6 +74,13 @@ const Information = () => {
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    setIsAdd(false);
+    setIsEditing(true);
+  };
+
+  const handleAdd = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsAdd(true);
     setIsEditing(true);
   };
 
@@ -85,7 +94,12 @@ const Information = () => {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await addOrUpdateApplicantProfile({ ...formValues, id: profileData.id });
+      if (isAdd) {
+        await addApplicantProfile({ ...formValues, id: profileData.id });
+      }
+      else {
+        await updateApplicantProfile(profileData.applicantId, { ...formValues, id: profileData.id });
+      }
       message.success("Profile updated successfully!");
       setProfileData({ ...profileData, ...formValues });
       setIsEditing(false);
@@ -96,7 +110,7 @@ const Information = () => {
 
   const handleExportPDF = async () => {
     try {
-      const pdfBlob = await exportApplicantProfileToPdf(profileData.id);
+      const pdfBlob = await exportApplicantProfileToPdf(profileData.applicantId);
       const url = window.URL.createObjectURL(new Blob([pdfBlob]));
       const link = document.createElement('a');
       link.href = url;
@@ -310,13 +324,21 @@ const Information = () => {
             </div>
 
             <div className="flex justify-center">
-              <button
+              {/*JSON.stringify(profileData)*/}
+              {profileData.constructor == Array && <button
                 type="button"
-                onClick={handleEdit}
+                onClick={handleAdd}
                 className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
               >
+                Add Profile
+              </button>}
+              {profileData.constructor != Array && <button
+                type="button"
+                onClick={handleEdit}
+                className="ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+              >
                 Edit Profile
-              </button>
+              </button>}
               <button
                 type="button"
                 onClick={handleExportPDF}

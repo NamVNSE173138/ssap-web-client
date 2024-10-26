@@ -7,13 +7,15 @@ import { useState } from 'react';
 import ScreenSpinner from '../ScreenSpinner';
 import RouteNames from '@/constants/routeNames';
 import { removeToken, removeUser } from "@/reducers/tokenSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CgProfile } from "react-icons/cg";
 import parseJwt from '@/services/parseJwt';
 import { messaging } from '@/services/firebase';
 import { deleteToken } from 'firebase/messaging';
+import { RootState } from '@/store/store';
 
 const HeaderAvatar = () => {
+    const avatar = useSelector((state: RootState) => state.token.avatar);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +49,7 @@ const HeaderAvatar = () => {
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarImage src={avatar != null ? avatar : "https://github.com/shadcn.png"} alt="@shadcn" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
