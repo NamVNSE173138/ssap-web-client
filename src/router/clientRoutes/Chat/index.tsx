@@ -3,8 +3,10 @@ import { getAllMessages, getChatHistory, sendMessage } from "@/services/ApiServi
 import { RootState } from "@/store/store";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import * as signalR from "@microsoft/signalr";
+//import * as signalR from "@microsoft/signalr";
 import { BASE_URL } from "@/constants/api";
+import { log } from "console";
+import { getMessaging, onMessage } from "firebase/messaging";
 
 interface Account {
   id: number;
@@ -27,8 +29,9 @@ const Chat: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [message, setMessage] = useState<string>("");
   const user = useSelector((state: RootState) => state.token.user);
-  const token = useSelector((state: RootState) => state.token.token);
-  const connectionRef = useRef<signalR.HubConnection | null>(null); 
+  //const token = useSelector((state: RootState) => state.token.token);
+  const messaging = getMessaging();
+  //const connectionRef = useRef<signalR.HubConnection | null>(null); 
 
   const fetchAccounts = async () => {
     if (user == null) {
@@ -92,10 +95,25 @@ const Chat: React.FC = () => {
       };
 
       fetchChatHistory();
+      navigator.serviceWorker.addEventListener('message', (event) => {
+            if(!event.data.notification && event.data.messageType != "push-received"){
+              //console.log(event.data);
+              fetchChatHistory();
+            }
+      });
+
+        onMessage(messaging, (payload: any) => {
+            //console.log('Message received:', payload);
+            if (!payload.notification && payload.data.messageType !== "push-received") {
+                fetchChatHistory();
+            }
+        });
+      
     }
+    
   }, [selectedUser]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const connectSignalR = async () => {
       if (user == null || token == null) return;
       const connection = new signalR.HubConnectionBuilder()
@@ -132,7 +150,8 @@ const Chat: React.FC = () => {
         connectionRef.current.stop();
       }
     };
-  }, [user, selectedUser]);
+      
+  }, [user, selectedUser]);*/
 
   const handleSendMessage = async () => {
     if (selectedUser && message) {
@@ -147,9 +166,9 @@ const Chat: React.FC = () => {
         { senderId: parseInt(user.id), receiverId: selectedUser.id, message, timestamp: new Date(currentTimestamp) }
       ]);
 
-      if (connectionRef.current) {
+      /*if (connectionRef.current) {
         await connectionRef.current.invoke("SendMessageToUser", parseInt(user.id), selectedUser.id, message);
-      }
+      }*/
 
       setMessage("");
     }
