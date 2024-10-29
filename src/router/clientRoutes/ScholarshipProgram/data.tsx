@@ -16,7 +16,6 @@ export type ScholarshipProgramType = {
     id: string;
     name: string;
     description: string;
-    status: string;
   }>;
 };
 

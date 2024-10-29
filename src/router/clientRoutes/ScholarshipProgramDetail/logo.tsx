@@ -1,5 +1,4 @@
-// import SchoolImage from "../../../assets/FPT_logo.jpg"
-// import { ScholarshipProgramType } from "../ScholarshipProgram/data";
+
 const SchoolLogo = ({ imageUrl }: { imageUrl: string }) => {
   return (
     <section>

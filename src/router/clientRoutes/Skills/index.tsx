@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
-import { addApplicantSkills, updateApplicantSkills, getApplicantSkills, deleteApplicantSkill } from "@/services/ApiServices/applicantProfileService";
+import { updateApplicantSkills, deleteApplicantSkill, getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Sidebar } from "@/components/AccountInfo";
@@ -25,11 +25,12 @@ const SkillInformation = () => {
 
         const fetchSkills = async () => {
             try {
-                const data = await getApplicantSkills(Number(id || user?.id));
+                const data = await getApplicantProfileById(Number(id || user?.id));
+                console.log(data.applicantSkills);
                 if (isMounted) {
-                    setSkills(data.data || []);
-                    if (data.data.length > 0) {
-                        setFormValues({ ...formValues, ...data.data[0], skillId: data.data[0].id }); // Cập nhật skillId
+                    setSkills(data.data.applicantSkills || []);
+                    if (data.data.applicantSkills.length > 0) {
+                        setFormValues({ ...formValues, ...data.data.applicantSkills[0], skillId: data.data.applicantSkills[0].id });
                     }
                 }
             } catch (error) {
@@ -65,10 +66,10 @@ const SkillInformation = () => {
                 return;
             }
 
-            await addApplicantSkills(Number(user.id), [formValues]);
+            await updateApplicantSkills(Number(user.id), [formValues]);
             message.success("Skill added successfully!");
             setSkills([...skills, formValues]);
-            setFormValues({ name: "", type: "", description: "", skillId: null, applicantId: user?.id }); // Reset skillId
+            setFormValues({ name: "", type: "", description: "", skillId: null, applicantId: user?.id }); 
         } catch (error) {
             message.error("Failed to add skill.");
         }
@@ -76,9 +77,8 @@ const SkillInformation = () => {
 
     const handleUpdate = async () => {
         try {
-            if (!user || formValues.skillId === null) return; // Kiểm tra skillId
+            if (!user || formValues.skillId === null) return; 
 
-            // Tạo danh sách kỹ năng cập nhật
             const updatedSkills = skills.map(skill => 
                 skill.id === formValues.skillId ? { ...skill, ...formValues } : skill
             );
@@ -86,7 +86,6 @@ const SkillInformation = () => {
             await updateApplicantSkills(Number(user.id), updatedSkills);
             message.success("Skill updated successfully!");
             setSkills(updatedSkills);
-            setFormValues({ name: "", type: "", description: "", skillId: null, applicantId: user?.id }); // Reset form
         } catch (error) {
             message.error("Failed to update skill.");
         }
