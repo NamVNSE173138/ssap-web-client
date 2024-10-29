@@ -9,6 +9,7 @@ const navigation = {
     LANGUAGE: 'navigation.language.title',
     CHOOSE_LANGUAGE: 'navigation.language.choose_language',
     CHAT: 'Chat',
+    SERVICES: 'Services',
 };
 
 export default navigation;

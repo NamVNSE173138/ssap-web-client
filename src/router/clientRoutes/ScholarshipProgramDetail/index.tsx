@@ -104,8 +104,6 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
-  //   if (loading) return <Spinner size='large' />;
-  //   if (error) return <p>Error: {error}</p>;
   if (!data) return <Spinner size="large" />;
 
   return (
