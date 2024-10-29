@@ -28,6 +28,7 @@ const AccountInfo = () => {
     hashedPassword: "",
     address: "",
     status: "",
+    loginWithGoogle: 0,
     roleId: "",
     avatarUrl: "",
   });
@@ -50,6 +51,7 @@ const AccountInfo = () => {
             address: data.address,
             status: data.status,
             roleId: data.roleId,
+            loginWithGoogle: data.loginWithGoogle,
             avatarUrl: data.avatarUrl,
           });
         }

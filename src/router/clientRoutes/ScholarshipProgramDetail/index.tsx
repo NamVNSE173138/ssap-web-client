@@ -20,24 +20,37 @@ import SchoolLogo from "./logo";
 import { useSelector } from "react-redux";
 import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
+import { RootState } from "@/store/store";
+import AccountDialog from "./applicant-dialog";
+import { getApplicantAppliedToScholarship, getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const token = useSelector((state: RootState) => state.token.token);
   const [data, setData] = useState<ScholarshipProgramType | null>(null);
+  const [authorized, setAuthorized] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   const isApplicant = user?.role;
 
+  const [applicants, setApplicants] = useState<any>(null);
+  const [applicantDialogOpen, setApplicantDialogOpen] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BASE_URL}/api/scholarship-programs/${id}`
-        );
+          `${BASE_URL}/api/scholarship-programs/${id}`,
+          {
+            headers: {
+                Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data.statusCode === 200) {
           setData(response.data.data);
+          setAuthorized(response.data.message);
         } else {
           setError("Failed to fetch data");
         }
@@ -50,6 +63,30 @@ const ScholarshipProgramDetail = () => {
 
     fetchData();
   }, [id]);
+
+  const fetchApplicants = async (scholarshipId: number) => {
+    try {
+      const response = await getApplicationsByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setApplicants(response.data);
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenApplicantDialog = async () => {
+    setLoading(true);
+    if(!data) return;
+    await fetchApplicants(parseInt(data?.id));
+    setLoading(false);
+    setApplicantDialogOpen(true);
+  };
 
   const deleteScholarship = async () => {
     try {
@@ -122,7 +159,7 @@ const ScholarshipProgramDetail = () => {
                 >
                   Apply now{" "}
                 </button>
-              ) : (
+              ) : (authorized != "Unauthorized" && (
                 <div className="flex justify-between w-full gap-10">
                   <button
                     onClick={() => navigate("")}
@@ -137,13 +174,25 @@ const ScholarshipProgramDetail = () => {
                     Delete{" "}
                   </button>
                   <button
+                    onClick={() => handleOpenApplicantDialog()}
+                    className=" text-xl w-full bg-green-700 rounded-[25px]"
+                  >
+                    View applications{" "}
+                  </button>
+                  <button
                     onClick={() => navigate("")}
                     className=" text-xl w-full bg-green-700 rounded-[25px]"
                   >
-                    View application{" "}
+                    Assign Expert{" "}
+                  </button>
+                  <button
+                    onClick={() => navigate("")}
+                    className=" text-xl w-full bg-green-700 rounded-[25px]"
+                  >
+                    Review History{" "}
                   </button>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>
@@ -357,6 +406,9 @@ const ScholarshipProgramDetail = () => {
           )}
         </section>
       </div> */}
+      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen} 
+        onClose={() => setApplicantDialogOpen(false)} 
+        applications={applicants ?? []}/>)}
     </div>
   );
 };
