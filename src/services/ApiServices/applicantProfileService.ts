@@ -68,27 +68,11 @@ export async function exportApplicantProfileToPdf(id: number) {
   return response.data;
 }
 
-export async function addApplicantSkills(applicantId: number, skillData: any[]) {
-  const response = await axios.post(
-    `${BASE_URL}/api/applicants/${applicantId}/skills`,
-    skillData,
-    ngrokSkipWarning
-  );
-  return response.data;
-}
 
 export async function updateApplicantSkills(applicantId: number, skillData: any[]) {
   const response = await axios.put(
     `${BASE_URL}/api/applicants/${applicantId}/skills`,
     skillData,
-    ngrokSkipWarning
-  );
-  return response.data;
-}
-
-export async function getApplicantSkills(applicantId: number) {
-  const response = await axios.get(
-    `${BASE_URL}/api/applicants/${applicantId}/skills`,
     ngrokSkipWarning
   );
   return response.data;

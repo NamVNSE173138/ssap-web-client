@@ -16,6 +16,8 @@ import ApplyScholarship from "./ApplyScholarship";
 import Information from "./Information";
 import PrivateRoute from "../PrivateRoute";
 import SkillInformation from "./Skills";
+import Service from "./Service";
+import ServiceDetails from "./ServiceDetail";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -51,6 +53,15 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.SCHOLARSHIP_PROGRAM_DETAIL,
     element: <ScholarshipProgramDetail />,
   },
+  {
+    path: RouteNames.SERVICES,
+    element: <Service />,
+  }
+  ,
+  {
+    path: RouteNames.SERVICES_DETAIL,
+    element: <ServiceDetails />,
+  }
 ];
 
 const privateRoutes: RouteObject[] = [
