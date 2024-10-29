@@ -20,6 +20,14 @@ export async function getAccountById(id: number) {
   return response.data;
 }
 
+export async function getApplicationsByScholarship(scholarshipId: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
 export async function addAccount(accountData: any) {
   const response = await axios.post(
     `${BASE_URL}/api/accounts/Add`,

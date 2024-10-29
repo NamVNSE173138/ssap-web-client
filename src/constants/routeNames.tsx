@@ -20,6 +20,9 @@ const RouteNames = {
     CHAT: '/chat',
     INFORMATION: '/information',
     SKILLS: '/skills',
+    FUNDER_APPLICATION: '/funder/application/:id',
+    SERVICES: '/services',
+    SERVICES_DETAIL: '/services/:id',
 }
 
 export default RouteNames
