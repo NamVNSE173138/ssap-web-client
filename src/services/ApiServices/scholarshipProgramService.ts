@@ -13,6 +13,17 @@ export async function getAllScholarshipProgram() {
     }
 }
 
+export async function getScholarshipProgram(id: number) {
+    try {
+        const response = await axios.get(`${BASE_URL}/api/scholarship-programs/${id}`);
+        console.log('API response:', response.data);
+        return response.data;
+    } catch (error: any) {
+        console.error('API error:', error?.response?.data || error.message);
+        throw error;
+    }
+}
+
 // Fetch an applicant profile by ID
 export async function getAllScholarshipProgramByMajorId(id: number) {
   const response = await axios.get(
