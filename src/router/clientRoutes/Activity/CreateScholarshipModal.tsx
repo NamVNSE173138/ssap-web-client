@@ -7,77 +7,81 @@ import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { z } from "zod";
 import { BASE_URL } from "@/constants/api";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CreateScholarshipModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
+// const formSchema = z.object({
+//   scholarshiptype: z.string().min(1, "Vui lòng chọn loại dịch vụ"),
+//   name: z.string().min(1, "Vui lòng nhập tên chương trình"),
+//   description: z.string().min(1, "Vui lòng nhập mô tả"),
+//   price: z.string().refine((price) => !isNaN(parseFloat(price)), {
+//     message: "Giá phải là số",
+//   }),
+//   quantity: z.string().refine((quantity) => !isNaN(parseInt(quantity)), {
+//     message: "Số lượng phải là số",
+//   }),
+//   imageUrl: z.string(),
+//   deadline: z.string(),
+//   status: z.string(),
+//   universities: z
+//     .array(z.string())
+//     .min(1, "Vui lòng nhập ít nhất một trường đại học"),
+//   majors: z.array(z.string()).min(1, "Vui lòng nhập ít nhất một ngành học"),
+//   certificates: z
+//     .array(z.string())
+//     .min(1, "Vui lòng nhập ít nhất một chứng chỉ"),
+//   skills: z.array(z.string()).min(1, "Vui lòng nhập ít nhất một kỹ năng"),
+// });
 const formSchema = z.object({
-  scholarshiptype: z
-    .string({ required_error: "Vui lòng chọn loại dịch vụ" })
-    .min(1, "Vui lòng chọn loại dịch vụ"),
-  name: z
-    .string({ required_error: "Vui lòng nhập tên chương trình" })
-    .min(1, "Vui lòng nhập tên chương trình"),
-  description: z
-    .string({ required_error: "Vui lòng nhập mô tả" })
-    .min(1, "Vui lòng nhập mô tả"),
-  price: z
-    .string()
-    .refine((price) => !isNaN(parseFloat(price)), {
-      message: "Giá phải là số",
-    }),
-  quantity: z
-    .string()
-    .refine((quantity) => !isNaN(parseFloat(quantity)), {
-      message: "Số lượng phải là số",
-    }),
-  quantity_renewal: z
-    .string()
-    .refine((quantity) => !isNaN(parseFloat(quantity)), {
-      message: "Số lượng phải là số",
-    }),
+  scholarshiptype: z.string().min(1, "Vui lòng chọn loại dịch vụ"),
+  name: z.string().min(1, "Vui lòng nhập tên chương trình"),
+  description: z.string().min(1, "Vui lòng nhập mô tả"),
+  price: z.string().refine((price) => !isNaN(parseFloat(price)), {
+    message: "Giá phải là số",
+  }),
+  quantity: z.string().refine((quantity) => !isNaN(parseInt(quantity)), {
+    message: "Số lượng phải là số",
+  }),
+  imageUrl: z.string(),
+  deadline: z.string(),
+  status: z.string(),
+  universities: z.string().min(1, "Vui lòng nhập ít nhất một trường đại học"),
+  majors: z.string().min(1, "Vui lòng nhập ít nhất một ngành học"),
+  certificates: z.string().min(1, "Vui lòng nhập ít nhất một chứng chỉ"),
+  skills: z.string().min(1, "Vui lòng nhập ít nhất một kỹ năng"),
 });
 
 const CreateScholarshipModal = ({
   isOpen,
   setIsOpen,
 }: CreateScholarshipModalProps) => {
-
-
-//     const [data, setData] = useState([]);
-//   const [error, setError] = useState<string | null>(null);
-//   const [loading, setLoading] = useState<boolean>(false);
-  
-//    const fetchData = async () => {
-//     setLoading(true);
-//     try {
-//       const response = await axios.get(
-//         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
-//       );
-//       if (response.data.statusCode === 200) {
-//         setData(response.data.data);
-//       } else {
-//         setError("Failed to fetch data");
-//       }
-//     } catch (err) {
-//       setError((err as Error).message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
   const [categories, setCategories] = useState([]);
   const funder = useSelector((state: any) => state.token.user);
   const funderId = funder?.id;
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
 
   const handleAddNewScholarshipProgram = async (
     values: z.infer<typeof formSchema>
   ) => {
-    console.log("Form submitted"); 
+    console.log("Selected scholarship type:", form.getValues("scholarshiptype"));
+
     try {
       if (!funderId) {
         throw new Error("Funder ID not available");
@@ -85,26 +89,31 @@ const CreateScholarshipModal = ({
 
       const postData = {
         name: values.name,
+        imageUrl: "string",
         description: values.description,
-        scholarshipAmount: parseFloat(values.price),
-        numberOfScholarships: parseInt(values.quantity),
-        numberOfRenewals: parseInt(values.quantity_renewal),
-        funderId, 
-        categories: [parseInt(values.scholarshiptype)], 
+        scholarshipAmount: values.price,
+        numberOfScholarships: values.quantity,
+        funderId,
+        categories: [parseInt(values.scholarshiptype)],
+        universities: values.universities,
+        majors: values.majors,
+        certificates: values.certificates,
+        skills: values.skills,
       };
 
+      console.log("Posting data to API:", postData);
       const response = await axios.post(
         `${BASE_URL}/api/scholarship-programs`,
         postData
       );
-
-      console.log("Success:", response.data);
+      console.log("API response:", response.data);
       setIsOpen(false);
-      
-        // await fetchData()
-      
     } catch (error) {
-      console.error("Error creating scholarship program", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error response:", error.response?.data);
+      } else {
+        console.error("Error creating scholarship program", error);
+      }
     }
   };
 
@@ -120,6 +129,7 @@ const CreateScholarshipModal = ({
         });
     }
   }, [isOpen]);
+
 
   return (
     <AnimatePresence>
@@ -140,92 +150,214 @@ const CreateScholarshipModal = ({
             </div>
             <form
               onSubmit={form.handleSubmit(handleAddNewScholarshipProgram)}
-              className="flex flex-col gap-4 mt-4"
+              className="flex flex-col gap-4"
             >
-              <div className="flex gap-12">
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt="profile"
-                  className="rounded-3xl w-44"
-                />
-                <div>
-                  <div className="grid grid-cols-2 items-center">
-                    <label htmlFor="scholarshiptype" className="">
-                      Scholarship Type:
-                    </label>
-                    <select
-                      {...form.register("scholarshiptype")}
-                      className="w-[180px] px-4 py-2 rounded-3xl border-2 border-blue-500 text-black mb-2"
-                    >
-                      <option selected hidden value="">
-                        Choose type
-                      </option>
-                      {categories.map((category: any) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-2 items-center mb-2">
-                    <label className="">Name:</label>
-                    <input
-                      type="text"
-                      id="name"
-                      className="columns-1 h-8 indent-2"
-                      placeholder="Name of Scholarship Program...."
-                      {...form.register("name")}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center mb-2">
-                    <label className="">Description:</label>
-                    <input
-                      type="text"
-                      id="description"
-                      className="columns-1 h-8 indent-2"
-                      placeholder="Description...."
-                      {...form.register("description")}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center">
-                    <label className="columns-1"> Amount:</label>
-                    <input
-                      type="number"
-                      id="amount"
-                      min="0"
-                      className="columns-1 h-8 indent-2"
-                      placeholder="Amount...."
-                      {...form.register("price")}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center">
-                    <label className="columns-1">Quantity:</label>
-                    <input
-                      type="number"
-                      id="quantity"
-                      min="0"
-                      className="columns-1 h-8 indent-2"
-                      placeholder="Quantity...."
-                      {...form.register("quantity")}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center">
-                    <label className="columns-1">Quantity of Renewals:</label>
-                    <input
-                      type="number"
-                      id="quantity_renewal"
-                      min="0"
-                      className="columns-1 h-8 indent-2"
-                      placeholder="Quantity...."
-                      {...form.register("quantity_renewal")}
-                    />
-                  </div>
-                </div>
-              </div>
+              <Tabs defaultValue="information">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="information">Information</TabsTrigger>
+                  <TabsTrigger value="majors">Majors</TabsTrigger>
+                  <TabsTrigger value="certificates">Certificates</TabsTrigger>
+                  <TabsTrigger value="skills">Skills</TabsTrigger>
+                </TabsList>
+                <TabsContent value="information">
+                  <Card>
+                    <CardContent className="space-y-2">
+                      <div className="space-y-1 grid grid-cols-2 items-center w-full">
+                        <Label htmlFor="scholarshiptype">Type</Label>
+                        <Select {...form.register("scholarshiptype")}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {categories.map((category: any) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.id.toString()}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {form.formState.errors.scholarshiptype && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.scholarshiptype.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Name</Label>
+                        <Input
+                          type="text"
+                          id="name"
+                          placeholder="Name of Scholarship Program"
+                          {...form.register("name")}
+                        />
+                      </div>
+                      {form.formState.errors.name && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.name.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Description</Label>
+                        <Input
+                          type="text"
+                          id="description"
+                          placeholder="Description"
+                          {...form.register("description")}
+                        />
+                      </div>
+                      {form.formState.errors.description && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.description.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Amount</Label>
+                        <Input
+                          type="number"
+                          id="amount"
+                          placeholder="Amount"
+                          {...form.register("price")}
+                        />
+                      </div>
+                      {form.formState.errors.price && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.price.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Quantity</Label>
+                        <Input
+                          type="number"
+                          id="quantity"
+                          placeholder="Quantity"
+                          {...form.register("quantity")}
+                        />
+                      </div>
+                      {form.formState.errors.quantity && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.quantity.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Deadline</Label>
+                        <Input
+                          type="text"
+                          id="deadline"
+                          placeholder="Set deadline"
+                          {...form.register("deadline")}
+                        />
+                      </div>
+                      {form.formState.errors.deadline && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.deadline.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Status</Label>
+                        <Input
+                          type="text"
+                          id="status"
+                          placeholder="Set status"
+                          {...form.register("status")}
+                        />
+                      </div>
+                      {form.formState.errors.status && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.status.message}
+                        </span>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="majors">
+                  <Card>
+                    <CardContent>
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Universities</Label>
+                        <Input
+                          type="text"
+                          id="universities"
+                          placeholder="Universities (comma-separated)"
+                          {...form.register("universities")}
+                        />
+                      </div>
+                      {form.formState.errors.universities && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.universities.message}
+                        </span>
+                      )}
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Majors</Label>
+                        <Input
+                          type="text"
+                          id="majors"
+                          placeholder="Majors (comma-separated)"
+                          {...form.register("majors")}
+                        />
+                      </div>
+                      {form.formState.errors.majors && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.majors.message}
+                        </span>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="certificates">
+                  <Card>
+                    <CardContent>
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Certificates</Label>
+                        <Input
+                          type="text"
+                          id="certificates"
+                          placeholder="Certificates (comma-separated)"
+                          {...form.register("certificates")}
+                        />
+                      </div>
+                      {form.formState.errors.certificates && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.certificates.message}
+                        </span>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="skills">
+                  <Card>
+                    <CardContent>
+                      <div className="space-y-1 grid grid-cols-2 items-center">
+                        <Label>Skills</Label>
+                        <Input
+                          type="text"
+                          id="skills"
+                          placeholder="Skills (comma-separated)"
+                          {...form.register("skills")}
+                        />
+                      </div>
+                      {form.formState.errors.skills && (
+                        <span className="text-red-500 text-sm">
+                          {form.formState.errors.skills.message}
+                        </span>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
               <div className="w-full flex justify-end mt-4">
-                {/* Ensure the button has type="submit" */}
-                <Button type="submit" className="bg-blue-500 hover:bg-blue-800 rounded-[2rem] w-36 h-12 text-xl">
-                  Thêm
+                <Button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-800 rounded-[2rem] w-36 h-12 text-xl"
+                  // disabled={
+                  //   !form.formState.isValid || form.formState.isSubmitting
+                  // }
+                >
+                  Add
                 </Button>
               </div>
             </form>
@@ -237,4 +369,3 @@ const CreateScholarshipModal = ({
 };
 
 export default CreateScholarshipModal;
-
