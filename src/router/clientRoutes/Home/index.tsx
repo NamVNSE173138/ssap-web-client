@@ -169,7 +169,7 @@ const Home = () => {
                 <Link
                   key={major.id}
                   to={`/major/${major.id}`}
-                  className="relative w-[250px] h-[110px] hover:scale-110 transition-transform  bg-orange-600 rounded-lg"
+                  className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-[#5559c7] rounded-lg"
                 >
                   <p className="text-center text-white  text-lg font-bold">
                     {major.name}
