@@ -22,7 +22,9 @@ import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
 import AccountDialog from "./applicant-dialog";
-import { getApplicantAppliedToScholarship, getApplicationsByScholarship } from "@/services/ApiServices/accountService";
+import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
+import { getAllExperts } from "@/services/ApiServices/expertService";
+import AssignExpertDialog from "./assign-expert-dialog";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +39,9 @@ const ScholarshipProgramDetail = () => {
 
   const [applicants, setApplicants] = useState<any>(null);
   const [applicantDialogOpen, setApplicantDialogOpen] = useState<boolean>(false);
+
+  const [experts, setExperts] = useState<any>(null);
+  const [assignExpertDialogOpen, setAssignExpertDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,12 +85,36 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+  const fetchExperts = async () => {
+    try {
+      const response = await getAllExperts();
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setExperts(response.data);
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssignExpertDialog = async () => {
+    setAssignExpertDialogOpen(true);
+    setLoading(true);
+    if(!data) return;
+    await fetchExperts();
+    setLoading(false);
+  };
+
   const handleOpenApplicantDialog = async () => {
+    setApplicantDialogOpen(true);
     setLoading(true);
     if(!data) return;
     await fetchApplicants(parseInt(data?.id));
     setLoading(false);
-    setApplicantDialogOpen(true);
   };
 
   const deleteScholarship = async () => {
@@ -178,7 +207,7 @@ const ScholarshipProgramDetail = () => {
                     View applications{" "}
                   </button>
                   <button
-                    onClick={() => navigate("")}
+                    onClick={() => handleAssignExpertDialog()}
                     className=" text-xl w-full bg-green-700 rounded-[25px]"
                   >
                     Assign Expert{" "}
@@ -407,6 +436,10 @@ const ScholarshipProgramDetail = () => {
       {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen} 
         onClose={() => setApplicantDialogOpen(false)} 
         applications={applicants ?? []}/>)}
+      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen} 
+        onClose={() => setAssignExpertDialogOpen(false)}
+        experts={experts ?? []} />)}
+
     </div>
   );
 };

@@ -29,3 +29,18 @@ export async function NotifyNewUser(id: number) {
   );
   return response.data;
 }
+
+export async function SendNotification(data: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/send-notification`,
+    data
+  );
+  return response.data;
+}
+
+export async function NotifyFunderNewApplicant(applicantId: number, scholarshipId: number) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/notify-funder-new-applicant?applicantId=${applicantId}&scholarshipId=${scholarshipId}`
+  );
+  return response.data;
+}
