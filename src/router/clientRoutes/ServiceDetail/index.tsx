@@ -10,8 +10,9 @@ import {
 import Spinner from "@/components/Spinner";
 import RouteNames from "@/constants/routeNames";
 import { deleteService, getServiceById } from "@/services/ApiServices/serviceService";
-import { createRequest } from "@/services/ApiServices/requestService";
+import { createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
+import AccountApplicantDialog from "./applicantrequests-dialog";
 
 interface ServiceType {
     id: string;
@@ -27,6 +28,8 @@ interface ServiceType {
 const ServiceDetails = () => {
     const { id } = useParams<{ id: string }>();
     const [serviceData, setServiceData] = useState<ServiceType | null>(null);
+    const [applicants, setApplicants] = useState<any>(null);
+    const [applicantDialogOpen, setApplicantDialogOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -50,6 +53,29 @@ const ServiceDetails = () => {
         };
         fetchService();
     }, [id]);
+
+    const fetchApplicants = async (serviceId: number) => {
+        try {
+          const response = await getRequestsByService(serviceId);
+          if (response.statusCode == 200) {
+            setApplicants(response.data);
+          } else {
+            setError("Failed to get applicants");
+          }
+        } catch (error) {
+          setError((error as Error).message);
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      const handleOpenApplicantDialog = async () => {
+        setLoading(true);
+        if(!serviceData) return;
+        await fetchApplicants(parseInt(serviceData?.id));
+        setLoading(false);
+        setApplicantDialogOpen(true);
+      };
 
     const handleDelete = async () => {
         setLoading(true);
@@ -204,7 +230,7 @@ const ServiceDetails = () => {
                                     <button onClick={() => navigate("")} className="text-xl w-full bg-blue-700 rounded-[25px]">
                                         Edit
                                     </button>
-                                    <button onClick={() => navigate("")} className="text-xl w-full bg-blue-700 rounded-[25px]">
+                                    <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
                                         View Request
                                     </button>
                                     <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
@@ -252,6 +278,8 @@ const ServiceDetails = () => {
                     <p>{serviceData.description}</p>
                 </div>
             </section>
+            <AccountApplicantDialog open={applicantDialogOpen} 
+            onClose={() => setApplicantDialogOpen(false)} applications={applicants ?? []}/>
         </div>
     );
 };

@@ -27,3 +27,8 @@ export async function deleteRequest(id: number) {
     const response = await axios.delete(`${BASE_URL}/api/requests/${id}`, ngrokSkipWarning);
     return response.data;
 }
+
+export async function getRequestsByService(serviceId: number) {
+    const response = await axios.get(`${BASE_URL}/api/requests/get-by-service/${serviceId}`, ngrokSkipWarning);
+    return response.data;
+}

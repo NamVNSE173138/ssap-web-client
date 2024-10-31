@@ -22,7 +22,7 @@ import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
 import AccountDialog from "./applicant-dialog";
-import { getApplicantAppliedToScholarship, getApplicationsByScholarship } from "@/services/ApiServices/accountService";
+import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();

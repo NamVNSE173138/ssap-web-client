@@ -23,6 +23,7 @@ const RouteNames = {
     FUNDER_APPLICATION: '/funder/application/:id',
     SERVICES: '/services',
     SERVICES_DETAIL: '/services/:id',
+    APPLICANT_REQUEST_INFORMATION: 'provider/requestinformation/:id'
 }
 
 export default RouteNames
