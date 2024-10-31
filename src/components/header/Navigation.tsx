@@ -33,6 +33,7 @@ const navItems: NavItem[] = [
     text: navigation.CHAT,
     to: RouteNames.CHAT,
   },
+  
 ];
 
 const Navigation = () => {

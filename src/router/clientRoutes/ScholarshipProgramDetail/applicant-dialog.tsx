@@ -8,6 +8,10 @@ const AccountDialog = ({ open, onClose, applications }: any) => {
     <Dialog onClose={onClose} open={open} fullWidth>
       <DialogTitle>Applied Applicants</DialogTitle>
       <List sx={{ pt: 0 }}>
+        {applications.length === 0 && 
+        <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+            No applicants applied for this scholarship
+        </p>}
         {applications && applications.map((app:any) => (
           <ListItem disableGutters key={app.id}>
             <ListItemButton disableRipple onClick={() => {}}>

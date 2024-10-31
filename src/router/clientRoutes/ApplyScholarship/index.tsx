@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "@/constants/api";
+import { NotifyFunderNewApplicant, SendNotification } from "@/services/ApiServices/notification";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const ApplyScholarship = () => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/api/applications/add`,
+        `${BASE_URL}/api/applications`,
         {
           method: "POST",
           headers: {
@@ -48,6 +49,7 @@ const ApplyScholarship = () => {
           body: JSON.stringify(applicationData),
         }
       );
+      
 
       if (response.ok) {
         const result = await response.json();
@@ -56,6 +58,8 @@ const ApplyScholarship = () => {
         console.error("Failed to submit application");
       }
       navigate("/");
+      if(id)
+        await NotifyFunderNewApplicant(isApplicant, parseInt(id));
     } catch (error) {
       console.error("Error submitting application:", error);
     }
