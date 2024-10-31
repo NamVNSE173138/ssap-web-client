@@ -33,10 +33,7 @@ const navItems: NavItem[] = [
     text: navigation.CHAT,
     to: RouteNames.CHAT,
   },
-  {
-    text: navigation.REVIEW,
-    to: RouteNames.REVIEWS,
-  }
+  
 ];
 
 const Navigation = () => {

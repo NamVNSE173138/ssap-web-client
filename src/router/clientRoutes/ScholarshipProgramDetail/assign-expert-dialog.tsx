@@ -35,7 +35,7 @@ const AssignExpertDialog = ({ open, onClose, experts }: any) => {
         <div className="h-full">
          <StyledAutocomplete
             sx={{ height: "200px"  }}
-            open
+            open={open}
             disableCloseOnSelect
             options={experts}
             //PaperComponent={CustomPaper}
