@@ -101,7 +101,7 @@ const CreateScholarshipModal = ({
         skills: values.skills,
       };
 
-      console.log("Posting data to API:", postData);
+      console.log("Post data to API:", postData);
       const response = await axios.post(
         `${BASE_URL}/api/scholarship-programs`,
         postData
