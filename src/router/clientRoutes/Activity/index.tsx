@@ -42,7 +42,8 @@ const Activity = () => {
           `${BASE_URL}/api/services/by-provider-id/${funderId}`
         );
         if (response.data.statusCode === 200) {
-          setServices(response.data.data); 
+          const activeServices = response.data.data.filter((service: any) => service.status === 'Active');
+          setServices(activeServices);
         } else {
           setError("Failed to fetch services");
         }
@@ -55,15 +56,14 @@ const Activity = () => {
   };
 
   useEffect(() => {
-
     fetchData();
-  }, [role, funderId]); 
+  }, [role, funderId]);
 
   return (
     <div className="grid grid-cols-12">
       <Sidebar className="col-start-1 col-end-3" />
-      <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5 ">
-        <div className="relative w-full flex items-center justify-between p-5 ">
+      <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+        <div className="relative w-full flex items-center justify-between p-5">
           <div className="flex items-center"></div>
           {role === "FUNDER" && (
             <button
@@ -101,7 +101,7 @@ const Activity = () => {
               <li key={item.id}>
                 <CreatedCard {...item} />
               </li>
-            )): services.map((item: any) => (
+            )) : services.map((item: any) => (
               <li key={item.id}>
                 <ServiceCard {...item} />
               </li>))
@@ -116,7 +116,7 @@ const Activity = () => {
         <AddServiceModal
           isOpen={isServiceModalOpen}
           setIsOpen={setIsServiceModalOpen}
-          fetchServices={fetchData}
+          fetchServices={fetchData} 
         />
       </div>
     </div>

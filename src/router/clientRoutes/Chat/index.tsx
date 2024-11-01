@@ -3,9 +3,6 @@ import { getAllMessages, getChatHistory, sendMessage } from "@/services/ApiServi
 import { RootState } from "@/store/store";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-//import * as signalR from "@microsoft/signalr";
-import { BASE_URL } from "@/constants/api";
-import { log } from "console";
 import { getMessaging, onMessage } from "firebase/messaging";
 
 interface Account {
@@ -29,21 +26,30 @@ const Chat: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [message, setMessage] = useState<string>("");
   const user = useSelector((state: RootState) => state.token.user);
-  //const token = useSelector((state: RootState) => state.token.token);
   const messaging = getMessaging();
-  //const connectionRef = useRef<signalR.HubConnection | null>(null); 
 
   const fetchAccounts = async () => {
     if (user == null) {
       return;
     }
+    const role = user.role;
     const response = await getAllAccounts();
     const accountsWithCount = response.map((account: Account) => ({ ...account, unreadCount: 0 }));
+    console.log(accountsWithCount)
+    const filteredAccounts = accountsWithCount.filter((account:any) => {
+      if (role === "PROVIDER") {
+        return account.roleName === "APPLICANT"; 
+      } else if (role === "APPLICANT") {
+        return account.roleName === "PROVIDER"; 
+      }
+      return false;
+    });
+
 
     const allMessagesResponse = await getAllMessages(parseInt(user.id));
     const allMessages = allMessagesResponse.data;
 
-    const updatedAccounts = accountsWithCount.map((account: any) => {
+    const updatedAccounts = filteredAccounts.map((account: any) => {
       const unreadMessages = allMessages.filter((message: any) =>
         message.senderId === account.id && !message.isRead
       ).length;
@@ -97,13 +103,11 @@ const Chat: React.FC = () => {
       fetchChatHistory();
       navigator.serviceWorker.addEventListener('message', (event) => {
             if(!event.data.notification && event.data.messageType != "push-received"){
-              //console.log(event.data);
               fetchChatHistory();
             }
       });
 
         onMessage(messaging, (payload: any) => {
-            //console.log('Message received:', payload);
             if (!payload.notification && payload.data.messageType !== "push-received") {
                 fetchChatHistory();
             }
@@ -113,45 +117,6 @@ const Chat: React.FC = () => {
     
   }, [selectedUser]);
 
-  /*useEffect(() => {
-    const connectSignalR = async () => {
-      if (user == null || token == null) return;
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`${BASE_URL}/chat?userId=${user.id}`, {
-          transport: signalR.HttpTransportType.WebSockets,
-          withCredentials: true,
-        })
-        .build();
-
-      connection.on("ReceiveMessage", (senderId: number, message: string) => {
-          //console.log("AAAA");
-          fetchAccounts();
-        if (selectedUser && selectedUser.id === senderId) {
-          setChatHistory((prevMessages) => [
-            ...prevMessages,
-            { senderId, receiverId: parseInt(user.id), message, timestamp: new Date() }
-          ]);
-        }
-      });
-
-      try {
-        await connection.start();
-        console.log("SignalR connected");
-        connectionRef.current = connection;
-      } catch (err) {
-        console.error("SignalR Connection Error: ", err);
-      }
-    };
-
-    connectSignalR();
-
-    return () => {
-      if (connectionRef.current) {
-        connectionRef.current.stop();
-      }
-    };
-      
-  }, [user, selectedUser]);*/
 
   const handleSendMessage = async () => {
     if (selectedUser && message) {
@@ -165,10 +130,6 @@ const Chat: React.FC = () => {
         ...chatHistory,
         { senderId: parseInt(user.id), receiverId: selectedUser.id, message, timestamp: new Date(currentTimestamp) }
       ]);
-
-      /*if (connectionRef.current) {
-        await connectionRef.current.invoke("SendMessageToUser", parseInt(user.id), selectedUser.id, message);
-      }*/
 
       setMessage("");
     }
