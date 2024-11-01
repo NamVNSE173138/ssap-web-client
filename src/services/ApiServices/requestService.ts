@@ -37,3 +37,14 @@ export async function getRequestWithApplicantAndRequestDetails(requestId: number
     const response = await axios.get(`${BASE_URL}/api/requests/with-applicant-and-request-details/${requestId}`, ngrokSkipWarning);
     return response.data;
 }
+
+export async function checkUserRequest(serviceId: number, applicantId: number) {
+    const response = await axios.get(`${BASE_URL}/api/requests/check-applicant-requests`, {
+        params: {
+            serviceId,
+            applicantId
+        },
+        ...ngrokSkipWarning
+    });
+    return response.data;
+}
