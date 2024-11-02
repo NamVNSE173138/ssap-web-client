@@ -48,3 +48,8 @@ export async function checkUserRequest(serviceId: number, applicantId: number) {
     });
     return response.data;
 }
+
+export async function cancelRequest(requestId: number) {
+    const response = await axios.delete(`${BASE_URL}/api/requests/cancel-request/${requestId}`, ngrokSkipWarning);
+    return response.data;
+}
