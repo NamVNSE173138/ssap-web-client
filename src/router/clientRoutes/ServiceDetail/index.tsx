@@ -453,7 +453,12 @@ const ServiceDetails = () => {
                 </div>
             </section>
             <AccountApplicantDialog open={applicantDialogOpen}
-                onClose={() => setApplicantDialogOpen(false)} applications={applicants ?? []} />
+                onClose={() => setApplicantDialogOpen(false)} 
+                applications={applicants ?? []}
+                fetchApplications={async () => {
+                    if (!serviceData) return;
+                    await fetchApplicants(parseInt(serviceData?.id));
+                }}/>
         </div>
     );
 };

@@ -31,9 +31,10 @@ interface AccountApplicantDialogProps {
     open: boolean;
     onClose: () => void;
     applications: Applicant[];
+    fetchApplications: () => void;
 }
 
-const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, onClose, applications }) => {
+const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, onClose, applications, fetchApplications }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [applicants, setApplicants] = useState({
         pending: [] as Applicant[],
@@ -80,16 +81,16 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     
                 await updateRequest(id, updatedRequest);
 
-                const updatedApplicants = {
+                /*const updatedApplicants = {
                     ...applicants,
                     [status.toLowerCase() as keyof typeof applicants]: [
                         ...applicants[status.toLowerCase() as keyof typeof applicants],
                         { ...existingApplicantResponse.data, status }
                     ],
                     pending: applicants.pending.filter(app => app.id !== id),
-                };
-    
-                setApplicants(updatedApplicants);
+                };*/
+                fetchApplications();
+                //setApplicants(updatedApplicants);
             } else {
                 console.error(`Request details for applicant id:${id} not found`);
             }
@@ -167,7 +168,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 style={{ borderRadius: "50%", width: "48px", height: "48px" }}
                             />
                         </ListItemAvatar>
-                        {JSON.stringify(app.applicant)}
                         <ListItemText
                             primary={<Typography variant="subtitle1">{app.applicant.username}</Typography>}
                             secondary={formatDate(app.requestDate)}
