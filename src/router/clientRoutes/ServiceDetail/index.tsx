@@ -9,10 +9,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import Spinner from "@/components/Spinner";
 import RouteNames from "@/constants/routeNames";
-import { deleteService, getServiceById } from "@/services/ApiServices/serviceService";
-import { createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
+import { deleteService, getServiceById, updateService } from "@/services/ApiServices/serviceService";
+import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
+import { uploadFile } from "@/services/ApiServices/testService";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 interface ServiceType {
     id: string;
@@ -36,15 +38,35 @@ const ServiceDetails = () => {
     const [expectedCompletionTime, setExpectedCompletionTime] = useState<Date | null>(null);
     const [applicationNotes, setApplicationNotes] = useState<string>("");
     const [scholarshipType, setScholarshipType] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [applicationFileUrl, setapplicationFileUrl] = useState<any>(null);
+    const [editData, setEditData] = useState<ServiceType | null>(null);
+    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const navigate = useNavigate();
     const user = useSelector((state: any) => state.token.user);
     const isProvider = user?.role === "PROVIDER";
+    const isFunder = user?.role === "FUNDER";
+    const [canEdit, setCanEdit] = useState<boolean>(true);
+    const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
+    const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchService = async () => {
             try {
                 const data = await getServiceById(Number(id));
                 setServiceData(data.data);
+                const requestCheckResponse = await checkUserRequest(data.data.id, user?.id);
+                if (requestCheckResponse.data) {
+                    setHasExistingRequest(true);
+                } else {
+                    setHasExistingRequest(false);
+                }
+                const response = await fetchApplicants(data.data.id);
+                if (response.length == 0) {
+                    setCanEdit(true);
+                } else {
+                    setCanEdit(false);
+                }
             } catch (err) {
                 setError((err as Error).message);
             } finally {
@@ -52,36 +74,72 @@ const ServiceDetails = () => {
             }
         };
         fetchService();
-    }, [id]);
+    }, [id, user]);
+
+    const openEditDialog = () => {
+        setEditData(serviceData);
+        setEditDialogOpen(true);
+    };
+
+    const handleEditChange = (field: keyof ServiceType, value: string | number | Date) => {
+        if (editData) {
+            setEditData({ ...editData, [field]: value });
+        }
+    };
+
+    const handleEditSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editData) return;
+
+        setLoading(true);
+        try {
+            await updateService(Number(id), editData);
+            setServiceData(editData);
+            setEditDialogOpen(false);
+            alert("Service updated successfully!");
+        } catch (error) {
+            setError((error as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchApplicants = async (serviceId: number) => {
         try {
-          const response = await getRequestsByService(serviceId);
-          if (response.statusCode == 200) {
-            setApplicants(response.data);
-          }
-          else {
-            setError("Failed to get applicants");
-          }
+            const response = await getRequestsByService(serviceId);
+            if (response.statusCode == 200) {
+                setApplicants(response.data);
+                return response.data;
+            }
+            else {
+                setError("Failed to get applicants");
+            }
         } catch (error) {
-          setError((error as Error).message);
+            setError((error as Error).message);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
-    
-      const handleOpenApplicantDialog = async () => {
+    };
+
+    const handleOpenApplicantDialog = async () => {
         setLoading(true);
-        if(!serviceData) return;
+        if (!serviceData) return;
         await fetchApplicants(parseInt(serviceData?.id));
         setLoading(false);
         setApplicantDialogOpen(true);
-      };
+    };
 
     const handleDelete = async () => {
+        const confirmDelete = window.confirm("Do you really want to delete?");
+        if (!confirmDelete || !serviceData) return;
+
         setLoading(true);
         try {
-            await deleteService(Number(id));
+            const updatedData = { ...serviceData, status: "Inactive" };
+            await updateService(Number(id), updatedData);
+
+            setServiceData(updatedData);
+            alert("Service marked as inactive successfully!");
             navigate(RouteNames.ACTIVITY);
         } catch (error) {
             setError((error as Error).message);
@@ -99,6 +157,7 @@ const ServiceDetails = () => {
         setExpectedCompletionTime(null);
         setApplicationNotes("");
         setScholarshipType("");
+        setapplicationFileUrl("");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -106,22 +165,49 @@ const ServiceDetails = () => {
         setLoading(true);
         setError(null);
 
+        const formData = new FormData();
+        formData.append("File", applicationFileUrl);
+
+        const fileUrl = await uploadFile(formData);
+
         const requestData = {
+            description,
             requestDate: new Date(),
-            status: "REQUESTED",
-            description: "SERVICE REQUESTED",
-            serviceId: serviceData?.id,
-            expectedCompletionTime,
-            applicationNotes,
-            scholarshipType,
-            applicationFileUrl: "",
+            status: "Pending",
             applicantId: user?.id,
+            requestDetails: [{
+                id,
+                expectedCompletionTime,
+                applicationNotes,
+                scholarshipType,
+                applicationFileUrl: fileUrl.url,
+                serviceId: serviceData?.id,
+                
+            }
+            ]
         };
 
         try {
             await createRequest(requestData);
             alert("Request created successfully!");
             closeDialog();
+        } catch (error) {
+            setError((error as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelRequest = async () => {
+        if (!existingRequestId) return;
+        const confirmCancel = window.confirm("Do you really want to cancel your request?");
+        if (!confirmCancel) return;
+
+        setLoading(true);
+        try {
+            await cancelRequest(existingRequestId);
+            alert("Request cancelled successfully!");
+            setHasExistingRequest(false);
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -150,9 +236,10 @@ const ServiceDetails = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700"> Notes</label>
-                                <textarea
-                                    onChange={(e) => setApplicationNotes(e.target.value)}
+                                <label className="block text-gray-700">Description</label>
+                                <input
+                                    type="text"
+                                    onChange={(e) => setDescription(e.target.value)}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
@@ -161,6 +248,14 @@ const ServiceDetails = () => {
                                 <input
                                     type="text"
                                     onChange={(e) => setScholarshipType(e.target.value)}
+                                    className="w-full border rounded p-2"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Application File</label>
+                                <input
+                                    type="file"
+                                    onChange={(e) => setapplicationFileUrl(e.target.files?.[0])}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
@@ -219,26 +314,104 @@ const ServiceDetails = () => {
                         </div>
                         <div className="text-white text-center flex h-[50px] mt-[26px]">
                             <div className="flex justify-between w-full gap-10">
-                                {!isProvider ? (
-                                    <button
-                                        onClick={handleRequestNow}
-                                        className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                    >
-                                        Request now
-                                    </button>
-                                ) : (
-                                <>
-                                    <button onClick={() => navigate("")} className="text-xl w-full bg-blue-700 rounded-[25px]">
-                                        Edit
-                                    </button>
-                                    <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
-                                        View Request
-                                    </button>
-                                    <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
-                                        Delete
-                                    </button>
-                                </>
-                                )}
+                                {!isFunder && !isProvider ? (
+                                    !hasExistingRequest ? (
+                                        <button
+                                            onClick={handleRequestNow}
+                                            className="text-xl w-full bg-blue-700 rounded-[25px]"
+                                        >
+                                            Request Now
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleCancelRequest}
+                                            className="text-xl w-full bg-yellow-500 rounded-[25px]"
+                                        >
+                                            Cancel Request
+                                        </button>
+                                    )
+                                ) : ((!isFunder && isProvider) ? (
+                                    <>
+                                        <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
+                                            Edit
+                                        </button>
+                                        {isEditDialogOpen && (
+                                            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                                                <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full space-y-6">
+                                                    <h2 className="text-2xl font-semibold text-center text-blue-800">Edit Service Details</h2>
+
+                                                    <form onSubmit={handleEditSubmit} className="space-y-4">
+                                                        {[
+                                                            { label: "Name", field: "name", type: "text" },
+                                                            { label: "Description", field: "description", type: "textarea" },
+                                                            { label: "Type", field: "type", type: "text" },
+                                                            { label: "Price", field: "price", type: "number" },
+                                                            { label: "Status", field: "status", type: "text", disabled: true },
+                                                        ].map(({ label, field, type, disabled }) => (
+                                                            <div key={field} className="space-y-1">
+                                                                <label className="block text-gray-700 font-medium">{label}</label>
+                                                                {type === "textarea" ? (
+                                                                    <textarea
+                                                                        value={(editData as any)[field] || ""}
+                                                                        onChange={(e) => handleEditChange(field as keyof ServiceType, e.target.value)}
+                                                                        className="w-full text-black-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                        placeholder={`Enter ${label.toLowerCase()}`}
+                                                                        disabled={disabled}
+                                                                    />
+                                                                ) : (
+                                                                    <input
+                                                                        type={type}
+                                                                        value={(editData as any)[field] || ""}
+                                                                        onChange={(e) => handleEditChange(field as keyof ServiceType, e.target.value)}
+                                                                        className="w-full p-2 text-black-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                        placeholder={`Enter ${label.toLowerCase()}`}
+                                                                        disabled={disabled}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        ))}
+
+                                                        <div className="space-y-1">
+                                                            <label className="block text-gray-700 font-medium">Duration</label>
+                                                            <input
+                                                                type="date"
+                                                                value={editData?.duration ? new Date(editData.duration).toISOString().substring(0, 10) : ""}
+                                                                onChange={(e) => handleEditChange("duration", new Date(e.target.value))}
+                                                                className="w-full p-2 border text-black-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            />
+                                                        </div>
+
+                                                        <div className="flex justify-end space-x-3 pt-6">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setEditDialogOpen(false)}
+                                                                className="px-4 py-2 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                            <button
+                                                                type="submit"
+                                                                className={`px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                                                                    }`}
+                                                                disabled={loading}
+                                                            >
+                                                                {loading ? "Updating..." : "Update"}
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        )}
+
+
+                                        <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
+                                            View Request
+                                        </button>
+                                        <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
+                                            Delete
+                                        </button>
+                                    </>
+                                ) : (<div></div>))}
                             </div>
                         </div>
                     </div>
@@ -279,8 +452,13 @@ const ServiceDetails = () => {
                     <p>{serviceData.description}</p>
                 </div>
             </section>
-            <AccountApplicantDialog open={applicantDialogOpen} 
-            onClose={() => setApplicantDialogOpen(false)} applications={applicants ?? []}/>
+            <AccountApplicantDialog open={applicantDialogOpen}
+                onClose={() => setApplicantDialogOpen(false)} 
+                applications={applicants ?? []}
+                fetchApplications={async () => {
+                    if (!serviceData) return;
+                    await fetchApplicants(parseInt(serviceData?.id));
+                }}/>
         </div>
     );
 };
