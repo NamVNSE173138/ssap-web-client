@@ -25,6 +25,8 @@ import AccountDialog from "./applicant-dialog";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
+import ReviewMilestoneDialog from "./review-milestone-dialog";
+import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,6 +44,9 @@ const ScholarshipProgramDetail = () => {
 
   const [experts, setExperts] = useState<any>(null);
   const [assignExpertDialogOpen, setAssignExpertDialogOpen] = useState<boolean>(false);
+
+  const [reviewMilestones, setReviewMilestones] = useState<any>(null);
+  const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,6 +106,22 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+  const fetchReviewMilestones = async (scholarshipId: number) => {
+    try {
+      const response = await getAllReviewMilestonesByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setReviewMilestones(response.data);
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAssignExpertDialog = async () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
@@ -114,6 +135,14 @@ const ScholarshipProgramDetail = () => {
     setLoading(true);
     if(!data) return;
     await fetchApplicants(parseInt(data?.id));
+    setLoading(false);
+  };
+
+  const handleOpenReviewMilestoneDialog = async () => {
+    setReviewMilestoneDialogOpen(true);
+    setLoading(true);
+    if(!data) return;
+    await fetchReviewMilestones(parseInt(data?.id));
     setLoading(false);
   };
 
@@ -213,10 +242,10 @@ const ScholarshipProgramDetail = () => {
                     Assign Expert{" "}
                   </button>
                   <button
-                    onClick={() => navigate("")}
+                    onClick={() => handleOpenReviewMilestoneDialog()}
                     className=" text-xl w-full bg-green-700 rounded-[25px]"
                   >
-                    Review History{" "}
+                    Review Milestones{" "}
                   </button>
                 </div>
               ))}
@@ -433,12 +462,20 @@ const ScholarshipProgramDetail = () => {
           )}
         </section>
       </div> */}
+
       {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen} 
         onClose={() => setApplicantDialogOpen(false)} 
         applications={applicants ?? []}/>)}
       {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen} 
         onClose={() => setAssignExpertDialogOpen(false)}
         experts={experts ?? []} />)}
+      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen} 
+        onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
+        reviewMilestones={reviewMilestones ?? []}
+        fetchReviewMilestones={async () => {
+            if(!data) return;
+            await fetchReviewMilestones(parseInt(data?.id));
+        }}/>)}
 
     </div>
   );
