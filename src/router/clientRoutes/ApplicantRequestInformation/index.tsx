@@ -127,41 +127,40 @@ import RequestDetailTable from "./request-detail-table"
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Nationality
               </p>
-              <p className="text-heading-6">{applicantProfile.nationality}</p>
+              <p className="text-heading-6">{applicantProfile? applicantProfile?.nationality: "N/a"}</p>
             </div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Ethnicity
               </p>
-              <p className="text-heading-6">{applicantProfile.ethnicity}</p>
+              <p className="text-heading-6">{applicantProfile? applicantProfile?.ethnicity: "N/a"}</p>
             </div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Gender
               </p>
-              <p className="text-heading-6">{applicantProfile.gender}</p>
+              <p className="text-heading-6">{applicantProfile? applicantProfile.gender: "N/a"}</p>
             </div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Birth Date
               </p>
-              <p className="text-heading-6">{formatOnlyDate(applicantProfile.birthDate)}</p>
+              <p className="text-heading-6">{formatOnlyDate(applicantProfile? applicantProfile.birthDate: "N/a")}</p>
             </div>
           </div>
         </section>
       </div>
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
-        <div className="max-w-[1216px] mx-auto">
-            <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-                <p className="text-4xl mb-8">
-                  Service Details
-                  <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
-                </p>
-                <RequestDetailTable requestDetails={requestDetails}/>
+            <div className="max-w-[1216px] mx-auto">
+                <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
+                    <p className="text-4xl mb-8">
+                        Service Details
+                        <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
+                    </p>
+                    <RequestDetailTable requestDetails={requestDetails} description={request.description} />
+                </div>
             </div>
-        </div>
-      </section>
-
+        </section>
     </div>
     )
   }

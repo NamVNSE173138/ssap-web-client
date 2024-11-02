@@ -10,7 +10,7 @@ import {
 import Spinner from "@/components/Spinner";
 import RouteNames from "@/constants/routeNames";
 import { deleteService, getServiceById, updateService } from "@/services/ApiServices/serviceService";
-import { checkUserRequest, createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
+import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { uploadFile } from "@/services/ApiServices/testService";
@@ -38,6 +38,7 @@ const ServiceDetails = () => {
     const [expectedCompletionTime, setExpectedCompletionTime] = useState<Date | null>(null);
     const [applicationNotes, setApplicationNotes] = useState<string>("");
     const [scholarshipType, setScholarshipType] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
     const [applicationFileUrl, setapplicationFileUrl] = useState<any>(null);
     const [editData, setEditData] = useState<ServiceType | null>(null);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -46,14 +47,21 @@ const ServiceDetails = () => {
     const isProvider = user?.role === "PROVIDER";
     const isFunder = user?.role === "FUNDER";
     const [canEdit, setCanEdit] = useState<boolean>(true);
+    const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
+    const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchService = async () => {
             try {
                 const data = await getServiceById(Number(id));
-                const response = await fetchApplicants(data.data.id);
-                console.log(response)
                 setServiceData(data.data);
+                const requestCheckResponse = await checkUserRequest(data.data.id, user?.id);
+                if (requestCheckResponse.data) {
+                    setHasExistingRequest(true);
+                } else {
+                    setHasExistingRequest(false);
+                }
+                const response = await fetchApplicants(data.data.id);
                 if (response.length == 0) {
                     setCanEdit(true);
                 } else {
@@ -66,7 +74,7 @@ const ServiceDetails = () => {
             }
         };
         fetchService();
-    }, [id]);
+    }, [id, user]);
 
     const openEditDialog = () => {
         setEditData(serviceData);
@@ -163,16 +171,18 @@ const ServiceDetails = () => {
         const fileUrl = await uploadFile(formData);
 
         const requestData = {
-            description: "SERVICE REQUESTED",
+            description,
             requestDate: new Date(),
-            status: "REQUESTED",
+            status: "Pending",
             applicantId: user?.id,
             requestDetails: [{
+                id,
                 expectedCompletionTime,
                 applicationNotes,
                 scholarshipType,
                 applicationFileUrl: fileUrl.url,
                 serviceId: serviceData?.id,
+                
             }
             ]
         };
@@ -181,6 +191,23 @@ const ServiceDetails = () => {
             await createRequest(requestData);
             alert("Request created successfully!");
             closeDialog();
+        } catch (error) {
+            setError((error as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelRequest = async () => {
+        if (!existingRequestId) return;
+        const confirmCancel = window.confirm("Do you really want to cancel your request?");
+        if (!confirmCancel) return;
+
+        setLoading(true);
+        try {
+            await cancelRequest(existingRequestId);
+            alert("Request cancelled successfully!");
+            setHasExistingRequest(false);
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -209,9 +236,10 @@ const ServiceDetails = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700"> Notes</label>
-                                <textarea
-                                    onChange={(e) => setApplicationNotes(e.target.value)}
+                                <label className="block text-gray-700">Description</label>
+                                <input
+                                    type="text"
+                                    onChange={(e) => setDescription(e.target.value)}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
@@ -286,14 +314,23 @@ const ServiceDetails = () => {
                         </div>
                         <div className="text-white text-center flex h-[50px] mt-[26px]">
                             <div className="flex justify-between w-full gap-10">
-                                {(!isFunder && !isProvider) ? (
-                                    <button
-                                        onClick={handleRequestNow}
-                                        className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                    >
-                                        Request now
-                                    </button>
-                                ) : ((!isFunder && isProvider) ?(
+                                {!isFunder && !isProvider ? (
+                                    !hasExistingRequest ? (
+                                        <button
+                                            onClick={handleRequestNow}
+                                            className="text-xl w-full bg-blue-700 rounded-[25px]"
+                                        >
+                                            Request Now
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleCancelRequest}
+                                            className="text-xl w-full bg-yellow-500 rounded-[25px]"
+                                        >
+                                            Cancel Request
+                                        </button>
+                                    )
+                                ) : ((!isFunder && isProvider) ? (
                                     <>
                                         <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
                                             Edit
@@ -374,7 +411,7 @@ const ServiceDetails = () => {
                                             Delete
                                         </button>
                                     </>
-                                ):(<div></div>))}
+                                ) : (<div></div>))}
                             </div>
                         </div>
                     </div>
@@ -416,7 +453,12 @@ const ServiceDetails = () => {
                 </div>
             </section>
             <AccountApplicantDialog open={applicantDialogOpen}
-                onClose={() => setApplicantDialogOpen(false)} applications={applicants ?? []} />
+                onClose={() => setApplicantDialogOpen(false)} 
+                applications={applicants ?? []}
+                fetchApplications={async () => {
+                    if (!serviceData) return;
+                    await fetchApplicants(parseInt(serviceData?.id));
+                }}/>
         </div>
     );
 };
