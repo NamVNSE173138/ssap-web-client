@@ -14,3 +14,10 @@ export async function uploadFile(file:any) {
   );
   return response.data;
 }
+
+export async function deleteFile(publicId:string) {
+  const response = await axios.delete(
+    `${BASE_URL}/api/test/delete-file/${publicId}` 
+      );
+  return response.data;
+}

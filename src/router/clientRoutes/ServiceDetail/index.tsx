@@ -50,8 +50,7 @@ const ServiceDetails = () => {
     const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
     const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
 
-    useEffect(() => {
-        const fetchService = async () => {
+    const fetchService = async () => {
             try {
                 const data = await getServiceById(Number(id));
                 setServiceData(data.data);
@@ -73,6 +72,8 @@ const ServiceDetails = () => {
                 setLoading(false);
             }
         };
+
+    useEffect(() => {
         fetchService();
     }, [id, user]);
 
@@ -190,6 +191,7 @@ const ServiceDetails = () => {
         try {
             await createRequest(requestData);
             alert("Request created successfully!");
+            await fetchService();
             closeDialog();
         } catch (error) {
             setError((error as Error).message);
@@ -224,7 +226,10 @@ const ServiceDetails = () => {
             {isDialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="bg-white p-5 rounded-lg shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Create Request</h2>
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-semibold mb-4">Create Request</h2>
+                            <span className="text-xl cursor-pointer" onClick={closeDialog}>&times;</span>
+                        </div>
                         {error && <p className="text-red-500">{error}</p>}
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
