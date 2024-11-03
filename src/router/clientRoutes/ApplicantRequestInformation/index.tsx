@@ -154,7 +154,7 @@ import RequestDetailTable from "./request-detail-table"
             <div className="max-w-[1216px] mx-auto">
                 <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
                     <p className="text-4xl mb-8">
-                        Service Details
+                        Request Details
                         <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
                     </p>
                     <RequestDetailTable requestDetails={requestDetails} description={request.description} />
