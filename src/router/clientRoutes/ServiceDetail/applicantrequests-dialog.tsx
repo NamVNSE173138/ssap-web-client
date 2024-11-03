@@ -1,5 +1,6 @@
 import { formatDate } from "@/lib/date-formatter";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
+import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
 import {
     Button,
     Dialog,
@@ -46,6 +47,9 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     const [selectedApplicantId, setSelectedApplicantId] = useState<number | null>(null);
     const [commentText, setCommentText] = useState("");
     const navigate = useNavigate();
+
+    const [commentWithFile, setCommentWithFile] = useState(0);
+    const [commentFile, setCommentFile] = useState<any>(null);
 
     useEffect(() => {
         setApplicants({
@@ -104,23 +108,44 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
         setCommentDialogOpen(true);
     };
 
+    const handleCommentFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setCommentFile(event.target.files[0]);
+        }
+    };
+
     const handleSubmitComment = async () => {
         if (selectedApplicantId === null) return;
 
         try {
             const existingApplicantResponse = await getRequestById(selectedApplicantId);
             const requestDetail = existingApplicantResponse.data.requestDetails[0];
-
+            
             if (requestDetail) {
+                if(requestDetail.applicationNotes.startsWith("https://")) {
+                    //split file url and comment
+                    try{
+                    await deleteFile(requestDetail.applicationNotes.split(", ")[0]
+                            //get publicId from url
+                            .split("/").pop());
+                    }catch(error){
+                    }
+                }
                 const updatedRequest = {
                     ...existingApplicantResponse.data,
                     requestDetails: [
                         {
                             ...requestDetail,
-                            applicationNotes: `${requestDetail.applicationNotes || ''}\n${commentText}`,
+                            applicationNotes: `, ${commentText}`,
                         },
                     ],
                 };
+                if(commentFile){
+                    const formData = new FormData();
+                    formData.append("File", commentFile);
+                    const fileUrl = await uploadFile(formData);
+                    updatedRequest.requestDetails[0].applicationNotes = fileUrl.url + updatedRequest.requestDetails[0].applicationNotes;
+                }
 
                 await updateRequest(selectedApplicantId, updatedRequest);
 
@@ -134,6 +159,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 setApplicants(updatedApplicants);
 
                 setCommentText("");
+                setCommentFile(null);
                 setCommentDialogOpen(false);
             } else {
                 console.error(`Request details for applicant id:${selectedApplicantId} not found`);
@@ -258,6 +284,12 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
             <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Add Comment</DialogTitle>
                 <Box sx={{ p: 3 }}>
+                    <Typography variant="body1">Add updated file:</Typography>
+                    <input
+                        type="file"
+                        onChange={handleCommentFile}
+                        style={{ marginTop: "8px", marginBottom: "20px" }}
+                    />
                     <Typography variant="body1">Add your comment:</Typography>
                     <textarea
                         value={commentText}
