@@ -6,6 +6,8 @@ import { BASE_URL } from "@/constants/api";
 import { NotifyFunderNewApplicant, SendNotification } from "@/services/ApiServices/notification";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import EditableTable from "./application-document-table";
+import { uploadFile } from "@/services/ApiServices/testService";
+import { addApplicationDocument } from "@/services/ApiServices/applicationDocumentService";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -57,10 +59,16 @@ const ApplyScholarship = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(rows);
+    setRows(rows.map((row) => ({ ...row, errors: {
+        name: !row.name,
+        type: !row.type,
+        file: !row.file
+    }})));
+    for(const row of rows){
+        if(!row.name || !row.type || !row.file)
+            return;
+    }
     
-    return;
-
     const applicationData = {
       applicantId: isApplicant,
       scholarshipProgramId: id,
@@ -83,6 +91,21 @@ const ApplyScholarship = () => {
 
       if (response.ok) {
         const result = await response.json();
+        for(const row of rows){
+            if(!row.name || !row.type || !row.file)
+                return;
+            const formData = new FormData();
+            formData.append("File", row.file);
+            const name = await uploadFile(formData);
+
+            const documentData = {
+                name: row.name,
+                type: row.type,
+                fileUrl: name.url,
+                applicationId: result.id
+            };
+            await addApplicationDocument(documentData);
+        }
         console.log("Application submitted:", result);
       } else {
         console.error("Failed to submit application");
