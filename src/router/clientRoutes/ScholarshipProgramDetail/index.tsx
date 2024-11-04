@@ -27,6 +27,7 @@ import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
+import { getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -48,6 +49,8 @@ const ScholarshipProgramDetail = () => {
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] = useState<boolean>(false);
 
+  const [existingApplication, setExistingApplication] = useState<any>(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,6 +64,10 @@ const ScholarshipProgramDetail = () => {
         if (response.data.statusCode === 200) {
           setData(response.data.data);
           setAuthorized(response.data.message);
+          if(user) {
+            const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
+            setExistingApplication(application.data);
+          }
         } else {
           setError("Failed to fetch data");
         }
@@ -207,14 +214,19 @@ const ScholarshipProgramDetail = () => {
             </div>
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
               {isApplicant == "APPLICANT" || !user ? (
-                <button
-                  onClick={() =>
-                    navigate(`/scholarship-program/${id}/application`)
-                  }
-                  className=" text-xl w-full bg-blue-700 rounded-[25px]"
-                >
-                  Apply now{" "}
-                </button>
+              <>
+                  {existingApplication && existingApplication.length == 0 && 
+                      (<button
+                          onClick={() =>
+                            navigate(`/scholarship-program/${id}/application`)
+                          }
+                          className=" text-xl w-full bg-blue-700 rounded-[25px]"
+                        >
+                          Apply now{" "}
+                        </button>)}
+                  {existingApplication && existingApplication.length > 0 && 
+                      (<div className="text-xl font-semibold">You have applied for this scholarship</div>)}
+              </>
               ) : (authorized != "Unauthorized" && (
                 <div className="flex justify-between w-full gap-10">
                   <button
