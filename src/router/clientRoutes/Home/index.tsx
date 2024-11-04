@@ -23,6 +23,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { Spin } from "antd";
+import { motion } from "framer-motion";
+
+const container = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.2 },
+  },
+};
 
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);
@@ -116,43 +124,61 @@ const Home = () => {
             </p>
           </div>
           <div className="flex items-center pt-10">
-  <input
-    className="h-14 px-4"
-    type="text"
-    placeholder="What to study"
-  />
-  <input
-    className="h-14 px-4"
-    type="text"
-    placeholder="Where to study"
-  />
-  <button
-    className="h-14 w-[20%] text-white"
-    style={{ backgroundColor: "#5559C7" }}
-  >
-    Find scholarship
-  </button>
-</div>
-
+            <input
+              className="h-14 px-4"
+              type="text"
+              placeholder="What to study"
+            />
+            <input
+              className="h-14 px-4"
+              type="text"
+              placeholder="Where to study"
+            />
+            <button
+              className="h-14 w-[20%] text-white"
+              style={{ backgroundColor: "#5559C7" }}
+            >
+              Find scholarship
+            </button>
+          </div>
         </div>
       </div>
 
       {/** HOW TO APPLY */}
       <div className="">
         <section className="relative ">
-          <div className="absolute ">
-            <p>HOW TO APPLY</p>
-            <ul className=" grid grid-cols-4 gap-20 px-12 py-10 text-center">
-              {attributes.map((attribute, idx) => (
-                <Attribute
-                  key={attribute.title}
-                  icon={attribute.icon}
-                  title={attribute.title}
-                  description={attribute.description}
-                  index={idx}
-                />
-              ))}
-            </ul>
+          <div className="absolute">
+            <motion.div
+              className="md:my-5 md:w-[70%]"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.5 }}
+              variants={{
+                hidden: { opacity: 0, x: -50 },
+                visible: { opacity: 1, x: 0 },
+              }}
+            >
+              <b
+                className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
+                style={{ color: "#5559C7" }}
+              >
+                HOW TO APPLY
+              </b>
+            </motion.div>
+            <motion.div>
+              <ul className=" grid grid-cols-4 gap-20 px-12 py-9 text-center">
+                {attributes.map((attribute, idx) => (
+                  <Attribute
+                    key={attribute.title}
+                    icon={attribute.icon}
+                    title={attribute.title}
+                    description={attribute.description}
+                    index={idx}
+                  />
+                ))}
+              </ul>
+            </motion.div>
           </div>
           <Background />
         </section>
@@ -162,7 +188,24 @@ const Home = () => {
       {!majors && <Spin size="large" />}
       <div className="my-10">
         <section className="relative ">
-          <p>BROWSE BY DISCIPLINE</p>
+        <motion.div
+              className="md:my-5 md:w-[70%]"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.5 }}
+              variants={{
+                hidden: { opacity: 0, x: -50 },
+                visible: { opacity: 1, x: 0 },
+              }}
+            >
+              <b
+                className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
+                style={{ color: "#5559C7" }}
+              >
+                BROWSER BY DISCIPLINES
+              </b>
+            </motion.div>
           <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
             {majors &&
               majors.map((major: any) => (
