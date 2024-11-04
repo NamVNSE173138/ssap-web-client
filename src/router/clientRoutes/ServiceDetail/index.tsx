@@ -13,7 +13,7 @@ import { deleteService, getServiceById, updateService } from "@/services/ApiServ
 import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
-import { uploadFile } from "@/services/ApiServices/testService";
+import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 
 interface ServiceType {
@@ -61,6 +61,8 @@ const ServiceDetails = () => {
                     setHasExistingRequest(false);
                 }
                 const response = await fetchApplicants(data.data.id);
+                console.log(response);
+                setExistingRequestId(response.find((r: any) => r.applicantId == user?.id)?.id || null);
                 if (response.length == 0) {
                     setCanEdit(true);
                 } else {
@@ -75,6 +77,7 @@ const ServiceDetails = () => {
 
     useEffect(() => {
         fetchService();
+
     }, [id, user]);
 
     const openEditDialog = () => {
@@ -207,6 +210,18 @@ const ServiceDetails = () => {
 
         setLoading(true);
         try {
+            let applicationFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
+                ?.requestDetails[0].applicationFileUrl.split("/").pop();
+            let reviewFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
+                ?.requestDetails[0].applicationNotes.split(", ")[0].split("/").pop();
+
+            //try remove files
+            try{
+                await deleteFile(applicationFileUrl);
+                await deleteFile(reviewFileUrl);
+            }
+            catch(error){
+            }
             await cancelRequest(existingRequestId);
             alert("Request cancelled successfully!");
             setHasExistingRequest(false);
