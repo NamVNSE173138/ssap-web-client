@@ -26,7 +26,7 @@ interface ServiceType {
     providerId: string;
 }
 
-const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
+const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const { id } = serviceId ?? useParams<{ id: string }>();
     const [serviceData, setServiceData] = useState<ServiceType | null>(null);
     const [applicants, setApplicants] = useState<any>(null);
@@ -80,29 +80,28 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
         setEditDialogOpen(true);
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files) return;
+    // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files = e.target.files;
+    //     if (!files) return;
 
-        setLoading(true);
+    //     setLoading(true);
 
-        try {
-            const filesArray = Array.from(files);
-            const formData = new FormData();
+    //     try {
+    //         const filesArray = Array.from(files);
+    //         const formData = new FormData();
 
-            filesArray.forEach((file) => {
-                formData.append("files", file);
-            });
+    //         filesArray.forEach((file) => {
+    //             formData.append("files", file);
+    //         });
 
-            const urls = await uploadFile(formData);
-            setApplicationFileUrls(urls);
-        } catch (error) {
-            console.error("File upload failed:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    //         const urls = await uploadFile(formData);
+    //         setApplicationFileUrls(urls);
+    //     } catch (error) {
+    //         console.error("File upload failed:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const fetchApplicants = async (serviceId: number) => {
         try {

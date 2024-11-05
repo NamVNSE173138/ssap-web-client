@@ -1,5 +1,5 @@
 import { Separator } from "../ui/separator";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/tooltip";
 import { FaDollarSign, FaClock, FaStar, FaRegCalendarAlt, FaAddressBook } from "react-icons/fa";
 import { ServiceType } from "@/router/clientRoutes/Service/data";
+import { useEffect, useState } from "react";
+import { getServiceById } from "@/services/ApiServices/serviceService";
+import { GoPersonFill } from "react-icons/go";
 
 const truncateString = (str: string, num: number) => {
   if (str.length <= num) {
@@ -18,6 +21,33 @@ const truncateString = (str: string, num: number) => {
 
 const ServiceCard = (service: ServiceType) => {
   const truncatedDescription = truncateString(service.description, 40);
+  const { id } = useParams<{ id: string }>();
+  const [services, setServices] = useState<ServiceType | null>(null);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [feedbackCount, setFeedbackCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchService = async () => {
+      if (id) {
+        const fetchedService = await getServiceById(Number(id));
+        setServices(fetchedService.data);
+
+        // const feedbackResponse = await getFeedbacksByServiceId(Number(id));
+        // if (feedbackResponse.data && feedbackResponse.data.length > 0) {
+        //   const totalRating = feedbackResponse.data.reduce((acc:any, feedback:any) => {
+        //     return acc + (feedback.rating || 0);
+        //   }, 0);
+        //   const count = feedbackResponse.data.length;
+        //   setAverageRating(totalRating / count);
+        //   setFeedbackCount(count);
+        // }
+      }
+    };
+
+    fetchService();
+  }, [id]);
+
+  if (!service) return null;
 
   return (
     <Link to={`/services/${service.id}`}>
@@ -41,8 +71,15 @@ const ServiceCard = (service: ServiceType) => {
 
           <div className="flex flex-col gap-4 mt-5">
             <div className="flex items-center gap-2">
-              <FaStar color="#060606" size={20} />
+              <GoPersonFill color="#060606" size={20} />
               <p>{service.providerId ? `Provider ID: ${service.providerId}` : "No Provider"}</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <FaStar color="#060606" size={20} />
+              <p>
+                {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? 'review' : 'reviews'})
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
