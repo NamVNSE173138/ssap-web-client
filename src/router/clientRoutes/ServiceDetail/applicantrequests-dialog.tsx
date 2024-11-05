@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Applicant {
     id: number;
-    status: "Pending" | "Accepted" | "Rejected";
+    status: "Pending" | "Accepted" | "Rejected" | "Finished";
     requestDate: string;
     applicant: {
         avatarUrl: string;
@@ -41,6 +41,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
         pending: [] as Applicant[],
         accepted: [] as Applicant[],
         rejected: [] as Applicant[],
+        finished: [] as Applicant[],
     });
     
     const [commentDialogOpen, setCommentDialogOpen] = useState(false);
@@ -56,6 +57,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
             pending: applications.filter(app => app.status === "Pending"),
             accepted: applications.filter(app => app.status === "Accepted"),
             rejected: applications.filter(app => app.status === "Rejected"),
+            finished: applications.filter(app => app.status === "Finished"),
         });
     }, [applications]);
 
@@ -84,17 +86,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 };
     
                 await updateRequest(id, updatedRequest);
-
-                /*const updatedApplicants = {
-                    ...applicants,
-                    [status.toLowerCase() as keyof typeof applicants]: [
-                        ...applicants[status.toLowerCase() as keyof typeof applicants],
-                        { ...existingApplicantResponse.data, status }
-                    ],
-                    pending: applicants.pending.filter(app => app.id !== id),
-                };*/
                 fetchApplications();
-                //setApplicants(updatedApplicants);
             } else {
                 console.error(`Request details for applicant id:${id} not found`);
             }
@@ -110,9 +102,9 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     const handleCommentFile = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
-            setCommentFile(event.target.files[0]);
+            setCommentFile(Array.from(event.target.files)); 
         }
-    };
+    }
 
     const handleSubmitComment = async () => {
         if (selectedApplicantId === null) return;
@@ -123,10 +115,8 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
             
             if (requestDetail) {
                 if(requestDetail.applicationNotes.startsWith("https://")) {
-                    //split file url and comment
                     try{
                     await deleteFile(requestDetail.applicationNotes.split(", ")[0]
-                            //get publicId from url
                             .split("/").pop());
                     }catch(error){
                     }
@@ -141,10 +131,9 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     ],
                 };
                 if(commentFile){
-                    const formData = new FormData();
-                    formData.append("File", commentFile);
-                    const fileUrl = await uploadFile(formData);
-                    updatedRequest.requestDetails[0].applicationNotes = fileUrl.url + updatedRequest.requestDetails[0].applicationNotes;
+                    const fileUrls = await uploadFile(commentFile);
+                    const fileUrlsString = fileUrls.urls.join(", ");
+                    updatedRequest.requestDetails[0].applicationNotes = `${fileUrlsString}, ${commentText}`;
                 }
 
                 await updateRequest(selectedApplicantId, updatedRequest);
@@ -273,11 +262,13 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     <Tab label="Pending" />
                     <Tab label="Accepted" />
                     <Tab label="Rejected" />
+                    <Tab label="Finished" />
                 </Tabs>
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
                     {activeTab === 0 && renderApplicants(applicants.pending)}
                     {activeTab === 1 && renderApplicants(applicants.accepted)}
                     {activeTab === 2 && renderApplicants(applicants.rejected)}
+                    {activeTab === 3 && renderApplicants(applicants.finished)}
                 </List>
             </Dialog>
 
@@ -287,6 +278,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     <Typography variant="body1">Add updated file:</Typography>
                     <input
                         type="file"
+                        multiple
                         onChange={handleCommentFile}
                         style={{ marginTop: "8px", marginBottom: "20px" }}
                     />

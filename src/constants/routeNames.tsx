@@ -24,7 +24,8 @@ const RouteNames = {
     SERVICES: '/services',
     SERVICES_DETAIL: '/services/:id',
     REVIEWS: '/reviews',
-    APPLICANT_REQUEST_INFORMATION: 'provider/requestinformation/:id'
+    APPLICANT_REQUEST_INFORMATION: 'provider/requestinformation/:id',
+    PROVIDER_COMMENT_INFORMATION: 'applicant/requestinformation/:id'
 }
 
 export default RouteNames

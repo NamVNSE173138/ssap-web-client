@@ -25,8 +25,8 @@ import DocumentTable from "./document-table"
           if(!id) return;
           const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
           const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
-          console.log(response);
-          console.log(scholarship);
+          //console.log(response);
+          //console.log(scholarship);
           if (response.statusCode == 200) {
             setApplication(response.data);
             setApplicant(response.data.applicant);

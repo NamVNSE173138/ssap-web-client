@@ -107,6 +107,10 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.APPLICANT_REQUEST_INFORMATION,
     element: <ApplicantRequestInfo/>,
+  },
+  {
+    path: RouteNames.PROVIDER_COMMENT_INFORMATION,
+    element: <ApplicantRequestInfo/>,
   }
 ];
 

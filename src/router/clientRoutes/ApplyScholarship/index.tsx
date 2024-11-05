@@ -4,6 +4,10 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "@/constants/api";
 import { NotifyFunderNewApplicant, SendNotification } from "@/services/ApiServices/notification";
+import { IoIosAddCircleOutline } from "react-icons/io";
+import EditableTable from "./application-document-table";
+import { uploadFile } from "@/services/ApiServices/testService";
+import { addApplicationDocument } from "@/services/ApiServices/applicationDocumentService";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -20,6 +24,31 @@ const ApplyScholarship = () => {
     receiveUpdates: false,
   });
 
+
+  const [rowId, setRowId] = useState<number>(0);
+  const [rows, setRows] = useState<any[]>([
+        //{ id: 1, name: 'CV', type: "PDF", file: null, isNew: false },
+        //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
+    ]);
+
+    const handleAddRow = () => {
+        setRowId(rowId + 1);
+        const newRow = { id: rowId+1, name: '', type: '' }; // Blank row for user input
+        setRows([...rows, newRow]);
+    };
+
+    const handleDeleteRow = (id: number) => {
+        setRows(rows.filter((row) => row.id !== id));
+    };
+
+    const handleDocumentInputChange = (id: number, field:any, value:any) => {
+        setRows((prevRows) =>
+            prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+        );
+    };
+
+    
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -30,7 +59,16 @@ const ApplyScholarship = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setRows(rows.map((row) => ({ ...row, errors: {
+        name: !row.name,
+        type: !row.type,
+        file: !row.file
+    }})));
+    for(const row of rows){
+        if(!row.name || !row.type || !row.file)
+            return;
+    }
+    
     const applicationData = {
       applicantId: isApplicant,
       scholarshipProgramId: id,
@@ -53,6 +91,21 @@ const ApplyScholarship = () => {
 
       if (response.ok) {
         const result = await response.json();
+        for(const row of rows){
+            if(!row.name || !row.type || !row.file)
+                return;
+            const formData = new FormData();
+            formData.append("File", row.file);
+            const name = await uploadFile(formData);
+
+            const documentData = {
+                name: row.name,
+                type: row.type,
+                fileUrl: name.url,
+                applicationId: result.id
+            };
+            await addApplicationDocument(documentData);
+        }
         console.log("Application submitted:", result);
       } else {
         console.error("Failed to submit application");
@@ -156,6 +209,28 @@ const ApplyScholarship = () => {
                 </div>
               </div>
             </div>
+
+            <div className="flex gap-[20px] lg:col-span-2">
+                <div className="flex justify-between w-full">
+                    <h2>
+                        Documents
+                        <span className="block bg-blue-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
+                    </h2>
+                        
+                    <button
+                      type="button"
+                      onClick={handleAddRow}
+                      className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
+                    >
+                      <IoIosAddCircleOutline className="text-3xl text-blue-500" />
+                      <p className="text-xl text-blue-600">Add Document</p>
+                    </button>
+                </div>
+            </div>
+            <div className="flex gap-[20px] lg:col-span-2"> 
+                <EditableTable rows={rows} setRows={setRows} handleDeleteRow={handleDeleteRow} handleInputChange={handleDocumentInputChange}/>
+            </div>
+
             <div className="flex gap-[12px] flex-col lg:col-span-2 ">
               <div className="flex items-center">
                 <input
@@ -193,6 +268,7 @@ const ApplyScholarship = () => {
               </button>
             </div>
           </form>
+          
         </div>
         <div className="order-1 lg:order-2 hidden lg:block lg:col-span-4 xl:col-span-5">
           <img src="" alt="abc" className="h-full object-contain w-full" />

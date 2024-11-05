@@ -9,3 +9,11 @@ export async function getApplicationWithDocumentsAndAccount(id: number) {
   );
   return response.data;
 }
+
+export async function getApplicationByApplicantIdAndScholarshipId(applicantId: number, scholarshipId: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/applicants/by-applicantId-and-scholarshipId?applicantId=${applicantId}&scholarshipId=${scholarshipId}`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
