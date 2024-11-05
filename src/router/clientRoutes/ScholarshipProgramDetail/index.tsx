@@ -225,7 +225,15 @@ const ScholarshipProgramDetail = () => {
                           Apply now{" "}
                         </button>)}
                   {existingApplication && existingApplication.length > 0 && 
-                      (<div className="text-xl font-semibold">You have applied for this scholarship</div>)}
+                      (<>
+                        <div className="text-xl font-semibold">You have applied for this scholarship</div>
+                        <button
+                            onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                            className=" text-xl w-full bg-green-700 rounded-[25px]"
+                          >
+                            View applications{" "}
+                          </button>
+                       </>)}
               </>
               ) : (authorized != "Unauthorized" && (
                 <div className="flex justify-between w-full gap-10">
