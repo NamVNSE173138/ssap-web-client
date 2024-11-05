@@ -14,6 +14,8 @@ import {
     Tooltip,
     Typography,
     Box,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,14 +45,15 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
         rejected: [] as Applicant[],
         finished: [] as Applicant[],
     });
-    
+
     const [commentDialogOpen, setCommentDialogOpen] = useState(false);
     const [selectedApplicantId, setSelectedApplicantId] = useState<number | null>(null);
     const [commentText, setCommentText] = useState("");
     const navigate = useNavigate();
-
     const [commentWithFile, setCommentWithFile] = useState(0);
     const [commentFile, setCommentFile] = useState<any>(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
 
     useEffect(() => {
         setApplicants({
@@ -64,18 +67,17 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     const handleStatusUpdate = async (id: number, status: "Accepted" | "Rejected") => {
         try {
             const existingApplicantResponse = await getRequestById(id);
-            
-            const requestDetail = existingApplicantResponse.data.requestDetails[0]; 
-    
+            const requestDetail = existingApplicantResponse.data.requestDetails[0];
+
             if (requestDetail) {
                 const updatedRequest = {
-                    description: existingApplicantResponse.data.description, 
+                    description: existingApplicantResponse.data.description,
                     requestDate: existingApplicantResponse.data.requestDate,
                     status: status,
                     applicantId: existingApplicantResponse.data.applicantId,
                     requestDetails: [
                         {
-                            id:requestDetail.id,
+                            id: requestDetail.id,
                             expectedCompletionTime: requestDetail.expectedCompletionTime,
                             applicationNotes: requestDetail.applicationNotes,
                             scholarshipType: requestDetail.scholarshipType,
@@ -84,7 +86,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                         }
                     ]
                 };
-    
+
                 await updateRequest(id, updatedRequest);
                 fetchApplications();
             } else {
@@ -102,24 +104,23 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     const handleCommentFile = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
-            setCommentFile(Array.from(event.target.files)); 
+            setCommentFile(Array.from(event.target.files));
         }
-    }
+    };
 
     const handleSubmitComment = async () => {
         if (selectedApplicantId === null) return;
 
         try {
+            setSnackbarOpen(true);
             const existingApplicantResponse = await getRequestById(selectedApplicantId);
             const requestDetail = existingApplicantResponse.data.requestDetails[0];
-            
+
             if (requestDetail) {
-                if(requestDetail.applicationNotes.startsWith("https://")) {
-                    try{
-                    await deleteFile(requestDetail.applicationNotes.split(", ")[0]
-                            .split("/").pop());
-                    }catch(error){
-                    }
+                if (requestDetail.applicationNotes.startsWith("https://")) {
+                    try {
+                        await deleteFile(requestDetail.applicationNotes.split(", ")[0].split("/").pop());
+                    } catch (error) {}
                 }
                 const updatedRequest = {
                     ...existingApplicantResponse.data,
@@ -130,7 +131,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                         },
                     ],
                 };
-                if(commentFile){
+                if (commentFile) {
                     const fileUrls = await uploadFile(commentFile);
                     const fileUrlsString = fileUrls.urls.join(", ");
                     updatedRequest.requestDetails[0].applicationNotes = `${fileUrlsString}, ${commentText}`;
@@ -146,6 +147,9 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 };
 
                 setApplicants(updatedApplicants);
+
+                setSnackbarMessage("Comment successfully!");
+                setSnackbarOpen(true);
 
                 setCommentText("");
                 setCommentFile(null);
@@ -247,6 +251,10 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
         </Box>
     );
 
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
     return (
         <>
             <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
@@ -299,6 +307,12 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     </Box>
                 </Box>
             </Dialog>
+
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
+                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

@@ -20,6 +20,7 @@ import FunderApplication from "./FunderApplication";
 import Service from "./Service";
 import ServiceDetails from "./ServiceDetail";
 import ApplicantRequestInfo from "./ApplicantRequestInformation";
+import RequestHistory from "./RequestServiceHistory";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -63,6 +64,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SERVICES_DETAIL,
     element: <ServiceDetails />,
+  },
+  {
+    path: RouteNames.APPLICANT_REQUEST_HISTORY,
+    element: <RequestHistory/>,
   }
 ];
 
