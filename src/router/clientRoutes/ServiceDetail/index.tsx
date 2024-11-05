@@ -26,8 +26,8 @@ interface ServiceType {
     providerId: string;
 }
 
-const ServiceDetails = () => {
-    const { id } = useParams<{ id: string }>();
+const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
+    const { id } = serviceId ?? useParams<{ id: string }>();
     const [serviceData, setServiceData] = useState<ServiceType | null>(null);
     const [applicants, setApplicants] = useState<any>(null);
     const [applicantDialogOpen, setApplicantDialogOpen] = useState<boolean>(false);
@@ -38,7 +38,7 @@ const ServiceDetails = () => {
     const [applicationNotes, setApplicationNotes] = useState<string>("");
     const [scholarshipType, setScholarshipType] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [applicationFileUrl, setapplicationFileUrl] = useState<any>(null);
+    const [applicationFileUrls, setApplicationFileUrls] = useState<any>(null);
     const [editData, setEditData] = useState<ServiceType | null>(null);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const navigate = useNavigate();
@@ -80,28 +80,29 @@ const ServiceDetails = () => {
         setEditDialogOpen(true);
     };
 
-    // const handleEditChange = (field: keyof ServiceType, value: string | number | Date) => {
-    //     if (editData) {
-    //         setEditData({ ...editData, [field]: value });
-    //     }
-    // };
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
 
-    // const handleEditSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     if (!editData) return;
+        setLoading(true);
 
-    //     setLoading(true);
-    //     try {
-    //         await updateService(Number(id), editData);
-    //         setServiceData(editData);
-    //         setEditDialogOpen(false);
-    //         alert("Service updated successfully!");
-    //     } catch (error) {
-    //         setError((error as Error).message);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+        try {
+            const filesArray = Array.from(files);
+            const formData = new FormData();
+
+            filesArray.forEach((file) => {
+                formData.append("files", file);
+            });
+
+            const urls = await uploadFile(formData);
+            setApplicationFileUrls(urls);
+        } catch (error) {
+            console.error("File upload failed:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const fetchApplicants = async (serviceId: number) => {
         try {
@@ -166,18 +167,21 @@ const ServiceDetails = () => {
         setExpectedCompletionTime(null);
         setApplicationNotes("");
         setScholarshipType("");
-        setapplicationFileUrl("");
+        setApplicationFileUrls("");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-
+        const filesArray = Array.from(applicationFileUrls);
         const formData = new FormData();
-        formData.append("File", applicationFileUrl);
 
-        const fileUrl = await uploadFile(formData);
+        filesArray.forEach((file: any) => {
+            formData.append("files", file);
+        });
+
+        const urls = await uploadFile(filesArray);
 
         const requestData = {
             description,
@@ -189,7 +193,7 @@ const ServiceDetails = () => {
                 expectedCompletionTime,
                 applicationNotes,
                 scholarshipType,
-                applicationFileUrl: fileUrl.url,
+                applicationFileUrl: urls.urls.join(", "),
                 serviceId: serviceData?.id,
 
             }
@@ -208,10 +212,6 @@ const ServiceDetails = () => {
         }
     };
 
-    const handleViewRequest = (appId: any) => {
-        navigate(`/applicant/requestinformation/${appId}`);
-    };
-
     const handleCancelRequest = async () => {
         if (!existingRequestId) return;
         const confirmCancel = window.confirm("Do you really want to cancel your request?");
@@ -220,9 +220,9 @@ const ServiceDetails = () => {
         setLoading(true);
         try {
             let applicationFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
-                ?.requestDetails[0].applicationFileUrl.split("/").pop();
+                ?.requestDetails[0].applicationFileUrl?.split("/").pop();
             let reviewFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
-                ?.requestDetails[0].applicationNotes.split(", ")[0].split("/").pop();
+                ?.requestDetails[0].applicationNotes?.split(", ")[0].split("/").pop();
 
             try {
                 await deleteFile(applicationFileUrl);
@@ -280,10 +280,11 @@ const ServiceDetails = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700">Application File</label>
+                                <label className="block text-gray-700">Application File(s)</label>
                                 <input
                                     type="file"
-                                    onChange={(e) => setapplicationFileUrl(e.target.files?.[0])}
+                                    multiple
+                                    onChange={e => setApplicationFileUrls(e.target.files)}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
@@ -342,57 +343,54 @@ const ServiceDetails = () => {
                         </div>
                         <div className="text-white text-center flex h-[50px] mt-[26px]">
                             <div className="flex justify-between w-full gap-10">
-                                {!isFunder && !isProvider ? (
-                                    requestStatus === "Pending" ? (
-                                        <button
-                                            onClick={handleCancelRequest}
-                                            className="text-xl w-full bg-yellow-500 rounded-[25px]"
-                                        >
-                                            Cancel Request
-                                        </button>
-                                    ) : requestStatus === "Rejected" ? (
-                                        <button
-                                            onClick={handleRequestNow}
-                                            className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                        >
-                                            Request Now
-                                        </button>
-                                    ) : requestStatus === "Accepted" ? (
-                                        <button
-                                            onClick={() => handleViewRequest(existingRequestId?.toString())}
-                                            className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                        >
-                                            View Request
-                                        </button>
-                                    ) : requestStatus === "Finished" ? (
-                                        <>
+                                {showButtons && <>
+                                    {!isFunder && !isProvider ? (
+                                        requestStatus === "Pending" ? (
+                                            <button
+                                                onClick={handleCancelRequest}
+                                                className="text-xl w-full bg-yellow-500 rounded-[25px]"
+                                            >
+                                                Cancel Request
+                                            </button>
+                                        ) : requestStatus === "Rejected" ? (
                                             <button
                                                 onClick={handleRequestNow}
-                                                className="text-xl w-full bg-blue-700 rounded-[25px] mt-2"
+                                                className="text-xl w-full bg-blue-700 rounded-[25px]"
                                             >
                                                 Request Now
                                             </button>
+                                        ) : requestStatus === "Finished" ? (
+                                            <>
+                                                <button
+                                                    onClick={handleRequestNow}
+                                                    className="text-xl w-full bg-blue-700 rounded-[25px] mt-2"
+                                                >
+                                                    Request Now
+                                                </button>
+                                            </>
+                                        ) : (
                                             <button
-                                                onClick={() => handleViewRequest(existingRequestId?.toString())}
-                                                className="text-xl w-full bg-orange-500 rounded-[25px]"
+                                                onClick={handleRequestNow}
+                                                className="text-xl w-full bg-blue-700 rounded-[25px]"
                                             >
+                                                Request Now
+                                            </button>
+                                        )
+                                    ) : (!isFunder && isProvider ? (
+                                        <>
+                                            <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
+                                                Edit
+                                            </button>
+                                            <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
                                                 View Request
                                             </button>
+                                            <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
+                                                Delete
+                                            </button>
                                         </>
-                                    ) : null
-                                ) : ((!isFunder && isProvider) ? (
-                                    <>
-                                        <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
-                                            Edit
-                                        </button>
-                                        <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
-                                            View Request
-                                        </button>
-                                        <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
-                                            Delete
-                                        </button>
-                                    </>
-                                ) : (<div></div>))}
+                                    ) : (
+                                        <div></div>
+                                    ))}</>}
                             </div>
                         </div>
                     </div>

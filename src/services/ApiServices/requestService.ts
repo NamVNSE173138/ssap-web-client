@@ -53,3 +53,8 @@ export async function cancelRequest(requestId: number) {
     const response = await axios.delete(`${BASE_URL}/api/requests/cancel-request/${requestId}`, ngrokSkipWarning);
     return response.data;
 }
+
+export async function getRequestsByApplicantId(applicantId: number) {
+    const response = await axios.get(`${BASE_URL}/api/requests?ApplicantId=${applicantId}`, ngrokSkipWarning);
+    return response.data;
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ServiceSkeleton from "./ServiceSkeleton";
 import { BASE_URL } from "@/constants/api";
@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
+import RouteNames from "@/constants/routeNames";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -19,9 +20,10 @@ const Service = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const pageSize = 6; 
-
+  const pageSize = 6;
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -43,7 +45,7 @@ const Service = () => {
         }
       } else {
         setData([]);
-        setTotalPages(1); 
+        setTotalPages(1);
       }
     } catch (err) {
       setError("Failed to load services");
@@ -51,10 +53,10 @@ const Service = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    
     fetchData();
-  }, [currentPage, user]); 
+  }, [currentPage, user]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -68,37 +70,51 @@ const Service = () => {
     }
   };
 
+  const handleViewHistory = () => {
+    navigate(RouteNames.APPLICANT_REQUEST_HISTORY);
+  };
+
   return (
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
         <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[70px] z-10">
-          <Breadcrumb className=" ">
+          <Breadcrumb>
             <BreadcrumbList className="text-white">
               <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">
-                  Home
-                </Link>
+                <Link to="/" className="md:text-xl text-lg">Home</Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <p className="text-white md:text-xl text-lg">
-                  Services
-                </p>
+                <p className="text-white md:text-xl text-lg">Services</p>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </div>
+
       <div className="flex justify-between p-4">
-        <button 
-          onClick={() => setIsServiceModalOpen(true)} 
-          className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
-        >
-          <IoIosAddCircleOutline className="text-3xl text-blue-500" />
-          <p className="text-xl text-blue-600">Add Service</p>
-        </button>
+        {user?.role === "PROVIDER" && (
+          <button
+            onClick={() => setIsServiceModalOpen(true)}
+            className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
+          >
+            <IoIosAddCircleOutline className="text-3xl text-blue-500" />
+            <p className="text-xl text-blue-600">Add Service</p>
+          </button>
+        )}
+
+        {user?.role === "APPLICANT" && (
+          <button
+            onClick={handleViewHistory}
+            className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
+          >
+            <IoIosAddCircleOutline className="text-3xl text-blue-500" />
+            <p className="text-xl text-blue-600">View History</p>
+          </button>
+        )}
       </div>
+
       <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 p-10">
         {loading ? (
           <ServiceSkeleton />
@@ -110,18 +126,19 @@ const Service = () => {
           data.map((service) => <li key={service.id}><ServiceCard {...service} /></li>)
         )}
       </ul>
+
       <div className="flex justify-between p-4">
-        <button 
-          onClick={handlePrevPage} 
-          disabled={currentPage === 1} 
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
           Previous
         </button>
         <span>Page {currentPage} of {totalPages}</span>
-        <button 
-          onClick={handleNextPage} 
-          disabled={currentPage === totalPages} 
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
           Next
@@ -131,7 +148,7 @@ const Service = () => {
       <AddServiceModal
         isOpen={isServiceModalOpen}
         setIsOpen={setIsServiceModalOpen}
-        fetchServices={() => { setCurrentPage(1) ; fetchData()} } 
+        fetchServices={() => { setCurrentPage(1); fetchData(); }}
       />
     </div>
   );

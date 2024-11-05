@@ -1,10 +1,10 @@
 import { formatDate } from "@/lib/date-formatter";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, Button } from "@mui/material";
 import { useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate, useParams } from "react-router-dom"; 
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
 
-const RequestDetailTable = ({ request, requestDetails, description }: { request:any, requestDetails: any; description: string }) => {
+const RequestDetailTable = ({ showButtons, request, requestDetails, description }: { showButtons: boolean, request: any, requestDetails: any; description: string }) => {
     const { id } = useParams<{ id: string }>();
     const user = useSelector((state: any) => state.token.user);
     const navigate = useNavigate();
@@ -58,6 +58,9 @@ const RequestDetailTable = ({ request, requestDetails, description }: { request:
     };
 
     const isFinished = request.status === "Finished";
+    const isAccepted = request.status === "Accepted";
+    const isPending = request.status === "Pending"; 
+    const isRejected = request.status === "Rejected";
 
     return (
         <Box>
@@ -85,15 +88,25 @@ const RequestDetailTable = ({ request, requestDetails, description }: { request:
                     <TableBody>
                         {requestDetails.map((detail: any) => (
                             <TableRow key={detail.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { backgroundColor: '#f5f5f5' } }}>
-                                <TableCell>
+                                <TableCell align="right">
                                     {detail.applicationFileUrl ? (
-                                        <Link target="_blank" className="text-blue-500 underline hover:text-blue-700" to={detail.applicationFileUrl}>
-                                            Request File
-                                        </Link>
+                                        detail.applicationFileUrl.split(", ").map((fileUrl: any, index: any) => {
+                                            if (fileUrl.startsWith("https://")) {
+                                                return (
+                                                    <div key={index}>
+                                                        <Link target="_blank" className="text-blue-500 underline hover:text-blue-700" to={fileUrl}>
+                                                            File {index + 1}
+                                                        </Link>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })
                                     ) : (
                                         <Typography variant="body2" color="textSecondary">No file uploaded</Typography>
                                     )}
                                 </TableCell>
+
                                 <TableCell align="right">
                                     <Typography variant="body1">{detail.scholarshipType}</Typography>
                                 </TableCell>
@@ -131,25 +144,48 @@ const RequestDetailTable = ({ request, requestDetails, description }: { request:
                 </Table>
             </TableContainer>
             {user.role === "APPLICANT" && (
-                <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleFinish}
-                        disabled={isFinished}
-                        sx={{
-                            borderRadius: '25px',
-                            padding: '10px 20px',
-                            fontSize: '16px',
-                            boxShadow: 3,
-                            '&:hover': {
-                                boxShadow: 6,
-                            },
-                        }}
-                    >
-                        Finish
-                    </Button>
-                </Box>
+                <>
+                    {showButtons && (
+                        <Box display="flex" justifyContent="flex-end" mt={2}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={isFinished || isPending || isRejected}
+                                    onClick={() => console.log("Chat clicked")}
+                                    sx={{
+                                        borderRadius: '25px',
+                                        padding: '10px 20px',
+                                        fontSize: '16px',
+                                        marginRight: '10px',
+                                        boxShadow: 3,
+                                        '&:hover': {
+                                            boxShadow: 6,
+                                        },
+                                    }}
+                                >
+                                    Chat
+                                </Button>
+
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleFinish}
+                                disabled={isFinished || isPending || isRejected}
+                                sx={{
+                                    borderRadius: '25px',
+                                    padding: '10px 20px',
+                                    fontSize: '16px',
+                                    boxShadow: 3,
+                                    '&:hover': {
+                                        boxShadow: 6,
+                                    },
+                                }}
+                            >
+                                Finish
+                            </Button>
+                        </Box>
+                    )}
+                </>
             )}
         </Box>
     );
