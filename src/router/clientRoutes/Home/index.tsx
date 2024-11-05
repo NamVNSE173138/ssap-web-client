@@ -35,6 +35,7 @@ const container = {
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<any>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   const fetchMajors = async () => {
     try {
@@ -185,28 +186,49 @@ const Home = () => {
       </div>
 
       {/** BROWSER BY DISCIPLINES */}
-      {!majors && <Spin size="large" />}
+      {/* {!majors && <Spin size="large" />} */}
       <div className="my-10">
         <section className="relative ">
-        <motion.div
-              className="md:my-5 md:w-[70%]"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.5 }}
-              variants={{
-                hidden: { opacity: 0, x: -50 },
-                visible: { opacity: 1, x: 0 },
-              }}
+          <motion.div
+            className="md:my-5 md:w-[70%]"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            variants={{
+              hidden: { opacity: 0, x: -50 },
+              visible: { opacity: 1, x: 0 },
+            }}
+          >
+            <b
+              className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
+              style={{ color: "#5559C7" }}
             >
-              <b
-                className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
-                style={{ color: "#5559C7" }}
-              >
-                BROWSER BY DISCIPLINES
-              </b>
-            </motion.div>
-          <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
+              BROWSER BY DISCIPLINES
+            </b>
+          </motion.div>
+          {/* {!majors && <Spin size="large" />} */}
+          <motion.div
+            className="absolute grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10"
+            whileInView={{ opacity: 1, scale: 1, skewY: -6, rotate: 6 }}
+            initial={{ opacity: 0, scale: 0.5, skewY: -15, rotate: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: [0, 0.71, 0.2, 1.01],
+              scale: {
+                type: "spring",
+                damping: 7,
+                stiffness: 100,
+                restDelta: 0.001,
+              },
+              skew: {
+                type: "spring",
+                damping: 10,
+                stiffness: 50,
+              },
+            }}
+            viewport={{ once: true }} // Animates only once when it enters the viewport
+          >
             {majors &&
               majors.map((major: any) => (
                 <Link
@@ -214,7 +236,7 @@ const Home = () => {
                   to={`/major/${major.id}`}
                   className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-[#5559c7] rounded-lg"
                 >
-                  <p className="text-center text-white  text-lg font-bold">
+                  <p className="text-center text-white text-lg font-bold">
                     {major.name}
                   </p>
                   <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
@@ -222,7 +244,8 @@ const Home = () => {
                   </div>
                 </Link>
               ))}
-          </div>
+          </motion.div>
+
           <Background2 />
         </section>
       </div>
