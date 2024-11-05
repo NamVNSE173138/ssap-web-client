@@ -23,10 +23,19 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { Spin } from "antd";
+import { motion } from "framer-motion";
+
+const container = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.2 },
+  },
+};
 
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<any>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   const fetchMajors = async () => {
     try {
@@ -116,54 +125,110 @@ const Home = () => {
             </p>
           </div>
           <div className="flex items-center pt-10">
-  <input
-    className="h-14 px-4"
-    type="text"
-    placeholder="What to study"
-  />
-  <input
-    className="h-14 px-4"
-    type="text"
-    placeholder="Where to study"
-  />
-  <button
-    className="h-14 w-[20%] text-white"
-    style={{ backgroundColor: "#5559C7" }}
-  >
-    Find scholarship
-  </button>
-</div>
-
+            <input
+              className="h-14 px-4"
+              type="text"
+              placeholder="What to study"
+            />
+            <input
+              className="h-14 px-4"
+              type="text"
+              placeholder="Where to study"
+            />
+            <button
+              className="h-14 w-[20%] text-white"
+              style={{ backgroundColor: "#5559C7" }}
+            >
+              Find scholarship
+            </button>
+          </div>
         </div>
       </div>
 
       {/** HOW TO APPLY */}
       <div className="">
         <section className="relative ">
-          <div className="absolute ">
-            <p>HOW TO APPLY</p>
-            <ul className=" grid grid-cols-4 gap-20 px-12 py-10 text-center">
-              {attributes.map((attribute, idx) => (
-                <Attribute
-                  key={attribute.title}
-                  icon={attribute.icon}
-                  title={attribute.title}
-                  description={attribute.description}
-                  index={idx}
-                />
-              ))}
-            </ul>
+          <div className="absolute">
+            <motion.div
+              className="md:my-5 md:w-[70%]"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.5 }}
+              variants={{
+                hidden: { opacity: 0, x: -50 },
+                visible: { opacity: 1, x: 0 },
+              }}
+            >
+              <b
+                className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
+                style={{ color: "#5559C7" }}
+              >
+                HOW TO APPLY
+              </b>
+            </motion.div>
+            <motion.div>
+              <ul className=" grid grid-cols-4 gap-20 px-12 py-9 text-center">
+                {attributes.map((attribute, idx) => (
+                  <Attribute
+                    key={attribute.title}
+                    icon={attribute.icon}
+                    title={attribute.title}
+                    description={attribute.description}
+                    index={idx}
+                  />
+                ))}
+              </ul>
+            </motion.div>
           </div>
           <Background />
         </section>
       </div>
 
       {/** BROWSER BY DISCIPLINES */}
-      {!majors && <Spin size="large" />}
+      {/* {!majors && <Spin size="large" />} */}
       <div className="my-10">
         <section className="relative ">
-          <p>BROWSE BY DISCIPLINE</p>
-          <div className="absolute -skew-y-12 rotate-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10">
+          <motion.div
+            className="md:my-5 md:w-[70%]"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+            variants={{
+              hidden: { opacity: 0, x: -50 },
+              visible: { opacity: 1, x: 0 },
+            }}
+          >
+            <b
+              className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
+              style={{ color: "#5559C7" }}
+            >
+              BROWSER BY DISCIPLINES
+            </b>
+          </motion.div>
+          {/* {!majors && <Spin size="large" />} */}
+          <motion.div
+            className="absolute grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10"
+            whileInView={{ opacity: 1, scale: 1, skewY: -6, rotate: 6 }}
+            initial={{ opacity: 0, scale: 0.5, skewY: -15, rotate: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: [0, 0.71, 0.2, 1.01],
+              scale: {
+                type: "spring",
+                damping: 7,
+                stiffness: 100,
+                restDelta: 0.001,
+              },
+              skew: {
+                type: "spring",
+                damping: 10,
+                stiffness: 50,
+              },
+            }}
+            viewport={{ once: true }} // Animates only once when it enters the viewport
+          >
             {majors &&
               majors.map((major: any) => (
                 <Link
@@ -171,7 +236,7 @@ const Home = () => {
                   to={`/major/${major.id}`}
                   className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-[#5559c7] rounded-lg"
                 >
-                  <p className="text-center text-white  text-lg font-bold">
+                  <p className="text-center text-white text-lg font-bold">
                     {major.name}
                   </p>
                   <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
@@ -179,7 +244,8 @@ const Home = () => {
                   </div>
                 </Link>
               ))}
-          </div>
+          </motion.div>
+
           <Background2 />
         </section>
       </div>
