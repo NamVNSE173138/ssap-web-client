@@ -28,6 +28,7 @@ const RouteNames = {
     APPLICANT_REQUEST_INFORMATION: 'provider/requestinformation/:id',
     PROVIDER_COMMENT_INFORMATION: 'applicant/requestinformation/:id',
     APPLICANT_REQUEST_HISTORY: '/services-history',
+    PROVIDER_INFORMATION: '/provider-information/:id',
 }
 
 export default RouteNames

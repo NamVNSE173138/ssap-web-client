@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Applicant {
     id: number;
-    status: "Pending" | "Accepted" | "Rejected" | "Finished";
+    status: "Pending" | "Paid" | "Finished";
     requestDate: string;
     applicant: {
         avatarUrl: string;
@@ -41,8 +41,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     const [activeTab, setActiveTab] = useState(0);
     const [applicants, setApplicants] = useState({
         pending: [] as Applicant[],
-        accepted: [] as Applicant[],
-        rejected: [] as Applicant[],
+        paid: [] as Applicant[],
         finished: [] as Applicant[],
     });
 
@@ -58,44 +57,43 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     useEffect(() => {
         setApplicants({
             pending: applications.filter(app => app.status === "Pending"),
-            accepted: applications.filter(app => app.status === "Accepted"),
-            rejected: applications.filter(app => app.status === "Rejected"),
+            paid: applications.filter(app => app.status === "Paid"),
             finished: applications.filter(app => app.status === "Finished"),
         });
     }, [applications]);
 
-    const handleStatusUpdate = async (id: number, status: "Accepted" | "Rejected") => {
-        try {
-            const existingApplicantResponse = await getRequestById(id);
-            const requestDetail = existingApplicantResponse.data.requestDetails[0];
+    // const handleStatusUpdate = async (id: number, status: "Accepted" | "Rejected") => {
+    //     try {
+    //         const existingApplicantResponse = await getRequestById(id);
+    //         const requestDetail = existingApplicantResponse.data.requestDetails[0];
 
-            if (requestDetail) {
-                const updatedRequest = {
-                    description: existingApplicantResponse.data.description,
-                    requestDate: existingApplicantResponse.data.requestDate,
-                    status: status,
-                    applicantId: existingApplicantResponse.data.applicantId,
-                    requestDetails: [
-                        {
-                            id: requestDetail.id,
-                            expectedCompletionTime: requestDetail.expectedCompletionTime,
-                            applicationNotes: requestDetail.applicationNotes,
-                            scholarshipType: requestDetail.scholarshipType,
-                            applicationFileUrl: requestDetail.applicationFileUrl,
-                            serviceId: requestDetail.serviceId,
-                        }
-                    ]
-                };
+    //         if (requestDetail) {
+    //             const updatedRequest = {
+    //                 description: existingApplicantResponse.data.description,
+    //                 requestDate: existingApplicantResponse.data.requestDate,
+    //                 status: status,
+    //                 applicantId: existingApplicantResponse.data.applicantId,
+    //                 requestDetails: [
+    //                     {
+    //                         id: requestDetail.id,
+    //                         expectedCompletionTime: requestDetail.expectedCompletionTime,
+    //                         applicationNotes: requestDetail.applicationNotes,
+    //                         scholarshipType: requestDetail.scholarshipType,
+    //                         applicationFileUrl: requestDetail.applicationFileUrl,
+    //                         serviceId: requestDetail.serviceId,
+    //                     }
+    //                 ]
+    //             };
 
-                await updateRequest(id, updatedRequest);
-                fetchApplications();
-            } else {
-                console.error(`Request details for applicant id:${id} not found`);
-            }
-        } catch (error) {
-            console.error("Failed to update applicant status", error);
-        }
-    };
+    //             await updateRequest(id, updatedRequest);
+    //             fetchApplications();
+    //         } else {
+    //             console.error(`Request details for applicant id:${id} not found`);
+    //         }
+    //     } catch (error) {
+    //         console.error("Failed to update applicant status", error);
+    //     }
+    // };
 
     const handleOpenCommentDialog = (applicantId: number) => {
         setSelectedApplicantId(applicantId);
@@ -200,7 +198,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                         >
                             View Request
                         </Button>
-                        {app.status === "Accepted" && (
+                        {app.status === "Paid" && (
                             <Button
                                 onClick={() => handleOpenCommentDialog(app.id)}
                                 color="primary"
@@ -210,30 +208,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             >
                                 Add Comment
                             </Button>
-                        )}
-                        {app.status === "Pending" && (
-                            <Box sx={{ display: "flex", gap: 1 }}>
-                                <Tooltip title="Accept the applicant" arrow>
-                                    <Button
-                                        onClick={() => handleStatusUpdate(app.id, "Accepted")}
-                                        color="primary"
-                                        variant="outlined"
-                                        size="small"
-                                    >
-                                        Accept
-                                    </Button>
-                                </Tooltip>
-                                <Tooltip title="Reject the applicant" arrow>
-                                    <Button
-                                        onClick={() => handleStatusUpdate(app.id, "Rejected")}
-                                        color="secondary"
-                                        variant="outlined"
-                                        size="small"
-                                    >
-                                        Reject
-                                    </Button>
-                                </Tooltip>
-                            </Box>
                         )}
                     </ListItem>
                 ))
@@ -268,15 +242,13 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     sx={{ borderBottom: 1, borderColor: "divider" }}
                 >
                     <Tab label="Pending" />
-                    <Tab label="Accepted" />
-                    <Tab label="Rejected" />
+                    <Tab label="Paid" />
                     <Tab label="Finished" />
                 </Tabs>
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
                     {activeTab === 0 && renderApplicants(applicants.pending)}
-                    {activeTab === 1 && renderApplicants(applicants.accepted)}
-                    {activeTab === 2 && renderApplicants(applicants.rejected)}
-                    {activeTab === 3 && renderApplicants(applicants.finished)}
+                    {activeTab === 1 && renderApplicants(applicants.paid)}
+                    {activeTab === 2 && renderApplicants(applicants.finished)}
                 </List>
             </Dialog>
 

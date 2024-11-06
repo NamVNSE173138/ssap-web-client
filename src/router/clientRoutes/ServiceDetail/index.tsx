@@ -14,6 +14,7 @@ import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } 
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
+import { FaStar } from "react-icons/fa";
 
 interface ServiceType {
     id: string;
@@ -26,7 +27,7 @@ interface ServiceType {
     providerId: string;
 }
 
-const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
+const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const { id } = serviceId ?? useParams<{ id: string }>();
     const [serviceData, setServiceData] = useState<ServiceType | null>(null);
     const [applicants, setApplicants] = useState<any>(null);
@@ -49,12 +50,25 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
     const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
     const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
     const [requestStatus, setRequestStatus] = useState<string | null>(null);
+    const [averageRating, setAverageRating] = useState<number>(0);
+    const [feedbackCount, setFeedbackCount] = useState<number>(0);
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
+    const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
 
 
     const fetchService = async () => {
         try {
             const data = await getServiceById(Number(id));
             setServiceData(data.data);
+            const feedbacks = data.data.feedbacks || [];
+            console.log(feedbacks)
+            if (feedbacks && feedbacks.length > 0) {
+                const totalRating = feedbacks.reduce((acc: number, feedback: any) => acc + (feedback.rating || 0), 0);
+                const count = feedbacks.length;
+                setFeedbacks(feedbacks);
+                setAverageRating(totalRating / count);
+                setFeedbackCount(count);
+            }
             const response = await fetchApplicants(data.data.id);
             console.log(response);
             setExistingRequestId(response.find((r: any) => r.applicantId == user?.id)?.id || null);
@@ -80,29 +94,40 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
         setEditDialogOpen(true);
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files) return;
-
-        setLoading(true);
-
-        try {
-            const filesArray = Array.from(files);
-            const formData = new FormData();
-
-            filesArray.forEach((file) => {
-                formData.append("files", file);
-            });
-
-            const urls = await uploadFile(formData);
-            setApplicationFileUrls(urls);
-        } catch (error) {
-            console.error("File upload failed:", error);
-        } finally {
-            setLoading(false);
+    const handleFeedbackClick = () => {
+        if (feedbackCount === 0) {
+            alert("This service has no feedbacks yet, be the first!");
+        } else {
+            setIsFeedbackDialogOpen(true);
         }
     };
 
+    const handleCloseFeedbackDialog = () => {
+        setIsFeedbackDialogOpen(false);
+    };
+
+    // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files = e.target.files;
+    //     if (!files) return;
+
+    //     setLoading(true);
+
+    //     try {
+    //         const filesArray = Array.from(files);
+    //         const formData = new FormData();
+
+    //         filesArray.forEach((file) => {
+    //             formData.append("files", file);
+    //         });
+
+    //         const urls = await uploadFile(formData);
+    //         setApplicationFileUrls(urls);
+    //     } catch (error) {
+    //         console.error("File upload failed:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const fetchApplicants = async (serviceId: number) => {
         try {
@@ -334,13 +359,74 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
                         </Breadcrumb>
                     </div>
                     <div className={isProvider ? "w-2/3" : ""}>
-                        <div className="lg:flex-row items-center flex-row flex gap-[20px]">
+                        <div className="lg:flex-col items-center flex-row flex gap-[20px]">
                             <div>
                                 <p className="text-white text-5xl lg:line-clamp-3 line-clamp-5">
                                     {serviceData.name}
                                 </p>
                             </div>
+                            <div className="flex flex-col items gap-2">
+                                <div className="flex items-center gap-2">
+                                    <FaStar color="yellow" size={20} />
+                                    <p className="text-yellow-500 cursor-pointer underline" onClick={handleFeedbackClick}>
+                                        {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? 'feedback' : 'feedbacks'})
+                                    </p>
+                                </div>
+                            </div>
                         </div>
+
+                        {isFeedbackDialogOpen && (
+                            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                                <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className="text-xl font-semibold">Feedback Details</h2>
+                                        <span
+                                            className="text-xl cursor-pointer"
+                                            onClick={handleCloseFeedbackDialog}
+                                        >
+                                            &times;
+                                        </span>
+                                    </div>
+
+                                    <table className="min-w-full bg-white border border-gray-300">
+                                        <thead>
+                                            <tr className="bg-gray-100">
+                                                <th className="p-2 text-left">Applicant Name</th>
+                                                <th className="p-2 text-left">Rating</th>
+                                                <th className="p-2 text-left">Comment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {feedbacks.map((feedback, index) => (
+                                                <tr key={index} className="border-t">
+                                                    <td className="p-2">********</td>
+                                                    <td className="p-2 flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                color={i < feedback.rating ? "#FFB800" : "#ddd"}
+                                                                size={16}
+                                                            />
+                                                        ))}
+                                                    </td>
+                                                    <td className="p-2">{feedback.content}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+
+                                    </table>
+                                    <div className="mt-4 text-right">
+                                        <button
+                                            onClick={handleCloseFeedbackDialog}
+                                            className="bg-gray-300 px-4 py-2 rounded-md"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="text-white text-center flex h-[50px] mt-[26px]">
                             <div className="flex justify-between w-full gap-10">
                                 {showButtons && <>
@@ -351,13 +437,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
                                                 className="text-xl w-full bg-yellow-500 rounded-[25px]"
                                             >
                                                 Cancel Request
-                                            </button>
-                                        ) : requestStatus === "Rejected" ? (
-                                            <button
-                                                onClick={handleRequestNow}
-                                                className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                            >
-                                                Request Now
                                             </button>
                                         ) : requestStatus === "Finished" ? (
                                             <>
@@ -418,8 +497,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }:any) => {
                             <p>{serviceData.status}</p>
                         </div>
                         <div>
-                            <p className="font-semibold">Provider Information:</p>
-                            <p>{serviceData.providerId}</p>
+                            <Link
+                                to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
+                                className="text-blue-600 hover:underline"
+                            >
+                                Provider Information
+                            </Link>
                         </div>
                     </div>
                 </div>
