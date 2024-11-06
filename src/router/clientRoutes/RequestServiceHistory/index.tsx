@@ -18,8 +18,7 @@ const RequestHistory = () => {
     const user = useSelector((state: RootState) => state.token.user);
     const [applicants, setApplicants] = useState({
         pending: [],
-        accepted: [],
-        rejected: [],
+        paid: [],
         finished: [],
     });
     const [activeTab, setActiveTab] = useState<number>(0);
@@ -34,15 +33,13 @@ const RequestHistory = () => {
                 const requests = response.data;
                 setApplicants({
                     pending: requests.filter((req: any) => req.status === "Pending"),
-                    accepted: requests.filter((req: any) => req.status === "Accepted"),
-                    rejected: requests.filter((req: any) => req.status === "Rejected"),
+                    paid: requests.filter((req: any) => req.status === "Paid"),
                     finished: requests.filter((req: any) => req.status === "Finished"),
                 });
             } else {
                 setApplicants({
                     pending: [],
-                    accepted: [],
-                    rejected: [],
+                    paid: [],
                     finished: [],
                 });
             }
@@ -129,16 +126,14 @@ const RequestHistory = () => {
                     sx={{ borderBottom: 1, borderColor: "divider" }}
                 >
                     <Tab label="Pending" />
-                    <Tab label="Accepted" />
-                    <Tab label="Rejected" />
+                    <Tab label="Paid" />
                     <Tab label="Finished" />
                 </Tabs>
 
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
                     {activeTab === 0 && renderApplicants(applicants.pending)}
-                    {activeTab === 1 && renderApplicants(applicants.accepted)}
-                    {activeTab === 2 && renderApplicants(applicants.rejected)}
-                    {activeTab === 3 && renderApplicants(applicants.finished)}
+                    {activeTab === 1 && renderApplicants(applicants.paid)}
+                    {activeTab === 2 && renderApplicants(applicants.finished)}
                 </List>
             </div>
         </div>

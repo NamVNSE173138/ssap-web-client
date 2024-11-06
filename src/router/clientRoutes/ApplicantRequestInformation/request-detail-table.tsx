@@ -3,11 +3,11 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
-import RouteNames from "@/constants/routeNames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addFeedback } from "@/services/ApiServices/feedbackService";
 import { Star } from "lucide-react";
 import { StarBorder } from "@mui/icons-material";
+import { getServiceById } from "@/services/ApiServices/serviceService";
 
 const RequestDetailTable = ({ showButtons, request, requestDetails, description }: { showButtons: boolean, request: any, requestDetails: any; description: string }) => {
     const { id } = useParams<{ id: string }>();
@@ -17,6 +17,7 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
     const [openFeedbackDialog, setOpenFeedbackDialog] = useState(false);
     const [rating, setRating] = useState<number | null>(null);
     const [comment, setComment] = useState<string>("");
+    const [hasFeedback, setHasFeedback] = useState(false);
 
     if (!requestDetails || requestDetails.length === 0) {
         return (
@@ -65,7 +66,34 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
         }
     };
 
+    useEffect(() => {
+        const fetchServiceData = async () => {
+          try {
+            const serviceId = request.requestDetails[0]?.serviceId;
+            if (serviceId) {
+              const fetchedService = await getServiceById(serviceId);
+              console.log(fetchedService)
+              const userFeedback = fetchedService.data.feedbacks.find(
+                (feedback:any) => feedback.applicantId == user.id
+              );
+              if (userFeedback) {
+                setHasFeedback(true);
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching service data", error);
+          }
+        };
+    
+        fetchServiceData();
+      }, [request, user.id]);
+
     const handleFeedbackSubmit = async () => {
+        if (hasFeedback) {
+            alert("You have already feedback this service!");
+            return;
+          }
+
         if (rating !== null && comment) {
             const feedbackData = {
                 content: comment,
@@ -77,8 +105,8 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
 
             try {
                 await addFeedback(feedbackData);
-                console.log("Feedback submitted successfully");
                 setOpenFeedbackDialog(false);
+                setHasFeedback(true);
                 navigate("/services");
             } catch (error) {
                 console.error("Failed to submit feedback", error);
@@ -89,11 +117,8 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
     };
 
     const isFinished = request.status === "Finished";
-    const isAccepted = request.status === "Accepted";
-    const isPending = request.status === "Pending";
-    const isRejected = request.status === "Rejected";
+    const isPaid = request.status === "Paid";
 
-    console.log(request)
     const handleChatClick = () => {
         const chatUserId = user.role === "APPLICANT" ? request.requestDetails[0].service.id : request.applicantId;
         navigate(`/chat?id=${chatUserId}`);
@@ -188,7 +213,7 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                             <Button
                                 variant="contained"
                                 color="primary"
-                                disabled={isFinished || isPending || isRejected}
+                                disabled={isFinished }
                                 onClick={handleChatClick}
                                 sx={{
                                     borderRadius: '25px',
@@ -207,7 +232,7 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                                 variant="contained"
                                 color="primary"
                                 onClick={handleFinish}
-                                disabled={isFinished || isPending || isRejected}
+                                disabled={isFinished || isPaid}
                                 sx={{
                                     borderRadius: '25px',
                                     padding: '10px 20px',
@@ -224,7 +249,14 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                                 <Button
                                     variant="contained"
                                     color="secondary"
-                                    onClick={() => setOpenFeedbackDialog(true)}
+                                    onClick={() => {
+                                        if (hasFeedback) {
+                                          alert("You have already feedback this service!");
+                                        } else {
+                                          setOpenFeedbackDialog(true);
+                                        }
+                                      }}
+                                      disabled={hasFeedback}
                                     sx={{
                                         borderRadius: '25px',
                                         padding: '10px 20px',

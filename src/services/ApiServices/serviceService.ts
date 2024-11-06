@@ -19,6 +19,14 @@ export async function getServiceById(id: number) {
   return response.data;
 }
 
+export async function getServicesByProvider(providerId: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/services/by-provider-id/${providerId}`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
 export async function addService(serviceData: any) {
   const response = await axios.post(
     `${BASE_URL}/api/services`,

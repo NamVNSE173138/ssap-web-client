@@ -21,31 +21,29 @@ const truncateString = (str: string, num: number) => {
 
 const ServiceCard = (service: ServiceType) => {
   const truncatedDescription = truncateString(service.description, 40);
-  const { id } = useParams<{ id: string }>();
   const [services, setServices] = useState<ServiceType | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchService = async () => {
-      if (id) {
-        const fetchedService = await getServiceById(Number(id));
+      if (service.id) {
+        const fetchedService = await getServiceById(Number(service.id));
         setServices(fetchedService.data);
-
-        // const feedbackResponse = await getFeedbacksByServiceId(Number(id));
-        // if (feedbackResponse.data && feedbackResponse.data.length > 0) {
-        //   const totalRating = feedbackResponse.data.reduce((acc:any, feedback:any) => {
-        //     return acc + (feedback.rating || 0);
-        //   }, 0);
-        //   const count = feedbackResponse.data.length;
-        //   setAverageRating(totalRating / count);
-        //   setFeedbackCount(count);
-        // }
+        console.log(fetchedService)
+        const feedbacks = fetchedService.data.feedbacks;
+        console.log(feedbacks)
+        if (feedbacks && feedbacks.length > 0) {
+          const totalRating = feedbacks.reduce((acc:any, feedback:any) => acc + (feedback.rating || 0), 0);
+          const count = feedbacks.length;
+          setAverageRating(totalRating / count);
+          setFeedbackCount(count);
+        }
       }
     };
 
     fetchService();
-  }, [id]);
+  }, [service.id]);
 
   if (!service) return null;
 
@@ -70,11 +68,6 @@ const ServiceCard = (service: ServiceType) => {
           <Separator orientation="horizontal" />
 
           <div className="flex flex-col gap-4 mt-5">
-            <div className="flex items-center gap-2">
-              <GoPersonFill color="#060606" size={20} />
-              <p>{service.providerId ? `Provider ID: ${service.providerId}` : "No Provider"}</p>
-            </div>
-
             <div className="flex items-center gap-2">
               <FaStar color="#060606" size={20} />
               <p>
