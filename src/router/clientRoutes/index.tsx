@@ -20,6 +20,7 @@ import FunderApplication from "./FunderApplication";
 import Service from "./Service";
 import ServiceDetails from "./ServiceDetail";
 import ApplicantRequestInfo from "./ApplicantRequestInformation";
+import FormCreateScholarshipProgram from "./FormCreateScholarshipProgram";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -111,6 +112,10 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.PROVIDER_COMMENT_INFORMATION,
     element: <ApplicantRequestInfo/>,
+  },
+  {
+    path: RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM,
+    element: <FormCreateScholarshipProgram/>
   }
 ];
 

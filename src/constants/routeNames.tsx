@@ -25,7 +25,8 @@ const RouteNames = {
     SERVICES_DETAIL: '/services/:id',
     REVIEWS: '/reviews',
     APPLICANT_REQUEST_INFORMATION: 'provider/requestinformation/:id',
-    PROVIDER_COMMENT_INFORMATION: 'applicant/requestinformation/:id'
+    PROVIDER_COMMENT_INFORMATION: 'applicant/requestinformation/:id',
+    FORM_CREATE_SCHOLARSHIP_PROGRAM: '/create-scholarship-program'
 }
 
 export default RouteNames
