@@ -154,7 +154,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
               Request Details
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
-            <RequestDetailTable showButtons={showButtons} request={request} requestDetails={requestDetails} description={request.description} />
+            <RequestDetailTable showButtons={showButtons} request={request} fetchRequest={fetchRequest} requestDetails={requestDetails} description={request.description} />
           </div>
         </div>
       </section>

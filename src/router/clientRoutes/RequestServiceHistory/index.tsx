@@ -17,7 +17,6 @@ const formatDate = (dateString: string) => {
 const RequestHistory = () => {
     const user = useSelector((state: RootState) => state.token.user);
     const [applicants, setApplicants] = useState({
-        pending: [],
         paid: [],
         finished: [],
     });
@@ -32,13 +31,11 @@ const RequestHistory = () => {
             if (response.statusCode === 200) {
                 const requests = response.data;
                 setApplicants({
-                    pending: requests.filter((req: any) => req.status === "Pending"),
                     paid: requests.filter((req: any) => req.status === "Paid"),
                     finished: requests.filter((req: any) => req.status === "Finished"),
                 });
             } else {
                 setApplicants({
-                    pending: [],
                     paid: [],
                     finished: [],
                 });
@@ -67,20 +64,14 @@ const RequestHistory = () => {
                         className="flex justify-between items-center p-4 border-b hover:bg-gray-100 rounded-lg transition"
                     >
                         <Link
-                        to={``}
-                        onClick={() => {
-                            setOpenServiceDetail({open: "ServiceDetail", id: request.requestDetails[0].service.id});
-                        }}
+                        to={`/services-history/services/${request.requestDetails[0].service.id}`}
                         className="w-1/3 text-blue-600 underline hover:text-blue-800"
                     >
                         {request.requestDetails[0].service.name}
                     </Link>
                         <p className="w-1/3 text-center">{formatDate(request.requestDate)}</p>
                         <Link
-                            to={``}
-                            onClick={() => {
-                                setOpenServiceDetail({open:"RequestDetail", id:request.id});
-                            }}
+                            to={`/services-history/request/${request.id}`}
                             className="w-1/3 text-right text-blue-600 underline hover:text-blue-800"
                         >
                             View Request
@@ -125,15 +116,13 @@ const RequestHistory = () => {
                     textColor="primary"
                     sx={{ borderBottom: 1, borderColor: "divider" }}
                 >
-                    <Tab label="Pending" />
                     <Tab label="Paid" />
                     <Tab label="Finished" />
                 </Tabs>
 
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-                    {activeTab === 0 && renderApplicants(applicants.pending)}
-                    {activeTab === 1 && renderApplicants(applicants.paid)}
-                    {activeTab === 2 && renderApplicants(applicants.finished)}
+                    {activeTab === 0 && renderApplicants(applicants.paid)}
+                    {activeTab === 1 && renderApplicants(applicants.finished)}
                 </List>
             </div>
         </div>

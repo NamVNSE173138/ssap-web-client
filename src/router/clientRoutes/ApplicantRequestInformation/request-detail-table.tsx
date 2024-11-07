@@ -1,22 +1,25 @@
 import { formatDate } from "@/lib/date-formatter";
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
 import { useEffect, useState } from "react";
-import { addFeedback } from "@/services/ApiServices/feedbackService";
+import { addFeedback, updateFeedback } from "@/services/ApiServices/feedbackService";
 import { Star } from "lucide-react";
-import { StarBorder } from "@mui/icons-material";
+import { Edit, StarBorder } from "@mui/icons-material";
 import { getServiceById } from "@/services/ApiServices/serviceService";
 
-const RequestDetailTable = ({ showButtons, request, requestDetails, description }: { showButtons: boolean, request: any, requestDetails: any; description: string }) => {
-    const { id } = useParams<{ id: string }>();
+const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails, description }: { showButtons: boolean, request: any, fetchRequest: () => void, requestDetails: any; description: string }) => {
     const user = useSelector((state: any) => state.token.user);
     const navigate = useNavigate();
 
     const [openFeedbackDialog, setOpenFeedbackDialog] = useState(false);
+    const [openUserFeedbackDialog, setOpenUserFeedbackDialog] = useState(false);
     const [rating, setRating] = useState<number | null>(null);
     const [comment, setComment] = useState<string>("");
+    const [userFeedback, setUserFeedback] = useState<any>(null);
+    const [isEditing, setIsEditing] = useState(false);
+
     const [hasFeedback, setHasFeedback] = useState(false);
 
     if (!requestDetails || requestDetails.length === 0) {
@@ -31,10 +34,11 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
 
     const handleFinish = async () => {
         try {
-            if (!id) {
+            if (!request.id) {
                 return null;
             }
-            const existingRequestResponse = await getRequestById(parseInt(id));
+            console.log(request.id)
+            const existingRequestResponse = await getRequestById(parseInt(request.id));
             const requestDetail = existingRequestResponse.data.requestDetails[0];
             console.log(requestDetail)
 
@@ -58,8 +62,10 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
 
                 await updateRequest(existingRequestResponse.data.id, updatedRequest);
                 console.log("Request finished", updatedRequest);
+                await fetchRequest();
+
             } else {
-                console.error(`Request details for id:${id} not found`);
+                console.error(`Request details for id:${request.id} not found`);
             }
         } catch (error) {
             console.error("Failed to finish request", error);
@@ -68,31 +74,34 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
 
     useEffect(() => {
         const fetchServiceData = async () => {
-          try {
-            const serviceId = request.requestDetails[0]?.serviceId;
-            if (serviceId) {
-              const fetchedService = await getServiceById(serviceId);
-              console.log(fetchedService)
-              const userFeedback = fetchedService.data.feedbacks.find(
-                (feedback:any) => feedback.applicantId == user.id
-              );
-              if (userFeedback) {
-                setHasFeedback(true);
-              }
+            try {
+                const serviceId = request.requestDetails[0]?.serviceId;
+                if (serviceId) {
+                    const fetchedService = await getServiceById(serviceId);
+                    console.log(fetchedService)
+                    const userFeedback = fetchedService.data.feedbacks.find(
+                        (feedback: any) => feedback.applicantId == user.id
+                    );
+                    if (userFeedback) {
+                        setUserFeedback(userFeedback);
+                        setRating(userFeedback.rating);
+                        setComment(userFeedback.content);
+                        setHasFeedback(true);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching service data", error);
             }
-          } catch (error) {
-            console.error("Error fetching service data", error);
-          }
         };
-    
+
         fetchServiceData();
-      }, [request, user.id]);
+    }, [request, user.id]);
 
     const handleFeedbackSubmit = async () => {
         if (hasFeedback) {
             alert("You have already feedback this service!");
             return;
-          }
+        }
 
         if (rating !== null && comment) {
             const feedbackData = {
@@ -113,6 +122,26 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
             }
         } else {
             console.error("Rating and comment are required.");
+        }
+    };
+
+    const handleEditFeedback = () => {
+        setIsEditing(true);
+        setOpenUserFeedbackDialog(true);
+    };
+
+    const handleSaveFeedback = async () => {
+        if (!userFeedback) return;
+        try {
+            await updateFeedback(userFeedback.id, {
+                content: comment,
+                rating,
+            });
+            alert("Feedback updated successfully.");
+            setIsEditing(false);
+            setOpenUserFeedbackDialog(false);
+        } catch (error) {
+            console.error("Failed to update feedback", error);
         }
     };
 
@@ -213,7 +242,7 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                             <Button
                                 variant="contained"
                                 color="primary"
-                                disabled={isFinished }
+                                disabled={isFinished}
                                 onClick={handleChatClick}
                                 sx={{
                                     borderRadius: '25px',
@@ -232,7 +261,7 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                                 variant="contained"
                                 color="primary"
                                 onClick={handleFinish}
-                                disabled={isFinished || isPaid}
+                                disabled={isFinished}
                                 sx={{
                                     borderRadius: '25px',
                                     padding: '10px 20px',
@@ -251,12 +280,12 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                                     color="secondary"
                                     onClick={() => {
                                         if (hasFeedback) {
-                                          alert("You have already feedback this service!");
+                                            alert("You have already feedback this service!");
                                         } else {
-                                          setOpenFeedbackDialog(true);
+                                            setOpenFeedbackDialog(true);
                                         }
-                                      }}
-                                      disabled={hasFeedback}
+                                    }}
+                                    disabled={hasFeedback}
                                     sx={{
                                         borderRadius: '25px',
                                         padding: '10px 20px',
@@ -269,6 +298,23 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                                     }}
                                 >
                                     Feedback
+                                </Button>
+                            )}
+                            {hasFeedback && (
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={() => setOpenUserFeedbackDialog(true)}
+                                    sx={{
+                                        borderRadius: '25px',
+                                        padding: '10px 20px',
+                                        fontSize: '16px',
+                                        marginLeft: '10px',
+                                        boxShadow: 3,
+                                        '&:hover': { boxShadow: 6 },
+                                    }}
+                                >
+                                    Your Feedback
                                 </Button>
                             )}
                         </Box>
@@ -285,7 +331,7 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                                         key={index}
                                         onClick={() => setRating(index + 1)}
                                         style={{ cursor: 'pointer' }}
-                                    >{rating !== null && index < rating ? <Star style={{ color: 'gold' }} /> : <StarBorder />}                                        
+                                    >{rating !== null && index < rating ? <Star style={{ color: 'gold' }} /> : <StarBorder />}
                                     </Box>
                                 ))}
                             </Box>
@@ -309,6 +355,49 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
                     </Dialog>
                 </>
             )}
+            <Dialog open={openUserFeedbackDialog} onClose={() => setOpenUserFeedbackDialog(false)}>
+                <DialogTitle>
+                    Your Feedback
+                    {isEditing ? null : (
+                        <IconButton onClick={handleEditFeedback}>
+                            <Edit fontSize="small" />
+                        </IconButton>
+                    )}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {isEditing ? "Edit your feedback:" : "Your feedback details"}
+                    </DialogContentText>
+                    <Box display="flex" alignItems="center" mt={2}>
+                        {[...Array(5)].map((_, index) => (
+                            <Box key={index} onClick={() => isEditing && setRating(index + 1)} style={{ cursor: 'pointer' }}>
+                                {index < (rating || 0) ? <Star style={{ color: 'gold' }} /> : <StarBorder />}
+                            </Box>
+                        ))}
+                    </Box>
+                    <TextField
+                        margin="dense"
+                        label="Comment"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        disabled={!isEditing}
+                        sx={{ marginTop: 2 }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    {isEditing ? (
+                        <>
+                            <Button onClick={() => setIsEditing(false)} color="secondary">Cancel</Button>
+                            <Button onClick={handleSaveFeedback} color="primary">Save</Button>
+                        </>
+                    ) : (
+                        <Button onClick={() => setOpenUserFeedbackDialog(false)} color="primary">Close</Button>
+                    )}
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

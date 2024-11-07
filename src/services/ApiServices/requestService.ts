@@ -3,8 +3,8 @@ import { BASE_URL } from "@/constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
-export async function getAllRequests() {
-    const response = await axios.get(`${BASE_URL}/api/requests`, ngrokSkipWarning);
+export async function getAllRequests(id?:number) {
+    const response = await axios.get(`${BASE_URL}/api/requests${id?"?applicantId="+id:""}`, ngrokSkipWarning);
     return response.data;
 }
 

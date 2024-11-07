@@ -226,7 +226,7 @@ const ScholarshipProgramDetail = () => {
                         </button>)}
                   {existingApplication && existingApplication.length > 0 && 
                       (<>
-                        <div className="text-xl font-semibold">You have applied for this scholarship</div>
+                        <div className="text-xl font-semibold">Your application is being reviewed</div>
                         <button
                             onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
                             className=" text-xl w-full bg-green-700 rounded-[25px]"
@@ -485,9 +485,11 @@ const ScholarshipProgramDetail = () => {
 
       {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen} 
         onClose={() => setApplicantDialogOpen(false)} 
-        applications={applicants ?? []}/>)}
+        applications={applicants ?? []}
+        scholarship={data}/>)}
       {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen} 
         onClose={() => setAssignExpertDialogOpen(false)}
+        resetMajor={null}
         experts={experts ?? []} />)}
       {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen} 
         onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
