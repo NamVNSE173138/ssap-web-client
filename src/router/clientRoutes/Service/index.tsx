@@ -41,7 +41,7 @@ const Service = () => {
           setTotalPages(Math.ceil(filteredServices.length / pageSize));
         } else {
           setData(activeServices);
-          setTotalPages(Math.ceil(activeServices.length / pageSize));
+          setTotalPages(response.data.data.totalPages);
         }
       } else {
         setData([]);
@@ -61,12 +61,14 @@ const Service = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
+      fetchData();
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+      fetchData();
     }
   };
 

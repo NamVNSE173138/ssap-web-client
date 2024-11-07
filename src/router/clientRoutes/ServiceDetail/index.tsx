@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
     Breadcrumb,
@@ -54,7 +54,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [feedbackCount, setFeedbackCount] = useState<number>(0);
     const [feedbacks, setFeedbacks] = useState<any[]>([]);
     const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
-
+    const [amount, setAmount] = useState<number>(serviceData?.price || 0);
+    const [isConfirmationDialogOpen, setConfirmationDialogOpen] = useState<boolean>(false);
+    const [requestData, setRequestData] = useState<any>(null);
 
     const fetchService = async () => {
         try {
@@ -195,11 +197,37 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setApplicationFileUrls("");
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleNext = (e: React.FormEvent) => {
         e.preventDefault();
+        setDialogOpen(false);
+        setConfirmationDialogOpen(true);
+        setRequestData(e);
+    };
+
+    const handleConfirmPayment = async () => {
+        if (!requestData) return;
+        try {
+            await handleSubmit();
+            alert("Request has been successfully confirmed and paid!");
+            await fetchService();
+            closeDialog();
+        } catch (error) {
+            setError((error as Error).message);
+        } finally {
+            setLoading(false);
+            setConfirmationDialogOpen(false);
+        }
+    };
+
+    const handleCancelPayment = () => {
+        setConfirmationDialogOpen(false);
+    };
+
+    const handleSubmit = async () => {
         setLoading(true);
         setError(null);
-        const filesArray = Array.from(applicationFileUrls);
+
+        const filesArray = Array.from(applicationFileUrls || []);
         const formData = new FormData();
 
         filesArray.forEach((file: any) => {
@@ -208,17 +236,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
         const urls = await uploadFile(filesArray);
 
-        const requestData = {
+        const requestDatas = {
             description,
             requestDate: new Date(),
-            status: "Pending",
+            status: "Paid",
             applicantId: user?.id,
             requestDetails: [{
                 id,
                 expectedCompletionTime,
                 applicationNotes,
                 scholarshipType,
-                applicationFileUrl: urls.urls.join(", "),
+                applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
                 serviceId: serviceData?.id,
 
             }
@@ -226,39 +254,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         };
 
         try {
-            await createRequest(requestData);
+            await createRequest(requestDatas);
             alert("Request created successfully!");
             await fetchService();
             closeDialog();
-        } catch (error) {
-            setError((error as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCancelRequest = async () => {
-        if (!existingRequestId) return;
-        const confirmCancel = window.confirm("Do you really want to cancel your request?");
-        if (!confirmCancel) return;
-
-        setLoading(true);
-        try {
-            let applicationFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
-                ?.requestDetails[0].applicationFileUrl?.split("/").pop();
-            let reviewFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
-                ?.requestDetails[0].applicationNotes?.split(", ")[0].split("/").pop();
-
-            try {
-                await deleteFile(applicationFileUrl);
-                await deleteFile(reviewFileUrl);
-            }
-            catch (error) {
-            }
-            await cancelRequest(existingRequestId);
-            alert("Request cancelled successfully!");
-            setHasExistingRequest(false);
-            await fetchService()
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -274,13 +273,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         <div>
             {isDialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                    <div className="bg-white p-5 rounded-lg shadow-lg">
+                    <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-semibold mb-4">Create Request</h2>
-                            <span className="text-xl cursor-pointer" onClick={closeDialog}>&times;</span>
+                            <span
+                                className="text-xl cursor-pointer"
+                                onClick={closeDialog}
+                            >
+                                &times;
+                            </span>
                         </div>
-                        {error && <p className="text-red-500">{error}</p>}
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleNext}>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Expected Completion Time</label>
                                 <input
@@ -310,7 +313,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 <input
                                     type="file"
                                     multiple
-                                    onChange={e => setApplicationFileUrls(e.target.files)}
+                                    onChange={(e) => setApplicationFileUrls(e.target.files)}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
@@ -325,12 +328,46 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 <button
                                     type="submit"
                                     className="bg-blue-600 text-white rounded px-4 py-2"
-                                    disabled={loading}
                                 >
-                                    {loading ? "Submitting..." : "Submit"}
+                                    Next
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {isConfirmationDialogOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-semibold mb-4">Confirmation</h2>
+                            <span
+                                className="text-xl cursor-pointer"
+                                onClick={handleCancelPayment}
+                            >
+                                &times;
+                            </span>
+                        </div>
+                        <p className="text-gray-700 mb-4">
+                            Using this service will incur a fee: <strong>${serviceData.price}</strong>. Do you want to continue?
+                        </p>
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={handleCancelPayment}
+                                className="mr-2 bg-gray-300 rounded px-4 py-2"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleConfirmPayment}
+                                className="bg-blue-600 text-white rounded px-4 py-2"
+                            >
+                                Yes, Continue
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -432,14 +469,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                             <div className="flex justify-between w-full gap-10">
                                 {showButtons && <>
                                     {!isFunder && !isProvider ? (
-                                        requestStatus === "Pending" ? (
-                                            <button
-                                                onClick={handleCancelRequest}
-                                                className="text-xl w-full bg-yellow-500 rounded-[25px]"
-                                            >
-                                                Cancel Request
-                                            </button>
-                                        ) : requestStatus === "Finished" ? (
+                                        requestStatus === "Finished" ? (
                                             <>
                                                 <button
                                                     onClick={handleRequestNow}

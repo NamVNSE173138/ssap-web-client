@@ -78,8 +78,10 @@ const Chat: React.FC = () => {
     if (role === "APPLICANT") {
       const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
       const requestData = requestsResponse.data;
-      const hasAcceptedRequest = requestData.some((request: any) => request.status === "Accepted");
-      setIsChatEnabled(hasAcceptedRequest);
+      const hasPaidRequest = requestData.some((request: any) => request.status === "Paid");
+      setIsChatEnabled(hasPaidRequest);
+    }else{
+      setIsChatEnabled(true);
     }
   };
 
@@ -165,9 +167,8 @@ const Chat: React.FC = () => {
       const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
       const requestData = requestsResponse.data;
       console.log(requestData)
-      const hasAcceptedRequest = requestData.some((request: any) => request.status === "Accepted" && request.requestDetails[0].service.providerId === account.id);
-      console.log(hasAcceptedRequest)
-      setIsChatEnabled(hasAcceptedRequest);
+      const hasPaidRequest = requestData.some((request: any) => request.status === "Paid" && request.requestDetails[0].service.providerId === account.id);
+      setIsChatEnabled(hasPaidRequest);
     }
   };
 
@@ -259,7 +260,7 @@ const Chat: React.FC = () => {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={isChatEnabled ? "Type your message..." : "You have no more requests's status 'Accepted' so you cannot chat with the Provider, thank you!."}
+              placeholder={isChatEnabled ? "Type your message..." : "You have no more requests's status 'Paid' so you cannot chat with the Provider, thank you!."}
               disabled={!isChatEnabled}
               style={{ flex: 1, padding: "10px", borderRadius: "10px", border: "1px solid #ccc", marginRight: "10px" }}
             />

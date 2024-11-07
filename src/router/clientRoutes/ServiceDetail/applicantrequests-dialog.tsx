@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Applicant {
     id: number;
-    status: "Pending" | "Paid" | "Finished";
+    status: "Paid" | "Finished";
     requestDate: string;
     applicant: {
         avatarUrl: string;
@@ -40,7 +40,6 @@ interface AccountApplicantDialogProps {
 const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, onClose, applications, fetchApplications }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [applicants, setApplicants] = useState({
-        pending: [] as Applicant[],
         paid: [] as Applicant[],
         finished: [] as Applicant[],
     });
@@ -56,7 +55,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     useEffect(() => {
         setApplicants({
-            pending: applications.filter(app => app.status === "Pending"),
             paid: applications.filter(app => app.status === "Paid"),
             finished: applications.filter(app => app.status === "Finished"),
         });
@@ -139,7 +137,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 const updatedApplicants = {
                     ...applicants,
-                    pending: applicants.pending.map(app =>
+                    paid: applicants.paid.map(app =>
                         app.id === selectedApplicantId ? { ...app, status: app.status } : app
                     ),
                 };
@@ -241,14 +239,12 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     textColor="primary"
                     sx={{ borderBottom: 1, borderColor: "divider" }}
                 >
-                    <Tab label="Pending" />
                     <Tab label="Paid" />
                     <Tab label="Finished" />
                 </Tabs>
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-                    {activeTab === 0 && renderApplicants(applicants.pending)}
-                    {activeTab === 1 && renderApplicants(applicants.paid)}
-                    {activeTab === 2 && renderApplicants(applicants.finished)}
+                    {activeTab === 0 && renderApplicants(applicants.paid)}
+                    {activeTab === 1 && renderApplicants(applicants.finished)}
                 </List>
             </Dialog>
 
