@@ -258,6 +258,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             await cancelRequest(existingRequestId);
             alert("Request cancelled successfully!");
             setHasExistingRequest(false);
+            await fetchService()
         } catch (error) {
             setError((error as Error).message);
         } finally {

@@ -9,7 +9,7 @@ import { Star } from "lucide-react";
 import { StarBorder } from "@mui/icons-material";
 import { getServiceById } from "@/services/ApiServices/serviceService";
 
-const RequestDetailTable = ({ showButtons, request, requestDetails, description }: { showButtons: boolean, request: any, requestDetails: any; description: string }) => {
+const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails, description }: { showButtons: boolean, request: any, fetchRequest: () => void, requestDetails: any; description: string }) => {
     const { id } = useParams<{ id: string }>();
     const user = useSelector((state: any) => state.token.user);
     const navigate = useNavigate();
@@ -58,6 +58,8 @@ const RequestDetailTable = ({ showButtons, request, requestDetails, description 
 
                 await updateRequest(existingRequestResponse.data.id, updatedRequest);
                 console.log("Request finished", updatedRequest);
+                await fetchRequest();
+
             } else {
                 console.error(`Request details for id:${id} not found`);
             }
