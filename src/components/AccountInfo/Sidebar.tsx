@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BiLogOutCircle } from 'react-icons/bi';
 import { IconType } from 'react-icons';
-import { AiOutlineBarChart, AiOutlineHistory, AiOutlineBook, AiOutlineAudit } from 'react-icons/ai';
+import { AiOutlineBarChart, AiOutlineHistory, AiOutlineBook, AiOutlineAudit, AiOutlineWallet } from 'react-icons/ai';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
@@ -57,6 +57,7 @@ const Sidebar = ({ className }: SidebarProps) => {
         { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}`},
         { Icon: AiOutlineBook, text: 'Information', link: RouteNames.INFORMATION},
         { Icon: AiOutlineBook, text: 'Skills', link: RouteNames.SKILLS},
+        { Icon: AiOutlineWallet, text: 'Wallet', link: RouteNames.WALLET},        
         { Icon: AiOutlineBarChart, text: 'Change Password', link: RouteNames.CHANGE_PASSWORD},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
         { Icon: AiOutlineHistory, text: 'History', link: "/history"},
