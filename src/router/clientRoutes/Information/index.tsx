@@ -11,6 +11,7 @@ const Information = () => {
   const user = useSelector((state: RootState) => state.token.user);
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [hasProfile, setHasProfile] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isAdd, setIsAdd] = useState<boolean>(false);
@@ -96,6 +97,7 @@ const Information = () => {
     try {
       if (isAdd) {
         await addApplicantProfile({ ...formValues, id: profileData.id });
+        setHasProfile(true);
       }
       else {
         await updateApplicantProfile(profileData.applicantId, { ...formValues, id: profileData.id });
@@ -138,7 +140,7 @@ const Information = () => {
 
   return (
     <div className="grid grid-cols-12 h-full">
-      <Sidebar className="col-start-1 col-end-3" />
+      <Sidebar className="col-start-1 col-end-3" needRefresh={hasProfile}/>
       {isEditing ? (
         <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
           <form className="lg:px-28 flex flex-col gap-9" onSubmit={handleSave}>

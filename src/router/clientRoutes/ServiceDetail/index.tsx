@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
     Breadcrumb,
@@ -14,6 +14,7 @@ import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } 
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
+import { FaStar } from "react-icons/fa";
 
 interface ServiceType {
     id: string;
@@ -26,8 +27,8 @@ interface ServiceType {
     providerId: string;
 }
 
-const ServiceDetails = () => {
-    const { id } = useParams<{ id: string }>();
+const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
+    const { id } = serviceId ?? useParams<{ id: string }>();
     const [serviceData, setServiceData] = useState<ServiceType | null>(null);
     const [applicants, setApplicants] = useState<any>(null);
     const [applicantDialogOpen, setApplicantDialogOpen] = useState<boolean>(false);
@@ -38,7 +39,7 @@ const ServiceDetails = () => {
     const [applicationNotes, setApplicationNotes] = useState<string>("");
     const [scholarshipType, setScholarshipType] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [applicationFileUrl, setapplicationFileUrl] = useState<any>(null);
+    const [applicationFileUrls, setApplicationFileUrls] = useState<any>(null);
     const [editData, setEditData] = useState<ServiceType | null>(null);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const navigate = useNavigate();
@@ -49,12 +50,27 @@ const ServiceDetails = () => {
     const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
     const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
     const [requestStatus, setRequestStatus] = useState<string | null>(null);
-
+    const [averageRating, setAverageRating] = useState<number>(0);
+    const [feedbackCount, setFeedbackCount] = useState<number>(0);
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
+    const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+    const [amount, setAmount] = useState<number>(serviceData?.price || 0);
+    const [isConfirmationDialogOpen, setConfirmationDialogOpen] = useState<boolean>(false);
+    const [requestData, setRequestData] = useState<any>(null);
 
     const fetchService = async () => {
         try {
             const data = await getServiceById(Number(id));
             setServiceData(data.data);
+            const feedbacks = data.data.feedbacks || [];
+            console.log(feedbacks)
+            if (feedbacks && feedbacks.length > 0) {
+                const totalRating = feedbacks.reduce((acc: number, feedback: any) => acc + (feedback.rating || 0), 0);
+                const count = feedbacks.length;
+                setFeedbacks(feedbacks);
+                setAverageRating(totalRating / count);
+                setFeedbackCount(count);
+            }
             const response = await fetchApplicants(data.data.id);
             console.log(response);
             setExistingRequestId(response.find((r: any) => r.applicantId == user?.id)?.id || null);
@@ -80,24 +96,36 @@ const ServiceDetails = () => {
         setEditDialogOpen(true);
     };
 
-    // const handleEditChange = (field: keyof ServiceType, value: string | number | Date) => {
-    //     if (editData) {
-    //         setEditData({ ...editData, [field]: value });
-    //     }
-    // };
+    const handleFeedbackClick = () => {
+        if (feedbackCount === 0) {
+            alert("This service has no feedbacks yet, be the first!");
+        } else {
+            setIsFeedbackDialogOpen(true);
+        }
+    };
 
-    // const handleEditSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     if (!editData) return;
+    const handleCloseFeedbackDialog = () => {
+        setIsFeedbackDialogOpen(false);
+    };
+
+    // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files = e.target.files;
+    //     if (!files) return;
 
     //     setLoading(true);
+
     //     try {
-    //         await updateService(Number(id), editData);
-    //         setServiceData(editData);
-    //         setEditDialogOpen(false);
-    //         alert("Service updated successfully!");
+    //         const filesArray = Array.from(files);
+    //         const formData = new FormData();
+
+    //         filesArray.forEach((file) => {
+    //             formData.append("files", file);
+    //         });
+
+    //         const urls = await uploadFile(formData);
+    //         setApplicationFileUrls(urls);
     //     } catch (error) {
-    //         setError((error as Error).message);
+    //         console.error("File upload failed:", error);
     //     } finally {
     //         setLoading(false);
     //     }
@@ -166,30 +194,59 @@ const ServiceDetails = () => {
         setExpectedCompletionTime(null);
         setApplicationNotes("");
         setScholarshipType("");
-        setapplicationFileUrl("");
+        setApplicationFileUrls("");
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleNext = (e: React.FormEvent) => {
         e.preventDefault();
+        setDialogOpen(false);
+        setConfirmationDialogOpen(true);
+        setRequestData(e);
+    };
+
+    const handleConfirmPayment = async () => {
+        if (!requestData) return;
+        try {
+            await handleSubmit();
+            alert("Request has been successfully confirmed and paid!");
+            await fetchService();
+            closeDialog();
+        } catch (error) {
+            setError((error as Error).message);
+        } finally {
+            setLoading(false);
+            setConfirmationDialogOpen(false);
+        }
+    };
+
+    const handleCancelPayment = () => {
+        setConfirmationDialogOpen(false);
+    };
+
+    const handleSubmit = async () => {
         setLoading(true);
         setError(null);
 
+        const filesArray = Array.from(applicationFileUrls || []);
         const formData = new FormData();
-        formData.append("File", applicationFileUrl);
 
-        const fileUrl = await uploadFile(formData);
+        filesArray.forEach((file: any) => {
+            formData.append("files", file);
+        });
 
-        const requestData = {
+        const urls = await uploadFile(filesArray);
+
+        const requestDatas = {
             description,
             requestDate: new Date(),
-            status: "Pending",
+            status: "Paid",
             applicantId: user?.id,
             requestDetails: [{
                 id,
                 expectedCompletionTime,
                 applicationNotes,
                 scholarshipType,
-                applicationFileUrl: fileUrl.url,
+                applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
                 serviceId: serviceData?.id,
 
             }
@@ -197,42 +254,10 @@ const ServiceDetails = () => {
         };
 
         try {
-            await createRequest(requestData);
+            await createRequest(requestDatas);
             alert("Request created successfully!");
             await fetchService();
             closeDialog();
-        } catch (error) {
-            setError((error as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleViewRequest = (appId: any) => {
-        navigate(`/applicant/requestinformation/${appId}`);
-    };
-
-    const handleCancelRequest = async () => {
-        if (!existingRequestId) return;
-        const confirmCancel = window.confirm("Do you really want to cancel your request?");
-        if (!confirmCancel) return;
-
-        setLoading(true);
-        try {
-            let applicationFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
-                ?.requestDetails[0].applicationFileUrl.split("/").pop();
-            let reviewFileUrl = applicants.find((a: any) => a.applicantId == user?.id)
-                ?.requestDetails[0].applicationNotes.split(", ")[0].split("/").pop();
-
-            try {
-                await deleteFile(applicationFileUrl);
-                await deleteFile(reviewFileUrl);
-            }
-            catch (error) {
-            }
-            await cancelRequest(existingRequestId);
-            alert("Request cancelled successfully!");
-            setHasExistingRequest(false);
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -248,13 +273,17 @@ const ServiceDetails = () => {
         <div>
             {isDialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                    <div className="bg-white p-5 rounded-lg shadow-lg">
+                    <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-semibold mb-4">Create Request</h2>
-                            <span className="text-xl cursor-pointer" onClick={closeDialog}>&times;</span>
+                            <span
+                                className="text-xl cursor-pointer"
+                                onClick={closeDialog}
+                            >
+                                &times;
+                            </span>
                         </div>
-                        {error && <p className="text-red-500">{error}</p>}
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleNext}>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Expected Completion Time</label>
                                 <input
@@ -280,10 +309,11 @@ const ServiceDetails = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700">Application File</label>
+                                <label className="block text-gray-700">Application File(s)</label>
                                 <input
                                     type="file"
-                                    onChange={(e) => setapplicationFileUrl(e.target.files?.[0])}
+                                    multiple
+                                    onChange={(e) => setApplicationFileUrls(e.target.files)}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
@@ -298,12 +328,46 @@ const ServiceDetails = () => {
                                 <button
                                     type="submit"
                                     className="bg-blue-600 text-white rounded px-4 py-2"
-                                    disabled={loading}
                                 >
-                                    {loading ? "Submitting..." : "Submit"}
+                                    Next
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {isConfirmationDialogOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-semibold mb-4">Confirmation</h2>
+                            <span
+                                className="text-xl cursor-pointer"
+                                onClick={handleCancelPayment}
+                            >
+                                &times;
+                            </span>
+                        </div>
+                        <p className="text-gray-700 mb-4">
+                            Using this service will incur a fee: <strong>${serviceData.price}</strong>. Do you want to continue?
+                        </p>
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={handleCancelPayment}
+                                className="mr-2 bg-gray-300 rounded px-4 py-2"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleConfirmPayment}
+                                className="bg-blue-600 text-white rounded px-4 py-2"
+                            >
+                                Yes, Continue
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -333,66 +397,110 @@ const ServiceDetails = () => {
                         </Breadcrumb>
                     </div>
                     <div className={isProvider ? "w-2/3" : ""}>
-                        <div className="lg:flex-row items-center flex-row flex gap-[20px]">
+                        <div className="lg:flex-col items-center flex-row flex gap-[20px]">
                             <div>
                                 <p className="text-white text-5xl lg:line-clamp-3 line-clamp-5">
                                     {serviceData.name}
                                 </p>
                             </div>
+                            <div className="flex flex-col items gap-2">
+                                <div className="flex items-center gap-2">
+                                    <FaStar color="yellow" size={20} />
+                                    <p className="text-yellow-500 cursor-pointer underline" onClick={handleFeedbackClick}>
+                                        {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? 'feedback' : 'feedbacks'})
+                                    </p>
+                                </div>
+                            </div>
                         </div>
+
+                        {isFeedbackDialogOpen && (
+                            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                                <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className="text-xl font-semibold">Feedback Details</h2>
+                                        <span
+                                            className="text-xl cursor-pointer"
+                                            onClick={handleCloseFeedbackDialog}
+                                        >
+                                            &times;
+                                        </span>
+                                    </div>
+
+                                    <table className="min-w-full bg-white border border-gray-300">
+                                        <thead>
+                                            <tr className="bg-gray-100">
+                                                <th className="p-2 text-left">Applicant Name</th>
+                                                <th className="p-2 text-left">Rating</th>
+                                                <th className="p-2 text-left">Comment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {feedbacks.map((feedback, index) => (
+                                                <tr key={index} className="border-t">
+                                                    <td className="p-2">********</td>
+                                                    <td className="p-2 flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                color={i < feedback.rating ? "#FFB800" : "#ddd"}
+                                                                size={16}
+                                                            />
+                                                        ))}
+                                                    </td>
+                                                    <td className="p-2">{feedback.content}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+
+                                    </table>
+                                    <div className="mt-4 text-right">
+                                        <button
+                                            onClick={handleCloseFeedbackDialog}
+                                            className="bg-gray-300 px-4 py-2 rounded-md"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="text-white text-center flex h-[50px] mt-[26px]">
                             <div className="flex justify-between w-full gap-10">
-                                {!isFunder && !isProvider ? (
-                                    requestStatus === "Pending" ? (
-                                        <button
-                                            onClick={handleCancelRequest}
-                                            className="text-xl w-full bg-yellow-500 rounded-[25px]"
-                                        >
-                                            Cancel Request
-                                        </button>
-                                    ) : requestStatus === "Rejected" ? (
-                                        <button
-                                            onClick={handleRequestNow}
-                                            className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                        >
-                                            Request Now
-                                        </button>
-                                    ) : requestStatus === "Accepted" ? (
-                                        <button
-                                            onClick={() => handleViewRequest(existingRequestId?.toString())}
-                                            className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                        >
-                                            View Request
-                                        </button>
-                                    ) : requestStatus === "Finished" ? (
-                                        <>
+                                {showButtons && <>
+                                    {!isFunder && !isProvider ? (
+                                        requestStatus === "Finished" ? (
+                                            <>
+                                                <button
+                                                    onClick={handleRequestNow}
+                                                    className="text-xl w-full bg-blue-700 rounded-[25px] mt-2"
+                                                >
+                                                    Request Now
+                                                </button>
+                                            </>
+                                        ) : (
                                             <button
                                                 onClick={handleRequestNow}
-                                                className="text-xl w-full bg-blue-700 rounded-[25px] mt-2"
+                                                className="text-xl w-full bg-blue-700 rounded-[25px]"
                                             >
                                                 Request Now
                                             </button>
-                                            <button
-                                                onClick={() => handleViewRequest(existingRequestId?.toString())}
-                                                className="text-xl w-full bg-orange-500 rounded-[25px]"
-                                            >
+                                        )
+                                    ) : (!isFunder && isProvider ? (
+                                        <>
+                                            <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
+                                                Edit
+                                            </button>
+                                            <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
                                                 View Request
                                             </button>
+                                            <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
+                                                Delete
+                                            </button>
                                         </>
-                                    ) : null
-                                ) : ((!isFunder && isProvider) ? (
-                                    <>
-                                        <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
-                                            Edit
-                                        </button>
-                                        <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
-                                            View Request
-                                        </button>
-                                        <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
-                                            Delete
-                                        </button>
-                                    </>
-                                ) : (<div></div>))}
+                                    ) : (
+                                        <div></div>
+                                    ))}</>}
                             </div>
                         </div>
                     </div>
@@ -420,8 +528,12 @@ const ServiceDetails = () => {
                             <p>{serviceData.status}</p>
                         </div>
                         <div>
-                            <p className="font-semibold">Provider Information:</p>
-                            <p>{serviceData.providerId}</p>
+                            <Link
+                                to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
+                                className="text-blue-600 hover:underline"
+                            >
+                                Provider Information
+                            </Link>
                         </div>
                     </div>
                 </div>

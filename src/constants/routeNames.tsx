@@ -18,6 +18,7 @@ const RouteNames = {
     MAJOR:'/major/:id',
     FORGOT_PASSWORD: '/forgot-password',
     CHAT: '/chat',
+    CHAT_WITH_USER:'/chat/:id',
     INFORMATION: '/information',
     SKILLS: '/skills',
     FUNDER_APPLICATION: '/funder/application/:id',
@@ -25,7 +26,12 @@ const RouteNames = {
     SERVICES_DETAIL: '/services/:id',
     REVIEWS: '/reviews',
     APPLICANT_REQUEST_INFORMATION: 'provider/requestinformation/:id',
-    PROVIDER_COMMENT_INFORMATION: 'applicant/requestinformation/:id'
+    PROVIDER_COMMENT_INFORMATION: 'applicant/requestinformation/:id',
+    APPLICANT_REQUEST_HISTORY: '/services-history',
+    PROVIDER_INFORMATION: '/provider-information/:id',
+    SERVICE_HISTORY_DETAILS: '/services-history/services/:id',
+    REQUEST_HISTORY_DETAILS: '/services-history/request/:id',
+    WALLET: '/wallet' ,
 }
 
 export default RouteNames

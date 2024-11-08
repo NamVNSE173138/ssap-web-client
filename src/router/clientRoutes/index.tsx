@@ -20,6 +20,9 @@ import FunderApplication from "./FunderApplication";
 import Service from "./Service";
 import ServiceDetails from "./ServiceDetail";
 import ApplicantRequestInfo from "./ApplicantRequestInformation";
+import RequestHistory from "./RequestServiceHistory";
+import ProviderInformation from "./ProviderInformation";
+import Wallet from "./Wallet";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -63,6 +66,14 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SERVICES_DETAIL,
     element: <ServiceDetails />,
+  },
+  {
+    path: RouteNames.APPLICANT_REQUEST_HISTORY,
+    element: <RequestHistory/>,
+  },
+  {
+    path: RouteNames.PROVIDER_INFORMATION,
+    element: <ProviderInformation/>,
   }
 ];
 
@@ -111,6 +122,18 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.PROVIDER_COMMENT_INFORMATION,
     element: <ApplicantRequestInfo/>,
+  },
+  {
+    path: RouteNames.SERVICE_HISTORY_DETAILS,
+    element: <ServiceDetails showButtons={false}/>,
+  },
+  {
+    path: RouteNames.REQUEST_HISTORY_DETAILS,
+    element: <ApplicantRequestInfo/>,
+  },
+  {
+    path: RouteNames.WALLET,
+    element: <Wallet />,
   }
 ];
 

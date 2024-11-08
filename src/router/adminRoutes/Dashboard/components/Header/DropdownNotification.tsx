@@ -22,8 +22,8 @@ const DropdownNotification = () => {
     try {
       if(!user) return;
       let majors = await GetAllNotisFromUserId(parseInt(user.id));
-      setNotis(majors.data.items);
-      let unread = majors.data.items.filter((noti : any) => !noti.isRead).length
+      setNotis(majors.data);
+      let unread = majors.data.filter((noti : any) => !noti.isRead).length
       setUnreadNotis(unread);
       if(unread > 0) document.title = `(${unread}) ${title}`
       else document.title = title
