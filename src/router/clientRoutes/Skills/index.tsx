@@ -10,6 +10,7 @@ const SkillInformation = () => {
     const user = useSelector((state: RootState) => state.token.user);
     const { id } = useParams<{ id: string }>();
     const [skills, setSkills] = useState<any[]>([]);
+    const [hasProfile, setHasProfile] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [formValues, setFormValues] = useState({
@@ -26,17 +27,21 @@ const SkillInformation = () => {
         const fetchSkills = async () => {
             try {
                 const data = await getApplicantProfileById(Number(id || user?.id));
-                console.log(data.applicantSkills);
                 if (isMounted) {
                     setSkills(data.data.applicantSkills || []);
                     if (data.data.applicantSkills.length > 0) {
                         setFormValues({ ...formValues, ...data.data.applicantSkills[0], skillId: data.data.applicantSkills[0].id });
                     }
                 }
-            } catch (error) {
+            } catch (error: any) {
+                
                 if (isMounted) {
                     setSkills([]);
                     setError("Failed to load skills.");
+                }
+                if(error.response.data.detail.includes('applicantId')){
+                    setHasProfile(false);   
+                    setError(null);
                 }
             } finally {
                 if (isMounted) {
@@ -112,6 +117,9 @@ const SkillInformation = () => {
 
     if (error) {
         return <Alert message={error} type="error" />;
+    }
+    if (!hasProfile) {
+        return <Alert message={"You have to add profile before adding skills"} type="error" />;
     }
 
     return (
