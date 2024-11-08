@@ -31,6 +31,7 @@ const RouteNames = {
     PROVIDER_INFORMATION: '/provider-information/:id',
     SERVICE_HISTORY_DETAILS: '/services-history/services/:id',
     REQUEST_HISTORY_DETAILS: '/services-history/request/:id',
+    WALLET: '/wallet' ,
 }
 
 export default RouteNames

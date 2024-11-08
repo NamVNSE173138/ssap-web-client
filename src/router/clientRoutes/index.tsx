@@ -22,6 +22,7 @@ import ServiceDetails from "./ServiceDetail";
 import ApplicantRequestInfo from "./ApplicantRequestInformation";
 import RequestHistory from "./RequestServiceHistory";
 import ProviderInformation from "./ProviderInformation";
+import Wallet from "./Wallet";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -129,6 +130,10 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.REQUEST_HISTORY_DETAILS,
     element: <ApplicantRequestInfo/>,
+  },
+  {
+    path: RouteNames.WALLET,
+    element: <Wallet />,
   }
 ];
 
