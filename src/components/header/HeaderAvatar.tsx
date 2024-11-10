@@ -44,6 +44,18 @@ const HeaderAvatar = () => {
         }
     };
 
+    const handleWalletClick = () => {
+        const token = localStorage.getItem('token');
+        const decodedToken = parseJwt(token);
+        const userId = decodedToken ? decodedToken.id : null;
+
+        if (userId) {
+            navigate(RouteNames.WALLET); 
+        } else {
+            console.error("User ID not found in token");
+        }
+    };
+
     return (
         <>
             <DropdownMenu>
@@ -59,6 +71,9 @@ const HeaderAvatar = () => {
                     <DropdownMenuItem  onClick={handleProfileClick}>
                         <CgProfile className='mr-2'/> Profile</DropdownMenuItem>
                     <AlertDialog>
+                    <DropdownMenuItem onClick={handleWalletClick}>
+                        <span className='mr-2'>💰</span> Wallet
+                    </DropdownMenuItem>
                         <AlertDialogTrigger>
                             <div className="flex items-center px-2 text-sm">
                                 <LogOut className="mr-2 h-4 w-4" />
