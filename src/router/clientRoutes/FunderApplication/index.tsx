@@ -124,25 +124,25 @@ import DocumentTable from "./document-table"
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Nationality
               </p>
-              <p className="text-heading-6">{applicantProfile.nationality}</p>
+              <p className="text-heading-6">{applicantProfile ? applicantProfile.nationality : "N/A"}</p>
             </div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Ethnicity
               </p>
-              <p className="text-heading-6">{applicantProfile.ethnicity}</p>
+              <p className="text-heading-6">{applicantProfile ? applicantProfile.ethnicity : "N/A"}</p>
             </div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Gender
               </p>
-              <p className="text-heading-6">{applicantProfile.gender}</p>
+              <p className="text-heading-6">{applicantProfile ? applicantProfile.gender: "N/A"}</p>
             </div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Birth Date
               </p>
-              <p className="text-heading-6">{formatOnlyDate(applicantProfile.birthDate)}</p>
+              <p className="text-heading-6">{applicantProfile ? formatOnlyDate(applicantProfile.birthDate) : "N/A"}</p>
             </div>
           </div>
         </section>

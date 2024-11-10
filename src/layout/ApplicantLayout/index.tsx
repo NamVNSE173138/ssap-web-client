@@ -40,7 +40,7 @@ const ClientLayout = () => {
                 });
             }
         });
-    }, [user]);
+    }, []);
 
 
     return (

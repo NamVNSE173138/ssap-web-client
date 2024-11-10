@@ -23,6 +23,7 @@ import ApplicantRequestInfo from "./ApplicantRequestInformation";
 import RequestHistory from "./RequestServiceHistory";
 import ProviderInformation from "./ProviderInformation";
 import Wallet from "./Wallet";
+import ChooseWinner from "./ChooseWinner";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -134,7 +135,12 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.WALLET,
     element: <Wallet />,
+  },
+  {
+    path: RouteNames.CHOOSE_WINNER,
+    element: <ChooseWinner />,
   }
+
 ];
 
 const clientRoutes: RouteObject[] = [

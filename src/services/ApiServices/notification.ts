@@ -44,3 +44,10 @@ export async function NotifyFunderNewApplicant(applicantId: number, scholarshipI
   );
   return response.data;
 }
+
+export async function NotifyProviderNewRequest(applicantId: number, serviceId: number) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/notify-provider-new-request?applicantId=${applicantId}&serviceId=${serviceId}`
+  );
+  return response.data;
+}
