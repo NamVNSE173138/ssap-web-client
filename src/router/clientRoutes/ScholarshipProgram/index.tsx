@@ -26,7 +26,7 @@ const ScholarshipProgram = () => {
           `${BASE_URL}/api/scholarship-programs`
         );
         if (response.data.statusCode === 200) {
-          setData(response.data.data);
+          setData(response.data.data.items);
         } else {
           setError("Failed to fetch data");
         }

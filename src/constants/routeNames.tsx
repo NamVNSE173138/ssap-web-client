@@ -32,6 +32,7 @@ const RouteNames = {
     SERVICE_HISTORY_DETAILS: '/services-history/services/:id',
     REQUEST_HISTORY_DETAILS: '/services-history/request/:id',
     WALLET: '/wallet' ,
+    CHOOSE_WINNER: '/funder/choose-winners/:id',
 }
 
 export default RouteNames
