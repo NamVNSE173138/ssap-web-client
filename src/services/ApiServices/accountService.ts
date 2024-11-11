@@ -92,3 +92,13 @@ export async function updateWalletBalance(id: number, updateWalletBalanceDto: an
   );
   return response.data;
 }
+
+export async function updateWalletBankInformation(id: number, updateWalletBankInformationDto: any) {
+  const response = await axios.put(
+    `${BASE_URL}/api/accounts/${id}/wallet/bank-information`,
+    updateWalletBankInformationDto,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
