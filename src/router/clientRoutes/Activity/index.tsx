@@ -12,6 +12,8 @@ import scholarshipProgram, {
 import { BASE_URL } from "@/constants/api";
 import AddServiceModal from "./AddServiceModal";
 import ServiceCard from "@/components/Services/ServiceCard";
+import { Link } from "react-router-dom";
+import RouteNames from "@/constants/routeNames";
 
 const Activity = () => {
   const user = useSelector((state: any) => state.token.user);
@@ -66,13 +68,13 @@ const Activity = () => {
         <div className="relative w-full flex items-center justify-between p-5">
           <div className="flex items-center"></div>
           {role === "FUNDER" && (
-            <button
-              onClick={() => setIsScholarshipModalOpen(true)}
+            <Link to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
+              // onClick={() => setIsScholarshipModalOpen(true)}
               className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
             >
               <IoIosAddCircleOutline className="text-3xl text-blue-500" />
               <p className="text-xl text-blue-600">Add Scholarship Program</p>
-            </button>
+            </Link>
           )}
           {role === "PROVIDER" && (
             <button

@@ -34,6 +34,8 @@ const RouteNames = {
     WALLET: "/wallet",
     CHOOSE_WINNER: "/funder/choose-winners/:id",
     PAYMENT_RESULT: "/payment/result",
+    FORM_CREATE_SCHOLARSHIP_PROGRAM: '/create-scholarship-program',
 };
+
 
 export default RouteNames;
