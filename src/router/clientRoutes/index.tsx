@@ -20,11 +20,13 @@ import FunderApplication from "./FunderApplication";
 import Service from "./Service";
 import ServiceDetails from "./ServiceDetail";
 import ApplicantRequestInfo from "./ApplicantRequestInformation";
+import FormCreateScholarshipProgram from "./FormCreateScholarshipProgram";
 import RequestHistory from "./RequestServiceHistory";
 import ProviderInformation from "./ProviderInformation";
 import SuccessfulPayment from "./Payment";
 import Wallet from "./Wallet";
 import ChooseWinner from "./ChooseWinner";
+
 
 const publicRoutes: RouteObject[] = [
     {
@@ -143,6 +145,11 @@ const privateRoutes: RouteObject[] = [
         path: RouteNames.CHOOSE_WINNER,
         element: <ChooseWinner />,
     },
+     {
+    path: RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM,
+    element: <FormCreateScholarshipProgram/>
+    },
+
 ];
 
 const clientRoutes: RouteObject[] = [
