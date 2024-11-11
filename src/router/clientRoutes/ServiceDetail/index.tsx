@@ -15,6 +15,7 @@ import ScholarshipProgramBackground from "@/components/footer/components/Scholar
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
 import { FaStar } from "react-icons/fa";
+import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 
 interface ServiceType {
     id: string;
@@ -195,6 +196,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setApplicationNotes("");
         setScholarshipType("");
         setApplicationFileUrls("");
+        setConfirmationDialogOpen(false);
     };
 
     const handleNext = (e: React.FormEvent) => {
@@ -258,6 +260,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             alert("Request created successfully!");
             await fetchService();
             closeDialog();
+            await NotifyProviderNewRequest(user.id, serviceData?.id);
         } catch (error) {
             setError((error as Error).message);
         } finally {

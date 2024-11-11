@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../components/header/index';
 import Footer from '../../components/footer/index';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,16 +6,26 @@ import { RootState } from '@/store/store';
 import { useEffect } from 'react';
 import { requestNotify } from '@/services/requestNotify';
 import { useToast } from "@/components/ui/use-toast";
+import { NotifyNewUser } from '@/services/ApiServices/notification';
 
 const ClientLayout = () => {
     const user = useSelector((state: RootState) => state.token.user);
     //const unread = useSelector((state: RootState) => state.unreadNotify.unreadNotify);
     const {toast} = useToast();
     const navigate = useNavigate();
+    const location = useLocation();
+    const { sendNotification } = location.state || {sendNotification:false};
+
+    const notify = async () => {
+        if(user != null){
+            await requestNotify(user.id);
+            if(sendNotification) await NotifyNewUser(parseInt(user.id));
+        }
+    }
 
     useEffect(() => {
-        if(user != null)
-            requestNotify(user.id);
+        notify();
+        
         navigator.serviceWorker.addEventListener('message', (event) => {
             if(event.data.notification){
                 toast({
@@ -30,7 +40,7 @@ const ClientLayout = () => {
                 });
             }
         });
-    }, [user]);
+    }, []);
 
 
     return (

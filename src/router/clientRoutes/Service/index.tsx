@@ -10,8 +10,10 @@ import ScholarshipProgramBackground from "@/components/footer/components/Scholar
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { IoIosAddCircleOutline } from "react-icons/io";
+import { IoIosSearch, IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
+import { Input } from "@/components/ui/input";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -23,6 +25,8 @@ const Service = () => {
   const pageSize = 6;
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [filteredData, setFilteredData] = useState<ServiceType[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const fetchData = async () => {
     setLoading(true);
@@ -41,10 +45,12 @@ const Service = () => {
           setTotalPages(Math.ceil(filteredServices.length / pageSize));
         } else {
           setData(activeServices);
+          setFilteredData(activeServices);
           setTotalPages(response.data.data.totalPages);
         }
       } else {
         setData([]);
+        setFilteredData([]);
         setTotalPages(1);
       }
     } catch (err) {
@@ -57,6 +63,12 @@ const Service = () => {
   useEffect(() => {
     fetchData();
   }, [currentPage, user]);
+
+  useEffect(() => {
+    setFilteredData(
+      data.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [searchTerm, data]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -74,6 +86,10 @@ const Service = () => {
 
   const handleViewHistory = () => {
     navigate(RouteNames.APPLICANT_REQUEST_HISTORY);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
   };
 
   return (
@@ -95,7 +111,23 @@ const Service = () => {
         </div>
       </div>
 
-      <div className="flex justify-between p-4">
+      <div className="flex justify-between p-4 items-center">
+        <div className="relative w-full max-w-md">
+          <Input
+            className="w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
+            placeholder="Search for services..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <IoIosSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 text-xl" />
+          {searchTerm && (
+            <IoMdClose
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition"
+              onClick={clearSearch}
+            />
+          )}
+        </div>
+
         {user?.role === "PROVIDER" && (
           <button
             onClick={() => setIsServiceModalOpen(true)}
@@ -125,7 +157,7 @@ const Service = () => {
         ) : data.length === 0 ? (
           <p>No services found</p>
         ) : (
-          data.map((service) => <li key={service.id}><ServiceCard {...service} /></li>)
+          filteredData.map((service) => <li key={service.id}><ServiceCard {...service} /></li>)
         )}
       </ul>
 
