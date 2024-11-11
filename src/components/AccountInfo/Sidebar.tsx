@@ -73,7 +73,6 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
         { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}`},
         { Icon: AiOutlineBook, text: 'Information', link: RouteNames.INFORMATION},
         { Icon: AiOutlineBook, text: `Skills ${hasProfile ? '' : '(You need to add profile first)'} `, link: hasProfile ? RouteNames.SKILLS : ""},
-        { Icon: AiOutlineWallet, text: 'Wallet', link: RouteNames.WALLET},        
         { Icon: AiOutlineBarChart, text: 'Change Password', link: RouteNames.CHANGE_PASSWORD},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
         { Icon: AiOutlineHistory, text: 'History', link: "/history"},
