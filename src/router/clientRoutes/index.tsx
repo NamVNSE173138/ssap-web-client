@@ -22,6 +22,7 @@ import ServiceDetails from "./ServiceDetail";
 import ApplicantRequestInfo from "./ApplicantRequestInformation";
 import RequestHistory from "./RequestServiceHistory";
 import ProviderInformation from "./ProviderInformation";
+import SuccessfulPayment from "./Payment";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -44,7 +45,7 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.BLOGS_DETAIL,
     element: <BlogDetail />,
   },
-  
+
   {
     path: RouteNames.MAJOR,
     element: <Major />,
@@ -60,20 +61,23 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SERVICES,
     element: <Service />,
-  }
-  ,
+  },
   {
     path: RouteNames.SERVICES_DETAIL,
     element: <ServiceDetails />,
   },
   {
     path: RouteNames.APPLICANT_REQUEST_HISTORY,
-    element: <RequestHistory/>,
+    element: <RequestHistory />,
   },
   {
     path: RouteNames.PROVIDER_INFORMATION,
-    element: <ProviderInformation/>,
-  }
+    element: <ProviderInformation />,
+  },
+  {
+    path: RouteNames.PAYMENT_RESULT,
+    element: <SuccessfulPayment />,
+  },
 ];
 
 const privateRoutes: RouteObject[] = [
@@ -100,7 +104,6 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.CHANGE_PASSWORD,
     element: <ChangePassword />,
-
   },
   {
     path: RouteNames.CHAT,
@@ -112,24 +115,24 @@ const privateRoutes: RouteObject[] = [
   },
   {
     path: RouteNames.FUNDER_APPLICATION,
-    element: <FunderApplication/>,
+    element: <FunderApplication />,
   },
   {
     path: RouteNames.APPLICANT_REQUEST_INFORMATION,
-    element: <ApplicantRequestInfo/>,
+    element: <ApplicantRequestInfo />,
   },
   {
     path: RouteNames.PROVIDER_COMMENT_INFORMATION,
-    element: <ApplicantRequestInfo/>,
+    element: <ApplicantRequestInfo />,
   },
   {
     path: RouteNames.SERVICE_HISTORY_DETAILS,
-    element: <ServiceDetails showButtons={false}/>,
+    element: <ServiceDetails showButtons={false} />,
   },
   {
     path: RouteNames.REQUEST_HISTORY_DETAILS,
-    element: <ApplicantRequestInfo/>,
-  }
+    element: <ApplicantRequestInfo />,
+  },
 ];
 
 const clientRoutes: RouteObject[] = [
@@ -145,18 +148,6 @@ const clientRoutes: RouteObject[] = [
 ];
 
 export default clientRoutes;
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { Navigate, RouteObject } from "react-router-dom";
 // import RouteNames from "../../constants/routeNames";
@@ -245,4 +236,3 @@ export default clientRoutes;
 // ];
 
 // export default clientRoutes;
-
