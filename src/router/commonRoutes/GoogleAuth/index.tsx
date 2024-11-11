@@ -18,13 +18,7 @@ const GoogleLogin = () => {
   const isNewUser = queryParams.get('isNewUser');
   const jwt = queryParams.get('jwt');
 
-  const sendNotification = async (userId: number) => {
-    if(isNewUser == 'True') {
-      await NotifyNewUser(userId);
-    }
-  }
-
-  useEffect(() => {
+  const sendNotification = async () => {
     if (result === 'success' && jwt) {
       if(parseJwt(jwt) === null) {
         navigate("/login");
@@ -32,8 +26,8 @@ const GoogleLogin = () => {
       };
       dispatch(setToken(jwt));
       const userInfo = parseJwt(jwt);
-      dispatch(setUser(userInfo)); 
-      sendNotification(userInfo.id);
+      dispatch(setUser(userInfo));
+      
       if(userInfo.role === RoleNames.ADMIN) {
         navigate("/admin");
       }
@@ -47,14 +41,20 @@ const GoogleLogin = () => {
         navigate("/expert");
       }
       else {
-        navigate("/");
+        if(isNewUser == "True")
+          navigate("/", { state: { sendNotification: true } });
+        else navigate("/");
       }
-      
     }
     else {
       navigate("/login");
     }
-  }, [result, jwt]);   
+    
+  }
+
+  useEffect(() => {
+    sendNotification()
+  }, []);   
   
   
   return (

@@ -9,7 +9,6 @@ function EditableTable({ rows, setRows, handleDeleteRow, handleInputChange }: an
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Id</TableCell>
                         <TableCell>Name</TableCell>
                         <TableCell>Type</TableCell>
                         <TableCell>File</TableCell>
@@ -20,7 +19,6 @@ function EditableTable({ rows, setRows, handleDeleteRow, handleInputChange }: an
                     {rows.map((row:any) => {
                         return (
                         <TableRow key={row.id}>
-                            <TableCell>{row.id}</TableCell>
                             <TableCell>
                                     <TextField
                                         error={row.errors?.name}

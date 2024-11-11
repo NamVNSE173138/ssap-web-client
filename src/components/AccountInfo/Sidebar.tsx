@@ -1,20 +1,22 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BiLogOutCircle } from 'react-icons/bi';
 import { IconType } from 'react-icons';
-import { AiOutlineBarChart, AiOutlineHistory, AiOutlineBook, AiOutlineAudit } from 'react-icons/ai';
+import { AiOutlineBarChart, AiOutlineHistory, AiOutlineBook, AiOutlineAudit, AiOutlineWallet } from 'react-icons/ai';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import RouteNames from '@/constants/routeNames';
 import { AlertDialog } from '@radix-ui/react-alert-dialog';
 import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 import { useDispatch } from "react-redux";
 import { removeToken, removeUser } from "@/reducers/tokenSlice";
 import { useSelector } from 'react-redux';
+import { getApplicantProfileById } from '@/services/ApiServices/applicantProfileService';
 
 type SidebarProps = {
     className?: string;
+    needRefresh?: boolean;
 };
 
 type ListItemProps = {
@@ -45,18 +47,33 @@ const ListItem = ({ Icon, text, link }: ListItemProps) => {
 
 
 
-const Sidebar = ({ className }: SidebarProps) => {
+const Sidebar = ({ className, needRefresh }: SidebarProps) => {
     const isAboveMediumScreens = useMediaQuery('(min-width: 1060px)');
     const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
+    const [hasProfile, setHasProfile] = useState<boolean>(true);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = useSelector((state: any) => state.token.user); 
     const id = user?.id;
 
+    const fetchSkills = async () => {
+            try {
+                const data = await getApplicantProfileById(Number(id || user?.id));
+                setHasProfile(true);
+            } catch (error: any) {
+                if(error.response.data.detail.includes('applicantId')){
+                    setHasProfile(false);   
+                }
+            } finally {
+                
+            }
+        };
+
     const listItems: ListItemProps[] = [
         { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}`},
         { Icon: AiOutlineBook, text: 'Information', link: RouteNames.INFORMATION},
-        { Icon: AiOutlineBook, text: 'Skills', link: RouteNames.SKILLS},
+        { Icon: AiOutlineBook, text: `Skills ${hasProfile ? '' : '(You need to add profile first)'} `, link: hasProfile ? RouteNames.SKILLS : ""},
+        { Icon: AiOutlineWallet, text: 'Wallet', link: RouteNames.WALLET},        
         { Icon: AiOutlineBarChart, text: 'Change Password', link: RouteNames.CHANGE_PASSWORD},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
         { Icon: AiOutlineHistory, text: 'History', link: "/history"},
@@ -78,6 +95,11 @@ const Sidebar = ({ className }: SidebarProps) => {
         //   setIsLoading(false); 
         }, 500); 
       };
+
+    useEffect(() => {
+        fetchSkills();
+    },[needRefresh])
+
     return (
         <>
             <div className={`${className} flex flex-col py-10 border-r-2 `}>

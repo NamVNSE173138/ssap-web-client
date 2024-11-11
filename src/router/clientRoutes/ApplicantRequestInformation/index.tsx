@@ -10,8 +10,8 @@ import { getRequestWithApplicantAndRequestDetails } from "@/services/ApiServices
 import RequestDetailTable from "./request-detail-table"
 import { useSelector } from "react-redux"
 
-const ApplicantRequestInfo = () => {
-  const { id } = useParams<{ id: string }>();
+const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
+  const { id } = requestId ?? useParams<{ id: string }>();
   const [request, setRequest] = useState<any>(null);
   const [applicant, setApplicant] = useState<any>(null);
   const [applicantProfile, setApplicantProfile] = useState<any>(null);
@@ -154,7 +154,7 @@ const ApplicantRequestInfo = () => {
               Request Details
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
-            <RequestDetailTable request={request} requestDetails={requestDetails} description={request.description} />
+            <RequestDetailTable showButtons={showButtons} request={request} fetchRequest={fetchRequest} requestDetails={requestDetails} description={request.description} />
           </div>
         </div>
       </section>

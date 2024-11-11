@@ -4,6 +4,8 @@ import { RootState } from "@/store/store";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { getMessaging, onMessage } from "firebase/messaging";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
 
 interface Account {
   id: number;
@@ -27,6 +29,18 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const user = useSelector((state: RootState) => state.token.user);
   const messaging = getMessaging();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isChatEnabled, setIsChatEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const chatUserId = queryParams.get("id");
+    if (chatUserId) {
+      const userToChat = accounts.find(account => account.id === parseInt(chatUserId));
+      if (userToChat) setSelectedUser(userToChat);
+    }
+  }, [location.search, accounts]);
 
   const fetchAccounts = async () => {
     if (user == null) {
@@ -36,15 +50,14 @@ const Chat: React.FC = () => {
     const response = await getAllAccounts();
     const accountsWithCount = response.map((account: Account) => ({ ...account, unreadCount: 0 }));
     console.log(accountsWithCount)
-    const filteredAccounts = accountsWithCount.filter((account:any) => {
+    const filteredAccounts = accountsWithCount.filter((account: any) => {
       if (role === "PROVIDER") {
-        return account.roleName === "APPLICANT"; 
+        return account.roleName === "APPLICANT";
       } else if (role === "APPLICANT") {
-        return account.roleName === "PROVIDER"; 
+        return account.roleName === "PROVIDER";
       }
       return false;
     });
-
 
     const allMessagesResponse = await getAllMessages(parseInt(user.id));
     const allMessages = allMessagesResponse.data;
@@ -61,9 +74,18 @@ const Chat: React.FC = () => {
     });
 
     setAccounts(updatedAccounts);
+
+    if (role === "APPLICANT") {
+      const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
+      const requestData = requestsResponse.data;
+      const hasPaidRequest = requestData.some((request: any) => request.status === "Paid");
+      setIsChatEnabled(hasPaidRequest);
+    }else{
+      setIsChatEnabled(true);
+    }
   };
+
   useEffect(() => {
-    
     fetchAccounts();
   }, [user]);
 
@@ -102,19 +124,19 @@ const Chat: React.FC = () => {
 
       fetchChatHistory();
       navigator.serviceWorker.addEventListener('message', (event) => {
-            if(!event.data.notification && event.data.messageType != "push-received"){
-              fetchChatHistory();
-            }
+        if (!event.data.notification && event.data.messageType != "push-received") {
+          fetchChatHistory();
+        }
       });
 
-        onMessage(messaging, (payload: any) => {
-            if (!payload.notification && payload.data.messageType !== "push-received") {
-                fetchChatHistory();
-            }
-        });
-      
+      onMessage(messaging, (payload: any) => {
+        if (!payload.notification && payload.data.messageType !== "push-received") {
+          fetchChatHistory();
+        }
+      });
+
     }
-    
+
   }, [selectedUser]);
 
 
@@ -135,6 +157,21 @@ const Chat: React.FC = () => {
     }
   };
 
+  const handleAccountClick = async (account: Account) => {
+    const chatUserId = account.id;
+
+    navigate(`/chat?id=${chatUserId}`);
+    setSelectedUser(account);
+
+    if (user?.role === "APPLICANT") {
+      const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
+      const requestData = requestsResponse.data;
+      console.log(requestData)
+      const hasPaidRequest = requestData.some((request: any) => request.status === "Paid" && request.requestDetails[0].service.providerId === account.id);
+      setIsChatEnabled(hasPaidRequest);
+    }
+  };
+
   if (user == null) {
     return <></>;
   }
@@ -146,7 +183,7 @@ const Chat: React.FC = () => {
           {accounts.map((account) => (
             <li
               key={account.id}
-              onClick={() => setSelectedUser(account)}
+              onClick={() => handleAccountClick(account)}
               style={{
                 padding: "10px",
                 marginBottom: "10px",
@@ -160,7 +197,7 @@ const Chat: React.FC = () => {
               <img
                 src={account.avatarUrl || "https://via.placeholder.com/40"}
                 alt={account.username}
-                style={{width:"40px", height:"40px", borderRadius: "50%", marginRight: "20px" }}
+                style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "20px" }}
               />
               <span>{account.username}</span>
               {account.unreadCount > 0 && (
@@ -223,17 +260,13 @@ const Chat: React.FC = () => {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "20px",
-                border: "1px solid #ccc",
-                marginRight: "10px"
-              }}
-              placeholder="Type a message..."
+              placeholder={isChatEnabled ? "Type your message..." : "You have no more requests's status 'Paid' so you cannot chat with the Provider, thank you!."}
+              disabled={!isChatEnabled}
+              style={{ flex: 1, padding: "10px", borderRadius: "10px", border: "1px solid #ccc", marginRight: "10px" }}
             />
             <button
               onClick={handleSendMessage}
+              disabled={!isChatEnabled}
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#0084ff",

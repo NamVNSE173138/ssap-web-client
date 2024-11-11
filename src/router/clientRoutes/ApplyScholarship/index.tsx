@@ -64,9 +64,21 @@ const ApplyScholarship = () => {
         type: !row.type,
         file: !row.file
     }})));
+
+    const applicationDocuments = [];
     for(const row of rows){
         if(!row.name || !row.type || !row.file)
             return;
+        const formData = new FormData();
+        formData.append("File", row.file);
+        const name = await uploadFile(formData);
+
+        const documentData = {
+            name: row.name,
+            type: row.type,
+            fileUrl: name.urls[0],
+        };
+        applicationDocuments.push(documentData);
     }
     
     const applicationData = {
@@ -74,7 +86,9 @@ const ApplyScholarship = () => {
       scholarshipProgramId: id,
       appliedDate: new Date().toISOString(),
       status: "PENDING",
+      documents: applicationDocuments
     };
+
 
     try {
       const response = await fetch(
@@ -87,25 +101,9 @@ const ApplyScholarship = () => {
           body: JSON.stringify(applicationData),
         }
       );
-      
 
       if (response.ok) {
         const result = await response.json();
-        for(const row of rows){
-            if(!row.name || !row.type || !row.file)
-                return;
-            const formData = new FormData();
-            formData.append("File", row.file);
-            const name = await uploadFile(formData);
-
-            const documentData = {
-                name: row.name,
-                type: row.type,
-                fileUrl: name.url,
-                applicationId: result.id
-            };
-            await addApplicationDocument(documentData);
-        }
         console.log("Application submitted:", result);
       } else {
         console.error("Failed to submit application");
