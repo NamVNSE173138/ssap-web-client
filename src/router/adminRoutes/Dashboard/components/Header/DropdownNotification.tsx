@@ -73,7 +73,7 @@ const DropdownNotification = () => {
             setDropdownOpen(!dropdownOpen);
           }}
           to="#"
-          className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
+          className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 text-black"
         >
           <span
             className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full 
@@ -104,7 +104,7 @@ const DropdownNotification = () => {
             className={`absolute z-99 -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80`}
           >
             <div className="px-4.5 py-3">
-              <h5 className="text-sm font-medium text-bodydark2">
+              <h5 className="text-sm font-medium text-black">
                 Notification
               </h5>
             </div>
@@ -116,14 +116,14 @@ const DropdownNotification = () => {
                         <div
                           className="w-11/12 flex flex-col gap-2.5 px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                         >
-                          <p className="text-sm">
+                          <p className="text-sm text-black">
                             <span className="text-black dark:text-white">
                                 {/*noti.title*/}
                             </span>{' '}
                             {noti.message}
                           </p>
 
-                          <p className="text-xs">{formatDate(noti.sentDate)}</p> 
+                          <p className="text-xs text-black">{formatDate(noti.sentDate)}</p> 
 
                          </div>
 

@@ -38,7 +38,7 @@ const Header = () => {
           <HeaderAvatar />
         ) : (
           <div className="flex justify-between gap-8">
-            <div className="flex justify-center ml-9 p-2 rounded-xl" style={{ backgroundColor: "#5559C7" }}
+            <div className="flex justify-center ml-9 p-2 rounded-xl" style={{ backgroundColor: "#1eb2a6" }}
             >
               <AuthNavigation to={RouteNames.LOGIN} text={navigation.LOGIN} />
               <p className="text-xl text-white">/</p>
