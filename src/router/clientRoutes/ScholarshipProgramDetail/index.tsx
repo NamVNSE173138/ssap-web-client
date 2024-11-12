@@ -58,13 +58,13 @@ const ScholarshipProgramDetail = () => {
           `${BASE_URL}/api/scholarship-programs/${id}`,
           {
             headers: {
-                Authorization: `Bearer ${token}`,
-          },
-        });
+              Authorization: `Bearer ${token}`,
+            },
+          });
         if (response.data.statusCode === 200) {
           setData(response.data.data);
           setAuthorized(response.data.message);
-          if(user) {
+          if (user) {
             const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
             setExistingApplication(application.data);
           }
@@ -132,7 +132,7 @@ const ScholarshipProgramDetail = () => {
   const handleAssignExpertDialog = async () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
-    if(!data) return;
+    if (!data) return;
     await fetchExperts();
     setLoading(false);
   };
@@ -140,7 +140,7 @@ const ScholarshipProgramDetail = () => {
   const handleOpenApplicantDialog = async () => {
     setApplicantDialogOpen(true);
     setLoading(true);
-    if(!data) return;
+    if (!data) return;
     await fetchApplicants(parseInt(data?.id));
     setLoading(false);
   };
@@ -148,7 +148,7 @@ const ScholarshipProgramDetail = () => {
   const handleOpenReviewMilestoneDialog = async () => {
     setReviewMilestoneDialogOpen(true);
     setLoading(true);
-    if(!data) return;
+    if (!data) return;
     await fetchReviewMilestones(parseInt(data?.id));
     setLoading(false);
   };
@@ -214,27 +214,27 @@ const ScholarshipProgramDetail = () => {
             </div>
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
               {isApplicant == "APPLICANT" || !user ? (
-              <>
-                  {existingApplication && existingApplication.length == 0 && 
-                      (<button
-                          onClick={() =>
-                            navigate(`/scholarship-program/${id}/application`)
-                          }
-                          className=" text-xl w-full bg-blue-700 rounded-[25px]"
-                        >
-                          Apply now{" "}
-                        </button>)}
-                  {existingApplication && existingApplication.length > 0 && 
-                      (<>
-                        <div className="text-xl font-semibold">Your application is being reviewed</div>
-                        <button
-                            onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
-                            className=" text-xl w-full bg-green-700 rounded-[25px]"
-                          >
-                            View applications{" "}
-                          </button>
-                       </>)}
-              </>
+                <>
+                  {existingApplication && existingApplication.length == 0 &&
+                    (<button
+                      onClick={() =>
+                        navigate(`/scholarship-program/${id}/application`)
+                      }
+                      className=" text-xl w-full bg-blue-700 rounded-[25px]"
+                    >
+                      Apply now{" "}
+                    </button>)}
+                  {existingApplication && existingApplication.length > 0 &&
+                    (<>
+                      <div className="text-xl font-semibold">Your application is being reviewed</div>
+                      <button
+                        onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                        className=" text-xl w-full bg-green-700 rounded-[25px]"
+                      >
+                        View applications{" "}
+                      </button>
+                    </>)}
+                </>
               ) : (authorized != "Unauthorized" && (
                 <div className="flex justify-between w-full gap-10">
                   <button
@@ -419,12 +419,82 @@ const ScholarshipProgramDetail = () => {
                     aria-controls="panel2-content"
                     id="panel2-header"
                   >
-                    Entry Requirement
+                    Scholarship Category
                   </AccordionSummary>
                   <AccordionDetails>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse malesuada lacus ex, sit amet blandit leo
-                    lobortis eget.
+                    <div className="w-full flex gap-3 flex-wrap">
+                      <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                        Category Name:
+                      </p>
+                      {data.category.name}
+                    </div>
+                    <div className="w-full flex gap-3 flex-wrap">
+                      <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                        Description:
+                      </p>
+                      {data.category.description}
+                    </div>
+                  </AccordionDetails>
+                </Accordion>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel2-content"
+                    id="panel2-header"
+                  >
+                    Applicable Majors &amp; Skills
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {data.majorSkills.map((majorSkill: any) => (
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel3-content"
+                          id="panel3-header"
+                        >
+                          <span className="font-bold mr-2">{majorSkill.name} </span>
+                        </AccordionSummary>
+                        <AccordionDetails>
+
+                          <div className="w-full flex gap-3 flex-wrap">
+                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                              Description:
+                            </p>
+                            {majorSkill.description}
+                          </div>
+                          <div className="w-full mt-3 flex gap-3 flex-wrap">
+                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                              Skills:
+                            </p>
+                            <div>
+                              {majorSkill.skills.map((skill: any) => (
+                                <Accordion>
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel3-content"
+                                    id="panel3-header"
+                                  >
+                                    <span className="font-bold mr-2">{skill.name} </span>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+
+                                    <div className="w-full flex gap-3 flex-wrap">
+                                      <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                                        Description:
+                                      </p>
+                                      {skill.description}
+                                    </div>
+
+                                  </AccordionDetails>
+                                </Accordion>
+                              ))}
+                            </div>
+                          </div>
+
+                        </AccordionDetails>
+                      </Accordion>
+
+                    ))}
                   </AccordionDetails>
                 </Accordion>
                 <Accordion>
@@ -433,17 +503,68 @@ const ScholarshipProgramDetail = () => {
                     aria-controls="panel3-content"
                     id="panel3-header"
                   >
-                    How to Apply
+                    Applicable Universities
                   </AccordionSummary>
                   <AccordionDetails>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse malesuada lacus ex, sit amet blandit leo
-                    lobortis eget.
+                    {data.universities.map((university: any) => (
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel3-content"
+                          id="panel3-header"
+                        >
+                          <span className="font-bold mr-2">{university.name} </span>
+                          <span>at {university.city}</span>
+                        </AccordionSummary>
+                        <AccordionDetails>
+
+                          <div className="w-full flex gap-3 flex-wrap">
+                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                              Description:
+                            </p>
+                            {university.description}
+                          </div>
+
+                        </AccordionDetails>
+                      </Accordion>
+                    ))}
                   </AccordionDetails>
-                  <AccordionActions>
-                    <Button>Cancel</Button>
-                    <Button>Agree</Button>
-                  </AccordionActions>
+                </Accordion>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel3-content"
+                    id="panel3-header"
+                  >
+                    Required Certificates
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {data.certificates.map((certificate: any) => (
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel3-content"
+                          id="panel3-header"
+                        >
+                          <span className="font-bold mr-2">{certificate.name} </span>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <div className="w-full flex gap-3 flex-wrap">
+                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                              Description:
+                            </p>
+                            {certificate.description}
+                          </div>
+                          <div className="w-full flex gap-3 flex-wrap">
+                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
+                              Type:
+                            </p>
+                            {certificate.type}
+                          </div>
+                        </AccordionDetails>
+                      </Accordion>
+                    ))}
+                  </AccordionDetails>
                 </Accordion>
               </div>
             </div>
@@ -483,21 +604,21 @@ const ScholarshipProgramDetail = () => {
         </section>
       </div> */}
 
-      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen} 
-        onClose={() => setApplicantDialogOpen(false)} 
+      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen}
+        onClose={() => setApplicantDialogOpen(false)}
         applications={applicants ?? []}
-        scholarship={data}/>)}
-      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen} 
+        scholarship={data} />)}
+      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen}
         onClose={() => setAssignExpertDialogOpen(false)}
         resetMajor={null}
         experts={experts ?? []} />)}
-      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen} 
+      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen}
         onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
         reviewMilestones={reviewMilestones ?? []}
         fetchReviewMilestones={async () => {
-            if(!data) return;
-            await fetchReviewMilestones(parseInt(data?.id));
-        }}/>)}
+          if (!data) return;
+          await fetchReviewMilestones(parseInt(data?.id));
+        }} />)}
 
     </div>
   );
