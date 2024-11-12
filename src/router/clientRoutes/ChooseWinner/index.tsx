@@ -1,5 +1,10 @@
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Link, useParams } from "react-router-dom";
 import SchoolLogo from "../ScholarshipProgramDetail/logo";
 import { useEffect, useState } from "react";
@@ -9,24 +14,43 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
-import { Button, Checkbox, FormControl, Input, InputAdornment, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, OutlinedInput, Paper } from "@mui/material";
-import { DraftingCompassIcon, Search, SearchIcon, SendIcon } from "lucide-react";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  Input,
+  InputAdornment,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  OutlinedInput,
+  Paper,
+} from "@mui/material";
+import {
+  DraftingCompassIcon,
+  Search,
+  SearchIcon,
+  SendIcon,
+} from "lucide-react";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { LoginUser } from "@/services/ApiServices/authenticationService";
 
 const ChooseWinner = () => {
-    const { id } = useParams<{ id: string }>();
-    const token = useSelector((state: RootState) => state.token.token);
-    const [data, setData] = useState<ScholarshipProgramType | null>(null);
-    const [applicants, setApplicants] = useState<any>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const token = useSelector((state: RootState) => state.token.token);
+  const [data, setData] = useState<ScholarshipProgramType | null>(null);
+  const [applicants, setApplicants] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [availableScholarships, setAvailableScholarships] = useState(0);
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [availableScholarships, setAvailableScholarships] = useState(0);
 
   const fetchApplicants = async (scholarshipId: number) => {
     try {
@@ -44,50 +68,108 @@ const ChooseWinner = () => {
     }
   };
 
-const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'avatarUrl', headerName: 'Avatar', width: 130, flex: 0.5,
-    renderCell: (params) => {
-      return <img src={params.value} alt="avatar" 
-        style={{width: 50, height: 50, borderRadius: 50}}/>
+  const applyForSelectedWinners = async () => {
+    try {
+      const applyPromises = selectedRows.map(async (row) => {
+        const payload = {
+          id: row.id,
+          appliedDate: new Date().toISOString(),
+          status: "APPROVED",
+          applicantId: row.applicantId,
+          scholarshipProgramId: id,
+          applicationDocuments: [],
+          applicationReviews: []
+        };
+
+        const response = await axios.put(
+          `http://localhost:5254/api/applications/${row.id}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        return response;
+      });
+
+      await Promise.all(applyPromises);
+      alert("Selected applicants have been approved!");
+    } catch (error) {
+      setError("Failed to apply for selected winners.");
     }
-  },
-  { field: 'username', headerName: 'Username', width: 130, flex: 1 },
-  {
-    field: 'major',
-    headerName: 'Major',
-    type: 'string',
-    flex: 2,
-    width: 130,
-  },
-  {
-    field: 'link',
-    headerName: '',
-    renderCell: (params) => {
-        return <Link target="_blank" className="text-sky-500 underline" to={`/funder/application/${params.row.id}`}>
-            View Profile</Link>
+  };
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 70 },
+    {
+      field: "avatarUrl",
+      headerName: "Avatar",
+      width: 130,
+      flex: 0.5,
+      renderCell: (params) => {
+        return (
+          <img
+            src={params.value}
+            alt="avatar"
+            style={{ width: 50, height: 50, borderRadius: 50 }}
+          />
+        );
+      },
     },
-    flex: 1,
-    width: 130,
-  },
-];
+    { field: "username", headerName: "Username", width: 130, flex: 1 },
+    {
+      field: "major",
+      headerName: "Major",
+      type: "string",
+      flex: 2,
+      width: 130,
+    },
+    {
+      field: "link",
+      headerName: "",
+      renderCell: (params) => {
+        return (
+          <Link
+            target="_blank"
+            className="text-sky-500 underline"
+            to={`/funder/application/${params.row.id}`}
+          >
+            View Profile
+          </Link>
+        );
+      },
+      flex: 1,
+      width: 130,
+    },
+  ];
 
-const paginationModel = { page: 0, pageSize: 5 };
+  const paginationModel = { page: 0, pageSize: 5 };
 
-const handleSelectionChange = (selectionModel: any) => {
-    const selectedRowData = applicants.filter((row: any) => selectionModel.includes(row.id));
+  const handleSelectionChange = (selectionModel: any) => {
+    const selectedRowData = applicants.filter((row: any) =>
+      selectionModel.includes(row.id)
+    );
     setSelectedRows(selectedRowData);
-    if(data)
-        setAvailableScholarships(data.numberOfScholarships - selectedRowData.length <= 0 ?
-            0 : data.numberOfScholarships - selectedRowData.length);
+    if (data)
+      setAvailableScholarships(
+        data.numberOfScholarships - selectedRowData.length <= 0
+          ? 0
+          : data.numberOfScholarships - selectedRowData.length
+      );
   };
 
   // Filter rows based on search query
-  const filteredRows = applicants ? applicants.filter((row: any) =>
-    row.applicant.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
-  ):[];
-
+  const filteredRows = applicants
+    ? applicants.filter(
+        (row: any) =>
+          row.applicant.username
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,9 +178,10 @@ const handleSelectionChange = (selectionModel: any) => {
           `${BASE_URL}/api/scholarship-programs/${id}`,
           {
             headers: {
-                Authorization: `Bearer ${token}`,
-          },
-        });
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response.data.statusCode === 200) {
           setData(response.data.data);
           setAvailableScholarships(response.data.data.numberOfScholarships);
@@ -113,13 +196,13 @@ const handleSelectionChange = (selectionModel: any) => {
     };
 
     fetchData();
-    if(id)
-        fetchApplicants(parseInt(id));
+    if (id) fetchApplicants(parseInt(id));
   }, [id]);
 
   if (!data) return <Spinner size="large" />;
 
-return (<div>
+  return (
+    <div>
       <div className="relative">
         <ScholarshipProgramBackground />
         <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
@@ -159,7 +242,6 @@ return (<div>
                 </p>
               </div>
             </div>
-            
           </div>
         </div>
       </div>
@@ -169,7 +251,7 @@ return (<div>
             <div className="flex flex-col">
               <p className="block mb-[4px] lg:mb-[8px] font-semibold">
                 Location
-              </p> 
+              </p>
               <p className="text-heading-6">VietNam</p>
             </div>
             <div className="flex flex-col">
@@ -208,47 +290,74 @@ return (<div>
             </p>
 
             <p className="text-lg font-semibold my-5">
-                <span className="">Number of scholarships left: </span>
-                <span className="text-sky-500">{availableScholarships.toString()}</span>
+              <span className="">Number of scholarships left: </span>
+              <span className="text-sky-500">
+                {availableScholarships.toString()}
+              </span>
             </p>
-      <FormControl fullWidth sx={{  }}>
-          <InputLabel htmlFor="outlined-adornment-amount">Search</InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-amount"
-            startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            label="Amount"
-          />
-        </FormControl>
-    {<Paper sx={{ height: 400, width: '100%' }}>
-      {filteredRows.length > 0 ? <DataGrid
-        rows={filteredRows.map((app: any) => ({
-          id: app.id,
-          avatarUrl: app.applicant.avatarUrl,
-          username: app.applicant.username,
-          major: "Software Engineering",
-          choosable: availableScholarships > 0 || selectedRows.includes((row:any) => row.id === app.id)
-        }))}
-        onRowSelectionModelChange={handleSelectionChange}
-        columns={columns}
-        initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        sx={{ border: 0 }}
-        isRowSelectable={(params) => params.row.choosable}
-        //availableScholarships > 0 || selectedRows.includes((row:any) => row.id === params.id)}
-      /> : <p className="text-center text-gray-500 mt-4 text-xl">No data</p>}
-    </Paper>}
+            <FormControl fullWidth sx={{}}>
+              <InputLabel htmlFor="outlined-adornment-amount">
+                Search
+              </InputLabel>
+              <OutlinedInput
+                id="outlined-adornment-amount"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                }
+                onChange={(e) => setSearchQuery(e.target.value)}
+                label="Amount"
+              />
+            </FormControl>
+            {
+              <Paper sx={{ height: 400, width: "100%" }}>
+                {filteredRows.length > 0 ? (
+                  <DataGrid
+                    rows={filteredRows.map((app: any) => ({
+                      id: app.id,
+                      avatarUrl: app.applicant.avatarUrl,
+                      username: app.applicant.username,
+                      major: "Software Engineering",
+                      choosable:
+                        availableScholarships > 0 ||
+                        selectedRows.includes((row: any) => row.id === app.id),
+                    }))}
+                    onRowSelectionModelChange={handleSelectionChange}
+                    columns={columns}
+                    initialState={{ pagination: { paginationModel } }}
+                    pageSizeOptions={[5, 10]}
+                    checkboxSelection
+                    sx={{ border: 0 }}
+                    isRowSelectable={(params) => params.row.choosable}
+                    //availableScholarships > 0 || selectedRows.includes((row:any) => row.id === params.id)}
+                  />
+                ) : (
+                  <p className="text-center text-gray-500 mt-4 text-xl">
+                    No data
+                  </p>
+                )}
+              </Paper>
+            }
 
-      <div>Selected Winners: {selectedRows.map((row: any, index: number) => index > 0 ? ", "+row.applicant.username : row.applicant.username)}</div>
-                <div className="flex justify-end mt-4">
-                    <Button variant="contained" color="primary">Apply</Button>
-                </div>
+            <div>
+              Selected Winners:{" "}
+              {selectedRows.map((row: any, index: number) =>
+                index > 0
+                  ? ", " + row.applicant.username
+                  : row.applicant.username
+              )}
+            </div>
+            <div className="flex justify-end mt-4">
+              <Button variant="contained" color="primary" onClick={applyForSelectedWinners}>
+                Apply
+              </Button>
+            </div>
           </div>
         </div>
-
       </section>
-    </div>)
-}
+    </div>
+  );
+};
 
 export default ChooseWinner;
