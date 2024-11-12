@@ -12,10 +12,34 @@ export type ScholarshipProgramType = {
   createAt: Date;
   updateAt: Date;
   status: string;
-  categories: Array<{
+  category: {
     id: string;
     name: string;
     description: string;
+  };
+  majorSkills: Array<{
+    id: string;
+    name: string;
+    description: string;
+    skills: Array<{
+        id: string;
+        name: string;
+        description: string;
+        type: string;
+    }>;
+  }>;
+  certificates: Array<{
+    id: string;
+    name: string;
+    description: string;
+    type: string;
+  }>;
+  universities: Array<{
+     id: string; 
+     name: string;
+     description: string;
+     city: string;
+     country: string|null;
   }>;
 };
 
