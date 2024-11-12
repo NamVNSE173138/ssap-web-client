@@ -1,9 +1,9 @@
-import ScholarshipProgramImage from '../../../assets/ScholarshipProgram.jpg';
+import ScholarshipProgramImage from '../../../assets/awrapper.webp';
 
 const ScholarshipProgramBackground = () => {
     return (
         <section>
-            <img src={ScholarshipProgramImage} alt="bg_footer" className="h-[200px] lg:h-[500px] object-center w-full " />
+            <img src={ScholarshipProgramImage} alt="bg_footer" className="h-[200px] lg:h-[70vh] object-cover w-full " />
         </section>
     );
 };

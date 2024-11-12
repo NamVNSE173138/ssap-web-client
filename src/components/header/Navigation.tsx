@@ -40,11 +40,11 @@ const Navigation = () => {
   return (
     <nav>
       <div className="flex justify-between mr-10">
-        <ul className=" text-xl font-normal flex justify-around gap-10" style={{color: "#5559C7"}}>
+        <ul className=" text-xl font-normal flex justify-around gap-10" style={{color: "#fff"}}>
           {navItems.map((item) => (
             <li key={item.text} className="group/nav">
-              <Link to={item.to}>{item.text}</Link>
-              <div className="h-[2px] bg-blue-700 scale-x-0 group-hover/nav:scale-x-100 transition" />
+              <Link className="text-xl" to={item.to}>{item.text}</Link>
+              <div className="h-[2px] bg-[#1eb2a6] scale-x-0 group-hover/nav:scale-x-100 transition" />
             </li>
           ))}
           <DropdownNotification/>
