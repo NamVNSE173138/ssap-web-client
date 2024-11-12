@@ -137,7 +137,7 @@ const Home = () => {
             />
             <button
               className="h-14 w-[20%] text-white"
-              style={{ backgroundColor: "#5559C7" }}
+              style={{ backgroundColor: "#1eb2a6" }}
             >
               Find scholarship
             </button>
@@ -162,7 +162,7 @@ const Home = () => {
             >
               <b
                 className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
-                style={{ color: "#5559C7" }}
+                style={{ color: "#000" }}
               >
                 HOW TO APPLY
               </b>
@@ -202,14 +202,14 @@ const Home = () => {
           >
             <b
               className=" font-semibold text-[30px] md:text-[38px] lg:text-[48px] px-15 "
-              style={{ color: "#5559C7" }}
+              style={{ color: "#000" }}
             >
               BROWSER BY DISCIPLINES
             </b>
           </motion.div>
           {/* {!majors && <Spin size="large" />} */}
           <motion.div
-            className="absolute grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10"
+            className="text-[#1eb2a6] absolute grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-24 gap-y-16 gap-x-[112px] px-10 py-10"
             whileInView={{ opacity: 1, scale: 1, skewY: -6, rotate: 6 }}
             initial={{ opacity: 0, scale: 0.5, skewY: -15, rotate: 0 }}
             transition={{
@@ -227,16 +227,16 @@ const Home = () => {
                 stiffness: 50,
               },
             }}
-            viewport={{ once: true }} // Animates only once when it enters the viewport
+            viewport={{ once: true }}
           >
             {majors &&
               majors.map((major: any) => (
                 <Link
                   key={major.id}
                   to={`/major/${major.id}`}
-                  className="relative w-[250px] h-[110px] hover:scale-110 transition-transform bg-[#5559c7] rounded-lg"
+                  className="relative w-[250px] h-[110px] hover:scale-110 transition-transform hover:bg-[#1eb2a6] bg-[#fff] rounded-lg shadow-3 group"
                 >
-                  <p className="text-center text-white text-lg font-bold">
+                  <p className="text-center text-[#000] text-lg font-bold group-hover:text-white">
                     {major.name}
                   </p>
                   <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
