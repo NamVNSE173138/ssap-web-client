@@ -1,4 +1,4 @@
-import { ScholarshipProgramType } from "../../router/clientRoutes/ScholarshipProgram/data";
+import scholarshipProgram, { ScholarshipProgramType } from "../../router/clientRoutes/ScholarshipProgram/data";
 import { Separator } from "../ui/separator";
 import { Link } from "react-router-dom";
 // import formatCurrency from "../../lib/currency-formatter";
@@ -9,20 +9,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IoLocation } from "react-icons/io5";
-import { GiGraduateCap  } from "react-icons/gi";
+import { GiGraduateCap } from "react-icons/gi";
 import { FaCalendar } from "react-icons/fa";
 import { RiMoneyDollarCircleFill } from "react-icons/ri";
 
 
 const truncateString = (str: string, num: number) => {
-    if (str.length <= num) {
-        return str;
-    }
-    return str.slice(0, num) + '...';
+  if (str.length <= num) {
+    return str;
+  }
+  return str.slice(0, num) + '...';
 };
 
 const Card = (sholarshipProgram: ScholarshipProgramType) => {
-    const truncatedDescription = truncateString(sholarshipProgram.description, 40);
+  const truncatedDescription = truncateString(sholarshipProgram.description, 40);
   return (
     <Link to={`/scholarship-program/${sholarshipProgram.id}`}>
       <div className="columns-1 flex flex-col justify-between gap-8 p-4 rounded-3xl shadow shadow-gray-400 cursor-pointer hover:bg-gray-200 hover:scale-105 hover:shadow-xl transition-all">
@@ -35,30 +35,34 @@ const Card = (sholarshipProgram: ScholarshipProgramType) => {
         <div className="flex flex-col justify-between gap-2">
           <p className='text-lg md:text-xl lg:text-xl mt-4 font-bold'>{sholarshipProgram?.name}</p>
           <div className=" mb-5">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger  asChild>
-                <p>{truncatedDescription}</p>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{sholarshipProgram?.description}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p>{truncatedDescription}</p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{sholarshipProgram?.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-          
+
           {/* <p className="text-lg md:text-xl lg:text-sm">
             {sholarshipProgram.description}
           </p> */}
           <Separator orientation="horizontal" />
           <div className=" flex-row justify-between mt-5 ml-5">
             <div className="flex justify-start items-center gap-2 mb-4">
-              <IoLocation color="#060606" size={24} /> 
-              <p>{sholarshipProgram?.providerId}</p>
+              <IoLocation color="#060606" size={24} />
+              <p>{sholarshipProgram?.universities.length > 2 ?
+                sholarshipProgram?.universities.slice(0, 2).map((university) => university.name).join(", ") + "..." :
+                sholarshipProgram?.universities.map((university) => university.name).join(", ")}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
               <GiGraduateCap color="#060606" size={24} />
-              <p>{sholarshipProgram?.providerId}</p>
+              <p>{sholarshipProgram?.majorSkills.length > 2 ?
+                sholarshipProgram.majorSkills.slice(0, 2).map((majorSkill) => majorSkill.name).join(", ") + "..." :
+                sholarshipProgram?.majorSkills.map((majorSkill) => majorSkill.name).join(", ")}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
               <FaCalendar color="#060606" size={24} />
@@ -66,9 +70,9 @@ const Card = (sholarshipProgram: ScholarshipProgramType) => {
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
               <RiMoneyDollarCircleFill color="#060606" size={24} />
-              <p>{sholarshipProgram?.providerId}</p>
-            </div>  
-            
+              <p>{sholarshipProgram?.scholarshipAmount}</p>
+            </div>
+
             {/* <div className='w-[1px] bg-gray-400'></div>
                         <p>{sholarshipProgram.numberOfRenewals} Đã đặt</p>
                         <div className='w-[1px] bg-gray-400'></div>
