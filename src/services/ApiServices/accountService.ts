@@ -66,3 +66,39 @@ export async function deleteAccount(id: number) {
   );
   return response.data;
 }
+
+export async function getAccountWallet(id: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/accounts/${id}/wallet`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function createWallet(id: number, createWalletDto: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/accounts/${id}/wallet`,
+    createWalletDto,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function updateWalletBalance(id: number, updateWalletBalanceDto: any) {
+  const response = await axios.put(
+    `${BASE_URL}/api/accounts/${id}/wallet`,
+    updateWalletBalanceDto,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function updateWalletBankInformation(id: number, updateWalletBankInformationDto: any) {
+  const response = await axios.put(
+    `${BASE_URL}/api/accounts/${id}/wallet/bank-information`,
+    updateWalletBankInformationDto,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
