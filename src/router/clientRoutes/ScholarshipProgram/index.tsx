@@ -12,12 +12,18 @@ import axios from "axios";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { BASE_URL } from "@/constants/api";
+import { getAllCountries } from "@/services/ApiServices/countryService";
+import { getAllMajors } from "@/services/ApiServices/majorService";
+import { getAllCategories } from "@/services/ApiServices/categoryService";
 const ScholarshipProgram = () => {
   const [data, setData] =
     useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
   const [countries, setCountries] = useState<{ name: string }[]>([]);
+  const [majors, setMajors] = useState<{ name: string }[]>([]);
+  const [categories, setCategories] = useState<{ name: string }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,8 +31,14 @@ const ScholarshipProgram = () => {
         const response = await axios.get(
           `${BASE_URL}/api/scholarship-programs`
         );
+        const countryDatas = await getAllCountries();
+        const majorDatas = await getAllMajors();
+        const categoriesDatas = await getAllCategories();
         if (response.data.statusCode === 200) {
           setData(response.data.data.items);
+          setCountries(countryDatas.data);
+          setMajors(majorDatas.data.items);
+          setCategories(categoriesDatas.data);
         } else {
           setError("Failed to fetch data");
         }
@@ -89,9 +101,14 @@ const ScholarshipProgram = () => {
             <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-[1fr_120px]">
               <div className="flex gap-[16px] flex-col lg:flex-row">
                 <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
-                  <label hidden>Study Level</label>
+                  <label hidden>Study Major</label>
                   <select className="">
-                    <option>Select study level</option>
+                    <option>Select study major</option>
+                    {majors.map((major, index) => (
+                      <option key={index} value={major.name}>
+                        {major.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full cursor-pointer">
@@ -101,6 +118,17 @@ const ScholarshipProgram = () => {
                     {countries.map((country, index) => (
                       <option key={index} value={country.name}>
                         {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full cursor-pointer">
+                  <label hidden>Scholarship Categories</label>
+                  <select>
+                    <option>Select a scholarship categories</option>
+                    {categories.map((category, index) => (
+                      <option key={index} value={category.name}>
+                        {category.name}
                       </option>
                     ))}
                   </select>
