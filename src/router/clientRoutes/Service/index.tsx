@@ -14,6 +14,8 @@ import { IoIosSearch, IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
 import { Input } from "@/components/ui/input";
+import { getAccountWallet } from "@/services/ApiServices/accountService";
+import { Dialog } from "@mui/material";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -27,6 +29,7 @@ const Service = () => {
   const navigate = useNavigate();
   const [filteredData, setFilteredData] = useState<ServiceType[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -60,6 +63,19 @@ const Service = () => {
     }
   };
 
+  const checkWallet = async () => {
+    try {
+      const response = await getAccountWallet(Number(user?.id));
+       if (response.statusCode === 200) {
+        setIsServiceModalOpen(true);
+      }
+    } catch (error:any) {
+      if (error.response.data.statusCode === 400) {
+        setIsWalletDialogOpen(true);}
+      console.error('Error checking wallet:', error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [currentPage, user]);
@@ -90,6 +106,19 @@ const Service = () => {
 
   const clearSearch = () => {
     setSearchTerm("");
+  };
+
+  const handleAddServiceClick = () => {
+    checkWallet();
+  };
+
+  const handleCloseWalletDialog = () => {
+    setIsWalletDialogOpen(false);
+  };
+
+  const handleNavigateToWallet = () => {
+    setIsWalletDialogOpen(false);
+    navigate(RouteNames.WALLET);
   };
 
   return (
@@ -130,7 +159,7 @@ const Service = () => {
 
         {user?.role === "PROVIDER" && (
           <button
-            onClick={() => setIsServiceModalOpen(true)}
+            onClick={handleAddServiceClick}
             className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
           >
             <IoIosAddCircleOutline className="text-3xl text-blue-500" />
@@ -184,6 +213,24 @@ const Service = () => {
         setIsOpen={setIsServiceModalOpen}
         fetchServices={() => { setCurrentPage(1); fetchData(); }}
       />
+
+      <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
+        <div className="p-6">
+          <h3 className="text-xl font-semibold">You don't have a wallet yet!</h3>
+          <p className="my-4">
+            You need to create a wallet to add services. Do you want to go to the Wallet page?
+          </p>
+          <div className="flex justify-end gap-4">
+            <button onClick={handleCloseWalletDialog} className="bg-gray-300 px-4 py-2 rounded">
+              Cancel
+            </button>
+            <button onClick={handleNavigateToWallet} className="bg-blue-500 text-white px-4 py-2 rounded">
+              Yes
+            </button>
+          </div>
+        </div>
+      </Dialog>
+
     </div>
   );
 };

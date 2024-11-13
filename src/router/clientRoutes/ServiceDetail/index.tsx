@@ -16,6 +16,8 @@ import AccountApplicantDialog from "./applicantrequests-dialog";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
 import { FaStar } from "react-icons/fa";
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
+import { getAccountWallet } from "@/services/ApiServices/accountService";
+import { transferMoney } from "@/services/ApiServices/paymentService";
 
 interface ServiceType {
     id: string;
@@ -199,68 +201,62 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setConfirmationDialogOpen(false);
     };
 
-    const handleNext = (e: React.FormEvent) => {
-        e.preventDefault();
-        setDialogOpen(false);
-        setConfirmationDialogOpen(true);
-        setRequestData(e);
-    };
-
-    const handleConfirmPayment = async () => {
-        if (!requestData) return;
-        try {
-            await handleSubmit();
-            alert("Request has been successfully confirmed and paid!");
-            await fetchService();
-            closeDialog();
-        } catch (error) {
-            setError((error as Error).message);
-        } finally {
-            setLoading(false);
-            setConfirmationDialogOpen(false);
-        }
-    };
-
-    const handleCancelPayment = () => {
-        setConfirmationDialogOpen(false);
-    };
-
     const handleSubmit = async () => {
+        if(!serviceData) return null;
         setLoading(true);
         setError(null);
 
-        const filesArray = Array.from(applicationFileUrls || []);
-        const formData = new FormData();
-
-        filesArray.forEach((file: any) => {
-            formData.append("files", file);
-        });
-
-        const urls = await uploadFile(filesArray);
-
-        const requestDatas = {
-            description,
-            requestDate: new Date(),
-            status: "Paid",
-            applicantId: user?.id,
-            requestDetails: [{
-                id,
-                expectedCompletionTime,
-                applicationNotes,
-                scholarshipType,
-                applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
-                serviceId: serviceData?.id,
-
-            }
-            ]
-        };
-
         try {
+            const walletResponse = await getAccountWallet(user?.id);
+            const userBalance = walletResponse.data.balance;
+
+            if (userBalance < serviceData?.price) {
+                alert("Insufficient funds to request this service. Please add funds to your account.");
+                setLoading(false);
+                return;
+            }
+
+            const filesArray = Array.from(applicationFileUrls || []);
+            const formData = new FormData();
+
+            filesArray.forEach((file: any) => {
+                formData.append("files", file);
+            });
+
+            const urls = await uploadFile(filesArray);
+
+            const requestDatas = {
+                description,
+                requestDate: new Date(),
+                status: "Paid",
+                applicantId: user?.id,
+                requestDetails: [{
+                    id,
+                    expectedCompletionTime,
+                    applicationNotes,
+                    scholarshipType,
+                    applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
+                    serviceId: serviceData?.id,
+
+                }
+                ]
+            };
+
+            const transferRequest = {
+                senderId: Number(user.id),
+                receiverId: serviceData.providerId,
+                amount: serviceData.price
+            };
+
+            await transferMoney(transferRequest);
+            alert("Payment successful!");
+
             await createRequest(requestDatas);
             alert("Request created successfully!");
+            alert("Request has been successfully confirmed and paid!");
             await fetchService();
             closeDialog();
-            await NotifyProviderNewRequest(user.id, serviceData?.id);
+            await NotifyProviderNewRequest(user.id, Number(serviceData?.id));
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -286,7 +282,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 &times;
                             </span>
                         </div>
-                        <form onSubmit={handleNext}>
+                        <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Expected Completion Time</label>
                                 <input
@@ -332,45 +328,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     type="submit"
                                     className="bg-blue-600 text-white rounded px-4 py-2"
                                 >
-                                    Next
+                                    Send
                                 </button>
                             </div>
                         </form>
-                    </div>
-                </div>
-            )}
-
-            {isConfirmationDialogOpen && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                    <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-semibold mb-4">Confirmation</h2>
-                            <span
-                                className="text-xl cursor-pointer"
-                                onClick={handleCancelPayment}
-                            >
-                                &times;
-                            </span>
-                        </div>
-                        <p className="text-gray-700 mb-4">
-                            Using this service will incur a fee: <strong>${serviceData.price}</strong>. Do you want to continue?
-                        </p>
-                        <div className="flex justify-end">
-                            <button
-                                type="button"
-                                onClick={handleCancelPayment}
-                                className="mr-2 bg-gray-300 rounded px-4 py-2"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleConfirmPayment}
-                                className="bg-blue-600 text-white rounded px-4 py-2"
-                            >
-                                Yes, Continue
-                            </button>
-                        </div>
                     </div>
                 </div>
             )}

@@ -18,6 +18,7 @@ const Wallet = () => {
   const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isUpdateBankModalOpen, setIsUpdateBankModalOpen] = useState(false);
+  const [isModalWithdrawOpen, setIsModalWithdrawOpen] = useState(false);
 
   useEffect(() => {
     const fetchWalletData = async () => {
@@ -55,6 +56,14 @@ const Wallet = () => {
 
   const handleAddMoneyClick = () => {
     setIsModalOpen(true);
+  };
+
+  const handleWithdrawClick = () => {
+    setIsModalWithdrawOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalWithdrawOpen(false);
   };
 
   const handleAddMoney = async () => {
@@ -223,7 +232,7 @@ const Wallet = () => {
                 <AiOutlinePlusCircle size={24} />
                 <span className="font-semibold">Add money</span>
               </button>
-              <button className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-400 transition duration-200 ease-in-out transform hover:scale-105">
+              <button onClick={handleWithdrawClick} className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-400 transition duration-200 ease-in-out transform hover:scale-105">
                 <AiOutlineMinusCircle size={24} />
                 <span className="font-semibold">Withdraw</span>
               </button>
@@ -241,6 +250,21 @@ const Wallet = () => {
           </>
         )}
       </div>
+
+      {isModalWithdrawOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-1/3 text-center">
+            <h2 className="font-semibold text-xl mb-4">Thank you for using our service!</h2>
+            <p>Good luck!</p>
+            <button
+              onClick={closeModal}
+              className="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <Modal
         title="Update Bank Information"
