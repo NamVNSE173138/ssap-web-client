@@ -6,6 +6,7 @@ import ECommerce from "./Dashboard/pages/Dashboard/ECommerce";
 import { Calendar } from "antd";
 import AccountsManagement from "./Dashboard/pages/AccountsManagement";
 import RoleNames from "@/constants/roleNames";
+import TransactionsManagement from "./Dashboard/pages/TransactionsManagement";
 
 
 const privateRoutes: RouteObject[] = [
@@ -20,6 +21,10 @@ const privateRoutes: RouteObject[] = [
   {
     path: "/admin/accountsmanagement",
     element: <AccountsManagement />,
+  },
+  {
+    path: "/admin/transactionsmanagement",
+    element: <TransactionsManagement />,
   }
 ];
 const publicRoutes: RouteObject[] = [
@@ -34,7 +39,7 @@ const adminRoutes: RouteObject[] = [
     element: <Navigate to={RouteNames.DASHBOARD} replace />,
   },
   {
-    element: <PrivateRoute role={[RoleNames.ADMIN]}/>,
+    element: <PrivateRoute />,
     children: [...privateRoutes],
   },
   ...publicRoutes,
