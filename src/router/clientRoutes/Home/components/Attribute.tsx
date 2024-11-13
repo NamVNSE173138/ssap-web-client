@@ -32,7 +32,7 @@ const Attribute = ({ icon, title, description, index = 0 }: AttributeProps) => {
         <FontAwesomeIcon
           icon={icon}
           className="lg:text-4xl text-xl"
-          style={{ color: "#5559C7" }}
+          style={{ color: "#1eb2a6" }}
         />
       </div>
 
@@ -42,7 +42,7 @@ const Attribute = ({ icon, title, description, index = 0 }: AttributeProps) => {
         animate={hasAnimated ? { translateY: 0, opacity: 1 } : { translateY: "-100%", opacity: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }} 
       >
-        <p className="text-[28px] font-semibold text-center" style={{ color: "#5559C7" }}>
+        <p className="text-[28px] font-semibold text-center" style={{ color: "#000" }}>
           {title}
         </p>
         <div className="px-5 mt-5">

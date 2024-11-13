@@ -134,7 +134,7 @@ const ScholarshipProgram = () => {
                   </select>
                 </div>
               </div>
-              <div className=" flex w-full text-white bg-blue-500 justify-center rounded-full">
+              <div className=" flex w-full text-white bg-[#1eb2a6] justify-center rounded-full">
                 <button>Search</button>
               </div>
             </div>
