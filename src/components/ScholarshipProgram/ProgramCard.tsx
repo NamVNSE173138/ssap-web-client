@@ -21,8 +21,18 @@ const truncateString = (str: string, num: number) => {
   return str.slice(0, num) + '...';
 };
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
 const Card = (sholarshipProgram: ScholarshipProgramType) => {
   const truncatedDescription = truncateString(sholarshipProgram.description, 40);
+  // const truncatedUniversity = truncateString(sholarshipProgram.universities, 40);
+  // const truncatedMajorSkill = truncateString(sholarshipProgram.majorSkills, 40);
   return (
     <Link to={`/scholarship-program/${sholarshipProgram.id}`}>
       <div className="columns-1 flex flex-col justify-between gap-8 p-4 rounded-3xl shadow shadow-gray-400 cursor-pointer hover:bg-gray-200 hover:scale-105 hover:shadow-xl transition-all">
@@ -33,7 +43,7 @@ const Card = (sholarshipProgram: ScholarshipProgramType) => {
                     </div>
                 )} */}
         <div className="flex flex-col justify-between gap-2">
-          <p className='text-lg md:text-xl lg:text-xl mt-4 font-bold'>{sholarshipProgram?.name}</p>
+          <p className='text-lg md:text-xl lg:text-xl mt-4 font-bold text-black'>{sholarshipProgram?.name}</p>
           <div className=" mb-5">
             <TooltipProvider>
               <Tooltip>
@@ -53,24 +63,24 @@ const Card = (sholarshipProgram: ScholarshipProgramType) => {
           <Separator orientation="horizontal" />
           <div className=" flex-row justify-between mt-5 ml-5">
             <div className="flex justify-start items-center gap-2 mb-4">
-              <IoLocation color="#060606" size={24} />
-              <p>{sholarshipProgram?.universities.length > 2 ?
+              <IoLocation color="#1eb2a6" size={24} />
+              <p className="text-black">{sholarshipProgram?.universities.length > 2 ?
                 sholarshipProgram?.universities.slice(0, 2).map((university) => university.name).join(", ") + "..." :
                 sholarshipProgram?.universities.map((university) => university.name).join(", ")}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <GiGraduateCap color="#060606" size={24} />
-              <p>{sholarshipProgram?.majorSkills.length > 2 ?
+              <GiGraduateCap color="#1eb2a6" size={24} />
+              <p className="text-black">{sholarshipProgram?.majorSkills.length > 2 ?
                 sholarshipProgram.majorSkills.slice(0, 2).map((majorSkill) => majorSkill.name).join(", ") + "..." :
                 sholarshipProgram?.majorSkills.map((majorSkill) => majorSkill.name).join(", ")}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <FaCalendar color="#060606" size={24} />
-              <p>28 Oct 2025</p>
+              <FaCalendar color="#1eb2a6" size={24} />
+              <p className="text-black">{sholarshipProgram?.deadline}</p>
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <RiMoneyDollarCircleFill color="#060606" size={24} />
-              <p>{sholarshipProgram?.scholarshipAmount}</p>
+              <RiMoneyDollarCircleFill color="#1eb2a6" size={24} />
+              <p className="text-black">{sholarshipProgram?.scholarshipAmount}</p>
             </div>
 
             {/* <div className='w-[1px] bg-gray-400'></div>

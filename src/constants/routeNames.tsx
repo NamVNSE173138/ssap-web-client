@@ -35,6 +35,7 @@ const RouteNames = {
     CHOOSE_WINNER: "/funder/choose-winners/:id",
     PAYMENT_RESULT: "/payment/result",
     FORM_CREATE_SCHOLARSHIP_PROGRAM: '/create-scholarship-program',
+    HISTORY: "/history"
 };
 
 
