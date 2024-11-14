@@ -27,7 +27,7 @@ export async function RegisterProvider(credentials: any) {
 }
 
 export async function ChangedPassword(credentials: any) {
-  const response = await axios.post(`${BASE_URL}/api/Authentication/ChangePassword`, credentials);
+  const response = await axios.post(`${BASE_URL}/api/accounts/13/Change-Password`, credentials);
   return response.data;
 }
 

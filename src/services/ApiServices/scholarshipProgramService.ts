@@ -31,3 +31,14 @@ export async function getAllScholarshipProgramByMajorId(id: number) {
   );
   return response.data;
 }
+
+export async function searchScholarshipProgram(name: string, min: number, max: number, category: string, status: string, deadline: string) {
+    try {
+        const response = await axios.get(`${BASE_URL}/api/scholarship-programs/search?${name ? `Name=${name}` : ''}${min != null ? "&ScholarshipMinAmount=" + min : ""}${max ? "&ScholarshipMaxAmount=" + max : ""}${category ? "&Category=" + category : ""}${status ? "&Status=" + status : ""}${deadline ? "&Deadline=" + deadline : ""}`);
+        console.log('API response:', response.data);
+        return response.data;
+    } catch (error: any) {
+        console.error('API error:', error?.response?.data || error.message);
+        throw error;
+    }
+}
