@@ -220,7 +220,7 @@ const ScholarshipProgramDetail = () => {
                       onClick={() =>
                         navigate(`/scholarship-program/${id}/application`)
                       }
-                      className=" text-xl w-full bg-blue-700 rounded-[25px]"
+                      className=" text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
                     >
                       Apply now{" "}
                     </button>)}
@@ -314,7 +314,7 @@ const ScholarshipProgramDetail = () => {
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <p className="text-4xl">
               About the scholarship
-              <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
+              <span className="block bg-[#1eb2a6] w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4">

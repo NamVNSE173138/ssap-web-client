@@ -27,6 +27,36 @@ const Activity = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // const fetchData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     if (role === "FUNDER") {
+  //       const response = await axios.get(
+  //         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
+  //       );
+  //       if (response.data.statusCode === 200) {
+  //         setData(response.data.data);
+  //       } else {
+  //         setError("Failed to fetch scholarship programs");
+  //       }
+  //     } else if (role === "PROVIDER") {
+  //       const response = await axios.get(
+  //         `${BASE_URL}/api/services/by-provider-id/${funderId}`
+  //       );
+  //       if (response.data.statusCode === 200) {
+  //         const activeServices = response.data.data.filter((service: any) => service.status === 'Active');
+  //         setServices(activeServices);
+  //       } else {
+  //         setError("Failed to fetch services");
+  //       }
+  //     }
+  //   } catch (err) {
+  //     setError((err as Error).message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -44,10 +74,23 @@ const Activity = () => {
           `${BASE_URL}/api/services/by-provider-id/${funderId}`
         );
         if (response.data.statusCode === 200) {
-          const activeServices = response.data.data.filter((service: any) => service.status === 'Active');
+          const activeServices = response.data.data.filter(
+            (service: any) => service.status === 'Active'
+          );
           setServices(activeServices);
         } else {
           setError("Failed to fetch services");
+        }
+      } else if (role === "APPLICANT") {
+        const response = await axios.get(
+          `${BASE_URL}/api/applicants/${user.id}/applications`
+        );
+        console.log("APPLICANTID", user.id);
+        
+        if (response.status === 200) {
+          setData(response.data);
+        } else {
+          setError("Failed to fetch applications");
         }
       }
     } catch (err) {
@@ -56,6 +99,7 @@ const Activity = () => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchData();
@@ -64,7 +108,7 @@ const Activity = () => {
   return (
     <div className="grid grid-cols-12">
       <Sidebar className="col-start-1 col-end-3" />
-      <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+      <div className="col-span-10 gap-1 p-5">
         <div className="relative w-full flex items-center justify-between p-5">
           <div className="flex items-center"></div>
           {role === "FUNDER" && (
@@ -111,10 +155,10 @@ const Activity = () => {
           )}
         </menu>
 
-        <CreateScholarshipModal
+        {/* <CreateScholarshipModal
           isOpen={isScholarshipModalOpen}
           setIsOpen={setIsScholarshipModalOpen}
-        />
+        /> */}
         <AddServiceModal
           isOpen={isServiceModalOpen}
           setIsOpen={setIsServiceModalOpen}
