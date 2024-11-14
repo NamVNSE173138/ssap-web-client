@@ -27,6 +27,7 @@ import SuccessfulPayment from "./Payment";
 import Wallet from "./Wallet";
 import ChooseWinner from "./ChooseWinner";
 import History from "./History";
+import Test from "./Test";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -82,6 +83,11 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.PAYMENT_RESULT,
     element: <SuccessfulPayment />,
   },
+  {
+    path: RouteNames.TEST,
+    element: <Test />,
+  },
+
 ];
 
 const privateRoutes: RouteObject[] = [
@@ -153,6 +159,7 @@ const privateRoutes: RouteObject[] = [
     path: RouteNames.HISTORY,
     element: <History/>,
   },
+
 ];
 
 const clientRoutes: RouteObject[] = [
