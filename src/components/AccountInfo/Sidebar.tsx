@@ -36,10 +36,10 @@ const ListItem = ({ Icon, text, link }: ListItemProps) => {
     const isActive = location.pathname === link;
 
     return (
-        <li onClick={handleClick} className={`lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-blue-400 group rounded-lg ${isActive && 'bg-blue-300 text-white'}`}>
+        <li onClick={handleClick} className={`lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-[#179d8f] group rounded-lg ${isActive && 'bg-[#1eb2a6] text-black'}`}>
             <div className='flex justify-start items-center gap-8'>
-                <Icon size={24} className='text-[#067CEB] group-hover:text-white duration-200 transition-colors' />
-                <Link to={link} className='lg:text-[#067CEB] text-[#2968a4] lg:text-lg text-xl group-hover:text-white'>{text}</Link>
+                <Icon size={24} className='text-[#000] group-hover:text-white duration-200 transition-colors' />
+                <Link to={link} className='lg:text-[#000] text-[#000] lg:text-lg text-xl group-hover:text-white'>{text}</Link>
             </div>
         </li>
     );
@@ -70,13 +70,12 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
         };
 
     const listItems: ListItemProps[] = [
-        { Icon: AiOutlineAudit, text: 'Account', link: `${RouteNames.ACCOUNT_INFO}`},
+        { Icon: AiOutlineAudit, text: 'Account', link: RouteNames.ACCOUNT_INFO},
         { Icon: AiOutlineBook, text: 'Information', link: RouteNames.INFORMATION},
         { Icon: AiOutlineBook, text: `Skills ${hasProfile ? '' : '(You need to add profile first)'} `, link: hasProfile ? RouteNames.SKILLS : ""},
         { Icon: AiOutlineBarChart, text: 'Change Password', link: RouteNames.CHANGE_PASSWORD},
         { Icon: AiOutlineBook, text: 'Activity', link: RouteNames.ACTIVITY},
-        { Icon: AiOutlineHistory, text: 'History', link: "/history"},
-        // { Icon: BiLogOutCircle, text: 'Đăng xuất', link: RouteNames.HOME},
+        { Icon: AiOutlineHistory, text: 'History', link: RouteNames.HISTORY},
     ];
 
     // const handleLogout = () => {
@@ -114,36 +113,8 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
                         {listItems.map((item, index) => (
                             <ListItem key={index} Icon={item.Icon} text={item.text} link={item.link} />
                         ))}
-                        <li className='lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-blue-400 group rounded-lg'>
-                            <AlertDialog>
-                                <AlertDialogTrigger>
-                                    <div className='flex justify-start items-center gap-8'>
-                                        <BiLogOutCircle size={24} className='text-[#067CEB] group-hover:text-white duration-200 transition-colors' />
-                                        <p className='lg:text-[#067CEB] text-[#2968a4] lg:text-lg text-xl group-hover:text-white'>Log out</p>
-                                    </div>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>
-                                            Are you really want to Log out?
-                                        </AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            You'll be redirected to Home page
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>
-                                            Cancel
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction
-                                            onClick={handleLogout}
-                                        >
-                                            Log out
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </li>
+                        {/* <li className='lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-blue-400 group rounded-lg'>
+                        </li> */}
                     </menu>
                 ) : (
                     <motion.div

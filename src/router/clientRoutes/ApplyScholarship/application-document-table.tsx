@@ -40,7 +40,12 @@ function EditableTable({ rows, setRows, handleDeleteRow, handleInputChange }: an
                                 <Button
                                   component="label"
                                   variant="contained"
-                                  color={row.errors?.file ? 'error' : 'primary'}
+                                  sx={{
+                                    backgroundColor: row.errors?.file ? 'error.main' : '#1eb2a6',
+                                    '&:hover': {
+                                      backgroundColor: row.errors?.file ? 'error.dark' : '#179d8f', 
+                                    },
+                                  }}
                                   tabIndex={-1}
                                   startIcon={<CloudUploadIcon />}
                                 >
