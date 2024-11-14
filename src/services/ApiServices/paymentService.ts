@@ -3,7 +3,7 @@ import { BASE_URL } from "@/constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
-export async function createInvoice(invoiceRequest:any) {
+export async function createInvoice(invoiceRequest: any) {
   const response = await axios.post(
     `${BASE_URL}/api/payments/create-invoice`,
     invoiceRequest,
@@ -12,7 +12,7 @@ export async function createInvoice(invoiceRequest:any) {
   return response.data;
 }
 
-export async function transferMoney(transferRequest:any) {
+export async function transferMoney(transferRequest: any) {
   const response = await axios.post(
     `${BASE_URL}/api/payments/transfer-money`,
     transferRequest,
@@ -21,15 +21,23 @@ export async function transferMoney(transferRequest:any) {
   return response.data;
 }
 
-export async function getTransactionsByWalletSenderId(walletSenderId: number) {
-    const response = await axios.get(
-      `${BASE_URL}/api/payments/transactions/${walletSenderId}`,
-      ngrokSkipWarning
-    );
-    return response.data;
-  }
+export async function getTransactionsByWalletSenderId(walletUserId: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/payments/transactions/${walletUserId}`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
 
-export async function handleWebhook(webhookData:any) {
+export async function getAllTransactions() {
+  const response = await axios.get(
+    `${BASE_URL}/api/payments/transactions`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function handleWebhook(webhookData: any) {
   const response = await axios.post(
     `${BASE_URL}/api/payments/webhook`,
     webhookData,
