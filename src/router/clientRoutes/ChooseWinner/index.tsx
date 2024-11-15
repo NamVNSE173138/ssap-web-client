@@ -39,6 +39,7 @@ import {
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { LoginUser } from "@/services/ApiServices/authenticationService";
+import { SendNotification } from "@/services/ApiServices/notification";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -96,6 +97,15 @@ const ChooseWinner = () => {
 
       await Promise.all(applyPromises);
       alert("Selected applicants have been approved!");
+      for(let row of selectedRows){
+          await SendNotification({
+            topic: row.applicantId.toString(),
+            link: "string",
+            title: "string",
+            body: `Your application for ${data?.name} has been approved.`,
+          });
+      }
+      
     } catch (error) {
       setError("Failed to apply for selected winners.");
     }
