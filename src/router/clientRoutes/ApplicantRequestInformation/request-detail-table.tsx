@@ -1,5 +1,5 @@
 import { formatDate } from "@/lib/date-formatter";
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, IconButton } from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, IconButton, styled } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
@@ -8,6 +8,12 @@ import { addFeedback, updateFeedback } from "@/services/ApiServices/feedbackServ
 import { Star } from "lucide-react";
 import { Edit, StarBorder } from "@mui/icons-material";
 import { getServiceById } from "@/services/ApiServices/serviceService";
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import ChatIcon from '@mui/icons-material/Chat';
+import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { toast } from "react-toastify";
 
 const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails, description }: { showButtons: boolean, request: any, fetchRequest: () => void, requestDetails: any; description: string }) => {
     const user = useSelector((state: any) => state.token.user);
@@ -19,6 +25,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
     const [comment, setComment] = useState<string>("");
     const [userFeedback, setUserFeedback] = useState<any>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [scholarships, setScholarships] = useState<{ id: number; name: string }[]>([]);
 
     const [hasFeedback, setHasFeedback] = useState(false);
 
@@ -32,6 +39,27 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
         );
     }
 
+    const StyledLink = styled(Link)(({ theme }) => ({
+        color: '#4A90E2',
+        textDecoration: 'underline',
+        '&:hover': {
+            color: '#FF6347',
+        },
+    }));
+
+    useEffect(() => {
+        const fetchScholarships = async () => {
+            try {
+                const response = await getAllScholarshipProgram();
+                setScholarships(response.data.items);
+            } catch (error) {
+                console.error("Error fetching scholarships:", error);
+            }
+        };
+
+        fetchScholarships();
+    }, []);
+
     const handleFinish = async () => {
         try {
             if (!request.id) {
@@ -40,7 +68,6 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
             console.log(request.id)
             const existingRequestResponse = await getRequestById(parseInt(request.id));
             const requestDetail = existingRequestResponse.data.requestDetails[0];
-            console.log(requestDetail)
 
             if (requestDetail) {
                 const updatedRequest = {
@@ -61,7 +88,6 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 };
 
                 await updateRequest(existingRequestResponse.data.id, updatedRequest);
-                console.log("Request finished", updatedRequest);
                 await fetchRequest();
 
             } else {
@@ -99,7 +125,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
 
     const handleFeedbackSubmit = async () => {
         if (hasFeedback) {
-            alert("You have already feedback this service!");
+            toast.error("You have already feedback this service!");
             return;
         }
 
@@ -137,7 +163,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 content: comment,
                 rating,
             });
-            alert("Feedback updated successfully.");
+            toast.success("Feedback updated successfully.");
             setIsEditing(false);
             setOpenUserFeedbackDialog(false);
         } catch (error) {
@@ -147,49 +173,60 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
 
     const isFinished = request.status === "Finished";
     const isPaid = request.status === "Paid";
+    console.log(scholarships)
 
     const handleChatClick = () => {
-        const chatUserId = user.role === "APPLICANT" ? request.requestDetails[0].service.id : request.applicantId;
+        const chatUserId = user.role === "APPLICANT" ? request.requestDetails[0].service.providerId : request.applicantId;
+        console.log(request)
         navigate(`/chat?id=${chatUserId}`);
     };
 
-
     return (
         <Box>
-            <TableContainer component={Paper} elevation={3} style={{ borderRadius: '8px', marginTop: '20px' }}>
-                <Table sx={{ minWidth: 650 }} aria-label="request details table">
+            <TableContainer component={Paper} elevation={3} sx={{ borderRadius: '12px', marginTop: '20px', padding: '20px' }}>
+                <Table sx={{ minWidth: 1000 }} aria-label="request details table">
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                <Typography variant="h6" style={{ fontWeight: 'bold' }}>Request File</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Id</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Applicant Description</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Request File</Typography>
                             </TableCell>
                             <TableCell align="right">
-                                <Typography variant="h6" style={{ fontWeight: 'bold' }}>Scholarship Type</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Scholarship Type</Typography>
                             </TableCell>
-                            <TableCell align="right" style={{ color: 'red' }}>
-                                <Typography variant="h6" style={{ fontWeight: 'bold' }}>Provider Updated File</Typography>
+                            <TableCell align="right" sx={{ color: '#FF6347' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Provider Updated File</Typography>
                             </TableCell>
-                            <TableCell align="right" style={{ color: 'red' }}>
-                                <Typography variant="h6" style={{ fontWeight: 'bold' }}>Provider Notes</Typography>
+                            <TableCell align="right" sx={{ color: '#FF6347' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Provider Notes</Typography>
                             </TableCell>
                             <TableCell align="right">
-                                <Typography variant="h6" style={{ fontWeight: 'bold' }}>Expected Completion Time</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Expected Completion Time</Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {requestDetails.map((detail: any) => (
-                            <TableRow key={detail.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { backgroundColor: '#f5f5f5' } }}>
+                            <TableRow key={detail.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { backgroundColor: '#f9f9f9' } }}>
+                                <TableCell align="right">
+                                    <Typography variant="body1" sx={{ color: '#333' }}>{detail.id}</Typography>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body1" sx={{ color: '#333' }}>{request.description || "No description provided"}</Typography>
+                                </TableCell>
                                 <TableCell align="right">
                                     {detail.applicationFileUrl ? (
                                         detail.applicationFileUrl.split(", ").map((fileUrl: any, index: any) => {
                                             if (fileUrl.startsWith("https://")) {
                                                 return (
-                                                    <div key={index}>
-                                                        <Link target="_blank" className="text-blue-500 underline hover:text-blue-700" to={fileUrl}>
-                                                            File {index + 1}
-                                                        </Link>
-                                                    </div>
+                                                    <StyledLink target="_blank" to={fileUrl}>
+                                                        File {index + 1}
+                                                    </StyledLink>
                                                 );
                                             }
                                             return null;
@@ -200,7 +237,15 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                 </TableCell>
 
                                 <TableCell align="right">
-                                    <Typography variant="body1">{detail.scholarshipType}</Typography>
+                                    <Typography variant="body1" sx={{ color: '#333' }}>
+                                        {detail.scholarshipType
+                                            ? (
+                                                <Link to={`/scholarship-program/${detail.scholarshipType}`} style={{ color: '#4A90E2', textDecoration: 'underline' }}>
+                                                    {scholarships.find((scholarship) => scholarship.id == detail.scholarshipType)?.name || "Unknown"}
+                                                </Link>
+                                            )
+                                            : "No scholarship"}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell align="right">
                                     {detail.applicationNotes ? (
@@ -208,9 +253,9 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                             if (note.startsWith("https://")) {
                                                 return (
                                                     <div key={index}>
-                                                        <Link target="_blank" className="text-blue-500 underline hover:text-blue-700" to={note}>
+                                                        <StyledLink target="_blank" to={note}>
                                                             File {index + 1}
-                                                        </Link>
+                                                        </StyledLink>
                                                     </div>
                                                 );
                                             }
@@ -221,7 +266,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                     )}
                                 </TableCell>
                                 <TableCell align="right" className="max-w-[500px]" component="th" scope="row">
-                                    <Typography variant="body2">
+                                    <Typography variant="body2" sx={{ color: '#333' }}>
                                         {detail.applicationNotes && detail.applicationNotes.length > 0
                                             ? detail.applicationNotes.split(", ").pop()
                                             : "No notes uploaded"}
@@ -235,6 +280,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                     </TableBody>
                 </Table>
             </TableContainer>
+
             {user.role === "APPLICANT" && (
                 <>
                     {showButtons && (
@@ -246,14 +292,16 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                 onClick={handleChatClick}
                                 sx={{
                                     borderRadius: '25px',
-                                    padding: '10px 20px',
+                                    padding: '12px 24px',
                                     fontSize: '16px',
                                     marginRight: '10px',
                                     boxShadow: 3,
-                                    '&:hover': {
-                                        boxShadow: 6,
-                                    },
+                                    '&:hover': { boxShadow: 6 },
+                                    backgroundColor: '#4A90E2',
+                                    color: '#fff',
+                                    '&:disabled': { backgroundColor: '#C5CAE9' },
                                 }}
+                                startIcon={<ChatIcon />}
                             >
                                 Chat
                             </Button>
@@ -264,13 +312,15 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                 disabled={isFinished}
                                 sx={{
                                     borderRadius: '25px',
-                                    padding: '10px 20px',
+                                    padding: '12px 24px',
                                     fontSize: '16px',
                                     boxShadow: 3,
-                                    '&:hover': {
-                                        boxShadow: 6,
-                                    },
+                                    '&:hover': { boxShadow: 6 },
+                                    backgroundColor: '#4A90E2',
+                                    color: '#fff',
+                                    '&:disabled': { backgroundColor: '#C5CAE9' },
                                 }}
+                                startIcon={<CheckCircleOutlineIcon />}
                             >
                                 Finish
                             </Button>
@@ -280,7 +330,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                     color="secondary"
                                     onClick={() => {
                                         if (hasFeedback) {
-                                            alert("You have already feedback this service!");
+                                            toast.error("You have already given feedback!");
                                         } else {
                                             setOpenFeedbackDialog(true);
                                         }
@@ -288,14 +338,16 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                     disabled={hasFeedback}
                                     sx={{
                                         borderRadius: '25px',
-                                        padding: '10px 20px',
+                                        padding: '12px 24px',
                                         fontSize: '16px',
                                         marginLeft: '10px',
                                         boxShadow: 3,
-                                        '&:hover': {
-                                            boxShadow: 6,
-                                        },
+                                        '&:hover': { boxShadow: 6 },
+                                        backgroundColor: '#FF9800',
+                                        color: '#fff',
+                                        '&:disabled': { backgroundColor: '#F5CBE1' },
                                     }}
+                                    startIcon={<FeedbackIcon />}
                                 >
                                     Feedback
                                 </Button>
@@ -307,12 +359,15 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                     onClick={() => setOpenUserFeedbackDialog(true)}
                                     sx={{
                                         borderRadius: '25px',
-                                        padding: '10px 20px',
+                                        padding: '12px 24px',
                                         fontSize: '16px',
                                         marginLeft: '10px',
                                         boxShadow: 3,
                                         '&:hover': { boxShadow: 6 },
+                                        backgroundColor: '#FF9800',
+                                        color: '#fff',
                                     }}
+                                    startIcon={<RateReviewIcon />}
                                 >
                                     Your Feedback
                                 </Button>
@@ -323,15 +378,16 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                         <DialogTitle>Feedback</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Please give us feedback so we can improve in the future.
+                                Please give us feedback to help us improve our service.
                             </DialogContentText>
                             <Box display="flex" alignItems="center" mt={2}>
                                 {[...Array(5)].map((_, index) => (
                                     <Box
                                         key={index}
                                         onClick={() => setRating(index + 1)}
-                                        style={{ cursor: 'pointer' }}
-                                    >{rating !== null && index < rating ? <Star style={{ color: 'gold' }} /> : <StarBorder />}
+                                        sx={{ cursor: 'pointer', color: (rating ?? 0) >= index + 1 ? 'gold' : '#e0e0e0' }}
+                                    >
+                                        <Star />
                                     </Box>
                                 ))}
                             </Box>
@@ -355,6 +411,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                     </Dialog>
                 </>
             )}
+
             <Dialog open={openUserFeedbackDialog} onClose={() => setOpenUserFeedbackDialog(false)}>
                 <DialogTitle>
                     Your Feedback
@@ -370,7 +427,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                     </DialogContentText>
                     <Box display="flex" alignItems="center" mt={2}>
                         {[...Array(5)].map((_, index) => (
-                            <Box key={index} onClick={() => isEditing && setRating(index + 1)} style={{ cursor: 'pointer' }}>
+                            <Box key={index} onClick={() => isEditing && setRating(index + 1)} sx={{ cursor: 'pointer', color: index < (rating || 0) ? 'gold' : '#e0e0e0' }}>
                                 {index < (rating || 0) ? <Star style={{ color: 'gold' }} /> : <StarBorder />}
                             </Box>
                         ))}
@@ -399,6 +456,8 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 </DialogActions>
             </Dialog>
         </Box>
+
+
     );
 };
 
