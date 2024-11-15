@@ -294,7 +294,7 @@ const ScholarshipProgram = () => {
         </AccordionDetails>
       </Accordion>
     </div>
-      <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-between items-start gap-10 mt-10 my-8  px-12">
+      <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 justify-between items-start gap-10 mt-10 my-8  px-12">
         {loading ? (
           <ScholarshipProgramSkeleton />
         ) : error ? (
