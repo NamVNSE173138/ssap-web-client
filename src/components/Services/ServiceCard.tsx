@@ -49,50 +49,54 @@ const ServiceCard = (service: ServiceType) => {
 
   return (
     <Link to={`/services/${service.id}`}>
-      <div className="flex flex-col justify-between gap-8 p-4 rounded-3xl shadow shadow-gray-400 cursor-pointer hover:bg-gray-200 hover:scale-105 hover:shadow-xl transition-all">
-        <div className="flex flex-col justify-between gap-2">
-          <p className="text-lg md:text-xl lg:text-xl mt-4 font-bold">{service?.name}</p>
-          <div className="mb-5">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <p>{truncatedDescription}</p>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{service?.description}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+  <div className="flex flex-col justify-between gap-6 p-4 rounded-xl shadow-lg bg-gradient-to-r from-indigo-100 via-blue-100 to-teal-50 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:translate-y-1">
+    <div className="flex flex-col justify-between gap-4">
+      <p className="text-xl md:text-2xl lg:text-2xl font-semibold text-gray-800 hover:text-indigo-500 transition-all duration-300 ease-in-out">
+        {service?.name}
+      </p>
 
-          <Separator orientation="horizontal" />
+      <div className="mb-4">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-gray-700 text-xs lg:text-sm">{truncatedDescription}</p>
+            </TooltipTrigger>
+            <TooltipContent className="bg-indigo-600 text-white p-3 rounded-md">
+              <p className="text-sm">{service?.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
-          <div className="flex flex-col gap-4 mt-5">
-            <div className="flex items-center gap-2">
-              <FaStar color="#060606" size={20} />
-              <p>
-                {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? 'review' : 'reviews'})
-              </p>
-            </div>
+      <Separator orientation="horizontal" className="border-t-2 border-gray-300 mb-3" />
 
-            <div className="flex items-center gap-2">
-              <FaAddressBook color="#060606" size={20} />
-              <p>{service.type || "No Type Specified"}</p>
-            </div>
+      <div className="flex flex-col gap-4 mt-4">
+        <div className="flex items-center gap-3 text-lg md:text-xl">
+          <FaStar color="#FFB800" size={20} className="transition-transform transform hover:scale-110" />
+          <p className="text-gray-800 font-medium">
+            {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? 'review' : 'reviews'})
+          </p>
+        </div>
 
-            <div className="flex items-center gap-2">
-              <FaRegCalendarAlt color="#060606" size={20} />
-              <p>{service.duration ? new Date(service.duration).toLocaleDateString() : "No Duration"}</p>
-            </div>
+        <div className="flex items-center gap-3 text-lg md:text-xl">
+          <FaAddressBook color="#2D3748" size={20} className="transition-transform transform hover:scale-110" />
+          <p className="text-gray-800">{service.type || "No Type Specified"}</p>
+        </div>
 
-            <div className="flex items-center gap-2">
-              <FaDollarSign color="#060606" size={20} />
-              <p>{service.price ? `$${service.price.toFixed(2)}` : "Price not available"}</p>
-            </div>
-          </div>
+        <div className="flex items-center gap-3 text-lg md:text-xl">
+          <FaRegCalendarAlt color="#2D3748" size={20} className="transition-transform transform hover:scale-110" />
+          <p className="text-gray-800">{service.duration ? new Date(service.duration).toLocaleDateString() : "No Duration"}</p>
+        </div>
+
+        <div className="flex items-center gap-3 text-lg md:text-xl">
+          <FaDollarSign color="#2D3748" size={20} className="transition-transform transform hover:scale-110" />
+          <p className="text-gray-800">{service.price ? `$${service.price.toFixed(2)}` : "Price not available"}</p>
         </div>
       </div>
-    </Link>
+    </div>
+  </div>
+</Link>
+
   );
 };
 

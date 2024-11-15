@@ -190,7 +190,7 @@ const Wallet = () => {
         <h1 className="text-3xl font-semibold text-blue-700 mb-4">Wallet 💰</h1>
 
         {error ? (
-          <div className="w-full lg:w-1/2 bg-blue-500 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
+          <div className="w-full lg:w-2/3 bg-blue-500 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
             <Button
               onClick={() => setIsOpenDialog(true)}
               className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white"
@@ -200,13 +200,13 @@ const Wallet = () => {
           </div>
         ) : (
           <>
-            <div className="w-full lg:w-1/2 bg-blue-600 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
+            <div className="w-full lg:w-2/3 bg-blue-600 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
               <h2 className="text-2xl">Balance</h2>
               <p className="text-5xl font-bold mt-2">
                 {walletData?.data.balance}$
               </p>
             </div>
-            <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-lg mb-5">
+            <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-lg mb-5">
               <h2 className="text-lg font-semibold text-blue-600 mb-2">Bank Account Information</h2>
               <p>
                 <span className="font-semibold">Account Name:</span> {walletData?.data.bankAccountName || "N/a"}
@@ -224,7 +224,7 @@ const Wallet = () => {
               )}
             </div>
 
-            <div className="w-full lg:w-1/2 flex justify-around mb-5">
+            <div className="w-full lg:w-2/3 flex justify-around mb-5">
               <button
                 onClick={handleAddMoneyClick}
                 className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-500 transition duration-200 ease-in-out transform hover:scale-105"
@@ -238,7 +238,7 @@ const Wallet = () => {
               </button>
             </div>
 
-            <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-lg mb-5">
+            <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-lg mb-5">
               <h2 className="text-lg font-semibold text-blue-600 mb-2">Transaction History</h2>
               <Table
                 columns={columns}
