@@ -26,6 +26,7 @@ import ProviderInformation from "./ProviderInformation";
 import SuccessfulPayment from "./Payment";
 import Wallet from "./Wallet";
 import ChooseWinner from "./ChooseWinner";
+import History from "./History";
 import Test from "./Test";
 
 const publicRoutes: RouteObject[] = [
@@ -86,6 +87,7 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.TEST,
     element: <Test />,
   },
+
 ];
 
 const privateRoutes: RouteObject[] = [
@@ -153,6 +155,11 @@ const privateRoutes: RouteObject[] = [
     path: RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM,
     element: <FormCreateScholarshipProgram />,
   },
+  {
+    path: RouteNames.HISTORY,
+    element: <History/>,
+  },
+
 ];
 
 const clientRoutes: RouteObject[] = [
