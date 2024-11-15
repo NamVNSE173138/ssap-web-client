@@ -12,21 +12,81 @@ import axios from "axios";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { BASE_URL } from "@/constants/api";
+import { getAllCountries } from "@/services/ApiServices/countryService";
+import { getAllMajors } from "@/services/ApiServices/majorService";
+import { getAllCategories } from "@/services/ApiServices/categoryService";
+import { ArrowDownIcon, CalendarIcon, SearchIcon } from "lucide-react";
+import { getAllCertificates } from "@/services/ApiServices/certificateService";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Container, Slider } from "@mui/material";
+import { getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 const ScholarshipProgram = () => {
   const [data, setData] =
     useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [countries, setCountries] = useState<{ name: string }[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const [countries, setCountries] = useState<{ name: string }[]>([]);
+  const [majors, setMajors] = useState<{ name: string }[]>([]);
+  const [categories, setCategories] = useState<{ name: string }[]>([]);
+  const [certificates, setCertificates ] = useState<{ name: string }[]>([]);
+
+  const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 1400000]);
+  const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
+  const [scholarshipStatus, setScholarshipStatus] = useState<string>("");
+  const [scholarshipCategory, setScholarshipCategory] = useState<string>("");
+  const [scholarshipKeyword, setScholarshipKeyword] = useState<string>("");
+
+  const handleSearch = async () => {
+      if(!scholarshipKeyword || scholarshipAmount[0]==null || scholarshipAmount[1]==null || !scholarshipCategory || !scholarshipStatus || !scholarshipDeadline){
+          setLoading(true);
+          await fetchData();
+          return;
+        }
+      try {
+        setLoading(true);
+        const response = await searchScholarshipProgram(
+          scholarshipKeyword,
+          scholarshipAmount[0],
+          scholarshipAmount[1],
+          scholarshipCategory,
+          scholarshipStatus,
+          scholarshipDeadline && new Date(scholarshipDeadline).toISOString());
+        const scholarships = []
+        for(let res of response.data){
+          const scholarshipProgram = await getScholarshipProgram(res.id);
+          scholarships.push(scholarshipProgram.data);
+        }
+        setData(scholarships);
+
+        if (response.statusCode === 200) {
+        } else {
+          //setError("Failed to fetch data");
+        }
+      } catch (err) {
+        //setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+
+
+    //console.log(scholarshipAmount, scholarshipDeadline, scholarshipStatus, scholarshipCategory);
+  };
+  const fetchData = async () => {
       try {
         const response = await axios.get(
           `${BASE_URL}/api/scholarship-programs`
         );
+        const countryDatas = await getAllCountries();
+        const majorDatas = await getAllMajors();
+        const categoriesDatas = await getAllCategories();
+        const certificatesDatas = await getAllCertificates();
+
         if (response.data.statusCode === 200) {
           setData(response.data.data.items);
+          setCountries(countryDatas.data);
+          setMajors(majorDatas.data.items);
+          setCategories(categoriesDatas.data);
+          setCertificates(certificatesDatas.data);
         } else {
           setError("Failed to fetch data");
         }
@@ -36,6 +96,9 @@ const ScholarshipProgram = () => {
         setLoading(false);
       }
     };
+
+  useEffect(() => {
+    
 
     fetchData();
   }, []);
@@ -85,19 +148,30 @@ const ScholarshipProgram = () => {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          
           <form action="" className="w-full">
+            <div className="flex items-center mb-5 border border-zinc-950 rounded-sm relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
+              <SearchIcon className="w-[20px] h-[20px] ml-3 rounded-full"/>
+              <input value={scholarshipKeyword} onChange={(e) => setScholarshipKeyword(e.target.value)}
+                placeholder="Search scholarships by keyword" className="w-full outline-none py-[13px] pl-[16px] pr-[32px]" type="text"/>
+            </div>
             <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-[1fr_120px]">
-              <div className="flex gap-[16px] flex-col lg:flex-row">
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
-                  <label hidden>Study Level</label>
-                  <select className="">
-                    <option>Select study level</option>
+              <div className="flex gap-[16px] flex-col lg:flex-row flex-wrap">
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full sm:1/2 lg:w-1/5 cursor-pointer ">
+                  <label hidden>Study Major</label>
+                  <select className="w-full">
+                    <option value="">Select study major</option>
+                    {majors.map((major, index) => (
+                      <option key={index} value={major.name}>
+                        {major.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full cursor-pointer">
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
                   <label hidden>Study destination</label>
-                  <select>
-                    <option>Select a study destination</option>
+                  <select className="w-full">
+                    <option value="">Select a study destination</option>
                     {countries.map((country, index) => (
                       <option key={index} value={country.name}>
                         {country.name}
@@ -105,15 +179,122 @@ const ScholarshipProgram = () => {
                     ))}
                   </select>
                 </div>
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
+                  <label hidden>Scholarship Categories</label>
+                  <select value={scholarshipCategory} onChange={(e) => setScholarshipCategory(e.target.value)} className="w-full">
+                    <option value="">Select a scholarship categories</option>
+                    {categories.map((category, index) => (
+                      <option key={index} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
+                  <label hidden>Scholarship Certificates</label>
+                  <select className="w-full">
+                    <option value="">Select a scholarship certificates</option>
+                    {certificates.map((certificate, index) => (
+                      <option key={index} value={certificate.name}>
+                        {certificate.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className=" flex w-full text-white bg-[#1eb2a6] justify-center rounded-full">
-                <button>Search</button>
+                <button type="button" onClick={handleSearch}>Search</button>
               </div>
             </div>
           </form>
         </div>
       </div>
-      <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-between items-start gap-10 mt-10 my-8  px-12">
+
+      <div className="flex px-10 gap-5">
+
+      <div className="w-[250px] mt-10">
+      <span className="bg-sky-500 w-[98%] mx-auto mb-3 rounded-full h-[3px] block"></span>
+      <Accordion defaultExpanded>
+        <AccordionSummary
+          expandIcon={<ArrowDownIcon />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+        >
+          Amount
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ width: "100%", padding: "0px 10px" }}>
+      <Slider
+        get-aria-label="Custom marks"
+        value={scholarshipAmount}
+        max={1400000}
+        onChange={(_: Event, value: number | number[]) => 
+            setScholarshipAmount(value as number[])}
+        valueLabelDisplay="auto"
+        getAriaLabel={() => 'Scholarship Amount'}
+        valueLabelFormat={(value: number) => new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0,
+        }).format(value)}
+        disableSwap
+        marks={[
+  {
+    value: 0,
+    label: '$0',
+  },
+  {
+    value: 1400000,
+    label: 'Max',
+  },
+]}
+      />
+    </Box>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion defaultExpanded>
+        <AccordionSummary
+          expandIcon={<ArrowDownIcon />}
+          aria-controls="panel2-content"
+          id="panel2-header"
+        >
+         Deadline After
+        </AccordionSummary>
+        <AccordionDetails>
+          <div className="flex items-center mb-5 border border-zinc-950 rounded-sm relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
+              <CalendarIcon className="w-[20px] h-[20px] ml-3 rounded-full"/>
+              <input value={scholarshipDeadline} onChange={(e) => setScholarshipDeadline(e.target.value)} 
+                className="w-full outline-none py-[13px] pl-[16px] pr-[32px]" type="date"/>
+            </div>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion defaultExpanded>
+        <AccordionSummary
+          expandIcon={<ArrowDownIcon/>}
+          aria-controls="panel3-content"
+          id="panel3-header"
+        >
+          Status
+        </AccordionSummary>
+        <AccordionDetails>
+           <div className="flex py-[13px] pl-[16px] pr-[32px] items-center mb-5 border border-zinc-950 rounded-sm relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
+              <select value={scholarshipStatus} onChange={(e) => setScholarshipStatus(e.target.value)} className="w-full h-full outline-none">
+                    <option>Select scholarship status</option>
+                      <option value={"ACTIVE"}>
+                        {"ACTIVE"}
+                      </option>
+                      <option value={"FINISHED"}>
+                        {"FINISHED"}
+                      </option>
+                      <option value={"INACTIVE"}>
+                        {"INACTIVE"}
+                      </option>
+                  </select>
+            </div> 
+        </AccordionDetails>
+      </Accordion>
+    </div>
+      <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 justify-between items-start gap-10 mt-10 my-8  px-12">
         {loading ? (
           <ScholarshipProgramSkeleton />
         ) : error ? (
@@ -132,6 +313,7 @@ const ScholarshipProgram = () => {
           ))
         )}
       </menu>
+      </div>
     </div>
   );
 };
