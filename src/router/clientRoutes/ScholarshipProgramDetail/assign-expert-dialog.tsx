@@ -78,14 +78,14 @@ const AssignExpertDialog = ({ open, onClose, experts }: any) => {
                 <p className="p-10 text-center text-gray-500 font-semibold text-xl">
                     No majors
                 </p>}
-                {majors && majors.map((major:any) => (<>
+                {majors && majors.map((major:any) => (
                   <ListItem disableGutters key={major.id}>
                     <ListItemButton onClick={() => setSelectedMajor(major)}>
                       <ListItemText primary={major.name} />
                       <ArrowRightIcon/>
                     </ListItemButton>
                   </ListItem>
-                </>))}
+                ))}
             </List>
         </>)}
         {experts && selectedMajor &&
