@@ -10,6 +10,14 @@ export async function getApplicationWithDocumentsAndAccount(id: number) {
   return response.data;
 }
 
+export async function deleteApplication(id: number) {
+  const response = await axios.delete(
+    `${BASE_URL}/api/applications/${id}`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
 export async function updateApplication(application: any) {
   const response = await axios.put(
     `${BASE_URL}/api/applications/${application.id}`,
