@@ -32,6 +32,18 @@ export async function getAllScholarshipProgramByMajorId(id: number) {
   return response.data;
 }
 
+export async function updateScholarshipStatus(id: number, status: string) {
+  const response = await axios.put(
+    `${BASE_URL}/api/scholarship-programs/update-status/${id}`,
+    status, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return response.data;
+}
+
 export async function searchScholarshipProgram(name: string, min: number, max: number, category: string, status: string, deadline: string) {
     try {
         const response = await axios.get(`${BASE_URL}/api/scholarship-programs/search?${name ? `Name=${name}` : ''}${min != null ? "&ScholarshipMinAmount=" + min : ""}${max ? "&ScholarshipMaxAmount=" + max : ""}${category ? "&Category=" + category : ""}${status ? "&Status=" + status : ""}${deadline ? "&Deadline=" + deadline : ""}`);

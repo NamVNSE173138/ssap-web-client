@@ -18,6 +18,7 @@ import {
     Alert,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 interface Applicant {
@@ -59,39 +60,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
             finished: applications.filter(app => app.status === "Finished"),
         });
     }, [applications]);
-
-    // const handleStatusUpdate = async (id: number, status: "Accepted" | "Rejected") => {
-    //     try {
-    //         const existingApplicantResponse = await getRequestById(id);
-    //         const requestDetail = existingApplicantResponse.data.requestDetails[0];
-
-    //         if (requestDetail) {
-    //             const updatedRequest = {
-    //                 description: existingApplicantResponse.data.description,
-    //                 requestDate: existingApplicantResponse.data.requestDate,
-    //                 status: status,
-    //                 applicantId: existingApplicantResponse.data.applicantId,
-    //                 requestDetails: [
-    //                     {
-    //                         id: requestDetail.id,
-    //                         expectedCompletionTime: requestDetail.expectedCompletionTime,
-    //                         applicationNotes: requestDetail.applicationNotes,
-    //                         scholarshipType: requestDetail.scholarshipType,
-    //                         applicationFileUrl: requestDetail.applicationFileUrl,
-    //                         serviceId: requestDetail.serviceId,
-    //                     }
-    //                 ]
-    //             };
-
-    //             await updateRequest(id, updatedRequest);
-    //             fetchApplications();
-    //         } else {
-    //             console.error(`Request details for applicant id:${id} not found`);
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to update applicant status", error);
-    //     }
-    // };
 
     const handleOpenCommentDialog = (applicantId: number) => {
         setSelectedApplicantId(applicantId);
@@ -168,52 +136,86 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                         sx={{
                             display: "flex",
                             alignItems: "center",
-                            mb: 2,
-                            p: 2,
-                            borderRadius: 1,
+                            mb: 3,
+                            p: 3,
+                            borderRadius: "12px",
                             bgcolor: "background.paper",
-                            boxShadow: 1,
+                            boxShadow: 2,
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                boxShadow: 6,
+                                transform: "scale(1.02)",
+                            },
                         }}
                     >
                         <ListItemAvatar>
                             <img
                                 className="rounded-full w-12 h-12"
-                                src={app.applicant?.avatarUrl}
+                                src={app.applicant?.avatarUrl ?? "https://github.com/shadcn.png"}
                                 alt="avatar"
                                 style={{ borderRadius: "50%", width: "48px", height: "48px" }}
                             />
                         </ListItemAvatar>
                         <ListItemText
-                            primary={<Typography variant="subtitle1">{app.applicant.username}</Typography>}
-                            secondary={formatDate(app.requestDate)}
+                            primary={
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600", fontFamily: "Poppins, sans-serif" }}>
+                                    {app.applicant.username}
+                                </Typography>
+                            }
+                            secondary={
+                                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                                    {formatDate(app.requestDate)}
+                                </Typography>
+                            }
                             sx={{ flex: 1 }}
                         />
-                        <Button
-                            onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
-                            variant="contained"
-                            size="small"
-                            sx={{ mr: 1 }}
-                        >
-                            View Request
-                        </Button>
-                        {app.status === "Paid" && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                             <Button
-                                onClick={() => handleOpenCommentDialog(app.id)}
-                                color="primary"
-                                variant="outlined"
+                                onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
+                                variant="contained"
                                 size="small"
-                                sx={{ mr: 1 }}
+                                sx={{
+                                    backgroundColor: "#0078d4",
+                                    borderRadius: "20px",
+                                    fontFamily: "Roboto, sans-serif",
+                                    fontSize: "0.875rem",
+                                    "&:hover": {
+                                        backgroundColor: "#005bb5",
+                                    },
+                                }}
                             >
-                                Add Comment
+                                <FaEye style={{ marginRight: "8px" }} />
+                                View Request
                             </Button>
-                        )}
+                            {app.status === "Paid" && (
+                                <Button
+                                    onClick={() => handleOpenCommentDialog(app.id)}
+                                    color="primary"
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{
+                                        borderRadius: "20px",
+                                        fontFamily: "Roboto, sans-serif",
+                                        fontSize: "0.875rem",
+                                        borderColor: "#0078d4",
+                                        "&:hover": {
+                                            borderColor: "#005bb5",
+                                            backgroundColor: "#f0f8ff",
+                                        },
+                                    }}
+                                >
+                                    <FaCommentDots style={{ marginRight: "8px" }} />
+                                    Add Comment
+                                </Button>
+                            )}
+                        </Box>
                     </ListItem>
                 ))
             ) : (
                 <ListItem>
                     <ListItemText
                         primary={
-                            <Typography variant="body1" color="textSecondary" align="center">
+                            <Typography variant="body1" color="text.secondary" align="center" sx={{ fontFamily: "Poppins, sans-serif", fontWeight: "500" }}>
                                 No requests available
                             </Typography>
                         }
@@ -222,6 +224,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
             )}
         </Box>
     );
+    
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
@@ -229,59 +232,131 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     return (
         <>
-            <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
-                <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>Applicants Request Information</DialogTitle>
-                <Tabs
-                    value={activeTab}
-                    onChange={(e, newValue) => setActiveTab(newValue)}
-                    centered
-                    indicatorColor="primary"
-                    textColor="primary"
-                    sx={{ borderBottom: 1, borderColor: "divider" }}
+    <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
+        <DialogTitle sx={{
+            textAlign: "center", 
+            fontWeight: "bold", 
+            fontSize: "1.25rem", 
+            fontFamily: "Poppins, sans-serif", 
+            color: "#333"
+        }}>
+            <FaInfoCircle style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
+            Applicants Request Information
+        </DialogTitle>
+
+        <Tabs
+            value={activeTab}
+            onChange={(e, newValue) => setActiveTab(newValue)}
+            centered
+            indicatorColor="primary"
+            textColor="primary"
+            sx={{
+                borderBottom: 1, 
+                borderColor: "divider", 
+                "& .MuiTab-root": {
+                    fontFamily: "Lato, sans-serif", 
+                    fontWeight: "500"
+                }
+            }}
+        >
+            <Tab label="Paid" />
+            <Tab label="Finished" />
+        </Tabs>
+
+        <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
+            {activeTab === 0 && renderApplicants(applicants.paid)}
+            {activeTab === 1 && renderApplicants(applicants.finished)}
+        </List>
+    </Dialog>
+
+    <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: "bold", 
+            fontSize: "1.25rem",
+            color: "#333"
+        }}>
+            <FaCommentDots style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
+            Add Comment
+        </DialogTitle>
+
+        <Box sx={{ p: 3 }}>
+            <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add updated file:</Typography>
+            <input
+                type="file"
+                multiple
+                onChange={handleCommentFile}
+                style={{
+                    marginTop: "8px", 
+                    marginBottom: "20px", 
+                    padding: "8px", 
+                    borderRadius: "8px", 
+                    border: "1px solid #ddd", 
+                    fontSize: "1rem"
+                }}
+            />
+            <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add your comment:</Typography>
+            <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Type your comment here..."
+                style={{
+                    width: "100%", 
+                    height: "100px", 
+                    marginTop: "8px", 
+                    padding: "8px", 
+                    borderRadius: "8px", 
+                    border: "1px solid #ddd", 
+                    fontSize: "1rem",
+                    fontFamily: "Roboto, sans-serif"
+                }}
+            />
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                <Button 
+                    onClick={() => setCommentDialogOpen(false)} 
+                    color="secondary" 
+                    variant="outlined" 
+                    sx={{ 
+                        mr: 1, 
+                        borderRadius: "20px", 
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.875rem",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                            backgroundColor: "#f5f5f5"
+                        }
+                    }}
                 >
-                    <Tab label="Paid" />
-                    <Tab label="Finished" />
-                </Tabs>
-                <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-                    {activeTab === 0 && renderApplicants(applicants.paid)}
-                    {activeTab === 1 && renderApplicants(applicants.finished)}
-                </List>
-            </Dialog>
+                    Cancel
+                </Button>
+                <Button 
+                    onClick={handleSubmitComment} 
+                    color="primary" 
+                    variant="contained" 
+                    sx={{
+                        borderRadius: "20px", 
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.875rem",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                            backgroundColor: "#0064d2"
+                        }
+                    }}
+                >
+                    Submit
+                </Button>
+            </Box>
+        </Box>
+    </Dialog>
 
-            <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>Add Comment</DialogTitle>
-                <Box sx={{ p: 3 }}>
-                    <Typography variant="body1">Add updated file:</Typography>
-                    <input
-                        type="file"
-                        multiple
-                        onChange={handleCommentFile}
-                        style={{ marginTop: "8px", marginBottom: "20px" }}
-                    />
-                    <Typography variant="body1">Add your comment:</Typography>
-                    <textarea
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Type your comment here..."
-                        style={{ width: "100%", height: "100px", marginTop: "8px", padding: "8px" }}
-                    />
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                        <Button onClick={() => setCommentDialogOpen(false)} color="secondary" variant="outlined" sx={{ mr: 1 }}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSubmitComment} color="primary" variant="contained">
-                            Submit
-                        </Button>
-                    </Box>
-                </Box>
-            </Dialog>
+    <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+            {snackbarMessage}
+        </Alert>
+    </Snackbar>
+</>
 
-            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
-        </>
     );
 };
 

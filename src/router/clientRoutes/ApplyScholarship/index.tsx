@@ -12,6 +12,7 @@ import EditableTable from "./application-document-table";
 import { uploadFile } from "@/services/ApiServices/testService";
 import { addApplicationDocument } from "@/services/ApiServices/applicationDocumentService";
 import Background from "../../../assets/back.webp";
+import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -27,6 +28,9 @@ const ApplyScholarship = () => {
     contactConsent: false,
     receiveUpdates: false,
   });
+
+
+  const [applyLoading, setApplyLoading] = useState<boolean>(false)
 
   const [rowId, setRowId] = useState<number>(0);
   const [rows, setRows] = useState<any[]>([
@@ -60,6 +64,18 @@ const ApplyScholarship = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setApplyLoading(true);
+    const program = await getScholarshipProgram(Number(id));
+
+    if (!program) {
+      alert("Program not found");
+      return;
+    }
+    if(program.data.status == "FINISHED") {
+      alert("Program is finished");
+      return;
+    }
+
     setRows(
       rows.map((row) => ({
         ...row,
@@ -113,6 +129,9 @@ const ApplyScholarship = () => {
       if (id) await NotifyFunderNewApplicant(isApplicant, parseInt(id));
     } catch (error) {
       console.error("Error submitting application:", error);
+    }
+    finally{
+        setApplyLoading(false)
     }
   };
 
@@ -266,10 +285,15 @@ const ApplyScholarship = () => {
 
             <div className="mt-[20px] lg:mt-[16px]">
               <button
+                disabled={applyLoading}
                 type="submit"
                 className="text-white bg-[#1eb2a6] w-full lg:w-auto px-[20px] py-[12px] leading-6 rounded-[108px] border-2"
               >
-                <span>Apply now</span>
+                {applyLoading ? (<div
+                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                  aria-hidden="true"
+                ></div>) :
+                (<span>Apply now</span>)}
               </button>
             </div>
           </form>
