@@ -14,10 +14,15 @@ import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } 
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
-import { FaStar } from "react-icons/fa";
+import { FaEdit, FaEye, FaPlus, FaRedo, FaStar, FaTrash } from "react-icons/fa";
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
+import { toast, ToastContainer } from "react-toastify";
+import { FaInfoCircle, FaDollarSign, FaClock, FaCheckCircle, FaUser } from "react-icons/fa";
+import { DialogTitle, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { IoIosPaper } from "react-icons/io";
+import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
 interface ServiceType {
     id: string;
@@ -41,6 +46,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [expectedCompletionTime, setExpectedCompletionTime] = useState<Date | null>(null);
     const [applicationNotes, setApplicationNotes] = useState<string>("");
     const [scholarshipType, setScholarshipType] = useState<string>("");
+    const [scholarships, setScholarships] = useState<{ id: number; name: string }[]>([]);
     const [description, setDescription] = useState<string>("");
     const [applicationFileUrls, setApplicationFileUrls] = useState<any>(null);
     const [editData, setEditData] = useState<ServiceType | null>(null);
@@ -82,6 +88,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             } else {
                 setCanEdit(false);
             }
+
+            const scholarshipResponse = await getAllScholarshipProgram();
+            setScholarships(scholarshipResponse.data.items);
         } catch (err) {
             setError((err as Error).message);
         } finally {
@@ -100,39 +109,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     };
 
     const handleFeedbackClick = () => {
-        if (feedbackCount === 0) {
-            alert("This service has no feedbacks yet, be the first!");
-        } else {
-            setIsFeedbackDialogOpen(true);
-        }
+        setIsFeedbackDialogOpen(true);
     };
 
     const handleCloseFeedbackDialog = () => {
         setIsFeedbackDialogOpen(false);
     };
-
-    // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const files = e.target.files;
-    //     if (!files) return;
-
-    //     setLoading(true);
-
-    //     try {
-    //         const filesArray = Array.from(files);
-    //         const formData = new FormData();
-
-    //         filesArray.forEach((file) => {
-    //             formData.append("files", file);
-    //         });
-
-    //         const urls = await uploadFile(formData);
-    //         setApplicationFileUrls(urls);
-    //     } catch (error) {
-    //         console.error("File upload failed:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const fetchApplicants = async (serviceId: number) => {
         try {
@@ -179,10 +161,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             await updateService(Number(id), updatedData);
 
             setServiceData(updatedData);
-            alert("Service marked as inactive successfully!");
+            toast.success("Service marked as inactive successfully!");
             navigate(RouteNames.ACTIVITY);
         } catch (error) {
             setError((error as Error).message);
+            toast.error("Failed to delete service.");
         } finally {
             setLoading(false);
         }
@@ -202,7 +185,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     };
 
     const handleSubmit = async () => {
-        if(!serviceData) return null;
+        if (!serviceData) return;
         setLoading(true);
         setError(null);
 
@@ -211,18 +194,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             const userBalance = walletResponse.data.balance;
 
             if (userBalance < serviceData?.price) {
-                alert("Insufficient funds to request this service. Please add funds to your account.");
+                toast.error("Insufficient funds to request this service. Please add funds to your account.");
                 setLoading(false);
                 return;
             }
 
             const filesArray = Array.from(applicationFileUrls || []);
-            const formData = new FormData();
-
-            filesArray.forEach((file: any) => {
-                formData.append("files", file);
-            });
-
             const urls = await uploadFile(filesArray);
 
             const requestDatas = {
@@ -230,35 +207,34 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 requestDate: new Date(),
                 status: "Paid",
                 applicantId: user?.id,
-                requestDetails: [{
-                    id,
-                    expectedCompletionTime,
-                    applicationNotes,
-                    scholarshipType,
-                    applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
-                    serviceId: serviceData?.id,
-
-                }
-                ]
+                requestDetails: [
+                    {
+                        id,
+                        expectedCompletionTime,
+                        applicationNotes,
+                        scholarshipType,
+                        applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
+                        serviceId: serviceData?.id,
+                    },
+                ],
             };
 
             const transferRequest = {
                 senderId: Number(user.id),
                 receiverId: serviceData.providerId,
-                amount: serviceData.price
+                amount: serviceData.price,
             };
-
+            setLoading(false);
+            toast.success("Payment successful!");
             await transferMoney(transferRequest);
-            alert("Payment successful!");
-
+            toast.success("Request created successfully!");
             await createRequest(requestDatas);
-            alert("Request created successfully!");
-            alert("Request has been successfully confirmed and paid!");
             await fetchService();
             closeDialog();
             await NotifyProviderNewRequest(user.id, Number(serviceData?.id));
         } catch (error) {
             setError((error as Error).message);
+            toast.error("Failed to create request.");
         } finally {
             setLoading(false);
         }
@@ -273,8 +249,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             {isDialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-semibold mb-4">Create Request</h2>
+                        <div className="mb-5 flex justify-between items-center">
+                            <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
+                                <IoIosPaper className="text-3xl text-blue-500" />
+                                <span>Create Request</span>
+                            </DialogTitle>
                             <span
                                 className="text-xl cursor-pointer"
                                 onClick={closeDialog}
@@ -300,12 +279,24 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700">Scholarship Type</label>
-                                <input
-                                    type="text"
-                                    onChange={(e) => setScholarshipType(e.target.value)}
-                                    className="w-full border rounded p-2"
-                                />
+                                <FormControl fullWidth variant="outlined">
+                                    <InputLabel id="scholarship-type-label">Select Scholarship (Optional)</InputLabel>
+                                    <Select
+                                        labelId="scholarship-type-label"
+                                        value={scholarshipType}
+                                        onChange={(e) => setScholarshipType(e.target.value)}
+                                        label="Select Scholarship"
+                                    >
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        {scholarships.map((scholarship) => (
+                                            <MenuItem key={scholarship.id} value={scholarship.id}>
+                                                {scholarship.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Application File(s)</label>
@@ -390,33 +381,51 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                         </span>
                                     </div>
 
-                                    <table className="min-w-full bg-white border border-gray-300">
-                                        <thead>
-                                            <tr className="bg-gray-100">
-                                                <th className="p-2 text-left">Applicant Name</th>
-                                                <th className="p-2 text-left">Rating</th>
-                                                <th className="p-2 text-left">Comment</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {feedbacks.map((feedback, index) => (
-                                                <tr key={index} className="border-t">
-                                                    <td className="p-2">********</td>
-                                                    <td className="p-2 flex items-center">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <FaStar
-                                                                key={i}
-                                                                color={i < feedback.rating ? "#FFB800" : "#ddd"}
-                                                                size={16}
-                                                            />
-                                                        ))}
-                                                    </td>
-                                                    <td className="p-2">{feedback.content}</td>
+                                    {feedbacks.length > 0 ? (
+                                        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                                            <thead>
+                                                <tr className="bg-gray-100 text-gray-700">
+                                                    <th className="p-4 text-left font-semibold">Applicant Name</th>
+                                                    <th className="p-4 text-left font-semibold">Rating</th>
+                                                    <th className="p-4 text-left font-semibold">Comment</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {feedbacks.map((feedback, index) => (
+                                                    <tr key={index} className="border-t hover:bg-gray-50">
+                                                        <td className="p-4">{feedback.name || "********"}</td>
+                                                        <td className="p-4 flex items-center">
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <FaStar
+                                                                    key={i}
+                                                                    color={i < feedback.rating ? "#FFB800" : "#ddd"}
+                                                                    size={18}
+                                                                />
+                                                            ))}
+                                                        </td>
+                                                        <td className="p-4">{feedback.content}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    ) : (
+                                        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                                            <thead>
+                                                <tr className="bg-gray-100 text-gray-700">
+                                                    <th className="p-4 text-left font-semibold">Applicant Name</th>
+                                                    <th className="p-4 text-left font-semibold">Rating</th>
+                                                    <th className="p-4 text-left font-semibold">Comment</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colSpan={3} className="p-4 text-center text-gray-600">
+                                                        No feedback available.
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    )}
                                     <div className="mt-4 text-right">
                                         <button
                                             onClick={handleCloseFeedbackDialog}
@@ -428,87 +437,119 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 </div>
                             </div>
                         )}
-
-                        <div className="text-white text-center flex h-[50px] mt-[26px]">
-                            <div className="flex justify-between w-full gap-10">
-                                {showButtons && <>
-                                    {!isFunder && !isProvider ? (
-                                        requestStatus === "Finished" ? (
-                                            <>
+                        <div className="text-center flex h-[50px] mt-[26px]">
+                            <div className="flex justify-between w-full gap-4">
+                                {showButtons && (
+                                    <>
+                                        {!isFunder && !isProvider ? (
+                                            requestStatus === "Finished" ? (
                                                 <button
                                                     onClick={handleRequestNow}
-                                                    className="text-xl w-full bg-blue-700 rounded-[25px] mt-2"
+                                                    className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
                                                 >
-                                                    Request Now
+                                                    <FaRedo className="mr-2" /> Request Again
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={handleRequestNow}
+                                                    className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                                                >
+                                                    <FaPlus className="mr-2" /> Request Now
+                                                </button>
+                                            )
+                                        ) : !isFunder && isProvider ? (
+                                            <>
+                                                <button
+                                                    onClick={() => openEditDialog()}
+                                                    className="flex items-center justify-center w-full bg-yellow-500 hover:bg-yellow-400 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                                                    disabled={!canEdit}
+                                                >
+                                                    <FaEdit className="mr-2" /> Edit
+                                                </button>
+                                                <button
+                                                    onClick={handleOpenApplicantDialog}
+                                                    className="flex items-center justify-center w-full bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                                                >
+                                                    <FaEye className="mr-2" /> View Request
+                                                </button>
+                                                <button
+                                                    onClick={handleDelete}
+                                                    className="flex items-center justify-center w-full bg-red-600 hover:bg-red-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                                                >
+                                                    <FaTrash className="mr-2" /> Delete
                                                 </button>
                                             </>
                                         ) : (
-                                            <button
-                                                onClick={handleRequestNow}
-                                                className="text-xl w-full bg-blue-700 rounded-[25px]"
-                                            >
-                                                Request Now
-                                            </button>
-                                        )
-                                    ) : (!isFunder && isProvider ? (
-                                        <>
-                                            <button onClick={() => openEditDialog()} className="text-xl w-full bg-blue-700 rounded-[25px]" disabled={!canEdit}>
-                                                Edit
-                                            </button>
-                                            <button onClick={handleOpenApplicantDialog} className="text-xl w-full bg-blue-700 rounded-[25px]">
-                                                View Request
-                                            </button>
-                                            <button onClick={handleDelete} className="text-xl w-full bg-red-900 rounded-[25px]">
-                                                Delete
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <div></div>
-                                    ))}</>}
+                                            <div></div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
 
-            <section className="bg-white py-10">
+            <section className="bg-gradient-to-r from-gray-50 to-gray-100 py-10">
                 <div className="container mx-auto px-6">
-                    <h2 className="text-3xl font-semibold mb-6">Service Details</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <p className="font-semibold">Service Type:</p>
-                            <p>{serviceData.type}</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Price:</p>
-                            <p>${serviceData.price}</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Duration:</p>
-                            <p>{new Date(serviceData.duration).toLocaleDateString()}</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Status:</p>
-                            <p>{serviceData.status}</p>
-                        </div>
-                        <div>
-                            <Link
-                                to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
-                                className="text-blue-600 hover:underline"
-                            >
-                                Provider Information
-                            </Link>
+                    <h2 className="text-4xl font-bold text-blue-600 mb-8 text-center font-poppins">
+                        Service Details
+                    </h2>
+
+                    <div className="flex justify-center">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-3/5 bg-white shadow-lg rounded-xl p-8">
+                            <div className="flex items-center space-x-4">
+                                <FaInfoCircle className="text-blue-500 text-xl" />
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-700">Service Type:</p>
+                                    <p className="text-gray-600">{serviceData.type}</p>
+                                </div>
+                            </div>
+                            <div className="flex ml-35 items-center space-x-4">
+                                <FaDollarSign className="text-green-500 text-xl" />
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-700">Price:</p>
+                                    <p className="text-gray-600">${serviceData.price}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                <FaClock className="text-yellow-500 text-xl" />
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-700">Duration:</p>
+                                    <p className="text-gray-600">{new Date(serviceData.duration).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <div className="hidden flex items-center space-x-4">
+                                <FaCheckCircle className="text-teal-500 text-xl" />
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-700">Status:</p>
+                                    <p className="text-gray-600">{serviceData.status}</p>
+                                </div>
+                            </div>
+                            <div className="flex ml-35 items-center space-x-4">
+                                <FaUser className="text-indigo-500 text-xl" />
+                                <div>
+                                    <Link
+                                        to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
+                                        className="text-blue-600 hover:underline text-lg font-semibold"
+                                    >
+                                        Provider Information
+                                    </Link>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                <FaCheckCircle className="text-teal-500 text-xl" />
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-700">About This Service:</p>
+                                    <p className="text-gray-600">{serviceData.description}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="bg-gray-100 py-10">
-                <div className="container mx-auto px-6">
-                    <h3 className="text-2xl font-semibold mb-4">About This Service</h3>
-                    <p>{serviceData.description}</p>
-                </div>
-            </section>
             <AccountApplicantDialog open={applicantDialogOpen}
                 onClose={() => setApplicantDialogOpen(false)}
                 applications={applicants ?? []}
@@ -516,6 +557,20 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     if (!serviceData) return;
                     await fetchApplicants(parseInt(serviceData?.id));
                 }} />
+
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+
         </div>
     );
 };

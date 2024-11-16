@@ -177,7 +177,7 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh", padding: "30px" }}>
+    <div className="bg-blue-100" style={{ display: "flex", height: "100vh", padding: "30px" }}>
       <div style={{ width: "30%", borderRight: "1px solid #ccc", padding: "20px", overflowY: "scroll" }}>
         <ul style={{ listStyleType: "none", padding: 0 }}>
           {accounts.map((account) => (
@@ -195,7 +195,7 @@ const Chat: React.FC = () => {
               }}
             >
               <img
-                src={account.avatarUrl || "https://via.placeholder.com/40"}
+                src={account.avatarUrl || "https://github.com/shadcn.png"}
                 alt={account.username}
                 style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "20px" }}
               />
