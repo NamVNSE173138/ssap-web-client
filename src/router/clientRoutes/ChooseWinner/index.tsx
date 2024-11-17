@@ -15,22 +15,27 @@ import { RootState } from "@/store/store";
 import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
 import {
+    Avatar,
   Button,
   Checkbox,
+  Divider,
   FormControl,
   Input,
   InputAdornment,
   InputLabel,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   ListSubheader,
   OutlinedInput,
   Paper,
+  Typography,
 } from "@mui/material";
 import {
+    BoxIcon,
   DraftingCompassIcon,
   Search,
   SearchIcon,
@@ -39,6 +44,9 @@ import {
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { LoginUser } from "@/services/ApiServices/authenticationService";
+import { SendNotification } from "@/services/ApiServices/notification";
+import { argv0 } from "process";
+import { updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,13 +59,17 @@ const ChooseWinner = () => {
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [availableScholarships, setAvailableScholarships] = useState(0);
+  const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
 
-  const fetchApplicants = async (scholarshipId: number) => {
+  const fetchApplicants = async (scholarshipId: number, data: any) => {
     try {
       const response = await getApplicationsByScholarship(scholarshipId);
-      //console.log(response);
       if (response.statusCode == 200) {
-        setApplicants(response.data);
+        setApplicants(response.data.filter((row: any) => row.status != "APPROVED"));
+        if(data){
+            setScholarshipWinners(response.data.filter((row: any) => row.status == "APPROVED"));
+            setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "APPROVED")).length);
+        }
       } else {
         setError("Failed to get applicants");
       }
@@ -80,6 +92,7 @@ const ChooseWinner = () => {
           applicationDocuments: [],
           applicationReviews: []
         };
+        
 
         const response = await axios.put(
           `http://localhost:5254/api/applications/${row.id}`,
@@ -95,7 +108,20 @@ const ChooseWinner = () => {
       });
 
       await Promise.all(applyPromises);
+      if(availableScholarships == 0){
+        await updateScholarshipStatus(Number(data?.id), "FINISHED");
+      }
       alert("Selected applicants have been approved!");
+      await fetchData();
+      for(let row of selectedRows){
+          await SendNotification({
+            topic: row.applicantId.toString(),
+            link: "string",
+            title: "string",
+            body: `Your application for ${data?.name} has been approved.`,
+          });
+      }
+      
     } catch (error) {
       setError("Failed to apply for selected winners.");
     }
@@ -154,9 +180,9 @@ const ChooseWinner = () => {
     setSelectedRows(selectedRowData);
     if (data)
       setAvailableScholarships(
-        data.numberOfScholarships - selectedRowData.length <= 0
+        availableScholarships - selectedRowData.length <= 0
           ? 0
-          : data.numberOfScholarships - selectedRowData.length
+          : availableScholarships - selectedRowData.length
       );
   };
 
@@ -171,8 +197,7 @@ const ChooseWinner = () => {
       )
     : [];
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
       try {
         const response = await axios.get(
           `${BASE_URL}/api/scholarship-programs/${id}`,
@@ -184,7 +209,7 @@ const ChooseWinner = () => {
         );
         if (response.data.statusCode === 200) {
           setData(response.data.data);
-          setAvailableScholarships(response.data.data.numberOfScholarships);
+          if (id) await fetchApplicants(parseInt(id), response.data.data);
         } else {
           setError("Failed to fetch data");
         }
@@ -195,8 +220,10 @@ const ChooseWinner = () => {
       }
     };
 
+  useEffect(() => {
+    
+
     fetchData();
-    if (id) fetchApplicants(parseInt(id));
   }, [id]);
 
   if (!data) return <Spinner size="large" />;
@@ -288,6 +315,43 @@ const ChooseWinner = () => {
               Choose scholarship winner
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
+            <p className="text-lg font-semibold my-5">
+              <span className="">The winners of this scholarship: </span>
+              <span className="text-sky-500">
+                {scholarshipWinners.length}
+              </span>
+
+            </p>
+            {/*JSON.stringify(scholarshipWinners)*/}
+             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+             {scholarshipWinners.map((winner) => (
+             <div key={winner.id}>
+                 <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar alt="Remy Sharp" src={winner.applicant.avatarUrl??"https://github.com/shadcn.png"} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={winner.applicant.username}
+                      secondary={
+                        <>
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            sx={{ color: 'text.primary', display: 'inline' }}
+                          >
+                          {winner.applicant.email}
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <Link target="_blank" to={`/funder/application/${winner.id}`} className="text-sky-500 underline">
+                        View Profile
+                    </Link>
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+              </div>
+             ))}
+            </List>
 
             <p className="text-lg font-semibold my-5">
               <span className="">Number of scholarships left: </span>
@@ -316,7 +380,7 @@ const ChooseWinner = () => {
                   <DataGrid
                     rows={filteredRows.map((app: any) => ({
                       id: app.id,
-                      avatarUrl: app.applicant.avatarUrl,
+                      avatarUrl: app.applicant.avatarUrl??"https://github.com/shadcn.png",
                       username: app.applicant.username,
                       major: "Software Engineering",
                       choosable:
@@ -332,10 +396,11 @@ const ChooseWinner = () => {
                     isRowSelectable={(params) => params.row.choosable}
                     //availableScholarships > 0 || selectedRows.includes((row:any) => row.id === params.id)}
                   />
-                ) : (
+                ) : (<>
                   <p className="text-center text-gray-500 mt-4 text-xl">
-                    No data
+                    No scholarship applicants yet
                   </p>
+                </>
                 )}
               </Paper>
             }

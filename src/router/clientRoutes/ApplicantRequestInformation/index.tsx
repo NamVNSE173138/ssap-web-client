@@ -104,7 +104,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
           </div>
           <div className="w-full">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={applicant.avatarUrl} />
+              <SchoolLogo imageUrl={applicant.avatarUrl??"https://github.com/shadcn.png"} />
               <div>
                 <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
                   {applicant.username}

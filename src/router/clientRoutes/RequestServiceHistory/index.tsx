@@ -9,6 +9,7 @@ import { getRequestsByApplicantId } from "@/services/ApiServices/requestService"
 import ServiceDetails from "../ServiceDetail";
 import ApplicantRequestInfo from "../ApplicantRequestInformation";
 
+
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-GB");
@@ -51,44 +52,54 @@ const RequestHistory = () => {
 
     const renderApplicants = (requests: any) => {
         return (
-            <div className="space-y-2">
-                <div className="flex justify-between items-center p-4 bg-gray-200 font-semibold text-gray-700 rounded-lg">
-                    <p className="w-1/3">Service Name</p>
-                    <p className="w-1/3 text-center">Request Date</p>
-                    <p className="w-1/3 text-right">Action</p>
-                </div>
-
-                {requests.map((request: any) => (
-                    <div
-                        key={request.id}
-                        className="flex justify-between items-center p-4 border-b hover:bg-gray-100 rounded-lg transition"
-                    >
-                        <Link
-                        to={`/services-history/services/${request.requestDetails[0].service.id}`}
-                        className="w-1/3 text-blue-600 underline hover:text-blue-800"
-                    >
-                        {request.requestDetails[0].service.name}
-                    </Link>
-                        <p className="w-1/3 text-center">{formatDate(request.requestDate)}</p>
-                        <Link
-                            to={`/services-history/request/${request.id}`}
-                            className="w-1/3 text-right text-blue-600 underline hover:text-blue-800"
-                        >
-                            View Request
-                        </Link>
+            <div className="flex justify-center">
+                <div className="space-y-4 w-4/5">
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-200 to-blue-300 font-bold text-gray-800 rounded-lg shadow-md">
+                        <p className="w-1/12 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>No.</p>
+                        <p className="w-4/12 ml-5" style={{ fontFamily: "'Roboto', sans-serif" }}>Service Name</p>
+                        <p className="w-4/12 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>Request Date</p>
+                        <p className="w-4/12 text-right" style={{ fontFamily: "'Roboto', sans-serif" }}>Action</p>
                     </div>
-                ))}
+
+                    {requests.map((request: any, index: any) => (
+                        <div
+                            key={request.id}
+                            className="flex justify-between items-center p-4 bg-gray-50 border-b hover:bg-gray-200 rounded-lg transition duration-200 ease-in-out"
+                        >
+                            <p className="w-1/12 text-center">{index + 1}</p>
+                            <Link
+                                to={`/services-history/services/${request.requestDetails[0].service.id}`}
+                                className="w-4/12 ml-5 text-blue-700 font-semibold underline hover:text-blue-900 transition duration-150"
+                            >
+                                {request.requestDetails[0].service.name}
+                            </Link>
+                            <p className="w-4/12 text-center">{formatDate(request.requestDate)}</p>
+                            <Link
+                                to={`/services-history/request/${request.id}`}
+                                className="w-4/12 text-right text-blue-700 font-semibold underline hover:text-blue-900 transition duration-150"
+                            >
+                                View Request
+                            </Link>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     };
-    if(openServiceDetail.open == "ServiceDetail"){return <ServiceDetails showButtons={false} serviceId={{id: openServiceDetail.id}}/>}
-    if(openServiceDetail.open == "RequestDetail"){return <ApplicantRequestInfo showButtons={true} requestId={{id: openServiceDetail.id}}/>}
+
+    if (openServiceDetail.open === "ServiceDetail") {
+        return <ServiceDetails showButtons={false} serviceId={{ id: openServiceDetail.id }} />;
+    }
+
+    if (openServiceDetail.open === "RequestDetail") {
+        return <ApplicantRequestInfo showButtons={true} requestId={{ id: openServiceDetail.id }} />;
+    }
 
     return (
         <div>
             <div className="relative">
                 <ScholarshipProgramBackground />
-                <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[70px] z-10">
+                <div className="absolute top-0 bg-black/30 left-0 w-full h-full flex flex-col justify-between items-start p-16 z-10">
                     <Breadcrumb>
                         <BreadcrumbList className="text-white">
                             <BreadcrumbItem>
@@ -107,17 +118,44 @@ const RequestHistory = () => {
                 </div>
             </div>
 
-            <div className="p-10">
+            <div className="p-10 bg-gray-50 rounded-lg shadow-lg">
                 <Tabs
                     value={activeTab}
                     onChange={(e, newValue) => setActiveTab(newValue)}
                     centered
                     indicatorColor="primary"
-                    textColor="primary"
-                    sx={{ borderBottom: 1, borderColor: "divider" }}
+                    textColor="inherit"
+                    sx={{
+                        borderBottom: 1,
+                        borderColor: "divider",
+                        "& .MuiTab-root": {
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 'bold',
+                            borderRadius: '10px',
+                            margin: '0 5px',
+                        },
+                        "& .Mui-selected": {
+                            backgroundColor: 'rgba(255, 215, 0, 0.5)',
+                            color: 'black',
+                        },
+                        "& .MuiTab-root:not(.Mui-selected):hover": {
+                            backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                        },
+                    }}
                 >
-                    <Tab label="Paid" />
-                    <Tab label="Finished" />
+                    <Tab label="Paid" sx={{ color: 'blue' }} />
+                    <Tab
+                        label="Finished"
+                        sx={{
+                            color: 'green',
+                            "&.Mui-selected": {
+                                backgroundColor: 'rgba(76, 175, 80, 0.5)',
+                            },
+                            "&:hover": {
+                                backgroundColor: 'rgba(76, 175, 80, 0.3)',
+                            },
+                        }}
+                    />
                 </Tabs>
 
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
@@ -127,6 +165,6 @@ const RequestHistory = () => {
             </div>
         </div>
     );
-};
+}
 
 export default RequestHistory;

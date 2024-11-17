@@ -27,7 +27,9 @@ import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
-import { getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
+import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
+import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,8 +53,9 @@ const ScholarshipProgramDetail = () => {
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const [cancelLoading, setCancelLoading] = useState<boolean>(false);
+
+  const fetchData = async () => {
       try {
         const response = await axios.get(
           `${BASE_URL}/api/scholarship-programs/${id}`,
@@ -77,6 +80,9 @@ const ScholarshipProgramDetail = () => {
         setLoading(false);
       }
     };
+
+  useEffect(() => {
+    
 
     fetchData();
   }, [id]);
@@ -153,6 +159,25 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
+  const cancelApplication = async () => {
+    try {
+      if(!existingApplication[0]) return;
+      setCancelLoading(true);
+      const response = await deleteApplication(existingApplication[0].id)
+      if (response) {
+          await fetchData();
+      } else {
+        setError("Failed to delete scholarship")
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+      setCancelLoading(false);
+    }
+  };
+
+
   const deleteScholarship = async () => {
     try {
       const response = await axios.delete(`${BASE_URL}/api/scholarship-programs/${id}`)
@@ -212,10 +237,24 @@ const ScholarshipProgramDetail = () => {
                 </p>
               </div>
             </div>
+            {data.status == "FINISHED" &&
+                <div className="text-xl font-semibold mr-3">This scholarship has finished</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == "PENDING" &&
+                data.status != "FINISHED" &&
+                <div className="text-xl font-semibold mr-3">Your application is being reviewed</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status != "APPROVED" &&
+                <div className="text-xl font-semibold mr-3">Your application to this scholarship have not been approved</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == "APPROVED" &&
+                <div className="text-xl font-semibold mr-3">You have won this scholarship</div>
+            }
+
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
               {isApplicant == "APPLICANT" || !user ? (
                 <>
-                  {existingApplication && existingApplication.length == 0 &&
+                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && 
                     (<button
                       onClick={() =>
                         navigate(`/scholarship-program/${id}/application`)
@@ -226,13 +265,43 @@ const ScholarshipProgramDetail = () => {
                     </button>)}
                   {existingApplication && existingApplication.length > 0 &&
                     (<>
-                      <div className="text-xl font-semibold">Your application is being reviewed</div>
                       <button
                         onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
-                        className=" text-xl w-full bg-green-700 rounded-[25px]"
+                        className=" text-xl w-full bg-green-700 rounded-[25px] mr-3"
                       >
                         View applications{" "}
                       </button>
+                      {existingApplication[0].status != "APPROVED" && <AlertDialog>
+                          <AlertDialogTrigger className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" disabled={cancelLoading}>
+                          {cancelLoading ? (<div
+                              className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                              aria-hidden="true"
+                            ></div>) :
+                            (<span>Cancel applications{" "}</span>)}
+                            
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    You wanna cancel your application?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Cancel will delete your application.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>
+                                   No 
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={cancelApplication}
+                                >
+                                    Yes
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>}
+
                     </>)}
                 </>
               ) : (authorized != "Unauthorized" && (
@@ -446,7 +515,7 @@ const ScholarshipProgramDetail = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     {data.majorSkills.map((majorSkill: any) => (
-                      <Accordion>
+                      <Accordion key={majorSkill.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel3-content"
@@ -468,7 +537,7 @@ const ScholarshipProgramDetail = () => {
                             </p>
                             <div>
                               {majorSkill.skills.map((skill: any) => (
-                                <Accordion>
+                                <Accordion key={skill.id}>
                                   <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
                                     aria-controls="panel3-content"
@@ -507,7 +576,7 @@ const ScholarshipProgramDetail = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     {data.universities.map((university: any) => (
-                      <Accordion>
+                      <Accordion key={university.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel3-content"
@@ -540,7 +609,7 @@ const ScholarshipProgramDetail = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     {data.certificates.map((certificate: any) => (
-                      <Accordion>
+                      <Accordion key={certificate.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel3-content"

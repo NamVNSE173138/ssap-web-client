@@ -10,12 +10,28 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 interface AddServiceModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   fetchServices: () => void
 }
+
+const serviceTypes = [
+  { value: "CV_REVIEW", label: "CV Review" },
+  { value: "TRANSLATION", label: "Translation" },
+  { value: "ESSAY_WRITING", label: "Essay Writing Assistance" },
+  { value: "APPLICATION_REVIEW", label: "Application Review" },
+  { value: "INTERVIEW_COACHING", label: "Interview Coaching" },
+  { value: "RECOMMENDATION_LETTER", label: "Recommendation Letter Writing" },
+  { value: "SCHOLARSHIP_SEARCH", label: "Scholarship Search Assistance" },
+  { value: "DOCUMENT_PROOFREADING", label: "Document Proofreading" },
+  { value: "RESEARCH_ASSISTANCE", label: "Research Assistance" },
+  { value: "LANGUAGE_SUPPORT", label: "Language Support for Non-Native Speakers" },
+  { value: "FINANCIAL_AID_GUIDANCE", label: "Financial Aid Guidance" },
+  { value: "PERSONALIZED_STRATEGY", label: "Personalized Scholarship Strategy" },
+];
 
 const serviceFormSchema = z.object({
   name: z.string().min(1, "Please enter the service name"),
@@ -88,10 +104,31 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                 {form.formState.errors.description && <p>{form.formState.errors.description.message}</p>}
               </div>
               <div>
-                <Label>Type</Label>
-                <Input {...form.register("type")} placeholder="Service Type" />
-                {form.formState.errors.type && <p>{form.formState.errors.type.message}</p>}
+                <Label>Service Type</Label>
+                <FormControl fullWidth variant="outlined" className="mb-4">
+                  <InputLabel id="service-type-label"></InputLabel>
+                  <Select
+                    labelId="service-type-label"
+                    {...form.register("type")}
+                    label="Select Service Type"
+                    defaultValue=""
+                    error={!!form.formState.errors.type}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    {serviceTypes.map((service) => (
+                      <MenuItem key={service.value} value={service.value}>
+                        {service.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {form.formState.errors.type && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.type.message}</p>
+                )}
               </div>
+
               <div>
                 <Label>Price</Label>
                 <Input {...form.register("price")} placeholder="Price" type="number" />
@@ -99,7 +136,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
               </div>
               <div className="hidden">
                 <Label>Status</Label>
-                <Input {...form.register("status")} value={"Active"} disabled />
+                <Input hidden {...form.register("status")} value={"Active"} disabled />
                 {form.formState.errors.status && <p>{form.formState.errors.status.message}</p>}
               </div>
               <div>
@@ -120,7 +157,6 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
         </div>
       )}
     </AnimatePresence>
-
   );
 };
 
