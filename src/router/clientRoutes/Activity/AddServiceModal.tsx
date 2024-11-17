@@ -97,7 +97,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                 <Input {...form.register("price")} placeholder="Price" type="number" />
                 {form.formState.errors.price && <p>{form.formState.errors.price.message}</p>}
               </div>
-              <div>
+              <div className="hidden">
                 <Label>Status</Label>
                 <Input {...form.register("status")} value={"Active"} disabled />
                 {form.formState.errors.status && <p>{form.formState.errors.status.message}</p>}
@@ -107,7 +107,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                 <Input {...form.register("duration")} placeholder="Duration" type="date" />
                 {form.formState.errors.duration && <p>{form.formState.errors.duration.message}</p>}
               </div>
-              <div>
+              <div className="hidden">
                 <Label>Provider ID</Label>
                 <Input {...form.register("providerId")} placeholder="Provider ID" disabled />
                 {form.formState.errors.providerId && <p>{form.formState.errors.providerId.message}</p>}
