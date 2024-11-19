@@ -2,7 +2,7 @@ import { formatDate } from "@/lib/date-formatter";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, IconButton, styled } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
+import { getAllRequests, getRequestById, updateFinishRequest, updateRequest } from "@/services/ApiServices/requestService";
 import { useEffect, useState } from "react";
 import { addFeedback, updateFeedback } from "@/services/ApiServices/feedbackService";
 import { Star } from "lucide-react";
@@ -63,41 +63,20 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
     const handleFinish = async () => {
         try {
             if (!request.id) {
-                return null;
+                console.error("Request ID is missing.");
+                return;
             }
-            console.log(request.id)
-            const existingRequestResponse = await getRequestById(parseInt(request.id));
-            const requestDetail = existingRequestResponse.data.requestDetails[0];
-
-            if (requestDetail) {
-                const updatedRequest = {
-                    description: existingRequestResponse.data.description,
-                    requestDate: existingRequestResponse.data.requestDate,
-                    status: "Finished",
-                    applicantId: existingRequestResponse.data.applicantId,
-                    requestDetails: [
-                        {
-                            id: requestDetail.id,
-                            expectedCompletionTime: requestDetail.expectedCompletionTime,
-                            applicationNotes: requestDetail.applicationNotes,
-                            scholarshipType: requestDetail.scholarshipType,
-                            applicationFileUrl: requestDetail.applicationFileUrl,
-                            serviceId: requestDetail.serviceId,
-                        }
-                    ]
-                };
-
-                await updateRequest(existingRequestResponse.data.id, updatedRequest);
-                await fetchRequest();
-
-            } else {
-                console.error(`Request details for id:${request.id} not found`);
-            }
+    
+            toast.success("Request status updated to 'Finished' successfully!");    
+            const response = await updateFinishRequest(request.id);
+            await fetchRequest();
+            
         } catch (error) {
-            console.error("Failed to finish request", error);
+            console.error("Failed to update request status", error);
+            toast.error("Failed to update request status. Please try again.");
         }
     };
-
+    
     useEffect(() => {
         const fetchServiceData = async () => {
             try {
@@ -172,14 +151,13 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
     };
 
     const isFinished = request.status === "Finished";
-    const isPaid = request.status === "Paid";
-    console.log(scholarships)
 
     const handleChatClick = () => {
-        const chatUserId = user.role === "APPLICANT" ? request.requestDetails[0].service.providerId : request.applicantId;
+        const chatUserId = user.role === "Applicant" ? request.requestDetails[0].service.providerId : request.applicantId;
         console.log(request)
         navigate(`/chat?id=${chatUserId}`);
     };
+    console.log(requestDetails)
 
     return (
         <Box>
@@ -187,17 +165,14 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 <Table sx={{ minWidth: 1000 }} aria-label="request details table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>
+                            <TableCell align="right">
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Id</Typography>
                             </TableCell>
-                            <TableCell>
+                            <TableCell align="right">
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Applicant Description</Typography>
                             </TableCell>
-                            <TableCell>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Request File</Typography>
-                            </TableCell>
                             <TableCell align="right">
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Scholarship Type</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Request File</Typography>
                             </TableCell>
                             <TableCell align="right" sx={{ color: '#FF6347' }}>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Provider Updated File</Typography>
@@ -205,26 +180,23 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                             <TableCell align="right" sx={{ color: '#FF6347' }}>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Provider Notes</Typography>
                             </TableCell>
-                            <TableCell align="right">
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Expected Completion Time</Typography>
-                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {requestDetails.map((detail: any) => (
                             <TableRow key={detail.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { backgroundColor: '#f9f9f9' } }}>
                                 <TableCell align="right">
-                                    <Typography variant="body1" sx={{ color: '#333' }}>{detail.id}</Typography>
+                                    <Typography variant="body1" sx={{ color: '#333' }}>{detail.requestId}</Typography>
                                 </TableCell>
                                 <TableCell align="right">
                                     <Typography variant="body1" sx={{ color: '#333' }}>{request.description || "No description provided"}</Typography>
                                 </TableCell>
                                 <TableCell align="right">
-                                    {detail.applicationFileUrl ? (
-                                        detail.applicationFileUrl.split(", ").map((fileUrl: any, index: any) => {
-                                            if (fileUrl.startsWith("https://")) {
+                                    {detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Applicant").length > 0 ? (
+                                        detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Applicant").map((fileUrl: any, index: any) => {
+                                            if (fileUrl.fileUrl.startsWith("https://")) {
                                                 return (
-                                                    <StyledLink target="_blank" to={fileUrl}>
+                                                    <StyledLink className="block" target="_blank" to={fileUrl.fileUrl}>
                                                         File {index + 1}
                                                     </StyledLink>
                                                 );
@@ -235,25 +207,13 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                         <Typography variant="body2" color="textSecondary">No file uploaded</Typography>
                                     )}
                                 </TableCell>
-
                                 <TableCell align="right">
-                                    <Typography variant="body1" sx={{ color: '#333' }}>
-                                        {detail.scholarshipType
-                                            ? (
-                                                <Link to={`/scholarship-program/${detail.scholarshipType}`} style={{ color: '#4A90E2', textDecoration: 'underline' }}>
-                                                    {scholarships.find((scholarship) => scholarship.id == detail.scholarshipType)?.name || "Unknown"}
-                                                </Link>
-                                            )
-                                            : "No scholarship"}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="right">
-                                    {detail.applicationNotes ? (
-                                        detail.applicationNotes.split(", ").map((note: any, index: any) => {
-                                            if (note.startsWith("https://")) {
+                                    {detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Provider").length > 0 ? (
+                                        detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Provider").map((fileUrl: any, index: any) => {
+                                            if (fileUrl.fileUrl.startsWith("https://")) {
                                                 return (
                                                     <div key={index}>
-                                                        <StyledLink target="_blank" to={note}>
+                                                        <StyledLink target="_blank" to={fileUrl.fileUrl}>
                                                             File {index + 1}
                                                         </StyledLink>
                                                     </div>
@@ -265,15 +225,8 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                         <Typography variant="body2" color="textSecondary">No file uploaded</Typography>
                                     )}
                                 </TableCell>
-                                <TableCell align="right" className="max-w-[500px]" component="th" scope="row">
-                                    <Typography variant="body2" sx={{ color: '#333' }}>
-                                        {detail.applicationNotes && detail.applicationNotes.length > 0
-                                            ? detail.applicationNotes.split(", ").pop()
-                                            : "No notes uploaded"}
-                                    </Typography>
-                                </TableCell>
                                 <TableCell align="right">
-                                    <Typography variant="body2" color="textSecondary">{formatDate(detail.expectedCompletionTime)}</Typography>
+                                    <Typography variant="body1" sx={{ color: '#333' }}>{detail.comment || "No comment"}</Typography>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -281,7 +234,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 </Table>
             </TableContainer>
 
-            {user.role === "APPLICANT" && (
+            {user.role === "Applicant" && (
                 <>
                     {showButtons && (
                         <Box display="flex" justifyContent="flex-end" mt={2}>

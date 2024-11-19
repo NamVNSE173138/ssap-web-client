@@ -51,10 +51,10 @@ const Chat: React.FC = () => {
     const accountsWithCount = response.map((account: Account) => ({ ...account, unreadCount: 0 }));
     console.log(accountsWithCount)
     const filteredAccounts = accountsWithCount.filter((account: any) => {
-      if (role === "PROVIDER") {
-        return account.roleName === "APPLICANT";
-      } else if (role === "APPLICANT") {
-        return account.roleName === "PROVIDER";
+      if (role === "Provider") {
+        return account.roleName === "Applicant";
+      } else if (role === "Applicant") {
+        return account.roleName === "Provider";
       }
       return false;
     });
@@ -75,11 +75,11 @@ const Chat: React.FC = () => {
 
     setAccounts(updatedAccounts);
 
-    if (role === "APPLICANT") {
+    if (role === "Applicant") {
       const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
       const requestData = requestsResponse.data;
-      const hasPaidRequest = requestData.some((request: any) => request.status === "Paid");
-      setIsChatEnabled(hasPaidRequest);
+      const hasPendingRequest = requestData.some((request: any) => request.status === "Pending");
+      setIsChatEnabled(hasPendingRequest);
     }else{
       setIsChatEnabled(true);
     }
@@ -163,12 +163,12 @@ const Chat: React.FC = () => {
     navigate(`/chat?id=${chatUserId}`);
     setSelectedUser(account);
 
-    if (user?.role === "APPLICANT") {
+    if (user?.role === "Applicant") {
       const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
       const requestData = requestsResponse.data;
       console.log(requestData)
-      const hasPaidRequest = requestData.some((request: any) => request.status === "Paid" && request.requestDetails[0].service.providerId === account.id);
-      setIsChatEnabled(hasPaidRequest);
+      const hasPendingRequest = requestData.some((request: any) => request.status === "Pending" && request.service.providerId === account.id);
+      setIsChatEnabled(hasPendingRequest);
     }
   };
 
@@ -260,7 +260,7 @@ const Chat: React.FC = () => {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={isChatEnabled ? "Type your message..." : "You have no more requests's status 'Paid' so you cannot chat with the Provider, thank you!."}
+              placeholder={isChatEnabled ? "Type your message..." : "You have no more requests's status 'Pending' so you cannot chat with the Provider, thank you!."}
               disabled={!isChatEnabled}
               style={{ flex: 1, padding: "10px", borderRadius: "10px", border: "1px solid #ccc", marginRight: "10px" }}
             />
