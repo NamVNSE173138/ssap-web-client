@@ -111,7 +111,7 @@ const Activity = () => {
       <div className="col-span-10 gap-1 p-5">
         <div className="relative w-full flex items-center justify-between p-5">
           <div className="flex items-center"></div>
-          {role === "FUNDER" && (
+          {role === "FUNDER" || "Funder" && (
             <Link to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
               // onClick={() => setIsScholarshipModalOpen(true)}
               className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
