@@ -41,7 +41,6 @@ const serviceFormSchema = z.object({
     message: "Price must be a number",
   }),
   status: z.string().default("Active"),
-  duration: z.string(),
   providerId: z.number()
 });
 
@@ -130,7 +129,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
               </div>
 
               <div>
-                <Label>Price</Label>
+                <Label>Price($)</Label>
                 <Input {...form.register("price")} placeholder="Price" type="number" />
                 {form.formState.errors.price && <p>{form.formState.errors.price.message}</p>}
               </div>
@@ -138,11 +137,6 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                 <Label>Status</Label>
                 <Input hidden {...form.register("status")} value={"Active"} disabled />
                 {form.formState.errors.status && <p>{form.formState.errors.status.message}</p>}
-              </div>
-              <div>
-                <Label>Duration</Label>
-                <Input {...form.register("duration")} placeholder="Duration" type="date" />
-                {form.formState.errors.duration && <p>{form.formState.errors.duration.message}</p>}
               </div>
               <div className="hidden">
                 <Label>Provider ID</Label>
