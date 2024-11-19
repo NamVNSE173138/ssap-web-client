@@ -20,7 +20,7 @@ import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
 import { toast, ToastContainer } from "react-toastify";
 import { FaInfoCircle, FaDollarSign, FaClock, FaCheckCircle, FaUser } from "react-icons/fa";
-import { DialogTitle, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Dialog, DialogTitle, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { IoIosPaper } from "react-icons/io";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
@@ -53,8 +53,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const navigate = useNavigate();
     const user = useSelector((state: any) => state.token.user);
-    const isProvider = user?.role === "PROVIDER";
-    const isFunder = user?.role === "FUNDER";
+    const isProvider = user?.role === "Provider";
+    const isFunder = user?.role === "Funder";
     const [canEdit, setCanEdit] = useState<boolean>(true);
     const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
     const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
@@ -66,6 +66,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [amount, setAmount] = useState<number>(serviceData?.price || 0);
     const [isConfirmationDialogOpen, setConfirmationDialogOpen] = useState<boolean>(false);
     const [requestData, setRequestData] = useState<any>(null);
+    const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
 
     const fetchService = async () => {
         try {
@@ -171,8 +172,39 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         }
     };
 
-    const handleRequestNow = () => {
-        setDialogOpen(true);
+    const handleRequestNow = async () => {
+        if (!serviceData) return;
+        try {
+            setLoading(true);
+            const walletResponse = await getAccountWallet(user?.id);
+            const userBalance = walletResponse.data.balance;
+            if (userBalance < serviceData?.price) {
+                toast.error("Insufficient funds to request this service. Please add funds to your account.");
+                setLoading(false);
+                return;
+            }
+            setDialogOpen(true);
+
+        } catch (error: any) {
+            if (error.response?.data?.statusCode === 400) {
+                setIsWalletDialogOpen(true);
+            } else {
+                toast.error("Failed to check wallet information.");
+                console.error("Wallet check error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const handleNavigateToWallet = () => {
+        navigate(RouteNames.WALLET);
+        setIsWalletDialogOpen(false);
+    };
+
+    const handleCloseWalletDialog = () => {
+        setIsWalletDialogOpen(false);
     };
 
     const closeDialog = () => {
@@ -199,38 +231,34 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 return;
             }
 
-            const filesArray = Array.from(applicationFileUrls || []);
-            const urls = await uploadFile(filesArray);
+            let fileUrls: string[] = [];
+            if (applicationFileUrls && applicationFileUrls.length > 0) {
+                const filesArray = Array.from(applicationFileUrls);
+                const uploadedFiles = await uploadFile(filesArray);
+                fileUrls = uploadedFiles.urls;
+            }
 
             const requestDatas = {
                 description,
-                requestDate: new Date(),
-                status: "Paid",
                 applicantId: user?.id,
-                requestDetails: [
-                    {
-                        id,
-                        expectedCompletionTime,
-                        applicationNotes,
-                        scholarshipType,
-                        applicationFileUrl: filesArray.length > 0 ? urls.urls.join(", ") : null,
-                        serviceId: serviceData?.id,
-                    },
-                ],
+                serviceIds: [serviceData?.id],
+                requestFileUrls: fileUrls,
             };
 
             const transferRequest = {
                 senderId: Number(user.id),
                 receiverId: serviceData.providerId,
                 amount: serviceData.price,
+                paymentMethod: "Pay by wallet",
             };
             setLoading(false);
             toast.success("Payment successful!");
             await transferMoney(transferRequest);
+            closeDialog();
             toast.success("Request created successfully!");
             await createRequest(requestDatas);
             await fetchService();
-            closeDialog();
+            
             await NotifyProviderNewRequest(user.id, Number(serviceData?.id));
         } catch (error) {
             setError((error as Error).message);
@@ -263,14 +291,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
-                                <label className="block text-gray-700">Expected Completion Time</label>
-                                <input
-                                    type="date"
-                                    onChange={(e) => setExpectedCompletionTime(new Date(e.target.value))}
-                                    className="w-full border rounded p-2"
-                                />
-                            </div>
-                            <div className="mb-4">
                                 <label className="block text-gray-700">Description</label>
                                 <input
                                     type="text"
@@ -278,7 +298,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     className="w-full border rounded p-2"
                                 />
                             </div>
-                            <div className="mb-4">
+                            {/* <div className="mb-4">
                                 <FormControl fullWidth variant="outlined">
                                     <InputLabel id="scholarship-type-label">Select Scholarship (Optional)</InputLabel>
                                     <Select
@@ -297,16 +317,22 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                         ))}
                                     </Select>
                                 </FormControl>
-                            </div>
+                            </div> */}
                             <div className="mb-4">
-                                <label className="block text-gray-700">Application File(s)</label>
+                                <label className="block text-gray-700">Submit File(s)</label>
                                 <input
                                     type="file"
                                     multiple
-                                    onChange={(e) => setApplicationFileUrls(e.target.files)}
+                                    onChange={(e) => {
+                                        const files = e.target.files;
+                                        if (files) {
+                                            setApplicationFileUrls(Array.from(files));
+                                        }
+                                    }}
                                     className="w-full border rounded p-2"
                                 />
                             </div>
+
                             <div className="flex justify-end">
                                 <button
                                     type="button"
@@ -571,6 +597,23 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 theme="light"
             />
 
+            {/* Wallet Dialog */}
+            <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
+                <div className="p-6">
+                    <h3 className="text-2xl font-semibold">You don't have a wallet yet!</h3>
+                    <p className="my-4 text-lg text-gray-600">
+                        You need to create a wallet to add services. Do you want to go to the Wallet page?
+                    </p>
+                    <div className="flex justify-end gap-4">
+                        <button onClick={handleCloseWalletDialog} className="bg-gray-300 px-5 py-2 rounded-full hover:bg-gray-400 transition-all">
+                            Cancel
+                        </button>
+                        <button onClick={handleNavigateToWallet} className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 transition-all">
+                            Yes
+                        </button>
+                    </div>
+                </div>
+            </Dialog>
         </div>
     );
 };

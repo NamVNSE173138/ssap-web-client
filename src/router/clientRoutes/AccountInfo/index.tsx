@@ -252,14 +252,14 @@ const AccountInfo = () => {
             <div className="flex justify-center ">
               <button
                 type="submit"
-                className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className="lg:mb-7 mb-5 bg-[#1eb2a6] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
               >
                 Save
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className=" ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className=" ml-[10px] lg:mb-7 mb-5 text-black bg-[#fff] lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
               >
                 Cancel
               </button>
@@ -359,7 +359,7 @@ const AccountInfo = () => {
               <button
                 type="button"
                 onClick={handleEdit}
-                className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className="lg:mb-7 mb-5 bg-[#1eb2a6] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
               >
                 Edit Profile
               </button>

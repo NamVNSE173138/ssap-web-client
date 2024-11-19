@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, DatePicker, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
-import { addOrUpdateApplicantProfile, getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
-import { GoPencil } from "react-icons/go";
+import { getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Sidebar } from "@/components/AccountInfo";
@@ -330,7 +329,7 @@ const Information = () => {
               {profileData.constructor == Array && <button
                 type="button"
                 onClick={handleAdd}
-                className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className="lg:mb-7 mb-5 bg-[#1eb2a6] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
               >
                 Add Profile
               </button>}

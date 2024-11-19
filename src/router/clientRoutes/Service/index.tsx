@@ -45,7 +45,7 @@ const Service = () => {
       });
       if (response.data.statusCode === 200) {
         const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
-        if (user?.role === "PROVIDER") {
+        if (user?.role === "Provider") {
           const filteredServices = activeServices.filter((service: any) => service.providerId == user.id);
           setData(filteredServices);
           setTotalPages(Math.ceil(filteredServices.length / pageSize));
@@ -170,7 +170,7 @@ const Service = () => {
         </div>
 
         {/* Conditional Button based on User Role */}
-        {user?.role === "PROVIDER" && (
+        {user?.role === "Provider" && (
           <button
             onClick={handleAddServiceClick}
             className="flex justify-start items-center hover:bg-blue-500 hover:text-white transition-all duration-300 gap-4 px-5 py-3 bg-white rounded-xl shadow-md active:scale-95"
@@ -180,7 +180,7 @@ const Service = () => {
           </button>
         )}
 
-        {user?.role === "APPLICANT" && (
+        {user?.role === "Applicant" && (
           <div className="flex gap-4">
             <button
               onClick={handleViewHistory}

@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Applicant {
     id: number;
-    status: "Paid" | "Finished";
+    status: "Pending" | "Finished";
     requestDate: string;
     applicant: {
         avatarUrl: string;
@@ -41,7 +41,7 @@ interface AccountApplicantDialogProps {
 const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, onClose, applications, fetchApplications }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [applicants, setApplicants] = useState({
-        paid: [] as Applicant[],
+        pending: [] as Applicant[],
         finished: [] as Applicant[],
     });
 
@@ -56,7 +56,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     useEffect(() => {
         setApplicants({
-            paid: applications.filter(app => app.status === "Paid"),
+            pending: applications.filter(app => app.status === "Pending"),
             finished: applications.filter(app => app.status === "Finished"),
         });
     }, [applications]);
@@ -76,36 +76,33 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
         if (selectedApplicantId === null) return;
 
         try {
-            setSnackbarOpen(true);
             const existingApplicantResponse = await getRequestById(selectedApplicantId);
             const requestDetail = existingApplicantResponse.data.requestDetails[0];
 
             if (requestDetail) {
-                if (requestDetail.applicationNotes.startsWith("https://")) {
-                    try {
-                        await deleteFile(requestDetail.applicationNotes.split(", ")[0].split("/").pop());
-                    } catch (error) {}
-                }
-                const updatedRequest = {
-                    ...existingApplicantResponse.data,
-                    requestDetails: [
-                        {
-                            ...requestDetail,
-                            applicationNotes: `, ${commentText}`,
-                        },
-                    ],
-                };
+                const serviceResultDetails = [
+                    {
+                        comment: commentText,
+                        serviceId: requestDetail.serviceId, 
+                        requestFileUrls: [] as string[],
+                    },
+                ];
+
                 if (commentFile) {
                     const fileUrls = await uploadFile(commentFile);
-                    const fileUrlsString = fileUrls.urls.join(", ");
-                    updatedRequest.requestDetails[0].applicationNotes = `${fileUrlsString}, ${commentText}`;
+                    serviceResultDetails[0].requestFileUrls.push(...fileUrls.urls);
                 }
+
+                const updatedRequest = {
+                    ...existingApplicantResponse.data,
+                    serviceResultDetails,
+                };
 
                 await updateRequest(selectedApplicantId, updatedRequest);
 
                 const updatedApplicants = {
                     ...applicants,
-                    paid: applicants.paid.map(app =>
+                    pending: applicants.pending.map((app) =>
                         app.id === selectedApplicantId ? { ...app, status: app.status } : app
                     ),
                 };
@@ -113,11 +110,12 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 setApplicants(updatedApplicants);
 
                 setSnackbarMessage("Comment successfully!");
+                setCommentDialogOpen(false);
                 setSnackbarOpen(true);
 
                 setCommentText("");
                 setCommentFile(null);
-                setCommentDialogOpen(false);
+                
             } else {
                 console.error(`Request details for applicant id:${selectedApplicantId} not found`);
             }
@@ -187,7 +185,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 <FaEye style={{ marginRight: "8px" }} />
                                 View Request
                             </Button>
-                            {app.status === "Paid" && (
+                            {app.status === "Pending" && (
                                 <Button
                                     onClick={() => handleOpenCommentDialog(app.id)}
                                     color="primary"
@@ -224,7 +222,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
             )}
         </Box>
     );
-    
+
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
@@ -232,130 +230,130 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     return (
         <>
-    <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
-        <DialogTitle sx={{
-            textAlign: "center", 
-            fontWeight: "bold", 
-            fontSize: "1.25rem", 
-            fontFamily: "Poppins, sans-serif", 
-            color: "#333"
-        }}>
-            <FaInfoCircle style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
-            Applicants Request Information
-        </DialogTitle>
+            <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
+                <DialogTitle sx={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.25rem",
+                    fontFamily: "Poppins, sans-serif",
+                    color: "#333"
+                }}>
+                    <FaInfoCircle style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
+                    Applicants Request Information
+                </DialogTitle>
 
-        <Tabs
-            value={activeTab}
-            onChange={(e, newValue) => setActiveTab(newValue)}
-            centered
-            indicatorColor="primary"
-            textColor="primary"
-            sx={{
-                borderBottom: 1, 
-                borderColor: "divider", 
-                "& .MuiTab-root": {
-                    fontFamily: "Lato, sans-serif", 
-                    fontWeight: "500"
-                }
-            }}
-        >
-            <Tab label="Paid" />
-            <Tab label="Finished" />
-        </Tabs>
-
-        <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-            {activeTab === 0 && renderApplicants(applicants.paid)}
-            {activeTab === 1 && renderApplicants(applicants.finished)}
-        </List>
-    </Dialog>
-
-    <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{
-            fontFamily: "Poppins, sans-serif",
-            fontWeight: "bold", 
-            fontSize: "1.25rem",
-            color: "#333"
-        }}>
-            <FaCommentDots style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
-            Add Comment
-        </DialogTitle>
-
-        <Box sx={{ p: 3 }}>
-            <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add updated file:</Typography>
-            <input
-                type="file"
-                multiple
-                onChange={handleCommentFile}
-                style={{
-                    marginTop: "8px", 
-                    marginBottom: "20px", 
-                    padding: "8px", 
-                    borderRadius: "8px", 
-                    border: "1px solid #ddd", 
-                    fontSize: "1rem"
-                }}
-            />
-            <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add your comment:</Typography>
-            <textarea
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Type your comment here..."
-                style={{
-                    width: "100%", 
-                    height: "100px", 
-                    marginTop: "8px", 
-                    padding: "8px", 
-                    borderRadius: "8px", 
-                    border: "1px solid #ddd", 
-                    fontSize: "1rem",
-                    fontFamily: "Roboto, sans-serif"
-                }}
-            />
-
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                <Button 
-                    onClick={() => setCommentDialogOpen(false)} 
-                    color="secondary" 
-                    variant="outlined" 
-                    sx={{ 
-                        mr: 1, 
-                        borderRadius: "20px", 
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.875rem",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                            backgroundColor: "#f5f5f5"
-                        }
-                    }}
-                >
-                    Cancel
-                </Button>
-                <Button 
-                    onClick={handleSubmitComment} 
-                    color="primary" 
-                    variant="contained" 
+                <Tabs
+                    value={activeTab}
+                    onChange={(e, newValue) => setActiveTab(newValue)}
+                    centered
+                    indicatorColor="primary"
+                    textColor="primary"
                     sx={{
-                        borderRadius: "20px", 
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.875rem",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                            backgroundColor: "#0064d2"
+                        borderBottom: 1,
+                        borderColor: "divider",
+                        "& .MuiTab-root": {
+                            fontFamily: "Lato, sans-serif",
+                            fontWeight: "500"
                         }
                     }}
                 >
-                    Submit
-                </Button>
-            </Box>
-        </Box>
-    </Dialog>
+                    <Tab label="Pending" />
+                    <Tab label="Finished" />
+                </Tabs>
 
-    <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
-            {snackbarMessage}
-        </Alert>
-    </Snackbar>
-</>
+                <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
+                    {activeTab === 0 && renderApplicants(applicants.pending)}
+                    {activeTab === 1 && renderApplicants(applicants.finished)}
+                </List>
+            </Dialog>
+
+            <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle sx={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: "bold",
+                    fontSize: "1.25rem",
+                    color: "#333"
+                }}>
+                    <FaCommentDots style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
+                    Add Comment
+                </DialogTitle>
+
+                <Box sx={{ p: 3 }}>
+                    <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add updated file:</Typography>
+                    <input
+                        type="file"
+                        multiple
+                        onChange={handleCommentFile}
+                        style={{
+                            marginTop: "8px",
+                            marginBottom: "20px",
+                            padding: "8px",
+                            borderRadius: "8px",
+                            border: "1px solid #ddd",
+                            fontSize: "1rem"
+                        }}
+                    />
+                    <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add your comment:</Typography>
+                    <textarea
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Type your comment here..."
+                        style={{
+                            width: "100%",
+                            height: "100px",
+                            marginTop: "8px",
+                            padding: "8px",
+                            borderRadius: "8px",
+                            border: "1px solid #ddd",
+                            fontSize: "1rem",
+                            fontFamily: "Roboto, sans-serif"
+                        }}
+                    />
+
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                        <Button
+                            onClick={() => setCommentDialogOpen(false)}
+                            color="secondary"
+                            variant="outlined"
+                            sx={{
+                                mr: 1,
+                                borderRadius: "20px",
+                                fontFamily: "Poppins, sans-serif",
+                                fontSize: "0.875rem",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                    backgroundColor: "#f5f5f5"
+                                }
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSubmitComment}
+                            color="primary"
+                            variant="contained"
+                            sx={{
+                                borderRadius: "20px",
+                                fontFamily: "Poppins, sans-serif",
+                                fontSize: "0.875rem",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                    backgroundColor: "#0064d2"
+                                }
+                            }}
+                        >
+                            Submit
+                        </Button>
+                    </Box>
+                </Box>
+            </Dialog>
+
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
+                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+        </>
 
     );
 };

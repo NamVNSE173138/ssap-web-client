@@ -18,7 +18,7 @@ const formatDate = (dateString: string) => {
 const RequestHistory = () => {
     const user = useSelector((state: RootState) => state.token.user);
     const [applicants, setApplicants] = useState({
-        paid: [],
+        pending: [],
         finished: [],
     });
     const [activeTab, setActiveTab] = useState<number>(0);
@@ -32,12 +32,12 @@ const RequestHistory = () => {
             if (response.statusCode === 200) {
                 const requests = response.data;
                 setApplicants({
-                    paid: requests.filter((req: any) => req.status === "Paid"),
+                    pending: requests.filter((req: any) => req.status === "Pending"),
                     finished: requests.filter((req: any) => req.status === "Finished"),
                 });
             } else {
                 setApplicants({
-                    paid: [],
+                    pending: [],
                     finished: [],
                 });
             }
@@ -49,6 +49,7 @@ const RequestHistory = () => {
     useEffect(() => {
         fetchRequests();
     }, [user]);
+    console.log(applicants)
 
     const renderApplicants = (requests: any) => {
         return (
@@ -60,7 +61,6 @@ const RequestHistory = () => {
                         <p className="w-4/12 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>Request Date</p>
                         <p className="w-4/12 text-right" style={{ fontFamily: "'Roboto', sans-serif" }}>Action</p>
                     </div>
-
                     {requests.map((request: any, index: any) => (
                         <div
                             key={request.id}
@@ -68,10 +68,10 @@ const RequestHistory = () => {
                         >
                             <p className="w-1/12 text-center">{index + 1}</p>
                             <Link
-                                to={`/services-history/services/${request.requestDetails[0].service.id}`}
+                                to={`/services-history/services/${request.requestDetails[0].serviceId}`}
                                 className="w-4/12 ml-5 text-blue-700 font-semibold underline hover:text-blue-900 transition duration-150"
                             >
-                                {request.requestDetails[0].service.name}
+                                {request.service.name}
                             </Link>
                             <p className="w-4/12 text-center">{formatDate(request.requestDate)}</p>
                             <Link
@@ -143,7 +143,7 @@ const RequestHistory = () => {
                         },
                     }}
                 >
-                    <Tab label="Paid" sx={{ color: 'blue' }} />
+                    <Tab label="Pending" sx={{ color: 'blue' }} />
                     <Tab
                         label="Finished"
                         sx={{
@@ -159,7 +159,7 @@ const RequestHistory = () => {
                 </Tabs>
 
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-                    {activeTab === 0 && renderApplicants(applicants.paid)}
+                    {activeTab === 0 && renderApplicants(applicants.pending)}
                     {activeTab === 1 && renderApplicants(applicants.finished)}
                 </List>
             </div>

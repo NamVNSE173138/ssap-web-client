@@ -65,84 +65,75 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
 
     const handleFormSubmit = async () => {
         if (selectedService.length === 0) {
-          toast.error("Please fill out all required fields.");
-          return;
+            toast.error("Please select at least one service.");
+            return;
         }
-      
+    
         setLoading(true);
         setError(null);
-      
+    
         if (!user) return null;
-      
+    
         try {
-          // Step 1: Check user's wallet balance
-          const walletResponse = await getAccountWallet(Number(user?.id));
-          const userBalance = walletResponse.data.balance;
-      
-          if (userBalance < totalPrice) {
-            toast.error("Insufficient funds. Please add funds to your account.");
-            setLoading(false);
-            return;
-          }
-      
-          // Step 2: Upload files
-          const filesArray = Array.from(applicationFiles || []);
-          const uploadUrls = filesArray.length > 0 ? await uploadFile(filesArray) : { urls: [] };
-      
-          // Step 3: Process each selected service
-          for (const serviceId of selectedService) {
-            const service = services.find((s) => Number(s.id) === serviceId);
-      
-            if (!service) {
-              console.error(`Service with ID ${serviceId} not found.`);
-              continue;
+            // Step 1: Check user's wallet balance
+            const walletResponse = await getAccountWallet(Number(user?.id));
+            const userBalance = walletResponse.data.balance;
+    
+            if (userBalance < totalPrice) {
+                toast.error("Insufficient funds. Please add funds to your account.");
+                setLoading(false);
+                return;
             }
-      
-            // Step 3.1: Handle payment
-            if (service?.providerId && service?.price > 0) {
-              const transferRequest = {
-                senderId: Number(user.id),
-                receiverId: service.providerId,
-                amount: service.price,
-              };
-              await transferMoney(transferRequest);
-              toast.success(`Payment successful for service ID ${serviceId}.`);
+    
+            // Step 2: Upload files
+            const filesArray = Array.from(applicationFiles || []);
+            const uploadUrls = filesArray.length > 0 ? await uploadFile(filesArray) : { urls: [] };
+    
+            // Step 3: Process each selected service one by one
+            for (const serviceId of selectedService) {
+                const service = services.find((s) => Number(s.id) === serviceId);
+    
+                if (!service) {
+                    console.error(`Service with ID ${serviceId} not found.`);
+                    continue;
+                }
+    
+                // Step 3.1: Handle payment for this service
+                if (service?.providerId && service?.price > 0) {
+                    const transferRequest = {
+                        senderId: Number(user.id),
+                        receiverId: service.providerId,
+                        amount: service.price,
+                        paymentMethod: "Pay by wallet",
+                    };
+                    await transferMoney(transferRequest);
+                    toast.success(`Payment successful for service ID ${serviceId}.`);
+                }
+    
+                // Step 3.2: Create the request data for this service
+                const requestData = {
+                    description,
+                    applicantId: user?.id,
+                    serviceIds: [serviceId], // Only the current service
+                    requestFileUrls: uploadUrls.urls, // File URLs for this specific service
+                };
+    
+                // Step 3.3: Create the request for this service
+                await createRequest(requestData);
+                toast.success(`Request created successfully for service ID ${serviceId}.`);
             }
-      
-            // Step 3.2: Create request data for this service
-            const requestData = {
-              description,
-              requestDate: new Date(),
-              status: "Paid",
-              applicantId: user?.id,
-              requestDetails: [
-                {
-                  serviceId,
-                  expectedCompletionTime,
-                  scholarshipType: String(scholarshipType),
-                  applicationFileUrl: uploadUrls.urls.join(", "),
-                  applicationNotes,
-                },
-              ],
-            };
-      
-            // Step 3.3: Create the request
-            await createRequest(requestData);
-            toast.success(`Request created successfully for service ID ${serviceId}.`);
-          }
-      
-          // Step 4: Finalize process
-          handleClose();
+    
+            // Step 4: Finalize the process
+            handleClose();
         } catch (err) {
-          console.error("Error submitting the request:", err);
-          setError("An error occurred while submitting the request.");
-          toast.error("Failed to create request.");
+            console.error("Error submitting the request:", err);
+            setError("An error occurred while submitting the request.");
+            toast.error("Failed to create request.");
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
-      
-      
+    };
+     
 
     return (
         <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -182,16 +173,6 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                         />
                     </div>
 
-                    {/* Expected Completion Time */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700">Expected Completion Time</label>
-                        <input
-                            type="date"
-                            onChange={(e) => setExpectedCompletionTime(new Date(e.target.value))}
-                            className="w-full border rounded p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
                     {/* Description */}
                     <div className="mb-4">
                         <label className="block text-gray-700">Description</label>
@@ -203,27 +184,6 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                             placeholder="Provide a brief description"
                         />
                     </div>
-
-                    {/* Scholarship Type */}
-                    <FormControl fullWidth variant="outlined" className="mb-4">
-                        <InputLabel id="scholarship-type-label">Select Scholarship (Optional)</InputLabel>
-                        <Select
-                            labelId="scholarship-type-label"
-                            value={scholarshipType}
-                            onChange={(e) => setScholarshipType(e.target.value)}
-                            label="Select Scholarship"
-                            className="rounded-xl"
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            {scholarships.map((scholarship) => (
-                                <MenuItem key={scholarship.id} value={scholarship.id}>
-                                    {scholarship.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
 
                     {/* Application Files */}
                     <div className="mb-4">
