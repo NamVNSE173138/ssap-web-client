@@ -30,6 +30,10 @@ import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/revi
 import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
 import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
+import AwardDialog from "./award-dialog";
+import ApplicationStatus from "@/constants/applicationStatus";
+import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
+import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,7 +55,13 @@ const ScholarshipProgramDetail = () => {
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] = useState<boolean>(false);
 
+  const [winningApplications, setWinningApplications] = useState<any>(null);
+  const [awardDialogOpen, setAwardDialogOpen] = useState<boolean>(false);
+
   const [existingApplication, setExistingApplication] = useState<any>(null);
+
+  //const [awardMilestones, setAwardMilestones] = useState<any>(null);
+  const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
@@ -70,6 +80,16 @@ const ScholarshipProgramDetail = () => {
           if (user) {
             const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
             setExistingApplication(application.data);
+            const award = await getAwardMilestoneByScholarship(response.data.data.id);
+            //console.log(application.data);
+            if(application.data[0].status == ApplicationStatus.NeedExtend){
+                award.data.forEach((milestone: any) => {
+                    if(new Date(milestone.fromDate) > new Date() || new Date() > new Date(milestone.toDate)){
+                        return;
+                    }
+                    setExtendBeforeDate(milestone.fromDate);
+                })
+            }
           }
         } else {
           setError("Failed to fetch data");
@@ -135,6 +155,22 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+  const fetchWinningApplications = async (scholarshipId: number) => {
+    try {
+      const response = await getApplicationsByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setWinningApplications(response.data.filter((application: any) => application.status === "APPROVED"));
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAssignExpertDialog = async () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
@@ -159,6 +195,14 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
+  const handleOpenAwardDialog = async () => {
+    setAwardDialogOpen(true);
+    setLoading(true);
+    if (!data) return;
+    await fetchWinningApplications(parseInt(data?.id));
+    setLoading(false);
+  };
+
   const cancelApplication = async () => {
     try {
       if(!existingApplication[0]) return;
@@ -176,7 +220,6 @@ const ScholarshipProgramDetail = () => {
       setCancelLoading(false);
     }
   };
-
 
   const deleteScholarship = async () => {
     try {
@@ -240,15 +283,18 @@ const ScholarshipProgramDetail = () => {
             {data.status == "FINISHED" &&
                 <div className="text-xl font-semibold mr-3">This scholarship has finished</div>
             }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == "PENDING" &&
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Submitted &&
                 data.status != "FINISHED" &&
                 <div className="text-xl font-semibold mr-3">Your application is being reviewed</div>
             }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status != "APPROVED" &&
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Rejected &&
                 <div className="text-xl font-semibold mr-3">Your application to this scholarship have not been approved</div>
             }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == "APPROVED" &&
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Approved &&
                 <div className="text-xl font-semibold mr-3">You have won this scholarship</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.NeedExtend &&
+                <div className="text-xl font-semibold mr-3">You need to extend this scholarship before {formatDate(extendBeforeDate)}</div>
             }
 
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
@@ -271,7 +317,15 @@ const ScholarshipProgramDetail = () => {
                       >
                         View applications{" "}
                       </button>
-                      {existingApplication[0].status != "APPROVED" && <AlertDialog>
+                      {existingApplication[0].status == ApplicationStatus.NeedExtend && 
+                      <button
+                        onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                        className=" text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                      >
+                        Extend Application{" "}
+                      </button>
+                      }
+                      {existingApplication[0].status != ApplicationStatus.Approved && existingApplication[0].status != ApplicationStatus.NeedExtend && <AlertDialog>
                           <AlertDialogTrigger className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" disabled={cancelLoading}>
                           {cancelLoading ? (<div
                               className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
@@ -336,6 +390,13 @@ const ScholarshipProgramDetail = () => {
                   >
                     Review Milestones{" "}
                   </button>
+                  <button
+                    onClick={() => handleOpenAwardDialog()}
+                    className=" text-xl w-full  bg-blue-700 rounded-[25px]"
+                  >
+                    Award Progress{" "}
+                  </button>
+
                 </div>
               ))}
             </div>
@@ -688,6 +749,10 @@ const ScholarshipProgramDetail = () => {
           if (!data) return;
           await fetchReviewMilestones(parseInt(data?.id));
         }} />)}
+      {authorized != "Unauthorized" && (<AwardDialog isOpen={awardDialogOpen}
+        setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
+        winningApplications={winningApplications ?? []}/>
+      )}
 
     </div>
   );

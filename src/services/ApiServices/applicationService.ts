@@ -18,14 +18,27 @@ export async function deleteApplication(id: number) {
   return response.data;
 }
 
-export async function updateApplication(application: any) {
+export async function updateApplication(id: number, application: any) {
   const response = await axios.put(
-    `${BASE_URL}/api/applications/${application.id}`,
+    `${BASE_URL}/api/applications/${id}`,
     application,
     ngrokSkipWarning
   );
   return response.data;
 }
+
+
+export async function extendApplication(profileData: any) {
+
+  const response = await axios.put(
+    `${BASE_URL}/api/applications/extend`,
+    profileData,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+
 
 export async function getApplicationByApplicantIdAndScholarshipId(applicantId: number, scholarshipId: number) {
   const response = await axios.get(

@@ -1,8 +1,11 @@
 import { formatDate } from "@/lib/date-formatter"
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { Link } from "react-router-dom"
+import ExtendApplicationRows from "./extend-application-rows"
+import { useState } from "react"
 
-  const DocumentTable = ({ documents }: any) => {
+  const DocumentTable = ({ documents, rows, setRows,handleDeleteRow,handleInputChange}: any) => {
+
     if(!documents || documents.length == 0) 
         return <p className="text-center font-semibold text-xl">No uploaded documents</p>
     return (
@@ -32,6 +35,15 @@ import { Link } from "react-router-dom"
               <TableCell align="right">{formatDate(doc.updatedAt)}</TableCell>
             </TableRow>
           ))}
+            {rows && rows.length > 0 && 
+            rows.map((row:any) => (
+              <ExtendApplicationRows
+                row={row}
+                setRows={setRows}
+                handleDeleteRow={handleDeleteRow}
+                handleInputChange={handleInputChange}
+              />
+            ))}
         </TableBody>
       </Table>
     </TableContainer>

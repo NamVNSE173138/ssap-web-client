@@ -29,16 +29,6 @@ export async function addApplicationDocument(profileData: any) {
   return response.data;
 }
 
-export async function updateApplicationDocument(id: number, profileData: any) {
-
-  const response = await axios.put(
-    `${BASE_URL}/api/application-documents/${id}`,
-    profileData,
-    ngrokSkipWarning
-  );
-  return response.data;
-}
-
 export async function deleteApplicationDocument(id: number) {
 
   const response = await axios.delete(
