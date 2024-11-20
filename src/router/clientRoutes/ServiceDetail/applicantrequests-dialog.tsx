@@ -83,7 +83,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 const serviceResultDetails = [
                     {
                         comment: commentText,
-                        serviceId: requestDetail.serviceId, 
+                        serviceId: requestDetail.serviceId,
                         requestFileUrls: [] as string[],
                     },
                 ];
@@ -115,7 +115,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 setCommentText("");
                 setCommentFile(null);
-                
+
             } else {
                 console.error(`Request details for applicant id:${selectedApplicantId} not found`);
             }
@@ -127,7 +127,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     const renderApplicants = (applicantsList: Applicant[]) => (
         <Box>
             {applicantsList.length > 0 ? (
-                applicantsList.map(app => (
+                applicantsList.map((app) => (
                     <ListItem
                         key={app.id}
                         disableGutters
@@ -146,59 +146,79 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             },
                         }}
                     >
+                        {/* Avatar */}
                         <ListItemAvatar>
                             <img
-                                className="rounded-full w-12 h-12"
                                 src={app.applicant?.avatarUrl ?? "https://github.com/shadcn.png"}
-                                alt="avatar"
-                                style={{ borderRadius: "50%", width: "48px", height: "48px" }}
+                                alt={`${app.applicant?.username}'s avatar`}
+                                className="rounded-full"
+                                style={{ width: "48px", height: "48px" }}
                             />
                         </ListItemAvatar>
+
+                        {/* User Info */}
                         <ListItemText
                             primary={
-                                <Typography variant="subtitle1" sx={{ fontWeight: "600", fontFamily: "Poppins, sans-serif" }}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        fontWeight: 600,
+                                        fontFamily: "Poppins, sans-serif",
+                                    }}
+                                >
                                     {app.applicant.username}
                                 </Typography>
                             }
                             secondary={
-                                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{ color: "text.secondary" }}
+                                >
                                     {formatDate(app.requestDate)}
                                 </Typography>
                             }
-                            sx={{ flex: 1 }}
+                            sx={{ flex: 1, ml: 2 }}
                         />
+
+                        {/* Actions */}
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            {/* View Request Button */}
                             <Button
                                 onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
                                 variant="contained"
                                 size="small"
                                 sx={{
-                                    backgroundColor: "#0078d4",
+                                    bgcolor: "primary.main",
+                                    color: "white",
                                     borderRadius: "20px",
+                                    textTransform: "capitalize",
                                     fontFamily: "Roboto, sans-serif",
                                     fontSize: "0.875rem",
                                     "&:hover": {
-                                        backgroundColor: "#005bb5",
+                                        bgcolor: "primary.dark",
                                     },
                                 }}
                             >
                                 <FaEye style={{ marginRight: "8px" }} />
                                 View Request
                             </Button>
+
+                            {/* Add Comment Button (if Pending) */}
                             {app.status === "Pending" && (
                                 <Button
                                     onClick={() => handleOpenCommentDialog(app.id)}
-                                    color="primary"
                                     variant="outlined"
                                     size="small"
                                     sx={{
                                         borderRadius: "20px",
+                                        textTransform: "capitalize",
                                         fontFamily: "Roboto, sans-serif",
                                         fontSize: "0.875rem",
-                                        borderColor: "#0078d4",
+                                        borderColor: "primary.main",
+                                        color: "primary.main",
                                         "&:hover": {
-                                            borderColor: "#005bb5",
-                                            backgroundColor: "#f0f8ff",
+                                            borderColor: "primary.dark",
+                                            bgcolor: "action.hover",
                                         },
                                     }}
                                 >
@@ -213,7 +233,15 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 <ListItem>
                     <ListItemText
                         primary={
-                            <Typography variant="body1" color="text.secondary" align="center" sx={{ fontFamily: "Poppins, sans-serif", fontWeight: "500" }}>
+                            <Typography
+                                variant="body1"
+                                align="center"
+                                sx={{
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontWeight: 500,
+                                    color: "text.secondary",
+                                }}
+                            >
                                 No requests available
                             </Typography>
                         }
@@ -221,6 +249,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 </ListItem>
             )}
         </Box>
+
     );
 
 
@@ -230,18 +259,36 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     return (
         <>
-            <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
-                <DialogTitle sx={{
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    fontSize: "1.25rem",
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#333"
-                }}>
-                    <FaInfoCircle style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
+            <Dialog
+                onClose={onClose}
+                open={open}
+                fullWidth
+                maxWidth="sm"
+            >
+                {/* Dialog Title */}
+                <DialogTitle
+                    sx={{
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        fontSize: "1.25rem",
+                        fontFamily: "Poppins, sans-serif",
+                        color: "text.primary",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 1,
+                    }}
+                >
+                    <FaInfoCircle
+                        style={{
+                            color: "#0078d4",
+                            fontSize: "1.5rem",
+                        }}
+                    />
                     Applicants Request Information
                 </DialogTitle>
 
+                {/* Tabs for Switching */}
                 <Tabs
                     value={activeTab}
                     onChange={(e, newValue) => setActiveTab(newValue)}
@@ -253,33 +300,74 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                         borderColor: "divider",
                         "& .MuiTab-root": {
                             fontFamily: "Lato, sans-serif",
-                            fontWeight: "500"
-                        }
+                            fontWeight: 500,
+                            textTransform: "capitalize",
+                        },
                     }}
                 >
                     <Tab label="Pending" />
                     <Tab label="Finished" />
                 </Tabs>
 
-                <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-                    {activeTab === 0 && renderApplicants(applicants.pending)}
-                    {activeTab === 1 && renderApplicants(applicants.finished)}
+                {/* Applicants List */}
+                <List
+                    sx={{
+                        maxHeight: 400,
+                        overflowY: "auto",
+                        p: 2,
+                        bgcolor: "background.default",
+                    }}
+                >
+                    {activeTab === 0 ? (
+                        renderApplicants(applicants.pending)
+                    ) : (
+                        renderApplicants(applicants.finished)
+                    )}
                 </List>
             </Dialog>
 
-            <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle sx={{
-                    fontFamily: "Poppins, sans-serif",
-                    fontWeight: "bold",
-                    fontSize: "1.25rem",
-                    color: "#333"
-                }}>
-                    <FaCommentDots style={{ marginRight: "8px", color: "#0078d4", fontSize: "1.5rem" }} />
+
+            <Dialog
+                open={commentDialogOpen}
+                onClose={() => setCommentDialogOpen(false)}
+                fullWidth
+                maxWidth="sm"
+            >
+                {/* Dialog Title */}
+                <DialogTitle
+                    sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontWeight: "bold",
+                        fontSize: "1.25rem",
+                        color: "#333",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        justifyContent: "center",
+                    }}
+                >
+                    <FaCommentDots
+                        style={{
+                            color: "#0078d4",
+                            fontSize: "1.5rem",
+                        }}
+                    />
                     Add Comment
                 </DialogTitle>
 
+                {/* Dialog Body */}
                 <Box sx={{ p: 3 }}>
-                    <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add updated file:</Typography>
+                    {/* File Input */}
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            fontFamily: "Roboto, sans-serif",
+                            fontWeight: "500",
+                            mb: 1,
+                        }}
+                    >
+                        Add updated file:
+                    </Typography>
                     <input
                         type="file"
                         multiple
@@ -290,10 +378,21 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             padding: "8px",
                             borderRadius: "8px",
                             border: "1px solid #ddd",
-                            fontSize: "1rem"
+                            fontSize: "1rem",
                         }}
                     />
-                    <Typography variant="body1" sx={{ fontFamily: "Roboto, sans-serif", fontWeight: "500" }}>Add your comment:</Typography>
+
+                    {/* Comment Textarea */}
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            fontFamily: "Roboto, sans-serif",
+                            fontWeight: "500",
+                            mb: 1,
+                        }}
+                    >
+                        Add your comment:
+                    </Typography>
                     <textarea
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
@@ -306,10 +405,12 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             borderRadius: "8px",
                             border: "1px solid #ddd",
                             fontSize: "1rem",
-                            fontFamily: "Roboto, sans-serif"
+                            fontFamily: "Roboto, sans-serif",
+                            resize: "none",  // Disable resize
                         }}
                     />
 
+                    {/* Action Buttons */}
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                         <Button
                             onClick={() => setCommentDialogOpen(false)}
@@ -322,8 +423,8 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 fontSize: "0.875rem",
                                 transition: "all 0.3s ease",
                                 "&:hover": {
-                                    backgroundColor: "#f5f5f5"
-                                }
+                                    backgroundColor: "#f5f5f5",
+                                },
                             }}
                         >
                             Cancel
@@ -338,8 +439,8 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 fontSize: "0.875rem",
                                 transition: "all 0.3s ease",
                                 "&:hover": {
-                                    backgroundColor: "#0064d2"
-                                }
+                                    backgroundColor: "#0064d2",
+                                },
                             }}
                         >
                             Submit
@@ -347,6 +448,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     </Box>
                 </Box>
             </Dialog>
+
 
             <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>

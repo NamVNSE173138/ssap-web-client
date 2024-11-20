@@ -9,7 +9,6 @@ import { getRequestsByApplicantId } from "@/services/ApiServices/requestService"
 import ServiceDetails from "../ServiceDetail";
 import ApplicantRequestInfo from "../ApplicantRequestInformation";
 
-
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-GB");
@@ -49,34 +48,33 @@ const RequestHistory = () => {
     useEffect(() => {
         fetchRequests();
     }, [user]);
-    console.log(applicants)
 
     const renderApplicants = (requests: any) => {
         return (
             <div className="flex justify-center">
                 <div className="space-y-4 w-4/5">
-                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-200 to-blue-300 font-bold text-gray-800 rounded-lg shadow-md">
-                        <p className="w-1/12 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>No.</p>
-                        <p className="w-4/12 ml-5" style={{ fontFamily: "'Roboto', sans-serif" }}>Service Name</p>
-                        <p className="w-4/12 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>Request Date</p>
-                        <p className="w-4/12 text-right" style={{ fontFamily: "'Roboto', sans-serif" }}>Action</p>
+                    <div className="flex justify-between items-center p-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-lg shadow-md">
+                        <p className="w-1/12 text-center">No.</p>
+                        <p className="w-4/12 ml-5">Service Name</p>
+                        <p className="w-4/12 text-center">Request Date</p>
+                        <p className="w-4/12 text-right">Action</p>
                     </div>
                     {requests.map((request: any, index: any) => (
                         <div
                             key={request.id}
-                            className="flex justify-between items-center p-4 bg-gray-50 border-b hover:bg-gray-200 rounded-lg transition duration-200 ease-in-out"
+                            className="flex justify-between items-center p-4 bg-white border hover:shadow-lg rounded-lg transition-transform transform hover:scale-105 duration-200"
                         >
-                            <p className="w-1/12 text-center">{index + 1}</p>
+                            <p className="w-1/12 text-center text-gray-800">{index + 1}</p>
                             <Link
                                 to={`/services-history/services/${request.requestDetails[0].serviceId}`}
-                                className="w-4/12 ml-5 text-blue-700 font-semibold underline hover:text-blue-900 transition duration-150"
+                                className="w-4/12 ml-5 text-blue-600 font-medium underline hover:text-blue-800 transition"
                             >
                                 {request.service.name}
                             </Link>
-                            <p className="w-4/12 text-center">{formatDate(request.requestDate)}</p>
+                            <p className="w-4/12 text-center text-gray-600">{formatDate(request.requestDate)}</p>
                             <Link
                                 to={`/services-history/request/${request.id}`}
-                                className="w-4/12 text-right text-blue-700 font-semibold underline hover:text-blue-900 transition duration-150"
+                                className="w-4/12 text-right text-blue-600 font-medium underline hover:text-blue-800 transition"
                             >
                                 View Request
                             </Link>
@@ -99,7 +97,7 @@ const RequestHistory = () => {
         <div>
             <div className="relative">
                 <ScholarshipProgramBackground />
-                <div className="absolute top-0 bg-black/30 left-0 w-full h-full flex flex-col justify-between items-start p-16 z-10">
+                <div className="absolute top-0 bg-black/40 left-0 w-full h-full flex flex-col justify-between items-start p-16 z-10">
                     <Breadcrumb>
                         <BreadcrumbList className="text-white">
                             <BreadcrumbItem>
@@ -118,7 +116,7 @@ const RequestHistory = () => {
                 </div>
             </div>
 
-            <div className="p-10 bg-gray-50 rounded-lg shadow-lg">
+            <div className="p-10 bg-white rounded-lg shadow-lg">
                 <Tabs
                     value={activeTab}
                     onChange={(e, newValue) => setActiveTab(newValue)}
@@ -126,36 +124,24 @@ const RequestHistory = () => {
                     indicatorColor="primary"
                     textColor="inherit"
                     sx={{
-                        borderBottom: 1,
-                        borderColor: "divider",
                         "& .MuiTab-root": {
                             fontFamily: "'Roboto', sans-serif",
                             fontWeight: 'bold',
+                            padding: '10px 20px',
                             borderRadius: '10px',
-                            margin: '0 5px',
+                            transition: 'background-color 0.3s',
                         },
                         "& .Mui-selected": {
-                            backgroundColor: 'rgba(255, 215, 0, 0.5)',
-                            color: 'black',
+                            backgroundColor: 'rgba(255, 223, 186, 0.8)',
+                            color: '#444',
                         },
                         "& .MuiTab-root:not(.Mui-selected):hover": {
-                            backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                            backgroundColor: 'rgba(255, 223, 186, 0.6)',
                         },
                     }}
                 >
-                    <Tab label="Pending" sx={{ color: 'blue' }} />
-                    <Tab
-                        label="Finished"
-                        sx={{
-                            color: 'green',
-                            "&.Mui-selected": {
-                                backgroundColor: 'rgba(76, 175, 80, 0.5)',
-                            },
-                            "&:hover": {
-                                backgroundColor: 'rgba(76, 175, 80, 0.3)',
-                            },
-                        }}
-                    />
+                    <Tab label="Pending" />
+                    <Tab label="Finished" />
                 </Tabs>
 
                 <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
@@ -165,6 +151,6 @@ const RequestHistory = () => {
             </div>
         </div>
     );
-}
+};
 
 export default RequestHistory;

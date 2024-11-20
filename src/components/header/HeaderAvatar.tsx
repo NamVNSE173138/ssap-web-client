@@ -13,6 +13,7 @@ import parseJwt from '@/services/parseJwt';
 import { messaging } from '@/services/firebase';
 import { deleteToken } from 'firebase/messaging';
 import { RootState } from '@/store/store';
+import { FiDollarSign } from 'react-icons/fi';
 
 const HeaderAvatar = () => {
     const avatar = useSelector((state: RootState) => state.token.avatar);
@@ -58,53 +59,64 @@ const HeaderAvatar = () => {
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger>
-                    <Avatar>
-                        <AvatarImage src={avatar != null ? avatar : "https://github.com/shadcn.png"} alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    <DropdownMenuLabel>Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem  onClick={handleProfileClick}>
-                        <CgProfile className='mr-2'/> Profile</DropdownMenuItem>
-                    <AlertDialog>
-                    <DropdownMenuItem onClick={handleWalletClick}>
-                        <span className='mr-2'>💰</span> Wallet
-                    </DropdownMenuItem>
-                        <AlertDialogTrigger>
-                            <div className="flex items-center px-2 text-sm">
-                                <LogOut className="mr-2 h-4 w-4" />
-                                <span>Log out</span>
-                            </div>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    You wanna log out?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Log out will redirect you to Home Page
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>
-                                    Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={handleLogout}
-                                >
-                                    Log out
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            {isLoading && <ScreenSpinner />}
-        </>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Avatar>
+            <AvatarImage
+              src={avatar || "https://github.com/shadcn.png"}
+              alt="@shadcn"
+            />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="bg-white shadow-lg rounded-xl w-48 p-3">
+          <DropdownMenuLabel className="font-semibold text-lg text-gray-700">Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+
+          {/* Profile */}
+          <DropdownMenuItem onClick={handleProfileClick} className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <CgProfile className='mr-3 text-xl text-gray-600' /> 
+            <span className="text-gray-700">Profile</span>
+          </DropdownMenuItem>
+
+          {/* Wallet */}
+          <DropdownMenuItem onClick={handleWalletClick} className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <FiDollarSign className='mr-3 text-xl text-green-500' />
+            <span className="text-gray-700">Wallet</span>
+          </DropdownMenuItem>
+
+          {/* Log out */}
+          <AlertDialog>
+            <DropdownMenuItem className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
+              <LogOut className="mr-3 text-xl" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+            <AlertDialogTrigger>
+              <div className="hidden"></div>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-xl font-semibold text-gray-800">
+                  Are you sure you want to log out?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-600">
+                  Logging out will redirect you to the homepage.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-gray-200 rounded-md px-4 py-2">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleLogout} className="bg-red-500 text-white rounded-md px-4 py-2">
+                  Log out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {isLoading && <ScreenSpinner />}
+    </>
     );
 };
 

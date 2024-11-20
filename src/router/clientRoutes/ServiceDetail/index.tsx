@@ -14,7 +14,7 @@ import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } 
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
-import { FaEdit, FaEye, FaPlus, FaRedo, FaStar, FaTrash } from "react-icons/fa";
+import { FaClipboardList, FaEdit, FaExclamationTriangle, FaEye, FaPlus, FaRedo, FaStar, FaTimes, FaTrash, FaWallet } from "react-icons/fa";
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
@@ -22,6 +22,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { FaInfoCircle, FaDollarSign, FaClock, FaCheckCircle, FaUser } from "react-icons/fa";
 import { Dialog, DialogTitle, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { IoIosPaper } from "react-icons/io";
+import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoClose, IoText, IoCard, IoCloseCircleOutline } from "react-icons/io5";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
 interface ServiceType {
@@ -43,12 +44,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
-    const [expectedCompletionTime, setExpectedCompletionTime] = useState<Date | null>(null);
-    const [applicationNotes, setApplicationNotes] = useState<string>("");
     const [scholarshipType, setScholarshipType] = useState<string>("");
     const [scholarships, setScholarships] = useState<{ id: number; name: string }[]>([]);
     const [description, setDescription] = useState<string>("");
-    const [applicationFileUrls, setApplicationFileUrls] = useState<any>(null);
+    const [applicationFileUrls, setApplicationFileUrls] = useState<File[]>([]);
     const [editData, setEditData] = useState<ServiceType | null>(null);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const navigate = useNavigate();
@@ -56,17 +55,16 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const isProvider = user?.role === "Provider";
     const isFunder = user?.role === "Funder";
     const [canEdit, setCanEdit] = useState<boolean>(true);
-    const [hasExistingRequest, setHasExistingRequest] = useState<boolean>(false);
     const [existingRequestId, setExistingRequestId] = useState<number | null>(null);
     const [requestStatus, setRequestStatus] = useState<string | null>(null);
     const [averageRating, setAverageRating] = useState<number>(0);
     const [feedbackCount, setFeedbackCount] = useState<number>(0);
     const [feedbacks, setFeedbacks] = useState<any[]>([]);
     const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
-    const [amount, setAmount] = useState<number>(serviceData?.price || 0);
     const [isConfirmationDialogOpen, setConfirmationDialogOpen] = useState<boolean>(false);
     const [requestData, setRequestData] = useState<any>(null);
     const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
     const fetchService = async () => {
         try {
@@ -209,26 +207,31 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
     const closeDialog = () => {
         setDialogOpen(false);
-        setExpectedCompletionTime(null);
-        setApplicationNotes("");
         setScholarshipType("");
-        setApplicationFileUrls("");
+        setApplicationFileUrls([]);
         setConfirmationDialogOpen(false);
     };
 
     const handleSubmit = async () => {
         if (!serviceData) return;
+        if (!paymentMethod) {
+            toast.error("Please select a payment method.");
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
-            const walletResponse = await getAccountWallet(user?.id);
-            const userBalance = walletResponse.data.balance;
+            if (paymentMethod === "Pay by wallet") {
+                const walletResponse = await getAccountWallet(user?.id);
+                const userBalance = walletResponse.data.balance;
 
-            if (userBalance < serviceData?.price) {
-                toast.error("Insufficient funds to request this service. Please add funds to your account.");
-                setLoading(false);
-                return;
+                if (userBalance < serviceData?.price) {
+                    toast.error("Insufficient funds to request this service. Please add funds to your account.");
+                    setLoading(false);
+                    return;
+                }
             }
 
             let fileUrls: string[] = [];
@@ -248,17 +251,24 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             const transferRequest = {
                 senderId: Number(user.id),
                 receiverId: serviceData.providerId,
-                amount: serviceData.price,
-                paymentMethod: "Pay by wallet",
+                amount: paymentMethod === "Cash" ? 0 : serviceData.price,
+                paymentMethod,
             };
+
             setLoading(false);
-            toast.success("Payment successful!");
-            await transferMoney(transferRequest);
+            if (paymentMethod === "Pay by wallet") {
+                await transferMoney(transferRequest);
+                toast.success("Payment successful!");
+            }
+            if (paymentMethod === "Cash") {
+                await transferMoney(transferRequest);
+                toast.success("Payment successful!");
+            }
+
             closeDialog();
             toast.success("Request created successfully!");
             await createRequest(requestDatas);
             await fetchService();
-            
             await NotifyProviderNewRequest(user.id, Number(serviceData?.id));
         } catch (error) {
             setError((error as Error).message);
@@ -268,6 +278,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         }
     };
 
+
     if (loading) return <Spinner size="large" />;
     if (error) return <p className="text-center text-xl font-semibold">{error}</p>;
     if (!serviceData) return <p className="text-center text-xl font-semibold">Service not found</p>;
@@ -276,74 +287,130 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         <div>
             {isDialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                    <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] transform transition-all scale-95 hover:scale-100">
+                        {/* Dialog Header */}
                         <div className="mb-5 flex justify-between items-center">
-                            <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
+                            <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
                                 <IoIosPaper className="text-3xl text-blue-500" />
                                 <span>Create Request</span>
                             </DialogTitle>
                             <span
-                                className="text-xl cursor-pointer"
+                                className="text-xl cursor-pointer text-gray-600 hover:text-red-500 transition-all"
                                 onClick={closeDialog}
                             >
-                                &times;
+                                <IoClose className="text-2xl" />
                             </span>
                         </div>
+
+                        {/* Form Section */}
                         <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-gray-700">Description</label>
+                            {/* Description */}
+                            <div className="mb-5">
+                                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                    <IoText className="text-blue-500" />
+                                    Description
+                                </label>
                                 <input
                                     type="text"
+                                    placeholder="Enter a description"
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full border rounded p-2"
-                                />
-                            </div>
-                            {/* <div className="mb-4">
-                                <FormControl fullWidth variant="outlined">
-                                    <InputLabel id="scholarship-type-label">Select Scholarship (Optional)</InputLabel>
-                                    <Select
-                                        labelId="scholarship-type-label"
-                                        value={scholarshipType}
-                                        onChange={(e) => setScholarshipType(e.target.value)}
-                                        label="Select Scholarship"
-                                    >
-                                        <MenuItem value="">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        {scholarships.map((scholarship) => (
-                                            <MenuItem key={scholarship.id} value={scholarship.id}>
-                                                {scholarship.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </div> */}
-                            <div className="mb-4">
-                                <label className="block text-gray-700">Submit File(s)</label>
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => {
-                                        const files = e.target.files;
-                                        if (files) {
-                                            setApplicationFileUrls(Array.from(files));
-                                        }
-                                    }}
-                                    className="w-full border rounded p-2"
+                                    className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-300 focus:outline-none shadow-sm"
                                 />
                             </div>
 
-                            <div className="flex justify-end">
+                            {/* File Upload */}
+                            <div className="mb-5">
+                                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                    <IoCloudUpload className="text-blue-500" />
+                                    Submit File(s)
+                                </label>
+                                <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        className="w-full hidden"
+                                        id="file-upload"
+                                        onChange={(e) => {
+                                            const files = e.target.files;
+                                            if (files) setApplicationFileUrls(Array.from(files));
+                                        }}
+                                    />
+                                    <label
+                                        htmlFor="file-upload"
+                                        className="cursor-pointer text-blue-500 hover:underline"
+                                    >
+                                        <IoCloudUpload className="text-4xl mx-auto text-gray-400 mb-2" />
+                                        Click to upload files
+                                    </label>
+                                </div>
+
+                                {/* Display the selected file names */}
+                                {applicationFileUrls.length > 0 && (
+                                    <div className="mt-4 text-gray-700">
+                                        <h3 className="font-medium">Selected Files:</h3>
+                                        <ul className="list-disc pl-5">
+                                            {applicationFileUrls.map((file: File, index: number) => (
+                                                <li key={index} className="text-sm">
+                                                    {file.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Payment Method */}
+                            <div className="mb-5">
+                                <label className="block text-gray-700 font-medium mb-3 flex items-center gap-2">
+                                    <IoCard className="text-blue-500" />
+                                    Choose Payment Method
+                                </label>
+                                <div className="flex gap-6">
+                                    {/* Pay by Wallet */}
+                                    <div
+                                        onClick={() => setPaymentMethod("Pay by wallet")}
+                                        className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Pay by wallet"
+                                            ? "border-blue-500 bg-blue-100"
+                                            : "border-gray-300 hover:bg-gray-100"
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
+                                            <IoWalletOutline className="text-2xl" />
+                                        </div>
+                                        <span className="font-medium text-gray-800">Pay by Wallet</span>
+                                    </div>
+
+                                    {/* Cash */}
+                                    <div
+                                        onClick={() => setPaymentMethod("Cash")}
+                                        className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash"
+                                            ? "border-green-500 bg-green-100"
+                                            : "border-gray-300 hover:bg-gray-100"
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
+                                            <IoCashOutline className="text-2xl" />
+                                        </div>
+                                        <span className="font-medium text-gray-800">Cash</span>
+                                    </div>
+                                </div>
+                                {paymentMethod === null && (
+                                    <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end mt-6">
                                 <button
                                     type="button"
                                     onClick={closeDialog}
-                                    className="mr-2 bg-gray-300 rounded px-4 py-2"
+                                    className="mr-3 bg-gray-300 text-gray-700 rounded-lg px-5 py-2 hover:bg-gray-400 transition"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-blue-600 text-white rounded px-4 py-2"
+                                    className="bg-blue-600 text-white rounded-lg px-5 py-2 hover:bg-blue-700 transition"
                                 >
                                     Send
                                 </button>
@@ -360,13 +427,13 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         <Breadcrumb>
                             <BreadcrumbList className="text-white">
                                 <BreadcrumbItem>
-                                    <Link to="/" className="md:text-xl text-lg">
+                                    <Link to="/" className="md:text-xl text-lg hover:text-blue-400 transition-all">
                                         Home
                                     </Link>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
-                                    <Link to="/services" className="text-white md:text-xl text-lg">
+                                    <Link to="/services" className="text-white md:text-xl text-lg hover:text-blue-400 transition-all">
                                         Services
                                     </Link>
                                 </BreadcrumbItem>
@@ -380,14 +447,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     <div className={isProvider ? "w-2/3" : ""}>
                         <div className="lg:flex-col items-center flex-row flex gap-[20px]">
                             <div>
-                                <p className="text-white text-5xl lg:line-clamp-3 line-clamp-5">
+                                <p className="text-white text-5xl lg:line-clamp-3 line-clamp-5 font-bold hover:text-blue-400 transition-all">
                                     {serviceData.name}
                                 </p>
                             </div>
                             <div className="flex flex-col items gap-2">
                                 <div className="flex items-center gap-2">
                                     <FaStar color="yellow" size={20} />
-                                    <p className="text-yellow-500 cursor-pointer underline" onClick={handleFeedbackClick}>
+                                    <p
+                                        className="text-yellow-500 cursor-pointer underline hover:text-yellow-400 transition-all"
+                                        onClick={handleFeedbackClick}
+                                    >
                                         {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? 'feedback' : 'feedbacks'})
                                     </p>
                                 </div>
@@ -398,12 +468,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                             <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                                 <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
                                     <div className="flex justify-between items-center mb-4">
-                                        <h2 className="text-xl font-semibold">Feedback Details</h2>
+                                        <h2 className="text-xl font-semibold text-blue-600">Feedback Details</h2>
                                         <span
-                                            className="text-xl cursor-pointer"
+                                            className="text-xl cursor-pointer text-gray-500 hover:text-red-500 transition-all"
                                             onClick={handleCloseFeedbackDialog}
                                         >
-                                            &times;
+                                            <IoCloseCircleOutline size={24} />
                                         </span>
                                     </div>
 
@@ -455,7 +525,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     <div className="mt-4 text-right">
                                         <button
                                             onClick={handleCloseFeedbackDialog}
-                                            className="bg-gray-300 px-4 py-2 rounded-md"
+                                            className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 transition-all"
                                         >
                                             Close
                                         </button>
@@ -512,7 +582,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 )}
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -565,7 +634,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <FaCheckCircle className="text-teal-500 text-xl" />
+                                <FaClipboardList className="text-teal-500 text-xl" />
                                 <div>
                                     <p className="text-lg font-semibold text-gray-700">About This Service:</p>
                                     <p className="text-gray-600">{serviceData.description}</p>
@@ -599,21 +668,29 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
             {/* Wallet Dialog */}
             <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
-                <div className="p-6">
-                    <h3 className="text-2xl font-semibold">You don't have a wallet yet!</h3>
+                <div className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto">
+                    <div className="flex items-center mb-6">
+                        <FaExclamationTriangle className="text-yellow-500 text-4xl mr-4" />
+                        <h3 className="text-2xl font-semibold text-gray-800">You don't have a wallet yet!</h3>
+                    </div>
                     <p className="my-4 text-lg text-gray-600">
                         You need to create a wallet to add services. Do you want to go to the Wallet page?
                     </p>
-                    <div className="flex justify-end gap-4">
-                        <button onClick={handleCloseWalletDialog} className="bg-gray-300 px-5 py-2 rounded-full hover:bg-gray-400 transition-all">
-                            Cancel
+                    <div className="flex justify-end gap-4 mt-6">
+                        <button
+                            onClick={handleCloseWalletDialog}
+                            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-all flex items-center gap-2">
+                            <FaTimes className="text-gray-700" /> Cancel
                         </button>
-                        <button onClick={handleNavigateToWallet} className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 transition-all">
-                            Yes
+                        <button
+                            onClick={handleNavigateToWallet}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all flex items-center gap-2">
+                            <FaWallet className="text-white" /> Yes, Go to Wallet
                         </button>
                     </div>
                 </div>
             </Dialog>
+
         </div>
     );
 };

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Alert, DatePicker, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
-import { addOrUpdateApplicantProfile, getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
+import { getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
 import { GoPencil } from "react-icons/go";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Sidebar } from "@/components/AccountInfo";
+import { FaCalendarAlt, FaFlag, FaMale, FaMapMarkerAlt, FaRegEdit, FaUserAlt } from "react-icons/fa";
+import { AiOutlineFilePdf, AiOutlineSave } from "react-icons/ai";
 
 const Information = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -25,7 +27,7 @@ const Information = () => {
     applicantId: user?.id,
   });
 
-  const { id } = useParams<{ id: string }>(); 
+  const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     let isMounted = true;
@@ -140,13 +142,17 @@ const Information = () => {
 
   return (
     <div className="grid grid-cols-12 h-full">
-      <Sidebar className="col-start-1 col-end-3" needRefresh={hasProfile}/>
+      <Sidebar className="col-start-1 col-end-3" needRefresh={hasProfile} />
+
       {isEditing ? (
-        <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+        <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-5 p-6 bg-white shadow-lg rounded-xl">
           <form className="lg:px-28 flex flex-col gap-9" onSubmit={handleSave}>
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label htmlFor="firstName">First Name:</label>
+            {/* Name Fields */}
+            <div className="grid grid-cols-2 lg:gap-8 gap-4">
+              <div>
+                <label htmlFor="firstName" className="flex items-center gap-2 text-gray-700">
+                  <FaUserAlt size={20} /> First Name:
+                </label>
                 <input
                   type="text"
                   id="firstName"
@@ -157,8 +163,10 @@ const Information = () => {
                   required
                 />
               </div>
-              <div className="columns-1">
-                <label htmlFor="lastName">Last Name:</label>
+              <div>
+                <label htmlFor="lastName" className="flex items-center gap-2 text-gray-700">
+                  <FaUserAlt size={20} /> Last Name:
+                </label>
                 <input
                   type="text"
                   id="lastName"
@@ -171,9 +179,12 @@ const Information = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label htmlFor="birthDate">Birth Date:</label>
+            {/* Date of Birth & Gender */}
+            <div className="grid grid-cols-2 lg:gap-8 gap-4">
+              <div>
+                <label htmlFor="birthDate" className="flex items-center gap-2 text-gray-700">
+                  <FaCalendarAlt size={20} /> Birth Date:
+                </label>
                 <input
                   type="date"
                   id="birthDate"
@@ -183,8 +194,10 @@ const Information = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="columns-1">
-                <label htmlFor="gender">Gender:</label>
+              <div>
+                <label htmlFor="gender" className="flex items-center gap-2 text-gray-700">
+                  <FaMale size={20} /> Gender:
+                </label>
                 <select
                   id="gender"
                   name="gender"
@@ -201,9 +214,12 @@ const Information = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label htmlFor="nationality">Nationality:</label>
+            {/* Nationality & Ethnicity */}
+            <div className="grid grid-cols-2 lg:gap-8 gap-4">
+              <div>
+                <label htmlFor="nationality" className="flex items-center gap-2 text-gray-700">
+                  <FaFlag size={20} /> Nationality:
+                </label>
                 <input
                   type="text"
                   id="nationality"
@@ -213,8 +229,10 @@ const Information = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="columns-1">
-                <label htmlFor="ethnicity">Ethnicity:</label>
+              <div>
+                <label htmlFor="ethnicity" className="flex items-center gap-2 text-gray-700">
+                  <FaMapMarkerAlt size={20} /> Ethnicity:
+                </label>
                 <input
                   type="text"
                   id="ethnicity"
@@ -224,41 +242,46 @@ const Information = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
-              <input
-                type="text"
-                id="applicantId"
-                name="applicantId"
-                className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
-                value={formValues.applicantId}
-                onChange={handleInputChange}
-                style={{ display: "none" }}
-              />
             </div>
 
-            <div className="flex justify-center">
+            {/* Hidden applicantId */}
+            <input
+              type="text"
+              id="applicantId"
+              name="applicantId"
+              className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+              value={formValues.applicantId}
+              onChange={handleInputChange}
+              style={{ display: 'none' }}
+            />
+
+            {/* Buttons */}
+            <div className="flex justify-center gap-4 mt-6">
               <button
                 type="submit"
-                className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className="lg:mb-7 mb-5 bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
               >
-                Save
+                <AiOutlineSave size={22} /> Save
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className="ml-3 lg:mb-7 mb-5 bg-[#FF5C5C] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
               >
-                Cancel
+                <FaRegEdit size={22} /> Cancel
               </button>
             </div>
           </form>
         </div>
       ) : (
-        <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+        <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-5 p-6 bg-white shadow-lg rounded-xl">
           <div className="lg:px-28 flex flex-col gap-12">
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label htmlFor="firstName">First Name:</label>
+            {/* Profile Fields */}
+            <div className="grid grid-cols-2 lg:gap-8 gap-4">
+              <div>
+                <label htmlFor="firstName" className="flex items-center gap-2 text-gray-700">
+                  <FaUserAlt size={20} /> First Name:
+                </label>
                 <input
                   type="text"
                   id="firstName"
@@ -267,8 +290,10 @@ const Information = () => {
                   readOnly
                 />
               </div>
-              <div className="columns-1">
-                <label htmlFor="lastName">Last Name:</label>
+              <div>
+                <label htmlFor="lastName" className="flex items-center gap-2 text-gray-700">
+                  <FaUserAlt size={20} /> Last Name:
+                </label>
                 <input
                   type="text"
                   id="lastName"
@@ -279,9 +304,12 @@ const Information = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label htmlFor="birthDate">Birth Date:</label>
+            {/* Date of Birth & Gender */}
+            <div className="grid grid-cols-2 lg:gap-8 gap-4">
+              <div>
+                <label htmlFor="birthDate" className="flex items-center gap-2 text-gray-700">
+                  <FaCalendarAlt size={20} /> Birth Date:
+                </label>
                 <input
                   type="text"
                   id="birthDate"
@@ -290,8 +318,10 @@ const Information = () => {
                   readOnly
                 />
               </div>
-              <div className="columns-1">
-                <label htmlFor="gender">Gender:</label>
+              <div>
+                <label htmlFor="gender" className="flex items-center gap-2 text-gray-700">
+                  <FaMale size={20} /> Gender:
+                </label>
                 <input
                   type="text"
                   id="gender"
@@ -302,9 +332,12 @@ const Information = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:gap-8 gap-0 lg:mx-0 mx-2">
-              <div className="columns-1">
-                <label htmlFor="nationality">Nationality:</label>
+            {/* Nationality & Ethnicity */}
+            <div className="grid grid-cols-2 lg:gap-8 gap-4">
+              <div>
+                <label htmlFor="nationality" className="flex items-center gap-2 text-gray-700">
+                  <FaFlag size={20} /> Nationality:
+                </label>
                 <input
                   type="text"
                   id="nationality"
@@ -313,8 +346,10 @@ const Information = () => {
                   readOnly
                 />
               </div>
-              <div className="columns-1">
-                <label htmlFor="ethnicity">Ethnicity:</label>
+              <div>
+                <label htmlFor="ethnicity" className="flex items-center gap-2 text-gray-700">
+                  <FaMapMarkerAlt size={20} /> Ethnicity:
+                </label>
                 <input
                   type="text"
                   id="ethnicity"
@@ -325,28 +360,32 @@ const Information = () => {
               </div>
             </div>
 
-            <div className="flex justify-center">
-              {/*JSON.stringify(profileData)*/}
-              {profileData.constructor == Array && <button
-                type="button"
-                onClick={handleAdd}
-                className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
-              >
-                Add Profile
-              </button>}
-              {profileData.constructor != Array && <button
-                type="button"
-                onClick={handleEdit}
-                className="ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
-              >
-                Edit Profile
-              </button>}
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-4 mt-6">
+              {profileData.constructor === Array && (
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  className="lg:mb-7 mb-5 bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
+                >
+                  <FaRegEdit size={22} /> Add Profile
+                </button>
+              )}
+              {profileData.constructor !== Array && (
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  className="ml-3 lg:mb-7 mb-5 bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
+                >
+                  <FaRegEdit size={22} /> Edit Profile
+                </button>
+              )}
               <button
                 type="button"
                 onClick={handleExportPDF}
-                className="ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                className="ml-3 lg:mb-7 mb-5 bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
               >
-                Export PDF
+                <AiOutlineFilePdf size={22} /> Export PDF
               </button>
             </div>
           </div>

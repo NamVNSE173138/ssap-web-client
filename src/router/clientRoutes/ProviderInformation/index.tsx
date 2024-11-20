@@ -6,6 +6,7 @@ import Spinner from "@/components/Spinner";
 import { getAccountById } from "@/services/ApiServices/accountService";
 import { getServicesByProvider } from "@/services/ApiServices/serviceService";
 import ServiceCard from "@/components/Services/ServiceCard";
+import { FaHome, FaServicestack, FaStar, FaTasks, FaUser, FaUserCircle } from "react-icons/fa";
 
 const ProviderInformation = () => {
   const { id } = useParams();
@@ -55,8 +56,8 @@ const ProviderInformation = () => {
   const totalServices = services.length;
   return (
     <>
-    <div className="relative">
-      <ScholarshipProgramBackground />
+  <div className="relative">
+  <ScholarshipProgramBackground />
       <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px] z-10">
         <Breadcrumb>
           <BreadcrumbList className="text-white">
@@ -75,30 +76,46 @@ const ProviderInformation = () => {
         </Breadcrumb>
         </div>
         </div>
-        <section className="bg-white py-10">     
-        <div className="container mx-auto px-6">
-          <div className="flex items-center gap-4 mb-6">
-            <img
-              src={providerData?.avatarUrl || "https://github.com/shadcn.png"}
-              alt="Provider Avatar"
-              className="w-24 h-24 rounded-full border-2 border-gray-300"
-            />
-            <div>
-              <h2 className="text-3xl font-semibold">{providerData?.username}</h2>
-              <p>Total Services: {totalServices}</p>
-              <p>Average Rating: {averageRatings.toFixed(1)}</p>
-            </div>
-          </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Services Provided</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {services.map((service: any) => (
-              <ServiceCard key={service.id} {...service} />
-            ))}
+  <section className="bg-white py-10 shadow-lg">
+    <div className="container mx-auto px-6">
+      {/* Provider Info Section */}
+      <div className="flex items-center gap-6 mb-8 bg-blue-50 p-6 rounded-lg shadow-lg">
+        <img
+          src={providerData?.avatarUrl || "https://github.com/shadcn.png"}
+          alt="Provider Avatar"
+          className="w-24 h-24 rounded-full border-4 border-blue-500 shadow-lg"
+        />
+        <div>
+          <h2 className="text-4xl font-semibold text-gray-800 flex items-center">
+            <FaUser className="mr-2 text-blue-500" />
+            {providerData?.username}
+          </h2>
+          <div className="text-lg text-gray-600">
+            <p className="flex items-center gap-2">
+              <FaTasks className="text-green-500" /> Total Services: {totalServices}
+            </p>
+            <p className="flex items-center gap-2">
+              <FaStar className="text-yellow-500" /> Average Rating: {averageRatings.toFixed(1)}
+            </p>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+
+      {/* Services Provided Section */}
+      <h3 className="text-3xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+        <FaServicestack className="text-blue-500" />
+        Services Provided
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {services.map((service: any) => (
+          <ServiceCard key={service.id} {...service} />
+        ))}
+      </div>
+    </div>
+  </section>
+</>
+
   );
 };
 

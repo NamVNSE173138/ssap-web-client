@@ -15,7 +15,7 @@ import { RootState } from "@/store/store";
 import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
 import {
-    Avatar,
+  Avatar,
   Button,
   Checkbox,
   Divider,
@@ -35,7 +35,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
-    BoxIcon,
+  BoxIcon,
   DraftingCompassIcon,
   Search,
   SearchIcon,
@@ -47,6 +47,7 @@ import { LoginUser } from "@/services/ApiServices/authenticationService";
 import { SendNotification } from "@/services/ApiServices/notification";
 import { argv0 } from "process";
 import { updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
+import { FaCalendarAlt, FaCheckCircle, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaTrophy } from "react-icons/fa";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,9 +67,9 @@ const ChooseWinner = () => {
       const response = await getApplicationsByScholarship(scholarshipId);
       if (response.statusCode == 200) {
         setApplicants(response.data.filter((row: any) => row.status != "APPROVED"));
-        if(data){
-            setScholarshipWinners(response.data.filter((row: any) => row.status == "APPROVED"));
-            setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "APPROVED")).length);
+        if (data) {
+          setScholarshipWinners(response.data.filter((row: any) => row.status == "APPROVED"));
+          setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "APPROVED")).length);
         }
       } else {
         setError("Failed to get applicants");
@@ -92,7 +93,7 @@ const ChooseWinner = () => {
           applicationDocuments: [],
           applicationReviews: []
         };
-        
+
 
         const response = await axios.put(
           `http://localhost:5254/api/applications/${row.id}`,
@@ -108,20 +109,20 @@ const ChooseWinner = () => {
       });
 
       await Promise.all(applyPromises);
-      if(availableScholarships == 0){
+      if (availableScholarships == 0) {
         await updateScholarshipStatus(Number(data?.id), "FINISHED");
       }
       alert("Selected applicants have been approved!");
       await fetchData();
-      for(let row of selectedRows){
-          await SendNotification({
-            topic: row.applicantId.toString(),
-            link: "string",
-            title: "string",
-            body: `Your application for ${data?.name} has been approved.`,
-          });
+      for (let row of selectedRows) {
+        await SendNotification({
+          topic: row.applicantId.toString(),
+          link: "string",
+          title: "string",
+          body: `Your application for ${data?.name} has been approved.`,
+        });
       }
-      
+
     } catch (error) {
       setError("Failed to apply for selected winners.");
     }
@@ -189,39 +190,39 @@ const ChooseWinner = () => {
   // Filter rows based on search query
   const filteredRows = applicants
     ? applicants.filter(
-        (row: any) =>
-          row.applicant.username
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (row: any) =>
+        row.applicant.username
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/api/scholarship-programs/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.data.statusCode === 200) {
-          setData(response.data.data);
-          if (id) await fetchApplicants(parseInt(id), response.data.data);
-        } else {
-          setError("Failed to fetch data");
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/scholarship-programs/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
+      );
+      if (response.data.statusCode === 200) {
+        setData(response.data.data);
+        if (id) await fetchApplicants(parseInt(id), response.data.data);
+      } else {
+        setError("Failed to fetch data");
       }
-    };
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    
+
 
     fetchData();
   }, [id]);
@@ -272,155 +273,165 @@ const ChooseWinner = () => {
           </div>
         </div>
       </div>
-      <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
+      <div className="bg-white lg:bg-white drop-shadow-lg lg:drop-shadow-xl relative rounded-lg">
         <section className="max-w-container mx-auto py-[24px] lg:py-[40px]">
-          <div className="grid grid-cols-2 mx-[150px] lg:px-0 lg:flex gap-[30px] flex-row flex-wrap justify-between lg:gap-[40px]">
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Location
-              </p>
-              <p className="text-heading-6">VietNam</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px] lg:gap-[40px] px-[24px] lg:px-0">
+            {/* Location */}
+            <div className="flex flex-col items-start bg-blue-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <FaMapMarkerAlt className="text-blue-500 text-2xl" />
+                <p className="block text-lg font-semibold">Location</p>
+              </div>
+              <p className="text-heading-6 text-gray-700">VietNam</p>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Qualification
-              </p>
-              <p className="text-heading-6">VietNam</p>
+
+            {/* Qualification */}
+            <div className="flex flex-col items-start bg-green-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <FaGraduationCap className="text-green-500 text-2xl" />
+                <p className="block text-lg font-semibold">Qualification</p>
+              </div>
+              <p className="text-heading-6 text-gray-700">VietNam</p>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Funding type
-              </p>
-              <p className="text-heading-6">VietNam</p>
+
+            {/* Funding Type */}
+            <div className="flex flex-col items-start bg-yellow-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <FaMoneyBillWave className="text-yellow-500 text-2xl" />
+                <p className="block text-lg font-semibold">Funding Type</p>
+              </div>
+              <p className="text-heading-6 text-gray-700">VietNam</p>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Deadline
-              </p>
-              <p className="text-heading-6">VietNam</p>
+
+            {/* Deadline */}
+            <div className="flex flex-col items-start bg-orange-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <FaCalendarAlt className="text-orange-500 text-2xl" />
+                <p className="block text-lg font-semibold">Deadline</p>
+              </div>
+              <p className="text-heading-6 text-gray-700">VietNam</p>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Value of Award
-              </p>
-              <p className="text-heading-6">VietNam</p>
+
+            {/* Value of Award */}
+            <div className="flex flex-col items-start bg-teal-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <FaTrophy className="text-teal-500 text-2xl" />
+                <p className="block text-lg font-semibold">Value of Award</p>
+              </div>
+              <p className="text-heading-6 text-gray-700">VietNam</p>
             </div>
           </div>
         </section>
       </div>
-      <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
+
+      <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-            <p className="text-4xl">
-              Choose scholarship winner
+            <p className="text-4xl font-semibold text-sky-600">
+              Choose Scholarship Winner
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
-            <p className="text-lg font-semibold my-5">
-              <span className="">The winners of this scholarship: </span>
-              <span className="text-sky-500">
-                {scholarshipWinners.length}
-              </span>
-
+            <p className="text-lg font-semibold my-5 text-gray-700">
+              <span>The winners of this scholarship: </span>
+              <span className="text-sky-500">{scholarshipWinners.length}</span>
             </p>
-            {/*JSON.stringify(scholarshipWinners)*/}
-             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-             {scholarshipWinners.map((winner) => (
-             <div key={winner.id}>
-                 <ListItem alignItems="flex-start">
+
+            {/* Scholarship Winners List */}
+            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+              {scholarshipWinners.map((winner) => (
+                <div key={winner.id}>
+                  <ListItem alignItems="flex-start" className="hover:bg-sky-50 rounded-lg transition-all duration-200">
                     <ListItemAvatar>
-                      <Avatar alt="Remy Sharp" src={winner.applicant.avatarUrl??"https://github.com/shadcn.png"} />
+                      <Avatar alt={winner.applicant.username} src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"} />
                     </ListItemAvatar>
                     <ListItemText
                       primary={winner.applicant.username}
                       secondary={
-                        <>
-                          <Typography
-                            component="span"
-                            variant="body2"
-                            sx={{ color: 'text.primary', display: 'inline' }}
-                          >
+                        <Typography component="span" variant="body2" sx={{ color: 'text.primary', display: 'inline' }}>
                           {winner.applicant.email}
-                          </Typography>
-                        </>
+                        </Typography>
                       }
                     />
-                    <Link target="_blank" to={`/funder/application/${winner.id}`} className="text-sky-500 underline">
-                        View Profile
+                    <Link target="_blank" to={`/funder/application/${winner.id}`} className="text-sky-500 underline hover:text-sky-600 transition-all">
+                      <FaExternalLinkAlt className="inline-block text-sky-500 ml-2" />
+                      View Profile
                     </Link>
                   </ListItem>
                   <Divider variant="inset" component="li" />
-              </div>
-             ))}
+                </div>
+              ))}
             </List>
 
-            <p className="text-lg font-semibold my-5">
-              <span className="">Number of scholarships left: </span>
-              <span className="text-sky-500">
-                {availableScholarships.toString()}
-              </span>
+            {/* Scholarships Left */}
+            <p className="text-lg font-semibold my-5 text-gray-700">
+              <span>Number of scholarships left: </span>
+              <span className="text-sky-500">{availableScholarships}</span>
             </p>
-            <FormControl fullWidth sx={{}}>
-              <InputLabel htmlFor="outlined-adornment-amount">
-                Search
-              </InputLabel>
+
+            {/* Search Input */}
+            <FormControl fullWidth sx={{ marginBottom: '20px' }}>
+              <InputLabel htmlFor="outlined-adornment-search">Search Applicants</InputLabel>
               <OutlinedInput
-                id="outlined-adornment-amount"
+                id="outlined-adornment-search"
                 startAdornment={
                   <InputAdornment position="start">
                     <SearchIcon />
                   </InputAdornment>
                 }
                 onChange={(e) => setSearchQuery(e.target.value)}
-                label="Amount"
+                label="Search"
+                className="border-2 border-sky-500 rounded-md"
               />
             </FormControl>
-            {
-              <Paper sx={{ height: 400, width: "100%" }}>
-                {filteredRows.length > 0 ? (
-                  <DataGrid
-                    rows={filteredRows.map((app: any) => ({
-                      id: app.id,
-                      avatarUrl: app.applicant.avatarUrl??"https://github.com/shadcn.png",
-                      username: app.applicant.username,
-                      major: "Software Engineering",
-                      choosable:
-                        availableScholarships > 0 ||
-                        selectedRows.includes((row: any) => row.id === app.id),
-                    }))}
-                    onRowSelectionModelChange={handleSelectionChange}
-                    columns={columns}
-                    initialState={{ pagination: { paginationModel } }}
-                    pageSizeOptions={[5, 10]}
-                    checkboxSelection
-                    sx={{ border: 0 }}
-                    isRowSelectable={(params) => params.row.choosable}
-                    //availableScholarships > 0 || selectedRows.includes((row:any) => row.id === params.id)}
-                  />
-                ) : (<>
-                  <p className="text-center text-gray-500 mt-4 text-xl">
-                    No scholarship applicants yet
-                  </p>
-                </>
-                )}
-              </Paper>
-            }
 
-            <div>
+            {/* DataGrid */}
+            <Paper sx={{ height: 400, width: "100%", borderRadius: '8px', boxShadow: 3 }}>
+              {filteredRows.length > 0 ? (
+                <DataGrid
+                  rows={filteredRows.map((app: any) => ({
+                    id: app.id,
+                    avatarUrl: app.applicant.avatarUrl ?? "https://github.com/shadcn.png",
+                    username: app.applicant.username,
+                    major: "Software Engineering",
+                    choosable: availableScholarships > 0 || selectedRows.includes((row: any) => row.id === app.id),
+                  }))}
+                  onRowSelectionModelChange={handleSelectionChange}
+                  columns={columns}
+                  initialState={{ pagination: { paginationModel } }}
+                  pageSizeOptions={[5, 10]}
+                  checkboxSelection
+                  sx={{ border: 0 }}
+                  isRowSelectable={(params) => params.row.choosable}
+                />
+              ) : (
+                <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+              )}
+            </Paper>
+
+            {/* Selected Winners */}
+            <div className="my-4 text-lg text-gray-700">
               Selected Winners:{" "}
               {selectedRows.map((row: any, index: number) =>
-                index > 0
-                  ? ", " + row.applicant.username
-                  : row.applicant.username
+                index > 0 ? `, ${row.applicant.username}` : row.applicant.username
               )}
             </div>
+
+            {/* Apply Button */}
             <div className="flex justify-end mt-4">
-              <Button variant="contained" color="primary" onClick={applyForSelectedWinners}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={applyForSelectedWinners}
+                className="text-white flex items-center gap-2"
+              >
+                <FaCheckCircle className="text-white" />
                 Apply
               </Button>
             </div>
           </div>
         </div>
       </section>
+
     </div>
   );
 };
