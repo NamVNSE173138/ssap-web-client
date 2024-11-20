@@ -95,7 +95,7 @@ const ChooseWinner = () => {
         
 
         const response = await axios.put(
-          `http://localhost:5254/api/applications/${row.id}`,
+          `${BASE_URL}/api/applications/${row.id}`,
           payload,
           {
             headers: {
@@ -177,12 +177,15 @@ const ChooseWinner = () => {
     const selectedRowData = applicants.filter((row: any) =>
       selectionModel.includes(row.id)
     );
+    
     setSelectedRows(selectedRowData);
     if (data)
       setAvailableScholarships(
-        availableScholarships - selectedRowData.length <= 0
+        data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "APPROVED")).length
+         - selectedRowData.length <= 0
           ? 0
-          : availableScholarships - selectedRowData.length
+          : data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "APPROVED")).length
+ - selectedRowData.length
       );
   };
 
