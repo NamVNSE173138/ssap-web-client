@@ -5,7 +5,7 @@ import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { Search } from "lucide-react";
 
-const BASE_API_URL = "http://localhost:5254";
+const BASE_API_URL = import.meta.env.BASE_URL;
 
 export default function SearchBox() {
   const [input, setInput] = useState("");
