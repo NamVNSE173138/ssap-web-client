@@ -3,15 +3,25 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from 
 import { Link, useParams } from "react-router-dom"
 import SchoolLogo from "../ScholarshipProgramDetail/logo"
 import { useEffect, useState } from "react"
-import { getApplicationWithDocumentsAndAccount } from "@/services/ApiServices/applicationService"
+import { extendApplication, getApplicationWithDocumentsAndAccount, updateApplication } from "@/services/ApiServices/applicationService"
 import NotFound from "@/router/commonRoutes/404"
 import { getAllScholarshipProgram, getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService"
 import { Spin } from "antd"
 import { formatOnlyDate } from "@/lib/date-formatter"
 import DocumentTable from "./document-table"
+import AwardProgressTable from "./award-progress-table"
+import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService"
+import { Button } from "@/components/ui/button"
+import ApplicationStatus from "@/constants/applicationStatus"
+import { uploadFile } from "@/services/ApiServices/testService"
+import Application from "../Application"
+import { useSelector } from "react-redux"
+import { RootState } from "@/store/store"
+import RoleNames from "@/constants/roleNames"
 
   const FunderApplication = () => {
     const { id } = useParams<{ id: string }>();
+    const user = useSelector((state: RootState) => state.token.user);
     const [application, setApplication] = useState<any>(null);
     const [applicant, setApplicant] = useState<any>(null);
     const [applicantProfile, setApplicantProfile] = useState<any>(null);
@@ -20,11 +30,88 @@ import DocumentTable from "./document-table"
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
 
+    const [applyLoading, setApplyLoading] = useState<boolean>(false);
+
+    const [awardMilestones, setAwardMilestones] = useState<any>(null);
+
+    const [rowId, setRowId] = useState<number>(0);
+      const [rows, setRows] = useState<any[]>([
+        //{ id: 1, name: 'CV', type: "PDF", file: null, isNew: false },
+        //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
+      ]);
+
+      const handleAddRow = () => {
+        setRowId(rowId + 1);
+        const newRow = { id: rowId + 1, name: "", type: "" }; // Blank row for user input
+        setRows([...rows, newRow]);
+      };
+
+      const handleDeleteRow = (id: number) => {
+        setRows(rows.filter((row) => row.id !== id));
+      };
+
+      const handleDocumentInputChange = (id: number, field: any, value: any) => {
+        setRows((prevRows) =>
+          prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+        );
+      };
+
+      const handleSubmit = async () => {
+        if(!id) return;
+        try {
+            if(rows.length === 0) {
+
+                return;
+            }
+          setRows(
+              rows.map((row) => ({
+                ...row,
+                errors: {
+                  name: !row.name,
+                  type: !row.type,
+                  file: !row.file,
+                },
+              }))
+            );
+          setApplyLoading(true);
+
+            const applicationDocuments = [];
+            for (const row of rows) {
+              if (!row.name || !row.type || !row.file) return;
+              const formData = new FormData();
+              formData.append("File", row.file);
+              const name = await uploadFile(formData);
+
+              const documentData = {
+                name: row.name,
+                type: row.type,
+                fileUrl: name.urls[0],
+              };
+              applicationDocuments.push(documentData);
+            }
+
+            const response = await extendApplication({
+                applicationId: parseInt(id),
+                documents: applicationDocuments
+            })
+            setRows([]);
+
+            await fetchApplication();
+        } catch (error) {
+          console.error("Error submitting application:", error);
+        }
+        finally{
+            setApplyLoading(false)
+        }
+
+      }
+
     const fetchApplication = async () => {
         try {
           if(!id) return;
           const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
           const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
+          const award = await getAwardMilestoneByScholarship(parseInt(id));
           //console.log(response);
           //console.log(scholarship);
           if (response.statusCode == 200) {
@@ -33,6 +120,7 @@ import DocumentTable from "./document-table"
             setApplicantProfile(response.data.applicant.applicantProfile);
             setDocuments(response.data.applicationDocuments);
             setScholarship(scholarship.data);
+            setAwardMilestones(award.data);
           } else {
             setError("Failed to get applicants");
           }
@@ -150,13 +238,45 @@ import DocumentTable from "./document-table"
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
             <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-                <p className="text-4xl mb-8">
-                  Documents
-                  <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
-                </p>
-                <DocumentTable documents={documents}/>
+                <div className="flex justify-between">
+                    <p className="text-4xl mb-8">
+                      Documents
+                      <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
+                    </p>
+                    {application.status == ApplicationStatus.NeedExtend && user?.role == RoleNames.APPLICANT &&
+                    <Button onClick={handleAddRow} className="bg-yellow-500 hover:bg-yellow-600">Add Extend Document</Button>}
+                </div>
+                <DocumentTable documents={documents}
+                    rows={rows}
+                    setRows={setRows}
+                    handleDeleteRow={handleDeleteRow}
+                    handleInputChange={handleDocumentInputChange}
+                />
             </div>
         </div>
+        <div className="max-w-[1216px] mx-auto">
+            <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
+                <p className="text-4xl mb-8">
+                  Award Progress
+                  <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
+                </p>
+                <AwardProgressTable awardMilestone={awardMilestones} application={application}/>
+                {application.status == ApplicationStatus.NeedExtend && user?.role == RoleNames.APPLICANT &&
+                <div className="flex justify-end mt-[24px]">
+                    <Button
+                        disabled={applyLoading}
+                        onClick={handleSubmit} 
+                        className="bg-blue-500 hover:bg-blue-600">
+                        {applyLoading ? <div
+                            className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                            aria-hidden="true"></div>:
+                        "Submit"}
+                    </Button>
+                </div>}
+            </div>
+        </div>
+
+        
       </section>
 
     </div>

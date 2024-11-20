@@ -90,18 +90,20 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
               </div>
             )}
 
-            {scholarshipProgram?.majorSkills && (
+            {/*JSON.stringify(scholarshipProgram?.major)*/}
+            {scholarshipProgram.major && (
               <div className="flex justify-start items-center gap-2 mb-4">
                 <GiGraduateCap color="#1eb2a6" size={24} />
                 <p className="text-black">
-                  {scholarshipProgram.majorSkills.length > 2
-                    ? scholarshipProgram.majorSkills
+                    {scholarshipProgram.major.name}
+                  {/*scholarshipProgram.major.length > 2
+                    ? scholarshipProgram.major
                         .slice(0, 2)
                         .map((majorSkill) => majorSkill.name)
                         .join(", ") + "..."
-                    : scholarshipProgram.majorSkills
+                    : scholarshipProgram.major
                         .map((majorSkill) => majorSkill.name)
-                        .join(", ")}
+                        .join(", ")*/}
                 </p>
               </div>
             )}
