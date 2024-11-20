@@ -16,8 +16,7 @@ import RouteNames from "@/constants/routeNames";
 import { Input } from "@/components/ui/input";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
-import RequestFormModal from "../ServiceDetail/applicantRequestForm-dialog";
-import { IoWallet } from "react-icons/io5";
+import { IoPerson, IoWallet } from "react-icons/io5";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -33,7 +32,6 @@ const Service = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
-  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -130,6 +128,10 @@ const Service = () => {
     setIsRequestFormOpen(true);
   };
 
+  const handleNavigateProviderList = () => {
+    navigate(RouteNames.PROVIDER_LIST);
+  };
+
   return (
     <div>
       {/* Header Section with Background Image */}
@@ -190,18 +192,16 @@ const Service = () => {
               <IoMdTime className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
               <p className="text-xl text-blue-600 font-semibold">View History</p>
             </button>
-
             <button
-              onClick={handleRequestForm}
+              onClick={handleNavigateProviderList}
               className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
             >
-              <IoIosPaper className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
-              <p className="text-xl text-blue-600 font-semibold">Request Form</p>
+              <IoPerson className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl text-blue-600 font-semibold">Provider List</p>
             </button>
           </div>
         )}
       </div>
-
 
       {/* Services Grid */}
       <ul className="grid grid-cols-1 bg-blue-100 md:grid-cols-2 lg:grid-cols-3 gap-10 p-10">
@@ -248,23 +248,12 @@ const Service = () => {
         </button>
       </div>
 
-
-      {/* Request Form Modal */}
-      <RequestFormModal
-        isOpen={isRequestFormOpen}
-        handleClose={() => setIsRequestFormOpen(false)}
-        services={data}
-        handleSubmit={() => { }}
-      />
-
-      {/* Add Service Modal */}
       <AddServiceModal
         isOpen={isServiceModalOpen}
         setIsOpen={setIsServiceModalOpen}
         fetchServices={() => { setCurrentPage(1); fetchData(); }}
       />
 
-      {/* Wallet Dialog */}
       <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
         <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
           <h3 className="text-2xl font-semibold text-blue-600 flex items-center gap-2">

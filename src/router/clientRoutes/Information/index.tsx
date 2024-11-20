@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Alert, DatePicker, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
 import { getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
-import { GoPencil } from "react-icons/go";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Sidebar } from "@/components/AccountInfo";
@@ -360,26 +359,22 @@ const Information = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-center gap-4 mt-6">
-              {profileData.constructor === Array && (
-                <button
-                  type="button"
-                  onClick={handleAdd}
-                  className="lg:mb-7 mb-5 bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
-                >
-                  <FaRegEdit size={22} /> Add Profile
-                </button>
-              )}
-              {profileData.constructor !== Array && (
-                <button
-                  type="button"
-                  onClick={handleEdit}
-                  className="ml-3 lg:mb-7 mb-5 bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base flex items-center justify-center gap-2"
-                >
-                  <FaRegEdit size={22} /> Edit Profile
-                </button>
-              )}
+            <div className="flex justify-center">
+              {/*JSON.stringify(profileData)*/}
+              {profileData.constructor == Array && <button
+                type="button"
+                onClick={handleAdd}
+                className="lg:mb-7 mb-5 bg-[#1eb2a6] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+              >
+                Add Profile
+              </button>}
+              {profileData.constructor != Array && <button
+                type="button"
+                onClick={handleEdit}
+                className="ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+              >
+                Edit Profile
+              </button>}
               <button
                 type="button"
                 onClick={handleExportPDF}

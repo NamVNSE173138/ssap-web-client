@@ -16,49 +16,49 @@ import { RootState } from '@/store/store';
 import { FiDollarSign } from 'react-icons/fi';
 
 const HeaderAvatar = () => {
-    const avatar = useSelector((state: RootState) => state.token.avatar);
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const [isLoading, setIsLoading] = useState(false);
+  const avatar = useSelector((state: RootState) => state.token.avatar);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogout = () => {
-        setIsLoading(true); 
-        deleteToken(messaging);
-        setTimeout(() => {
-          dispatch(removeToken()); 
-          dispatch(removeUser());  
-          localStorage.removeItem('token'); 
-          navigate(RouteNames.HOME); 
-          setIsLoading(false); 
-        }, 500); 
-      };
+  const handleLogout = () => {
+    setIsLoading(true);
+    deleteToken(messaging);
+    setTimeout(() => {
+      dispatch(removeToken());
+      dispatch(removeUser());
+      localStorage.removeItem('token');
+      navigate(RouteNames.HOME);
+      setIsLoading(false);
+    }, 500);
+  };
 
-      const handleProfileClick = () => {
-        const token = localStorage.getItem('token'); 
-        const decodedToken = parseJwt(token); 
-        const userId = decodedToken ? decodedToken.id : null; 
+  const handleProfileClick = () => {
+    const token = localStorage.getItem('token');
+    const decodedToken = parseJwt(token);
+    const userId = decodedToken ? decodedToken.id : null;
 
-        if (userId) {
-            navigate(`${RouteNames.ACCOUNT_INFO}`);
-        } else {
-            console.error("User ID not found in token");
-        }
-    };
+    if (userId) {
+      navigate(`${RouteNames.ACCOUNT_INFO}`);
+    } else {
+      console.error("User ID not found in token");
+    }
+  };
 
-    const handleWalletClick = () => {
-        const token = localStorage.getItem('token');
-        const decodedToken = parseJwt(token);
-        const userId = decodedToken ? decodedToken.id : null;
+  const handleWalletClick = () => {
+    const token = localStorage.getItem('token');
+    const decodedToken = parseJwt(token);
+    const userId = decodedToken ? decodedToken.id : null;
 
-        if (userId) {
-            navigate(RouteNames.WALLET); 
-        } else {
-            console.error("User ID not found in token");
-        }
-    };
+    if (userId) {
+      navigate(RouteNames.WALLET);
+    } else {
+      console.error("User ID not found in token");
+    }
+  };
 
-    return (
-        <>
+  return (
+    <>
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Avatar>
@@ -76,7 +76,7 @@ const HeaderAvatar = () => {
 
           {/* Profile */}
           <DropdownMenuItem onClick={handleProfileClick} className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <CgProfile className='mr-3 text-xl text-gray-600' /> 
+            <CgProfile className='mr-3 text-xl text-gray-600' />
             <span className="text-gray-700">Profile</span>
           </DropdownMenuItem>
 
@@ -88,12 +88,12 @@ const HeaderAvatar = () => {
 
           {/* Log out */}
           <AlertDialog>
-            <DropdownMenuItem className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
-              <LogOut className="mr-3 text-xl" />
-              <span>Log out</span>
-            </DropdownMenuItem>
-            <AlertDialogTrigger>
-              <div className="hidden"></div>
+            {/* Wrap DropdownMenuItem with AlertDialogTrigger */}
+            <AlertDialogTrigger asChild>
+              <div className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
+                <LogOut className="mr-3 text-xl" />
+                <span>Log out</span>
+              </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -105,19 +105,25 @@ const HeaderAvatar = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="bg-gray-200 rounded-md px-4 py-2">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleLogout} className="bg-red-500 text-white rounded-md px-4 py-2">
+                <AlertDialogCancel className="bg-gray-200 rounded-md px-4 py-2">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  className="bg-red-500 text-white rounded-md px-4 py-2"
+                >
                   Log out
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
         </DropdownMenuContent>
       </DropdownMenu>
 
       {isLoading && <ScreenSpinner />}
     </>
-    );
+  );
 };
 
 export default HeaderAvatar;

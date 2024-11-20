@@ -9,21 +9,24 @@ import {
 } from "@/components/ui/breadcrumb";
 import Spinner from "@/components/Spinner";
 import RouteNames from "@/constants/routeNames";
-import { deleteService, getServiceById, updateService } from "@/services/ApiServices/serviceService";
-import { cancelRequest, checkUserRequest, createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
+import { getServiceById, updateService } from "@/services/ApiServices/serviceService";
+import { createRequest, getRequestsByService } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
-import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
+import { uploadFile } from "@/services/ApiServices/testService";
 import { FaClipboardList, FaEdit, FaExclamationTriangle, FaEye, FaPlus, FaRedo, FaStar, FaTimes, FaTrash, FaWallet } from "react-icons/fa";
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
-import { toast, ToastContainer } from "react-toastify";
-import { FaInfoCircle, FaDollarSign, FaClock, FaCheckCircle, FaUser } from "react-icons/fa";
-import { Dialog, DialogTitle, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { toast } from "react-toastify";
+import { FaInfoCircle, FaDollarSign, FaCheckCircle, FaUser } from "react-icons/fa";
+import { Dialog, DialogTitle } from "@mui/material";
 import { IoIosPaper } from "react-icons/io";
 import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoClose, IoText, IoCard, IoCloseCircleOutline } from "react-icons/io5";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import EditServiceModal from "../Activity/UpdateServiceModal";
+
 
 interface ServiceType {
     id: string;
@@ -36,12 +39,45 @@ interface ServiceType {
     providerId: string;
 }
 
+const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
+    return (
+        <div
+            className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${isOpen ? "block" : "hidden"}`}
+            onClick={onClose}
+        >
+            <div
+                className="bg-white rounded-lg p-8 max-w-sm w-full flex flex-col items-center"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <FaExclamationTriangle className="text-yellow-500 text-4xl mb-4" />
+                <h3 className="text-xl font-semibold mb-4">Are you sure you want to delete this service?</h3>
+                <div className="flex space-x-4">
+                    <button
+                        onClick={onConfirm}
+                        className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-500 transition"
+                    >
+                        Ok
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-200 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const { id } = serviceId ?? useParams<{ id: string }>();
     const [serviceData, setServiceData] = useState<ServiceType | null>(null);
     const [applicants, setApplicants] = useState<any>(null);
     const [applicantDialogOpen, setApplicantDialogOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
+    const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
     const [scholarshipType, setScholarshipType] = useState<string>("");
@@ -107,6 +143,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setEditDialogOpen(true);
     };
 
+    const closeEditDialog = () => {
+        setEditDialogOpen(false);
+        setEditData(null);
+    };
+
     const handleFeedbackClick = () => {
         setIsFeedbackDialogOpen(true);
     };
@@ -151,9 +192,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     };
 
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("Do you really want to delete?");
-        if (!confirmDelete || !serviceData) return;
-
+        if (!serviceData) return;
+        setConfirmationDialogOpen(false);
         setLoading(true);
         try {
             const updatedData = { ...serviceData, status: "Inactive" };
@@ -171,30 +211,21 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     };
 
     const handleRequestNow = async () => {
-        if (!serviceData) return;
+        if (!serviceData) {
+            toast.error("Service data is missing. Please try again.");
+            return;
+        }
+
         try {
             setLoading(true);
-            const walletResponse = await getAccountWallet(user?.id);
-            const userBalance = walletResponse.data.balance;
-            if (userBalance < serviceData?.price) {
-                toast.error("Insufficient funds to request this service. Please add funds to your account.");
-                setLoading(false);
-                return;
-            }
             setDialogOpen(true);
-
-        } catch (error: any) {
-            if (error.response?.data?.statusCode === 400) {
-                setIsWalletDialogOpen(true);
-            } else {
-                toast.error("Failed to check wallet information.");
-                console.error("Wallet check error:", error);
-            }
+        } catch (error) {
+            console.error("Error in handleRequestNow:", error);
+            toast.error("An error occurred while processing your request. Please try again.");
         } finally {
             setLoading(false);
         }
     };
-
 
     const handleNavigateToWallet = () => {
         navigate(RouteNames.WALLET);
@@ -212,25 +243,39 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setConfirmationDialogOpen(false);
     };
 
-    const handleSubmit = async () => {
-        if (!serviceData) return;
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        if (!serviceData) {
+            toast.error("Service data is missing. Please try again.");
+            return;
+        }
         if (!paymentMethod) {
             toast.error("Please select a payment method.");
             return;
         }
 
-        setLoading(true);
+        setLoadingSubmit(true);
         setError(null);
 
         try {
-            if (paymentMethod === "Pay by wallet") {
-                const walletResponse = await getAccountWallet(user?.id);
-                const userBalance = walletResponse.data.balance;
+            console.log(paymentMethod)
+            if (paymentMethod === "Wallet") {
+                try {
+                    const walletResponse = await getAccountWallet(user?.id);
+                    const userBalance = walletResponse.data.balance;
 
-                if (userBalance < serviceData?.price) {
-                    toast.error("Insufficient funds to request this service. Please add funds to your account.");
-                    setLoading(false);
-                    return;
+                    if (userBalance < serviceData?.price) {
+                        toast.error("Insufficient funds to request this service. Please add funds to your account.");
+                        setLoading(false);
+                        return;
+                    }
+                } catch (error: any) {
+                    if (error.response?.data?.statusCode === 400) {
+                        setIsWalletDialogOpen(true);
+                    } else {
+                        toast.error("Failed to check wallet information.");
+                        console.error("Wallet check error:", error);
+                    }
                 }
             }
 
@@ -238,7 +283,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             if (applicationFileUrls && applicationFileUrls.length > 0) {
                 const filesArray = Array.from(applicationFileUrls);
                 const uploadedFiles = await uploadFile(filesArray);
-                fileUrls = uploadedFiles.urls;
+                fileUrls = uploadedFiles.urls || [];
             }
 
             const requestDatas = {
@@ -247,37 +292,34 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 serviceIds: [serviceData?.id],
                 requestFileUrls: fileUrls,
             };
+            console.log(serviceData.price)
 
-            const transferRequest = {
-                senderId: Number(user.id),
-                receiverId: serviceData.providerId,
-                amount: paymentMethod === "Cash" ? 0 : serviceData.price,
-                paymentMethod,
-            };
+            if (serviceData.price > 0) {
+                const transferRequest = {
+                    senderId: Number(user.id),
+                    receiverId: serviceData.providerId,
+                    amount: serviceData.price,
+                    paymentMethod,
+                    description: "Pay for service",
+                };
 
-            setLoading(false);
-            if (paymentMethod === "Pay by wallet") {
                 await transferMoney(transferRequest);
-                toast.success("Payment successful!");
-            }
-            if (paymentMethod === "Cash") {
-                await transferMoney(transferRequest);
-                toast.success("Payment successful!");
+                console.log(`Payment successful for service ID ${serviceData.id}.`);
             }
 
-            closeDialog();
-            toast.success("Request created successfully!");
             await createRequest(requestDatas);
+            toast.success("Request created successfully!");
             await fetchService();
             await NotifyProviderNewRequest(user.id, Number(serviceData?.id));
+            closeDialog();
         } catch (error) {
-            setError((error as Error).message);
+            console.error("Error in handleSubmit:", error);
+            setError((error as Error).message || "An unknown error occurred.");
             toast.error("Failed to create request.");
         } finally {
-            setLoading(false);
+            setLoadingSubmit(false);;
         }
     };
-
 
     if (loading) return <Spinner size="large" />;
     if (error) return <p className="text-center text-xl font-semibold">{error}</p>;
@@ -288,7 +330,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             {isDialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] transform transition-all scale-95 hover:scale-100">
-                        {/* Dialog Header */}
                         <div className="mb-5 flex justify-between items-center">
                             <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
                                 <IoIosPaper className="text-3xl text-blue-500" />
@@ -302,9 +343,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                             </span>
                         </div>
 
-                        {/* Form Section */}
                         <form onSubmit={handleSubmit}>
-                            {/* Description */}
                             <div className="mb-5">
                                 <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
                                     <IoText className="text-blue-500" />
@@ -318,7 +357,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 />
                             </div>
 
-                            {/* File Upload */}
                             <div className="mb-5">
                                 <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
                                     <IoCloudUpload className="text-blue-500" />
@@ -344,7 +382,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     </label>
                                 </div>
 
-                                {/* Display the selected file names */}
                                 {applicationFileUrls.length > 0 && (
                                     <div className="mt-4 text-gray-700">
                                         <h3 className="font-medium">Selected Files:</h3>
@@ -359,17 +396,15 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 )}
                             </div>
 
-                            {/* Payment Method */}
                             <div className="mb-5">
                                 <label className="block text-gray-700 font-medium mb-3 flex items-center gap-2">
                                     <IoCard className="text-blue-500" />
                                     Choose Payment Method
                                 </label>
                                 <div className="flex gap-6">
-                                    {/* Pay by Wallet */}
                                     <div
-                                        onClick={() => setPaymentMethod("Pay by wallet")}
-                                        className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Pay by wallet"
+                                        onClick={() => setPaymentMethod("Wallet")}
+                                        className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet"
                                             ? "border-blue-500 bg-blue-100"
                                             : "border-gray-300 hover:bg-gray-100"
                                             }`}
@@ -379,8 +414,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                         </div>
                                         <span className="font-medium text-gray-800">Pay by Wallet</span>
                                     </div>
-
-                                    {/* Cash */}
                                     <div
                                         onClick={() => setPaymentMethod("Cash")}
                                         className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash"
@@ -399,7 +432,19 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 )}
                             </div>
 
-                            {/* Action Buttons */}
+                            <div className="mb-5">
+                                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                    <IoText className="text-blue-500" />
+                                    Payment Description
+                                </label>
+                                <input
+                                    type="text"
+                                    value="Pay for service"
+                                    disabled
+                                    className="w-full border border-gray-300 bg-gray-100 text-gray-700 rounded-lg p-3 shadow-sm cursor-not-allowed focus:outline-none"
+                                />
+                            </div>
+
                             <div className="flex justify-end mt-6">
                                 <button
                                     type="button"
@@ -410,9 +455,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-blue-600 text-white rounded-lg px-5 py-2 hover:bg-blue-700 transition"
+                                    className="bg-blue-600 text-white rounded-lg px-5 py-2 flex items-center space-x-2 hover:bg-blue-700 transition"
+                                    disabled={loadingSubmit}
                                 >
-                                    Send
+                                    {loadingSubmit ? (
+                                        "Processing..."
+                                    ) : (
+                                        <>
+                                            <CheckCircleOutlineIcon className="text-white" />
+                                            <span>Send</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -557,8 +610,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                             <>
                                                 <button
                                                     onClick={() => openEditDialog()}
-                                                    className="flex items-center justify-center w-full bg-yellow-500 hover:bg-yellow-400 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                                                    className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
+                                                        ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                                                        : "bg-yellow-500 hover:bg-yellow-400 text-white"
+                                                        }`}
                                                     disabled={!canEdit}
+                                                    title={!canEdit ? "There is already an applicant to buy this service." : ""}
                                                 >
                                                     <FaEdit className="mr-2" /> Edit
                                                 </button>
@@ -569,8 +626,13 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                                     <FaEye className="mr-2" /> View Request
                                                 </button>
                                                 <button
-                                                    onClick={handleDelete}
-                                                    className="flex items-center justify-center w-full bg-red-600 hover:bg-red-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                                                    onClick={() => setConfirmationDialogOpen(true)}
+                                                    className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
+                                                        ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                                                        : "bg-red-600 hover:bg-red-500 text-white"
+                                                        }`}
+                                                    disabled={!canEdit}
+                                                    title={!canEdit ? "There is already an applicant to buy this service." : ""}
                                                 >
                                                     <FaTrash className="mr-2" /> Delete
                                                 </button>
@@ -601,7 +663,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     <p className="text-gray-600">{serviceData.type}</p>
                                 </div>
                             </div>
-                            <div className="flex ml-35 items-center space-x-4">
+                            <div className="flex ml-20 items-center space-x-4">
                                 <FaDollarSign className="text-green-500 text-xl" />
                                 <div>
                                     <p className="text-lg font-semibold text-gray-700">Price:</p>
@@ -609,20 +671,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <FaClock className="text-yellow-500 text-xl" />
-                                <div>
-                                    <p className="text-lg font-semibold text-gray-700">Duration:</p>
-                                    <p className="text-gray-600">{new Date(serviceData.duration).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                            <div className="hidden flex items-center space-x-4">
-                                <FaCheckCircle className="text-teal-500 text-xl" />
-                                <div>
-                                    <p className="text-lg font-semibold text-gray-700">Status:</p>
-                                    <p className="text-gray-600">{serviceData.status}</p>
-                                </div>
-                            </div>
-                            <div className="flex ml-35 items-center space-x-4">
                                 <FaUser className="text-indigo-500 text-xl" />
                                 <div>
                                     <Link
@@ -633,7 +681,14 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     </Link>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-4">
+                            <div className="hidden flex items-center space-x-4">
+                                <FaCheckCircle className="text-teal-500 text-xl" />
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-700">Status:</p>
+                                    <p className="text-gray-600">{serviceData.status}</p>
+                                </div>
+                            </div>
+                            <div className="flex ml-20 items-center space-x-4">
                                 <FaClipboardList className="text-teal-500 text-xl" />
                                 <div>
                                     <p className="text-lg font-semibold text-gray-700">About This Service:</p>
@@ -653,20 +708,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     await fetchApplicants(parseInt(serviceData?.id));
                 }} />
 
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
 
-            {/* Wallet Dialog */}
             <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
                 <div className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto">
                     <div className="flex items-center mb-6">
@@ -690,7 +732,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     </div>
                 </div>
             </Dialog>
-
+            <EditServiceModal
+                isOpen={isEditDialogOpen}
+                setIsOpen={closeEditDialog}
+                serviceData={serviceData}
+                fetchServices={fetchService}
+            />
+            <ConfirmationDialog
+                isOpen={isConfirmationDialogOpen}
+                onClose={() => setConfirmationDialogOpen(false)}
+                onConfirm={handleDelete}
+            />
         </div>
     );
 };
