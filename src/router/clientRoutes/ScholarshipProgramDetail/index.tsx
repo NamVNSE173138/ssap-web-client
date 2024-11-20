@@ -31,6 +31,9 @@ import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
 import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
 import AwardDialog from "./award-dialog";
+import ApplicationStatus from "@/constants/applicationStatus";
+import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
+import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,6 +60,9 @@ const ScholarshipProgramDetail = () => {
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
+  //const [awardMilestones, setAwardMilestones] = useState<any>(null);
+  const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
+
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
   const fetchData = async () => {
@@ -74,6 +80,16 @@ const ScholarshipProgramDetail = () => {
           if (user) {
             const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
             setExistingApplication(application.data);
+            const award = await getAwardMilestoneByScholarship(response.data.data.id);
+            //console.log(application.data);
+            if(application.data[0].status == ApplicationStatus.NeedExtend){
+                award.data.forEach((milestone: any) => {
+                    if(new Date(milestone.fromDate) > new Date() || new Date() > new Date(milestone.toDate)){
+                        return;
+                    }
+                    setExtendBeforeDate(milestone.fromDate);
+                })
+            }
           }
         } else {
           setError("Failed to fetch data");
@@ -205,7 +221,6 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
-
   const deleteScholarship = async () => {
     try {
       const response = await axios.delete(`${BASE_URL}/api/scholarship-programs/${id}`)
@@ -268,15 +283,18 @@ const ScholarshipProgramDetail = () => {
             {data.status == "FINISHED" &&
                 <div className="text-xl font-semibold mr-3">This scholarship has finished</div>
             }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == "PENDING" &&
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Submitted &&
                 data.status != "FINISHED" &&
                 <div className="text-xl font-semibold mr-3">Your application is being reviewed</div>
             }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status != "APPROVED" &&
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Rejected &&
                 <div className="text-xl font-semibold mr-3">Your application to this scholarship have not been approved</div>
             }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == "APPROVED" &&
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Approved &&
                 <div className="text-xl font-semibold mr-3">You have won this scholarship</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.NeedExtend &&
+                <div className="text-xl font-semibold mr-3">You need to extend this scholarship before {formatDate(extendBeforeDate)}</div>
             }
 
             <div className="text-white text-center flex h-[50px] mt-[26px] ">
@@ -299,7 +317,15 @@ const ScholarshipProgramDetail = () => {
                       >
                         View applications{" "}
                       </button>
-                      {existingApplication[0].status != "APPROVED" && <AlertDialog>
+                      {existingApplication[0].status == ApplicationStatus.NeedExtend && 
+                      <button
+                        onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                        className=" text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                      >
+                        Extend Application{" "}
+                      </button>
+                      }
+                      {existingApplication[0].status != ApplicationStatus.Approved && existingApplication[0].status != ApplicationStatus.NeedExtend && <AlertDialog>
                           <AlertDialogTrigger className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" disabled={cancelLoading}>
                           {cancelLoading ? (<div
                               className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
@@ -549,14 +575,14 @@ const ScholarshipProgramDetail = () => {
                     Applicable Majors &amp; Skills
                   </AccordionSummary>
                   <AccordionDetails>
-                    {data.majorSkills && data.majorSkills.map((majorSkill: any) => (
-                      <Accordion key={majorSkill.id}>
+                    {data?.major?.map((major: any) => (
+                      <Accordion key={major.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel3-content"
                           id="panel3-header"
                         >
-                          <span className="font-bold mr-2">{majorSkill.name} </span>
+                          <span className="font-bold mr-2">{major.name} </span>
                         </AccordionSummary>
                         <AccordionDetails>
 
@@ -564,14 +590,14 @@ const ScholarshipProgramDetail = () => {
                             <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
                               Description:
                             </p>
-                            {majorSkill.description}
+                            {major.description}
                           </div>
                           <div className="w-full mt-3 flex gap-3 flex-wrap">
                             <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
                               Skills:
                             </p>
                             <div>
-                              {majorSkill.skills.map((skill: any) => (
+                              {major.skills.map((skill: any) => (
                                 <Accordion key={skill.id}>
                                   <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
@@ -610,7 +636,7 @@ const ScholarshipProgramDetail = () => {
                     Applicable Universities
                   </AccordionSummary>
                   <AccordionDetails>
-                    {data.universities && data.universities.map((university: any) => (
+                    {data?.universities?.map((university: any) => (
                       <Accordion key={university.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
