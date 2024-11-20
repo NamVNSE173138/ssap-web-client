@@ -30,6 +30,7 @@ import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/revi
 import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
 import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
+import AwardDialog from "./award-dialog";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,6 +51,9 @@ const ScholarshipProgramDetail = () => {
 
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] = useState<boolean>(false);
+
+  const [winningApplications, setWinningApplications] = useState<any>(null);
+  const [awardDialogOpen, setAwardDialogOpen] = useState<boolean>(false);
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
@@ -135,6 +139,22 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+  const fetchWinningApplications = async (scholarshipId: number) => {
+    try {
+      const response = await getApplicationsByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setWinningApplications(response.data.filter((application: any) => application.status === "APPROVED"));
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAssignExpertDialog = async () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
@@ -156,6 +176,14 @@ const ScholarshipProgramDetail = () => {
     setLoading(true);
     if (!data) return;
     await fetchReviewMilestones(parseInt(data?.id));
+    setLoading(false);
+  };
+
+  const handleOpenAwardDialog = async () => {
+    setAwardDialogOpen(true);
+    setLoading(true);
+    if (!data) return;
+    await fetchWinningApplications(parseInt(data?.id));
     setLoading(false);
   };
 
@@ -336,6 +364,13 @@ const ScholarshipProgramDetail = () => {
                   >
                     Review Milestones{" "}
                   </button>
+                  <button
+                    onClick={() => handleOpenAwardDialog()}
+                    className=" text-xl w-full  bg-blue-700 rounded-[25px]"
+                  >
+                    Award Progress{" "}
+                  </button>
+
                 </div>
               ))}
             </div>
@@ -514,7 +549,7 @@ const ScholarshipProgramDetail = () => {
                     Applicable Majors &amp; Skills
                   </AccordionSummary>
                   <AccordionDetails>
-                    {data.majorSkills.map((majorSkill: any) => (
+                    {data.majorSkills && data.majorSkills.map((majorSkill: any) => (
                       <Accordion key={majorSkill.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
@@ -575,7 +610,7 @@ const ScholarshipProgramDetail = () => {
                     Applicable Universities
                   </AccordionSummary>
                   <AccordionDetails>
-                    {data.universities.map((university: any) => (
+                    {data.universities && data.universities.map((university: any) => (
                       <Accordion key={university.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
@@ -688,6 +723,10 @@ const ScholarshipProgramDetail = () => {
           if (!data) return;
           await fetchReviewMilestones(parseInt(data?.id));
         }} />)}
+      {authorized != "Unauthorized" && (<AwardDialog isOpen={awardDialogOpen}
+        setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
+        winningApplications={winningApplications ?? []}/>
+      )}
 
     </div>
   );

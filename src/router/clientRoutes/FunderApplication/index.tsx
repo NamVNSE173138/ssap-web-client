@@ -9,6 +9,8 @@ import { getAllScholarshipProgram, getScholarshipProgram } from "@/services/ApiS
 import { Spin } from "antd"
 import { formatOnlyDate } from "@/lib/date-formatter"
 import DocumentTable from "./document-table"
+import AwardProgressTable from "./award-progress-table"
+import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService"
 
   const FunderApplication = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,11 +22,15 @@ import DocumentTable from "./document-table"
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
 
+
+    const [awardMilestones, setAwardMilestones] = useState<any>(null);
+
     const fetchApplication = async () => {
         try {
           if(!id) return;
           const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
           const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
+          const award = await getAwardMilestoneByScholarship(parseInt(id));
           //console.log(response);
           //console.log(scholarship);
           if (response.statusCode == 200) {
@@ -33,6 +39,7 @@ import DocumentTable from "./document-table"
             setApplicantProfile(response.data.applicant.applicantProfile);
             setDocuments(response.data.applicationDocuments);
             setScholarship(scholarship.data);
+            setAwardMilestones(award.data);
           } else {
             setError("Failed to get applicants");
           }
@@ -155,6 +162,15 @@ import DocumentTable from "./document-table"
                   <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
                 </p>
                 <DocumentTable documents={documents}/>
+            </div>
+        </div>
+        <div className="max-w-[1216px] mx-auto">
+            <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
+                <p className="text-4xl mb-8">
+                  Award Progress
+                  <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
+                </p>
+                <AwardProgressTable awardMilestone={awardMilestones} application={application}/>
             </div>
         </div>
       </section>
