@@ -6,9 +6,9 @@ export type ScholarshipProgramType = {
   scholarshipAmount: number;
   numberOfScholarships: number;
   deadline: string;
-  numberOfRenewals: number;
+  // numberOfRenewals: number;
   funderId: number;
-  providerId: number;
+  // providerId: number;
   createAt: Date;
   updateAt: Date;
   status: string;
@@ -17,7 +17,7 @@ export type ScholarshipProgramType = {
     name: string;
     description: string;
   };
-  majorSkills: Array<{
+  major:Array< {
     id: string;
     name: string;
     description: string;

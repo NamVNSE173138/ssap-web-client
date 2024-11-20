@@ -514,14 +514,14 @@ const ScholarshipProgramDetail = () => {
                     Applicable Majors &amp; Skills
                   </AccordionSummary>
                   <AccordionDetails>
-                    {data.majorSkills.map((majorSkill: any) => (
-                      <Accordion key={majorSkill.id}>
+                    {data?.major?.map((major: any) => (
+                      <Accordion key={major.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel3-content"
                           id="panel3-header"
                         >
-                          <span className="font-bold mr-2">{majorSkill.name} </span>
+                          <span className="font-bold mr-2">{major.name} </span>
                         </AccordionSummary>
                         <AccordionDetails>
 
@@ -529,14 +529,14 @@ const ScholarshipProgramDetail = () => {
                             <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
                               Description:
                             </p>
-                            {majorSkill.description}
+                            {major.description}
                           </div>
                           <div className="w-full mt-3 flex gap-3 flex-wrap">
                             <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
                               Skills:
                             </p>
                             <div>
-                              {majorSkill.skills.map((skill: any) => (
+                              {major.skills.map((skill: any) => (
                                 <Accordion key={skill.id}>
                                   <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
@@ -575,7 +575,7 @@ const ScholarshipProgramDetail = () => {
                     Applicable Universities
                   </AccordionSummary>
                   <AccordionDetails>
-                    {data.universities.map((university: any) => (
+                    {data?.universities?.map((university: any) => (
                       <Accordion key={university.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
