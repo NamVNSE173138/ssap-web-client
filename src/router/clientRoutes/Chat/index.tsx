@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import { getMessaging, onMessage } from "firebase/messaging";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
+import { AiOutlineSend } from "react-icons/ai";
+import { FaComment, FaRegUser } from "react-icons/fa";
 
 interface Account {
   id: number;
@@ -80,7 +82,7 @@ const Chat: React.FC = () => {
       const requestData = requestsResponse.data;
       const hasPendingRequest = requestData.some((request: any) => request.status === "Pending");
       setIsChatEnabled(hasPendingRequest);
-    }else{
+    } else {
       setIsChatEnabled(true);
     }
   };
@@ -177,111 +179,116 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <div className="bg-blue-100" style={{ display: "flex", height: "100vh", padding: "30px" }}>
-      <div style={{ width: "30%", borderRight: "1px solid #ccc", padding: "20px", overflowY: "scroll" }}>
-        <ul style={{ listStyleType: "none", padding: 0 }}>
+    <div className="flex h-screen bg-blue-50 p-8">
+      {/* Sidebar */}
+      <div className="w-1/3 bg-blue-200 border-r border-gray-300 p-5 overflow-y-auto rounded-lg shadow-lg">
+        <ul className="space-y-4">
           {accounts.map((account) => (
             <li
               key={account.id}
               onClick={() => handleAccountClick(account)}
-              style={{
-                padding: "10px",
-                marginBottom: "10px",
-                cursor: "pointer",
-                backgroundColor: selectedUser?.id === account.id ? "#ddd" : "#f9f9f9",
-                borderRadius: "10px",
-                display: "flex",
-                alignItems: "center"
-              }}
+              className={`p-3 rounded-lg flex items-center cursor-pointer transition-all duration-200 transform hover:scale-105 ${selectedUser?.id === account.id
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-white hover:bg-blue-50"
+                }`}
             >
               <img
                 src={account.avatarUrl || "https://github.com/shadcn.png"}
                 alt={account.username}
-                style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "20px" }}
+                className="w-12 h-12 rounded-full mr-4 shadow-md"
               />
-              <span>{account.username}</span>
-              {account.unreadCount > 0 && (
-                <span
-                  style={{
-                    height: "10px",
-                    width: "10px",
-                    borderRadius: "50%",
-                    backgroundColor: "red",
-                    marginLeft: "10px"
-                  }}
-                />
-              )}
+              <div className="flex flex-col">
+                <span className="text-gray-800 font-medium truncate">{account.username}</span>
+                {account.unreadCount > 0 && (
+                  <span className="h-3 w-3 ml-3 bg-red-500 rounded-full" />
+                )}
+              </div>
+              <FaComment className="ml-auto text-gray-500 hover:text-blue-600" size={24} />
             </li>
           ))}
         </ul>
       </div>
 
-      <div style={{ width: "70%", display: "flex", flexDirection: "column", padding: "20px" }}>
-        <div style={{ flex: 1, overflowY: "scroll", paddingBottom: "20px" }}>
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col bg-blue-200 p-6 rounded-lg shadow-lg">
+        {/* Chat Header */}
+        <div className="mb-4 flex items-center justify-between">
           {selectedUser ? (
-            <>
-              <h2 className="font-extrabold">Chat with {selectedUser.username}</h2>
-              <div>
-                {chatHistory.map((msg, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      marginTop: "10px",
-                      marginBottom: "10px",
-                      display: "flex",
-                      justifyContent: msg.senderId === parseInt(user?.id) ? "flex-end" : "flex-start"
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "10px",
-                        borderRadius: "10px",
-                        backgroundColor: msg.senderId === parseInt(user?.id) ? "#DCF8C6" : "#f1f1f1",
-                        maxWidth: "60%"
-                      }}
-                    >
-                      {msg.message}
-                      <div style={{ fontSize: "12px", textAlign: "right", marginTop: "5px" }}>
-                        {new Date(msg.timestamp).toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 flex items-center gap-2">
+              <FaRegUser className="text-blue-500" />
+              Chat with {selectedUser.username}
+            </h2>
           ) : (
-            <h2>Select a user to chat</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
+              Select a user to chat
+            </h2>
           )}
         </div>
 
+        {/* Chat History */}
+        <div className="flex-1 overflow-y-auto space-y-3 pb-5">
+          {selectedUser && chatHistory.length > 0 ? (
+            chatHistory.map((msg, index) => (
+              <div
+                key={index}
+                className={`flex items-start ${msg.senderId === parseInt(user?.id) ? "justify-end" : "justify-start"
+                  }`}
+              >
+                <div
+                  className={`p-4 rounded-lg shadow-md max-w-sm text-sm ${msg.senderId === parseInt(user?.id)
+                      ? "bg-green-200 text-right"
+                      : "bg-gray-100"
+                    }`}
+                >
+                  <p>{msg.message}</p>
+                  <span className="text-xs text-gray-500 mt-2 block">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            selectedUser && (
+              <p className="text-center text-gray-500 text-sm">
+                No messages yet. Start the conversation!
+              </p>
+            )
+          )}
+        </div>
+
+        {/* Message Input */}
         {selectedUser && (
-          <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+          <div className="flex items-center mt-4">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={isChatEnabled ? "Type your message..." : "You have no more requests's status 'Pending' so you cannot chat with the Provider, thank you!."}
+              placeholder={
+                isChatEnabled
+                  ? "Type your message..."
+                  : "You cannot chat with the provider at this time."
+              }
               disabled={!isChatEnabled}
-              style={{ flex: 1, padding: "10px", borderRadius: "10px", border: "1px solid #ccc", marginRight: "10px" }}
+              className="flex-1 p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none mr-3 shadow-sm"
             />
             <button
               onClick={handleSendMessage}
               disabled={!isChatEnabled}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#0084ff",
-                color: "white",
-                border: "none",
-                borderRadius: "20px",
-                cursor: "pointer"
-              }}
+              className={`px-6 py-2 rounded-full font-medium text-white transition-all duration-200 ${isChatEnabled
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-gray-400 cursor-not-allowed"
+                }`}
             >
+              <AiOutlineSend className="inline-block mr-2" size={20} />
               Send
             </button>
           </div>
         )}
       </div>
     </div>
+
+
+
   );
 };
 
