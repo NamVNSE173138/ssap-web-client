@@ -54,6 +54,11 @@ export async function cancelRequest(requestId: number) {
     return response.data;
 }
 
+export async function updateFinishRequest(id: number) {
+    const response = await axios.put(`${BASE_URL}/api/requests/finish-request/${id}`, null, ngrokSkipWarning);
+    return response.data;
+}
+
 export async function getRequestsByApplicantId(applicantId: number) {
     const response = await axios.get(`${BASE_URL}/api/requests?ApplicantId=${applicantId}`, ngrokSkipWarning);
     return response.data;

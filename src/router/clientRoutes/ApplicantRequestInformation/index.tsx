@@ -26,6 +26,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
       if (!id) return;
       const request = await getRequestWithApplicantAndRequestDetails(parseInt(id));
       console.log(request);
+      console.log(request.data)
 
       if (request.statusCode == 200) {
         setRequest(request.data);
@@ -93,7 +94,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <Link
-                    to={user.role === 'APPLICANT' ? `/applicant/requestinformation/${request.id}` : `/provider/requestinformation/${request.id}`}
+                    to={user.role === 'Applicant' ? `/applicant/requestinformation/${request.id}` : `/provider/requestinformation/${request.id}`}
                     className="text-white md:text-xl text-lg"
                   >
                     {applicant.username}
