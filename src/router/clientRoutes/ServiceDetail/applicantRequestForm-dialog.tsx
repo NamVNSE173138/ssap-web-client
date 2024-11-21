@@ -5,17 +5,18 @@ import { ServiceType } from "../Service/data";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { createRequest } from "@/services/ApiServices/requestService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
-import { toast } from "react-toastify";
 import { uploadFile } from "@/services/ApiServices/testService";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoText, IoPricetag, IoCard, IoClose } from "react-icons/io5";
+import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoText, IoPricetag, IoCard, IoClose, IoInformationCircle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { FaExclamationTriangle, FaTimes, FaWallet } from "react-icons/fa";
 import RouteNames from "@/constants/routeNames";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
+import ServiceContractDialog from "./ServiceContractDialog";
+import { notification } from "antd";
 
 
 type RequestFormModalProps = {
@@ -44,6 +45,8 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const [isContractOpen, setContractOpen] = useState(false);
+
 
   useEffect(() => {
     const fetchScholarships = async () => {
@@ -69,19 +72,23 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
     setTotalPrice(newTotalPrice);
   }, [selectedService, services]);
 
+  const handleOpenContract = () => {
+    setContractOpen(true);
+  };
+
   const handleFormSubmit = async () => {
     if (selectedService.length === 0) {
-      toast.error("Please select at least one service.");
+      notification.error({ message: "Please select at least one service." });
       return;
     }
 
     if (!user) {
-      toast.error("User not found. Please log in again.");
+      notification.error({ message: "User not found. Please log in again." });
       return;
     }
 
     if (!paymentMethod) {
-      toast.error("Please select a payment method.");
+      notification.error({ message: "Please select a payment method." });
       return;
     }
 
@@ -95,7 +102,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
           const userBalance = walletResponse.data.balance;
 
           if (userBalance < totalPrice) {
-            toast.error("Insufficient funds to request this service. Please add funds to your account.");
+            notification.error({ message: "Insufficient funds to request this service. Please add funds to your account." });
             setLoading(false);
             return;
           }
@@ -103,7 +110,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
           if (error.response?.data?.statusCode === 400) {
             setIsWalletDialogOpen(true);
           } else {
-            toast.error("Failed to check wallet information.");
+            notification.error({ message: "Failed to check wallet information." });
             console.error("Wallet check error:", error);
           }
         }
@@ -140,15 +147,15 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
         };
 
         await createRequest(requestData);
+        handleClose();
+        notification.success({ message: "All services processed successfully!" });
         await NotifyProviderNewRequest(Number(user.id), serviceId);
         console.log(`Request created successfully for service ID ${serviceId}.`);
       }
-      handleClose();
-      toast.success("All services processed successfully!");
     } catch (err) {
       console.error("Error submitting the request:", err);
       setError("An error occurred while submitting the request.");
-      toast.error("Failed to process some or all services.");
+      notification.error({ message: "Failed to process some or all services." });
     } finally {
       setLoading(false);
     }
@@ -173,7 +180,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
               <span>Request Service</span>
               <button
                 onClick={handleClose}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
               >
                 <IoClose className="text-2xl" />
               </button>
@@ -304,28 +311,25 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                     <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
                   )}
                 </div>
-
-                <div className="mb-5">
-                  <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
-                    <IoText className="text-blue-500" />
-                    Payment Description
-                  </label>
-                  <input
-                    type="text"
-                    value="Pay for service"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 text-gray-700 rounded-lg p-3 shadow-sm cursor-not-allowed focus:outline-none"
-                  />
-                </div>
-
-                {error && <div className="text-red-500 text-sm">{error}</div>}
               </div>
             </DialogContent>
+
+            <div className="mt-6 text-gray-600 text-base flex items-center gap-2">
+              <IoInformationCircle className="text-blue-500 inline" />
+              By clicking <span className="font-medium">"Send"</span>, you agree to our{" "}
+              <span
+                className="text-blue-500 font-medium cursor-pointer hover:underline"
+                onClick={handleOpenContract}
+              >
+                Service Contract
+              </span>.
+            </div>
 
             <DialogActions>
               <Button
                 onClick={handleClose}
                 className="bg-gray-300 text-black hover:bg-gray-400 rounded-xl px-5 py-2 transition"
+                disabled={loading}
               >
                 Cancel
               </Button>
@@ -344,9 +348,11 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                 )}
               </Button>
             </DialogActions>
+
           </div>
         </div>
       </Dialog>
+
 
       <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
         <div className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto">
@@ -371,6 +377,11 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
           </div>
         </div>
       </Dialog>
+
+      <ServiceContractDialog
+        isOpen={isContractOpen}
+        onClose={() => setContractOpen(false)}
+      />
     </div>
   );
 }
