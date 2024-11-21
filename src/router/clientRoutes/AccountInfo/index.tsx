@@ -9,8 +9,8 @@ import { Sidebar } from "@/components/AccountInfo";
 import { GoPencil } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { log } from "console";
 import { setUser } from "@/reducers/tokenSlice";
+
 
 const AccountInfo = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -357,6 +357,93 @@ const AccountInfo = () => {
         </div>
       )}
     </div>
+    //   ) : (
+    //     <div className="col-start-3 col-end-13 flex flex-col justify-start gap-4 p-5 bg-white shadow-lg rounded-xl">
+    //       <form className="lg:px-28 flex flex-col gap-9">
+    //         {/* Avatar and View Mode */}
+    //         <div className="flex justify-start items-center gap-8">
+    //           <label className="relative cursor-pointer">
+    //             <input type="file" className="hidden" disabled />
+    //             <img
+    //               src={profileData?.avatarUrl || "https://via.placeholder.com/150"}
+    //               alt="avatar"
+    //               className="rounded-full lg:w-32 lg:h-32 w-24 h-24 ml-7 lg:ml-0"
+    //             />
+    //           </label>
+    //           <div className="flex flex-col gap-2">
+    //             <p className="text-xl font-semibold text-gray-800">{profileData?.username}</p>
+    //             <p className="text-sm lg:text-base text-gray-500">{user?.role}</p>
+    //           </div>
+    //         </div>
+
+    //         {/* Display Read-Only Information */}
+    //         <div className="grid grid-cols-2 lg:gap-8 gap-4 mx-2">
+    //           <div>
+    //             <label htmlFor="username" className="flex items-center gap-2 text-gray-700">
+    //               <GoPencil size={18} /> Username:
+    //             </label>
+    //             <input
+    //               type="text"
+    //               id="username"
+    //               className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+    //               value={profileData?.username || ""}
+    //               readOnly
+    //             />
+    //           </div>
+    //           <div>
+    //             <label htmlFor="email" className="flex items-center gap-2 text-gray-700">
+    //               <FaEnvelope size={18} /> Email:
+    //             </label>
+    //             <input
+    //               type="email"
+    //               id="email"
+    //               className="lg:w-full lg:h-15 h-9 w-[95%] lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+    //               value={profileData?.email || ""}
+    //               readOnly
+    //             />
+    //           </div>
+    //         </div>
+
+    //         <div className="grid grid-cols-2 lg:gap-8 gap-4 mx-2">
+    //           <div>
+    //             <label htmlFor="phoneNumber" className="flex items-center gap-2 text-gray-700">
+    //               <FaPhoneAlt size={18} /> Phone number:
+    //             </label>
+    //             <input
+    //               type="text"
+    //               id="phoneNumber"
+    //               className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+    //               value={profileData?.phoneNumber || ""}
+    //               readOnly
+    //             />
+    //           </div>
+    //           <div>
+    //             <label htmlFor="address" className="flex items-center gap-2 text-gray-700">
+    //               <FaMapMarkerAlt size={18} /> Address:
+    //             </label>
+    //             <input
+    //               type="text"
+    //               id="address"
+    //               className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-gray-300 text-base lg:text-xl"
+    //               value={profileData?.address || ""}
+    //               readOnly
+    //             />
+    //           </div>
+    //         </div>
+
+    //         <div className="flex justify-center mt-6">
+    //           <button
+    //             type="button"
+    //             onClick={handleEdit}
+    //             className="bg-[#067CEB] text-white lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base shadow-lg hover:bg-blue-700"
+    //           >
+    //             Edit Profile
+    //           </button>
+    //         </div>
+    //       </form>
+    //     </div>
+    //   )}
+    // </div>
   );
 };
 

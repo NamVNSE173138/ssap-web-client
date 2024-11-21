@@ -2,11 +2,15 @@ import { Input } from "@/components/ui/input";
 import { Button, IconButton, TableCell, TableRow, TextField, Tooltip } from "@mui/material";
 import { CloudUploadIcon, TrashIcon } from "lucide-react";
 
-const ExtendApplicationRows = ({ row, setRows,handleDeleteRow, handleInputChange }:any) => {
+const ExtendApplicationRows = ({ row, setRows, awardMilestones, handleDeleteRow, handleInputChange }:any) => {
     return (
         <TableRow key={row.id}
             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         >
+            <TableCell component="th" scope="row">
+                {"Progress "+(awardMilestones.findIndex((milestone: any) => new Date(milestone.fromDate) < new Date() && 
+                new Date() < new Date(milestone.toDate))+1)}
+            </TableCell>
             <TableCell component="th" scope="row">
                     <Input
                         className={`w-2/3 ${row.errors?.name ? 'border-red-500' : ''}`}

@@ -15,6 +15,10 @@ export default function PaymentResult() {
     navigate("/");
   };
 
+  const handleReturnToWallet = () => {
+    navigate("/wallet");
+  };
+
   return (
     <>
       <Toast.Provider>
@@ -59,6 +63,12 @@ export default function PaymentResult() {
               onClick={handleReturn}
             >
               Return to Home
+            </button>
+            <button
+              className={`mt-4 px-6 py-2 rounded-md text-white font-medium transition-colors ${isSuccessful ? "bg-blue-600 hover:bg-blue-700" : "bg-red-600 hover:bg-red-700"}`}
+              onClick={handleReturnToWallet}
+            >
+              Return to Wallet
             </button>
           </div>
         </div>
