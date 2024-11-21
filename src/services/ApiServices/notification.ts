@@ -38,6 +38,14 @@ export async function SendNotification(data: any) {
   return response.data;
 }
 
+export async function SendNotificationAndEmail(data: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/send-notification-and-email`,
+    data
+  );
+  return response.data;
+}
+
 export async function NotifyFunderNewApplicant(applicantId: number, scholarshipId: number) {
   const response = await axios.post(
     `${BASE_URL}/api/notifications/notify-funder-new-applicant?applicantId=${applicantId}&scholarshipId=${scholarshipId}`
