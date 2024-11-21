@@ -4,8 +4,9 @@ import { Spin, Modal, Input, Button, notification, Table } from "antd";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { createWallet, getAccountWallet, updateWalletBalance, updateWalletBankInformation } from "@/services/ApiServices/accountService";
-import { getTransactionsByWalletSenderId } from "@/services/ApiServices/paymentService";
+import { createCheckoutSession, getTransactionsByWalletSenderId } from "@/services/ApiServices/paymentService";
 import { toast } from "react-toastify";
+import { loadStripe } from '@stripe/stripe-js';
 
 const Wallet = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -20,6 +21,7 @@ const Wallet = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isUpdateBankModalOpen, setIsUpdateBankModalOpen] = useState(false);
   const [isModalWithdrawOpen, setIsModalWithdrawOpen] = useState(false);
+  const stripePromise = loadStripe('pk_test_51QCMb308u8J7LaJOAREpbPlmyfVpd22yS6ltclWgXSrdsB5OxGxSdo6zlhm54FdxUaRoX0zsKvlVdVSrjVessc0I00xFufsjzu');
 
   useEffect(() => {
     const fetchWalletData = async () => {
@@ -68,36 +70,46 @@ const Wallet = () => {
   };
 
   const handleAddMoney = async () => {
-    if (!user) return null;
-    if (walletData) {
-      try {
-        console.log(walletData)
-        console.log(addAmount)
-        const updatedBalance = walletData.data.balance + parseInt(addAmount);
-        const payload = {
-          balance: updatedBalance,
-        };
-
-        await updateWalletBalance(Number(user.id), payload);
-
-        setWalletData((prevData: any) => ({
-          ...prevData,
-          balance: updatedBalance,
-        }));
-
-        setAddAmount("");
-        setIsModalOpen(false);
-
-        notification.success({
-          message: "Balance updated successfully!",
-        });
-      } catch (err) {
-        notification.error({
-          message: "Failed to update balance.",
-        });
+    if (!user) {
+      notification.error({ message: 'User not found. Please login.' });
+      return;
+    }
+  
+    if (!addAmount || isNaN(Number(addAmount)) || Number(addAmount) <= 0) {
+      setError('Please enter a valid amount');
+      return;
+    }
+  
+    setError(null);
+  
+    try {
+      setLoading(true);
+  
+      const checkoutSessionRequest = {
+        email: user.email,
+        amount: Number(addAmount),
+        senderId: user.id,
+        receiverId: user.id,
+        description: 'Add Money to Wallet',
+      };
+  
+      const { data } = await createCheckoutSession(checkoutSessionRequest);
+      console.log(data)
+  
+      if (data) {
+        window.location.href = data.sessionUrl;
+  
+      } else {
+        notification.error({ message: 'Unable to create payment session. Please try again.' });
       }
+    } catch (error) {
+      console.error(error);
+      notification.error({ message: 'Error creating payment session' });
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   const handleCancel = () => {
     setIsModalOpen(false);

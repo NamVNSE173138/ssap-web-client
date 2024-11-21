@@ -25,8 +25,9 @@ const ProviderInformation = () => {
       try {
         const providerResponse = await getAccountById(parseInt(id));
         const servicesResponse = await getServicesByProvider(parseInt(id));
+        const activeServices = servicesResponse.data.filter((service: any) => service.status === 'Active');
         setProviderData(providerResponse);
-        setServices(servicesResponse.data);
+        setServices(activeServices);
 
         const allFeedbacks = servicesResponse.data.reduce((acc: any[], service: any) => {
           return acc.concat(service.feedbacks);

@@ -18,15 +18,15 @@ import { FaClipboardList, FaEdit, FaExclamationTriangle, FaEye, FaPlus, FaRedo, 
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
-import { toast } from "react-toastify";
 import { FaInfoCircle, FaDollarSign, FaCheckCircle, FaUser } from "react-icons/fa";
 import { Dialog, DialogTitle } from "@mui/material";
 import { IoIosPaper } from "react-icons/io";
-import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoClose, IoText, IoCard, IoCloseCircleOutline } from "react-icons/io5";
+import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoClose, IoText, IoCard, IoCloseCircleOutline, IoInformationCircle } from "react-icons/io5";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EditServiceModal from "../Activity/UpdateServiceModal";
-
+import ServiceContractDialog from "./ServiceContractDialog";
+import { notification } from "antd";
 
 interface ServiceType {
     id: string;
@@ -101,6 +101,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [requestData, setRequestData] = useState<any>(null);
     const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+    const [isContractOpen, setContractOpen] = useState(false);
 
     const fetchService = async () => {
         try {
@@ -156,6 +157,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setIsFeedbackDialogOpen(false);
     };
 
+    const handleOpenContract = () => {
+        setContractOpen(true);
+    };
+
     const fetchApplicants = async (serviceId: number) => {
         try {
             const response = await getRequestsByService(serviceId);
@@ -200,11 +205,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             await updateService(Number(id), updatedData);
 
             setServiceData(updatedData);
-            toast.success("Service marked as inactive successfully!");
-            navigate(RouteNames.ACTIVITY);
+            notification.success({ message: "Service marked as inactive successfully!" });
+            navigate(RouteNames.SERVICES);
         } catch (error) {
             setError((error as Error).message);
-            toast.error("Failed to delete service.");
+            notification.error({ message: "Failed to delete service." });
         } finally {
             setLoading(false);
         }
@@ -212,7 +217,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
     const handleRequestNow = async () => {
         if (!serviceData) {
-            toast.error("Service data is missing. Please try again.");
+            notification.error({ message: "Service data is missing. Please try again." });
             return;
         }
 
@@ -221,7 +226,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             setDialogOpen(true);
         } catch (error) {
             console.error("Error in handleRequestNow:", error);
-            toast.error("An error occurred while processing your request. Please try again.");
+            notification.error({ message: "An error occurred while processing your request. Please try again." });
         } finally {
             setLoading(false);
         }
@@ -246,11 +251,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if (!serviceData) {
-            toast.error("Service data is missing. Please try again.");
+            notification.error({ message: "Service data is missing. Please try again." });
             return;
         }
         if (!paymentMethod) {
-            toast.error("Please select a payment method.");
+            notification.error({ message: "Please select a payment method." });
             return;
         }
 
@@ -265,7 +270,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     const userBalance = walletResponse.data.balance;
 
                     if (userBalance < serviceData?.price) {
-                        toast.error("Insufficient funds to request this service. Please add funds to your account.");
+                        notification.error({ message: "Insufficient funds to request this service. Please add funds to your account." });
                         setLoading(false);
                         return;
                     }
@@ -273,7 +278,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     if (error.response?.data?.statusCode === 400) {
                         setIsWalletDialogOpen(true);
                     } else {
-                        toast.error("Failed to check wallet information.");
+                        notification.error({ message: "Failed to check wallet information." });
                         console.error("Wallet check error:", error);
                     }
                 }
@@ -308,14 +313,14 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             }
 
             await createRequest(requestDatas);
-            toast.success("Request created successfully!");
+            closeDialog();
+            notification.success({ message: "Request created successfully!" });
             await fetchService();
             await NotifyProviderNewRequest(user.id, Number(serviceData?.id));
-            closeDialog();
         } catch (error) {
             console.error("Error in handleSubmit:", error);
             setError((error as Error).message || "An unknown error occurred.");
-            toast.error("Failed to create request.");
+            notification.error({ message: "Failed to create request." });
         } finally {
             setLoadingSubmit(false);;
         }
@@ -445,11 +450,23 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                 />
                             </div>
 
+                            <div className="mb-5 text-gray-600 text-base">
+                                <IoInformationCircle className="text-blue-500 inline mr-2" />
+                                When you click "Send", it means you agree to our{" "}
+                                <span
+                                    className="text-blue-500 font-medium cursor-pointer hover:underline"
+                                    onClick={handleOpenContract}
+                                >
+                                    Service Contract
+                                </span>.
+                            </div>
+
                             <div className="flex justify-end mt-6">
                                 <button
                                     type="button"
                                     onClick={closeDialog}
                                     className="mr-3 bg-gray-300 text-gray-700 rounded-lg px-5 py-2 hover:bg-gray-400 transition"
+                                    disabled={loadingSubmit}
                                 >
                                     Cancel
                                 </button>
@@ -468,6 +485,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                     )}
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -743,6 +761,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 onClose={() => setConfirmationDialogOpen(false)}
                 onConfirm={handleDelete}
             />
+            <ServiceContractDialog
+                isOpen={isContractOpen}
+                onClose={() => setContractOpen(false)}
+            />
+
         </div>
     );
 };

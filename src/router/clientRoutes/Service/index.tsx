@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
 import { IoPerson, IoWallet } from "react-icons/io5";
+import { FaSadTear } from "react-icons/fa";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -124,10 +125,6 @@ const Service = () => {
     navigate(RouteNames.WALLET);
   };
 
-  const handleRequestForm = () => {
-    setIsRequestFormOpen(true);
-  };
-
   const handleNavigateProviderList = () => {
     navigate(RouteNames.PROVIDER_LIST);
   };
@@ -210,7 +207,10 @@ const Service = () => {
         ) : error ? (
           <p>{error}</p>
         ) : data.length === 0 ? (
-          <p className="text-center text-xl text-gray-500">No services found</p>
+          <div className="flex flex-col items-center justify-center text-center py-16">
+              <FaSadTear className="text-blue-500 text-6xl mb-4" />
+              <p className="text-gray-700 text-lg">No services found.</p>
+            </div>
         ) : (
           filteredData.map((service) => (
             <li key={service.id}>
