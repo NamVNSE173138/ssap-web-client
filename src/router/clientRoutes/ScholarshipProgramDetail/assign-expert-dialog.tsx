@@ -5,6 +5,7 @@ import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BiRightArrow } from "react-icons/bi";
 import { FaBook, FaCheckCircle, FaUniversity, FaUsers } from "react-icons/fa";
+import { MdArrowForward } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 
 const StyledAutocomplete = styled(Autocomplete)({
@@ -82,10 +83,10 @@ const AssignExpertDialog = ({ open, onClose, experts }: any) => {
           )}
 
           <List sx={{ pt: 0 }} className="space-y-5">
-          <p className="text-xl font-bold flex items-center justify-center bg-gradient-to-r text-blue-500 p-4 rounded-lg shadow-lg mt-5 mb-5">
-  <FaBook className="mr-3 text-blue text-3xl" />
-  <span>Choose the major of the expert you want to review applications</span>
-</p>
+            <p className="text-xl font-bold flex items-center justify-center bg-gradient-to-r text-blue-500 p-4 rounded-lg shadow-lg mt-5 mb-5">
+              <FaBook className="mr-3 text-blue text-3xl" />
+              <span>Choose the major of the expert you want to review applications</span>
+            </p>
 
 
             {majors.length === 0 && (
@@ -100,15 +101,15 @@ const AssignExpertDialog = ({ open, onClose, experts }: any) => {
                 key={major.id}
                 className="hover:bg-blue-50 transition duration-300 rounded-lg shadow-sm"
               >
-                <ListItemButton onClick={() => setSelectedMajor(major)} className="flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <FaUniversity className="text-blue-600 text-2xl" />
+                <ListItemButton onClick={() => setSelectedMajor(major)} className="flex items-center gap-6 px-4 py-3 hover:bg-blue-100 rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <FaUniversity className="text-blue-600 text-3xl" />
                     <ListItemText
                       primary={major.name}
-                      className="text-lg font-medium text-gray-800"
+                      className="text-xl font-medium text-gray-800 font-poppins"
                     />
                   </div>
-                  <ArrowRightIcon className="text-blue-500 text-xl" />
+                  <MdArrowForward className="text-blue-500 text-2xl" />
                 </ListItemButton>
               </ListItem>
             ))}

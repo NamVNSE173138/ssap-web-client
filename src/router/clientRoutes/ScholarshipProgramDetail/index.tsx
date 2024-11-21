@@ -277,114 +277,120 @@ const ScholarshipProgramDetail = () => {
                   {data.name}
                 </p>
                 <p className="text-white text-3xl text-heading-5 hidden lg:block mt-[12px]">
-  {data.description.length > 50 ? `${data.description.substring(0, 50)}...` : data.description}
-</p>
+                  {data.description.length > 50 ? `${data.description.substring(0, 50)}...` : data.description}
+                </p>
 
               </div>
             </div>
 
-            <div className="text-white text-center flex h-[50px] mt-[26px] ">
-              {isApplicant == "APPLICANT" || !user ? (
+            <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
+              {isApplicant == "Applicant" || !user ? (
                 <>
-                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" &&
-                    (<button
-                      onClick={() =>
-                        navigate(`/scholarship-program/${id}/application`)
-                      }
-                      className=" text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
+                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && (
+                    <button
+                      onClick={() => navigate(`/scholarship-program/${id}/application`)}
+                      className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
                     >
                       Apply now{" "}
-                    </button>)}
-                  {existingApplication && existingApplication.length > 0 &&
-                    (<>
+                    </button>
+                  )}
+                  {existingApplication && existingApplication.length > 0 && (
+                    <>
                       <button
                         onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
-                        className=" text-xl w-full bg-green-700 rounded-[25px] mr-3"
+                        className="flex-1 text-xl w-full bg-green-700 rounded-[25px] mr-3"
                       >
                         View applications{" "}
                       </button>
-                      {existingApplication[0].status == ApplicationStatus.NeedExtend &&
+                      {existingApplication[0].status == ApplicationStatus.NeedExtend && (
                         <button
                           onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
-                          className=" text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                          className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
                         >
                           Extend Application{" "}
                         </button>
-                      }
-                      {existingApplication[0].status != ApplicationStatus.Approved && existingApplication[0].status != ApplicationStatus.NeedExtend && <AlertDialog>
-                        <AlertDialogTrigger className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" disabled={cancelLoading}>
-                          {cancelLoading ? (<div
-                            className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                            aria-hidden="true"
-                          ></div>) :
-                            (<span>Cancel applications{" "}</span>)}
-
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              You wanna cancel your application?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Cancel will delete your application.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>
-                              No
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={cancelApplication}
+                      )}
+                      {existingApplication[0].status != ApplicationStatus.Approved &&
+                        existingApplication[0].status != ApplicationStatus.NeedExtend && (
+                          <AlertDialog>
+                            <AlertDialogTrigger
+                              className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
+                              disabled={cancelLoading}
                             >
-                              Yes
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>}
-
-                    </>)}
+                              {cancelLoading ? (
+                                <div
+                                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                                  aria-hidden="true"
+                                ></div>
+                              ) : (
+                                <span>Cancel applications{" "}</span>
+                              )}
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  You wanna cancel your application?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Cancel will delete your application.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>No</AlertDialogCancel>
+                                <AlertDialogAction onClick={cancelApplication}>
+                                  Yes
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                    </>
+                  )}
                 </>
-              ) : (authorized != "Unauthorized" && (
-                <div className="flex justify-between w-full gap-3">
-                  <button
-                    onClick={() => navigate("")}
-                    className="text-xl w-full bg-blue-700 hover:bg-blue-600 rounded-full py-2 transition duration-300 flex items-center justify-center"
-                  >
-                    <FaEdit className="mr-2" /> Edit
-                  </button>
-                  <button
-                    onClick={deleteScholarship}
-                    className="text-xl w-full bg-red-900 hover:bg-red-800 rounded-full py-2 transition duration-300 flex items-center justify-center"
-                  >
-                    <FaTrash className="mr-2" /> Delete
-                  </button>
-                  <button
-                    onClick={() => handleOpenApplicantDialog()}
-                    className="text-xl w-full bg-green-700 hover:bg-green-600 rounded-full py-2 transition duration-300 flex items-center justify-center"
-                  >
-                    <FaEye className="mr-2" /> View Applications
-                  </button>
-                  <button
-                    onClick={() => handleAssignExpertDialog()}
-                    className="text-xl w-full bg-green-700 hover:bg-green-600 rounded-full py-2 transition duration-300 flex items-center justify-center"
-                  >
-                    <FaUserTie className="mr-2" /> Assign Expert
-                  </button>
-                  <button
-                    onClick={() => handleOpenReviewMilestoneDialog()}
-                    className="text-xl w-full bg-green-700 hover:bg-green-600 rounded-full py-2 transition duration-300 flex items-center justify-center"
-                  >
-                    <FaCheckCircle className="mr-2" /> Review Milestones
-                  </button>
-                  <button
-                    onClick={() => handleOpenAwardDialog()}
-                    className="text-xl w-full bg-blue-700 hover:bg-blue-600 rounded-full py-2 transition duration-300 flex items-center justify-center"
-                  >
-                    <FaTrophy className="mr-2" /> Award Progress
-                  </button>
-                </div>
-              ))}
+              ) : (
+                authorized != "Unauthorized" && (
+                  <div className="flex justify-between w-full gap-3">
+                    <button
+                      onClick={() => navigate("")}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaEdit className="mr-2" /> Edit
+                    </button>
+                    <button
+                      onClick={deleteScholarship}
+                      className="flex-1 text-lg bg-red-900 hover:bg-red-800 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrash className="mr-2" /> Delete
+                    </button>
+                    <button
+                      onClick={() => handleOpenApplicantDialog()}
+                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaEye className="mr-2" /> View Applications
+                    </button>
+                    <button
+                      onClick={() => handleAssignExpertDialog()}
+                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaUserTie className="mr-2" /> Assign Expert
+                    </button>
+                    <button
+                      onClick={() => handleOpenReviewMilestoneDialog()}
+                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaCheckCircle className="mr-2" /> Review Milestones
+                    </button>
+                    <button
+                      onClick={() => handleOpenAwardDialog()}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrophy className="mr-2" /> Award Progress
+                    </button>
+                  </div>
+                )
+              )}
             </div>
+
 
             {data.status == "FINISHED" &&
               <div className="text-xl font-semibold mr-3">This scholarship has finished</div>
