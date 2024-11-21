@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import ExtendApplicationRows from "./extend-application-rows"
 import { useState } from "react"
 
-  const DocumentTable = ({ documents, rows, setRows,handleDeleteRow,handleInputChange}: any) => {
+  const DocumentTable = ({ documents, awardMilestones, rows, setRows,handleDeleteRow,handleInputChange}: any) => {
 
     if(!documents || documents.length == 0) 
         return <p className="text-center font-semibold text-xl">No uploaded documents</p>
@@ -13,7 +13,8 @@ import { useState } from "react"
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
+            <TableCell>Progress Name</TableCell>
+            <TableCell align="right">Name</TableCell>
             <TableCell align="right">Type</TableCell>
             <TableCell align="right">File</TableCell>
             <TableCell align="right">Uploaded At</TableCell>
@@ -25,6 +26,10 @@ import { useState } from "react"
               key={doc.id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
+              <TableCell component="th" scope="row">
+                {"Progress "+(awardMilestones.findIndex((milestone: any) => new Date(milestone.fromDate) < new Date(doc.updatedAt) && 
+                new Date(doc.updatedAt) < new Date(milestone.toDate))+1)}
+              </TableCell>
               <TableCell component="th" scope="row">
                 {doc.name}
               </TableCell>
@@ -38,6 +43,8 @@ import { useState } from "react"
             {rows && rows.length > 0 && 
             rows.map((row:any) => (
               <ExtendApplicationRows
+                key={row.id}
+                awardMilestones={awardMilestones}
                 row={row}
                 setRows={setRows}
                 handleDeleteRow={handleDeleteRow}
