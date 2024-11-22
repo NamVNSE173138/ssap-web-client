@@ -177,7 +177,7 @@ import { Link } from "react-router-dom";
 import { BiRightArrow } from "react-icons/bi";
 import { FaBook, FaCheckCircle, FaUniversity, FaUsers } from "react-icons/fa";
 import { MdArrowForward } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 const StyledAutocomplete = styled(Autocomplete)({
@@ -203,10 +203,11 @@ const CustomPaper = (props: any) => (
 //   const [selectedMajor, setSelectedMajor] = useState<any>(null);
 //   const [selectedExpert, setSelectedExpert] = useState<any>(null);
 
-const AssignExpertDialog = ({ open, onClose, experts }: any) => {
+const AssignExpertDialog = ({ open, onClose, experts, applicantId }: any) => {
   const navigate = useNavigate();
   const [majors, setMajors] = useState<any>([]);
   const [selectedMajor, setSelectedMajor] = useState<any>(null);
+  const [selectedExpert, setSelectedExpert] = useState<any>(null);
 
 
   const [error, setError] = useState<string>("");
@@ -320,27 +321,27 @@ const AssignExpertDialog = ({ open, onClose, experts }: any) => {
             </p>
           )}
 
-         // <List sx={{ pt: 0 }}>
-          //  <p className="text-lg font-semibold pl-5">
-           //   Choose the major of the expert you want to review applications
-           // </p>
-           // {majors.length === 0 && (
-          //    <p className="p-10 text-center text-gray-500 font-semibold text-xl">No majors</p>
-          //  )}
-         //   {majors &&
-         //     majors.map((major: any) => (
-          //      <ListItem disableGutters key={major.id}>
-          //        <ListItemButton onClick={() => setSelectedMajor(major)}>
-          //          <ListItemText primary={major.name} />
-          //          <ArrowRightIcon />
-           //       </ListItemButton>
-          //      </ListItem>
-          //    ))}
-         // </List>
-      //  </>
-    //  )}
-    //  {experts && selectedMajor && (
-    //    <div className="h-full">
+          {/* <List sx={{ pt: 0 }}> */}
+          {/* //  <p className="text-lg font-semibold pl-5"> */}
+           {/* //   Choose the major of the expert you want to review applications */}
+           {/* // </p> */}
+           {/* // {majors.length === 0 && ( */}
+          {/* //    <p className="p-10 text-center text-gray-500 font-semibold text-xl">No majors</p> */}
+          {/* //  )} */}
+         {/* //   {majors && */}
+         {/* //     majors.map((major: any) => ( */}
+          {/* //      <ListItem disableGutters key={major.id}> */}
+          {/* //        <ListItemButton onClick={() => setSelectedMajor(major)}> */}
+          {/* //          <ListItemText primary={major.name} /> */}
+          {/* //          <ArrowRightIcon /> */}
+           {/* //       </ListItemButton> */}
+          {/* //      </ListItem> */}
+          {/* //    ))} */}
+         {/* // </List> */}
+      {/* //  </> */}
+    {/* //  )} */}
+    {/* //  {experts && selectedMajor && ( */}
+    {/* //    <div className="h-full"> */}
 
 
           <List sx={{ pt: 0 }} className="space-y-5">
