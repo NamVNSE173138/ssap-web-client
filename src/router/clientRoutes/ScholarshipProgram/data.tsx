@@ -17,7 +17,7 @@ export type ScholarshipProgramType = {
     name: string;
     description: string;
   };
-  major:Array< {
+  major:{
     id: string;
     name: string;
     description: string;
@@ -27,20 +27,20 @@ export type ScholarshipProgramType = {
         description: string;
         type: string;
     }>;
-  }>;
+  };
   certificates: Array<{
     id: string;
     name: string;
     description: string;
     type: string;
   }>;
-  universities: Array<{
+  university: {
      id: string; 
      name: string;
      description: string;
      city: string;
      country: string|null;
-  }>;
+  };
 };
 
 export const scholarshipProgram: ScholarshipProgramType[] = [
