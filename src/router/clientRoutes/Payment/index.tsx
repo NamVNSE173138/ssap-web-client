@@ -1,7 +1,7 @@
-import { CheckCircleIcon, XCircleIcon } from "lucide-react";
-import React, { useState } from "react";
 import * as Toast from "@radix-ui/react-toast";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { CheckCircleIcon, XCircleIcon } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function PaymentResult() {
   const [open, setOpen] = useState(true);
