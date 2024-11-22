@@ -195,7 +195,7 @@ const ScholarshipProgramDetail = () => {
       const response = await getApplicationsByScholarship(scholarshipId);
       //console.log(response);
       if (response.statusCode == 200) {
-        setWinningApplications(response.data.filter((application: any) => application.status === "APPROVED"));
+        setWinningApplications(response.data.filter((application: any) => application.status === ApplicationStatus.Approved || application.status === ApplicationStatus.Awarded));
       } else {
         setError("Failed to get applicants");
       }
@@ -441,8 +441,9 @@ const ScholarshipProgramDetail = () => {
                           Extend Application{" "}
                         </button>
                       )}
-                      {existingApplication[0].status == ApplicationStatus.Submitted &&
-                        (new Date(awardMilestones.fromDate) < new Date() && new Date() < new Date(awardMilestones.toDate) ) && (
+                      {/*JSON.stringify(awardMilestones)*/}
+                      {existingApplication[0].status == ApplicationStatus.Submitted && 
+                        (new Date(awardMilestones?.fromDate) < new Date() && new Date() < new Date(awardMilestones.toDate) ) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
