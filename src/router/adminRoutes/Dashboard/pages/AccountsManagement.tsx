@@ -23,6 +23,7 @@ import {
 import { Edit as EditIcon } from "@mui/icons-material";
 import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
 import { TrashIcon } from "@heroicons/react/24/solid";
+import { FaCheckCircle, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle, FaUserCircle } from "react-icons/fa";
 
 const AccountsManagement = () => {
   const [accounts, setAccounts] = useState<AccountWithRole[]>([]);
@@ -32,7 +33,7 @@ const AccountsManagement = () => {
   const [status, setStatus] = useState("");
 
   const TABLE_HEAD = [
-    "ID", "Username", "Phone Number", "Email", "Address", "Avatar", "Status", "Actions"
+    "No.", "ID", "Username", "Phone Number", "Email", "Address", "Avatar", "Status", "Actions"
   ];
 
   const fetchAccounts = () => {
@@ -72,8 +73,8 @@ const AccountsManagement = () => {
           hashedPassword: account.hashedPassword,
           roleId: account.roleId,
           address: account.address,
-          avatarUrl: account.avatarUrl,
-          status: "INACTIVE", 
+          avatarUrl: account.avatarUrl || "https://github.com/shadcn.png",
+          status: "Inactive", 
           roleName: account.roleName,
         });
         fetchAccounts(); 
@@ -104,44 +105,88 @@ const AccountsManagement = () => {
   };
 
   const renderTable = (roleName: string, filteredAccounts: AccountWithRole[]) => (
-    <Card className="h-full w-full">
-      <Typography variant="h6" component="div" color="primary" sx={{ mt: 2, ml: 2 }}>
+    <Card className="h-full w-full shadow-lg rounded-lg">
+      <Typography variant="h6" component="div" color="primary" sx={{ mt: 2, ml: 2, fontWeight: 'bold' }}>
         {roleName} Accounts
       </Typography>
-      <TableContainer>
+
+      <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
         <Table>
-          <TableHead >
+          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
             <TableRow>
               {TABLE_HEAD.map((head) => (
-                <TableCell key={head}>
-                  <TableSortLabel className="font-bold">{head}</TableSortLabel>
+                <TableCell key={head} sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
+                  <TableSortLabel className="font-semibold">{head}</TableSortLabel>
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {filteredAccounts.map((account) => (
-              <TableRow key={account.id}>
+            {filteredAccounts.map((account, index) => (
+              <TableRow key={account.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>{account.id}</TableCell>
                 <TableCell>{account.username}</TableCell>
-                <TableCell>{account.phoneNumber || "N/A"}</TableCell>
-                <TableCell>{account.email || "N/A"}</TableCell>
-                <TableCell>{account.address || "N/A"}</TableCell>
                 <TableCell>
-                  <img src={account.avatarUrl || "/default-avatar.png"} alt="Avatar" style={{ height: 40, width: 40, borderRadius: "50%" }} />
+                  <div className="flex items-center gap-2">
+                    <FaPhoneAlt className="text-sky-500" />
+                    {account.phoneNumber || "N/A"}
+                  </div>
                 </TableCell>
-                <TableCell>{account.status || "N/A"}</TableCell>
                 <TableCell>
-                  <Tooltip title="Edit Account">
-                    <IconButton onClick={() => handleEditAccount(account)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete Account">
-                    <IconButton onClick={() => handleDeleteAccount(account.id)}>
-                      <TrashIcon color="error" />
-                    </IconButton>
-                  </Tooltip>
+                  <div className="flex items-center gap-2">
+                    <FaEnvelope className="text-gray-500" />
+                    {account.email || "N/A"}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <FaMapMarkerAlt className="text-green-500" />
+                    {account.address || "N/A"}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <img 
+                    src={account.avatarUrl || "https://github.com/shadcn.png"} 
+                    alt="Avatar" 
+                    style={{
+                      height: 40, 
+                      width: 40, 
+                      borderRadius: "50%", 
+                      objectFit: "cover",
+                    }} 
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {account.status === "Active" ? (
+                      <FaCheckCircle className="text-green-500" />
+                    ) : (
+                      <FaTimesCircle className="text-red-500" />
+                    )}
+                    {account.status || "N/A"}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Tooltip title="Edit Account">
+                      <IconButton 
+                        onClick={() => handleEditAccount(account)} 
+                        sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Account">
+                      <IconButton 
+                        onClick={() => handleDeleteAccount(account.id)} 
+                        sx={{ color: 'red', '&:hover': { color: '#d32f2f' } }}
+                      >
+                        <TrashIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -160,11 +205,11 @@ const AccountsManagement = () => {
         <CircularProgress />
       ) : (
         <>
-          {renderTable("Applicant", accounts.filter(account => account.roleName === "APPLICANT"))}
+          {renderTable("Applicant", accounts.filter(account => account.roleName === "Applicant"))}
           <br />
-          {renderTable("Funder", accounts.filter(account => account.roleName === "FUNDER"))}
+          {renderTable("Funder", accounts.filter(account => account.roleName === "Funder"))}
           <br />
-          {renderTable("Provider", accounts.filter(account => account.roleName === "PROVIDER"))}
+          {renderTable("Provider", accounts.filter(account => account.roleName === "Provider"))}
         </>
       )}
 
@@ -173,8 +218,8 @@ const AccountsManagement = () => {
         <DialogTitle>Edit Account Status</DialogTitle>
         <DialogContent>
           <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)} fullWidth>
-            <MenuItem value="ACTIVE">ACTIVE</MenuItem>
-            <MenuItem value="INACTIVE">INACTIVE</MenuItem>
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Inactive">Inactive</MenuItem>
           </Select>
         </DialogContent>
         <DialogActions>
