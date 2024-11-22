@@ -66,17 +66,17 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 console.error("Request ID is missing.");
                 return;
             }
-    
-            toast.success("Request status updated to 'Finished' successfully!");    
+
+            toast.success("Request status updated to 'Finished' successfully!");
             const response = await updateFinishRequest(request.id);
             await fetchRequest();
-            
+
         } catch (error) {
             console.error("Failed to update request status", error);
             toast.error("Failed to update request status. Please try again.");
         }
     };
-    
+
     useEffect(() => {
         const fetchServiceData = async () => {
             try {
@@ -165,19 +165,19 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 <Table sx={{ minWidth: 1000 }} aria-label="request details table">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="right">
+                            <TableCell>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Id</Typography>
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Applicant Description</Typography>
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4A90E2' }}>Request File</Typography>
                             </TableCell>
-                            <TableCell align="right" sx={{ color: '#FF6347' }}>
+                            <TableCell sx={{ color: '#FF6347' }}>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Provider Updated File</Typography>
                             </TableCell>
-                            <TableCell align="right" sx={{ color: '#FF6347' }}>
+                            <TableCell sx={{ color: '#FF6347' }}>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Provider Notes</Typography>
                             </TableCell>
                         </TableRow>
@@ -185,13 +185,13 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                     <TableBody>
                         {requestDetails.map((detail: any) => (
                             <TableRow key={detail.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { backgroundColor: '#f9f9f9' } }}>
-                                <TableCell align="right">
+                                <TableCell>
                                     <Typography variant="body1" sx={{ color: '#333' }}>{detail.requestId}</Typography>
                                 </TableCell>
-                                <TableCell align="right">
+                                <TableCell>
                                     <Typography variant="body1" sx={{ color: '#333' }}>{request.description || "No description provided"}</Typography>
                                 </TableCell>
-                                <TableCell align="right">
+                                <TableCell>
                                     {detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Applicant").length > 0 ? (
                                         detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Applicant").map((fileUrl: any, index: any) => {
                                             if (fileUrl.fileUrl.startsWith("https://")) {
@@ -204,10 +204,10 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                             return null;
                                         })
                                     ) : (
-                                        <Typography variant="body2" color="textSecondary">No file uploaded</Typography>
+                                        <Typography variant="body2" color="textSecondary">No file uploaded yet</Typography>
                                     )}
                                 </TableCell>
-                                <TableCell align="right">
+                                <TableCell>
                                     {detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Provider").length > 0 ? (
                                         detail.requestDetailFiles.filter((a: any) => a.uploadedBy == "Provider").map((fileUrl: any, index: any) => {
                                             if (fileUrl.fileUrl.startsWith("https://")) {
@@ -222,11 +222,11 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                             return null;
                                         })
                                     ) : (
-                                        <Typography variant="body2" color="textSecondary">No file uploaded</Typography>
+                                        <Typography variant="body2" color="textSecondary">No file uploaded yet</Typography>
                                     )}
                                 </TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="body1" sx={{ color: '#333' }}>{detail.comment || "No comment"}</Typography>
+                                <TableCell>
+                                    <Typography variant="body1" sx={{ color: '#333' }}>{detail.comment || "No comment yet"}</Typography>
                                 </TableCell>
                             </TableRow>
                         ))}
