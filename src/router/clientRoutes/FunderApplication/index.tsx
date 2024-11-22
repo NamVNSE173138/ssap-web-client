@@ -143,7 +143,7 @@ import PayAwardDialog from "./PayAwardDialog"
           if(!id) return;
           const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
           const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
-          const award = await getAwardMilestoneByScholarship(parseInt(id));
+          const award = await getAwardMilestoneByScholarship(response.data.scholarshipProgramId);
           //console.log(response);
           //console.log(scholarship);
           if (response.statusCode == 200) {
@@ -389,7 +389,7 @@ import PayAwardDialog from "./PayAwardDialog"
         scholarship={scholarship}
         awardName={awardMilestones.findIndex((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate))+1}
         handlePayAwardProgress={handlePayAwardProgress}
-        amount={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)).amount}/>
+        amount={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate))?.amount}/>
 
         
       </section>

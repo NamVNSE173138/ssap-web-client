@@ -65,10 +65,10 @@ const ChooseWinner = () => {
     try {
       const response = await getApplicationsByScholarship(scholarshipId);
       if (response.statusCode == 200) {
-        setApplicants(response.data.filter((row: any) => row.status != "APPROVED"));
+        setApplicants(response.data.filter((row: any) => row.status != "Approved"));
         if(data){
-            setScholarshipWinners(response.data.filter((row: any) => row.status == "APPROVED"));
-            setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "APPROVED")).length);
+            setScholarshipWinners(response.data.filter((row: any) => row.status == "Approved"));
+            setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "Approved")).length);
         }
       } else {
         setError("Failed to get applicants");
@@ -86,7 +86,7 @@ const ChooseWinner = () => {
         const payload = {
           id: row.id,
           appliedDate: new Date().toISOString(),
-          status: "APPROVED",
+          status: "Approved",
           applicantId: row.applicantId,
           scholarshipProgramId: id,
           applicationDocuments: [],
