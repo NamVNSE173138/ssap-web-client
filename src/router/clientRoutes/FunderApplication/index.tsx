@@ -341,7 +341,6 @@ const FunderApplication = () => {
         </section>
       </div>
       <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
-        {/* Documents Section */}
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <div className="flex justify-between items-center">
@@ -394,7 +393,6 @@ const FunderApplication = () => {
           </div>
         </div>
 
-        {/* Award Progress Section */}
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <p className="text-4xl mb-8 flex items-center">
@@ -447,7 +445,6 @@ const FunderApplication = () => {
           </div>
         </div>
 
-        {/* Pay Award Dialog */}
         <PayAwardDialog
           isOpen={openPayDialog}
           setIsOpen={setOpenPayDialog}
