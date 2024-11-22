@@ -27,7 +27,8 @@ import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
-import {
+
+<!-- import {
   deleteApplication,
   getApplicationByApplicantIdAndScholarshipId,
 } from "@/services/ApiServices/applicationService";
@@ -43,7 +44,17 @@ import {
 import {
   AlertDialogFooter,
   AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"; -->
+
+import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
+import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
+import AwardDialog from "./award-dialog";
+import ApplicationStatus from "@/constants/applicationStatus";
+import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
+import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
+import { FaCheckCircle, FaEdit, FaEye, FaTrash, FaTrophy, FaUserTie } from "react-icons/fa";
+
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,7 +79,13 @@ const ScholarshipProgramDetail = () => {
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] =
     useState<boolean>(false);
 
+  const [winningApplications, setWinningApplications] = useState<any>(null);
+  const [awardDialogOpen, setAwardDialogOpen] = useState<boolean>(false);
+
   const [existingApplication, setExistingApplication] = useState<any>(null);
+
+  //const [awardMilestones, setAwardMilestones] = useState<any>(null);
+  const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
@@ -80,17 +97,36 @@ const ScholarshipProgramDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
+
+<!--         } -->
+<!--       ); -->
+
+        });
+
       if (response.data.statusCode === 200) {
         setData(response.data.data);
         setAuthorized(response.data.message);
         if (user) {
-          const application = await getApplicationByApplicantIdAndScholarshipId(
+
+<!--           const application = await getApplicationByApplicantIdAndScholarshipId(
             parseInt(user?.id),
             response.data.data.id
           );
+          setExistingApplication(application.data); -->
+
+          const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
           setExistingApplication(application.data);
+          const award = await getAwardMilestoneByScholarship(response.data.data.id);
+          //console.log(application.data);
+          if (application.data[0].status == ApplicationStatus.NeedExtend) {
+            award.data.forEach((milestone: any) => {
+              if (new Date(milestone.fromDate) > new Date() || new Date() > new Date(milestone.toDate)) {
+                return;
+              }
+              setExtendBeforeDate(milestone.fromDate);
+            })
+          }
+
         }
       } else {
         setError("Failed to fetch data");
@@ -103,6 +139,7 @@ const ScholarshipProgramDetail = () => {
   };
 
   useEffect(() => {
+
     fetchData();
   }, [id]);
 
@@ -154,6 +191,22 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+  const fetchWinningApplications = async (scholarshipId: number) => {
+    try {
+      const response = await getApplicationsByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setWinningApplications(response.data.filter((application: any) => application.status === "APPROVED"));
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAssignExpertDialog = async () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
@@ -175,6 +228,14 @@ const ScholarshipProgramDetail = () => {
     setLoading(true);
     if (!data) return;
     await fetchReviewMilestones(parseInt(data?.id));
+    setLoading(false);
+  };
+
+  const handleOpenAwardDialog = async () => {
+    setAwardDialogOpen(true);
+    setLoading(true);
+    if (!data) return;
+    await fetchWinningApplications(parseInt(data?.id));
     setLoading(false);
   };
 
@@ -252,87 +313,89 @@ const ScholarshipProgramDetail = () => {
           </div>
           <div className="">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={data.imageUrl} />
+              <SchoolLogo imageUrl={data.imageUrl || "https://github.com/shadcn.png"} />
               <div>
                 <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
                   {data.name}
                 </p>
-                <p className="text-white text-3xl  text-heading-5 hidden lg:block mt-[12px]">
-                  {data.description}
+                <p className="text-white text-3xl text-heading-5 hidden lg:block mt-[12px]">
+                  {data.description.length > 50 ? `${data.description.substring(0, 50)}...` : data.description}
                 </p>
+
               </div>
             </div>
-            {data.status == "FINISHED" && (
+
+<!--             {data.status == "FINISHED" && (
               <div className="text-xl font-semibold mr-3">
                 This scholarship has finished
               </div>
-            )}
-            {existingApplication &&
+            )} -->
+<!--             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == "PENDING" &&
               data.status != "FINISHED" && (
                 <div className="text-xl font-semibold mr-3">
                   Your application is being reviewed
                 </div>
-              )}
-            {existingApplication &&
+              )} -->
+<!--             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status != "APPROVED" && (
                 <div className="text-xl font-semibold mr-3">
                   Your application to this scholarship have not been approved
                 </div>
-              )}
-            {existingApplication &&
+              )} -->
+<!--             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == "APPROVED" && (
                 <div className="text-xl font-semibold mr-3">
                   You have won this scholarship
                 </div>
-              )}
+              )} -->
 
-            <div className="text-white text-center flex h-[50px] mt-[26px] ">
-              {isApplicant == "Applicant"  ? (
-                <>
-                  {existingApplication &&
-                    existingApplication.length == 0 &&
-                    data.status != "FINISHED" && (
-                      <button
-                        onClick={() =>
-                          navigate(`/scholarship-program/${id}/application`)
-                        }
-                        className=" text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
-                      >
-                        Apply now{" "}
-                      </button>
-                    )}
-                  {existingApplication && existingApplication.length > 0 && (
-                    <>
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/funder/application/${existingApplication[0].id}`
-                          )
-                        }
-                        className=" text-xl w-full bg-green-700 rounded-[25px] mr-3"
-                      >
-                        View applications{" "}
-                      </button>
-                      {existingApplication[0].status != "APPROVED" && (
-                        <AlertDialog>
-                          <AlertDialogTrigger
-                            className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
-                            disabled={cancelLoading}
-                          >
-                            {cancelLoading ? (
-                              <div
-                                className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                                aria-hidden="true"
-                              ></div>
-                            ) : (
-                              <span>Cancel applications </span>
-                            )}
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
+<!--             <div className="text-white text-center flex h-[50px] mt-[26px] "> -->
+<!--               {isApplicant == "Applicant"  ? ( -->
+<!--                 <> -->
+<!--                   {existingApplication && -->
+<!--                     existingApplication.length == 0 && -->
+<!--                     data.status != "FINISHED" && ( -->
+<!--                       <button -->
+<!--                         onClick={() => -->
+<!--                           navigate(`/scholarship-program/${id}/application`) -->
+<!--                         } -->
+<!--                         className=" text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]" -->
+<!--                       > -->
+<!--                         Apply now{" "} -->
+<!--                       </button> -->
+<!--                     )} -->
+<!--                   {existingApplication && existingApplication.length > 0 && ( -->
+<!--                     <> -->
+<!--                       <button -->
+<!--                         onClick={() => -->
+<!--                           navigate( -->
+<!--                             `/funder/application/${existingApplication[0].id}` -->
+<!--                           ) -->
+<!--                         } -->
+<!--                         className=" text-xl w-full bg-green-700 rounded-[25px] mr-3" -->
+<!--                       > -->
+<!--                         View applications{" "} -->
+<!--                       </button> -->
+<!--                       {existingApplication[0].status != "APPROVED" && ( -->
+<!--                         <AlertDialog> -->
+<!--                           <AlertDialogTrigger -->
+<!--                             className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" -->
+<!--                             disabled={cancelLoading} -->
+<!--                           > -->
+<!--                             {cancelLoading ? ( -->
+<!--                               <div -->
+<!--                                 className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" -->
+<!--                                 aria-hidden="true" -->
+<!--                               ></div> -->
+<!--                             ) : ( -->
+<!--                               <span>Cancel applications </span> -->
+<!--                             )} -->
+<!--                           </AlertDialogTrigger> -->
+<!--                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
                                 You wanna cancel your application?
@@ -349,13 +412,78 @@ const ScholarshipProgramDetail = () => {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                      )} -->
+
+
+            <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
+              {isApplicant == "Applicant" || !user ? (
+                <>
+                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && (
+                    <button
+                      onClick={() => navigate(`/scholarship-program/${id}/application`)}
+                      className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
+                    >
+                      Apply now{" "}
+                    </button>
+                  )}
+                  {existingApplication && existingApplication.length > 0 && (
+                    <>
+                      <button
+                        onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                        className="flex-1 text-xl w-full bg-green-700 rounded-[25px] mr-3"
+                      >
+                        View applications{" "}
+                      </button>
+                      {existingApplication[0].status == ApplicationStatus.NeedExtend && (
+                        <button
+                          onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                          className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                        >
+                          Extend Application{" "}
+                        </button>
                       )}
+                      {existingApplication[0].status != ApplicationStatus.Approved &&
+                        existingApplication[0].status != ApplicationStatus.NeedExtend && (
+                          <AlertDialog>
+                            <AlertDialogTrigger
+                              className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
+                              disabled={cancelLoading}
+                            >
+                              {cancelLoading ? (
+                                <div
+                                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                                  aria-hidden="true"
+                                ></div>
+                              ) : (
+                                <span>Cancel applications{" "}</span>
+                              )}
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  You wanna cancel your application?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Cancel will delete your application.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>No</AlertDialogCancel>
+                                <AlertDialogAction onClick={cancelApplication}>
+                                  Yes
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+
                     </>
                   )}
                 </>
               ) : (
                 authorized != "Unauthorized" && (
-                  <div className="flex justify-between w-full gap-10">
+
+<!--                   <div className="flex justify-between w-full gap-10">
                     <button
                       onClick={() => navigate("")}
                       className=" text-xl w-full  bg-blue-700 rounded-[25px]"
@@ -384,12 +512,68 @@ const ScholarshipProgramDetail = () => {
                       onClick={() => handleOpenReviewMilestoneDialog()}
                       className=" text-xl w-full bg-green-700 rounded-[25px]"
                     >
-                      Review Milestones{" "}
+                      Review Milestones{" "} -->
+
+                  <div className="flex justify-between w-full gap-3">
+                    <button
+                      onClick={() => navigate("")}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaEdit className="mr-2" /> Edit
+                    </button>
+                    <button
+                      onClick={deleteScholarship}
+                      className="flex-1 text-lg bg-red-900 hover:bg-red-800 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrash className="mr-2" /> Delete
+                    </button>
+                    <button
+                      onClick={() => handleOpenApplicantDialog()}
+                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaEye className="mr-2" /> View Applications
+                    </button>
+                    <button
+                      onClick={() => handleAssignExpertDialog()}
+                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaUserTie className="mr-2" /> Assign Expert
+                    </button>
+                    <button
+                      onClick={() => handleOpenReviewMilestoneDialog()}
+                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaCheckCircle className="mr-2" /> Review Milestones
+                    </button>
+                    <button
+                      onClick={() => handleOpenAwardDialog()}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrophy className="mr-2" /> Award Progress
+
                     </button>
                   </div>
                 )
               )}
             </div>
+
+
+            {data.status == "FINISHED" &&
+              <div className="text-xl font-semibold mr-3">This scholarship has finished</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Submitted &&
+              data.status != "FINISHED" &&
+              <div className="text-xl font-semibold mr-3">Your application is being reviewed</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Rejected &&
+              <div className="text-xl font-semibold mr-3">Your application to this scholarship have not been approved</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Approved &&
+              <div className="text-xl font-semibold mr-3">You have won this scholarship</div>
+            }
+            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.NeedExtend &&
+              <div className="text-xl font-semibold mr-3">You need to extend this scholarship before {formatDate(extendBeforeDate)}</div>
+            }
           </div>
         </div>
       </div>
@@ -797,7 +981,8 @@ const ScholarshipProgramDetail = () => {
         </section>
       </div> */}
 
-      {authorized != "Unauthorized" && (
+
+<!--       {authorized != "Unauthorized" && (
         <AccountDialog
           open={applicantDialogOpen}
           onClose={() => setApplicantDialogOpen(false)}
@@ -805,7 +990,7 @@ const ScholarshipProgramDetail = () => {
           scholarship={data}
         />
       )}
-      {authorized != "Unauthorized" && (
+    //  {authorized != "Unauthorized" && (
         <AssignExpertDialog
           open={assignExpertDialogOpen}
           onClose={() => setAssignExpertDialogOpen(false)}
@@ -814,7 +999,7 @@ const ScholarshipProgramDetail = () => {
           applicantId={applicants}
         />
       )}
-      {authorized != "Unauthorized" && (
+   //   {authorized != "Unauthorized" && (
         <ReviewMilestoneDialog
           open={reviewMilestoneDialogOpen}
           onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
@@ -824,7 +1009,29 @@ const ScholarshipProgramDetail = () => {
             await fetchReviewMilestones(parseInt(data?.id));
           }}
         />
+      )} -->
+
+      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen}
+        onClose={() => setApplicantDialogOpen(false)}
+        applications={applicants ?? []}
+        scholarship={data} />)}
+      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen}
+        onClose={() => setAssignExpertDialogOpen(false)}
+        resetMajor={null}
+        experts={experts ?? []} />)}
+      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen}
+        onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
+        reviewMilestones={reviewMilestones ?? []}
+        fetchReviewMilestones={async () => {
+          if (!data) return;
+          await fetchReviewMilestones(parseInt(data?.id));
+        }} />)}
+      {authorized != "Unauthorized" && (<AwardDialog isOpen={awardDialogOpen}
+        setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
+        winningApplications={winningApplications ?? []} />
       )}
+
+
     </div>
   );
 };

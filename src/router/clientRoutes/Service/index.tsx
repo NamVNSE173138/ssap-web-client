@@ -9,14 +9,15 @@ import ServiceCard from "@/components/Services/ServiceCard";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { IoIosAddCircleOutline, IoIosPaper } from "react-icons/io";
+import { IoIosAddCircleOutline, IoIosArrowBack, IoIosArrowForward, IoIosPaper, IoMdTime } from "react-icons/io";
 import { IoIosSearch, IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
 import { Input } from "@/components/ui/input";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
-import RequestFormModal from "../ServiceDetail/applicantRequestForm-dialog";
+import { IoPerson, IoWallet } from "react-icons/io5";
+import { FaSadTear } from "react-icons/fa";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -32,7 +33,6 @@ const Service = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
-  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -125,8 +125,8 @@ const Service = () => {
     navigate(RouteNames.WALLET);
   };
 
-  const handleRequestForm = () => {
-    setIsRequestFormOpen(true);
+  const handleNavigateProviderList = () => {
+    navigate(RouteNames.PROVIDER_LIST);
   };
 
   return (
@@ -152,10 +152,10 @@ const Service = () => {
       </div>
 
       {/* Search and Action Buttons */}
-      <div className="flex bg-blue-200 justify-between p-6 items-center">
+      <div className="flex bg-gradient-to-r from-blue-300 to-blue-500 justify-between p-6 items-center shadow-lg">
         <div className="relative w-full max-w-md">
           <Input
-            className="w-full pl-12 pr-12 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
+            className="w-full pl-12 pr-12 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
             placeholder="Search for services..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -173,10 +173,10 @@ const Service = () => {
         {user?.role === "Provider" && (
           <button
             onClick={handleAddServiceClick}
-            className="flex justify-start items-center hover:bg-blue-500 hover:text-white transition-all duration-300 gap-4 px-5 py-3 bg-white rounded-xl shadow-md active:scale-95"
+            className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
           >
-            <IoIosAddCircleOutline className="text-3xl text-blue-500" />
-            <p className="text-xl text-blue-600">Add Service</p>
+            <IoIosAddCircleOutline className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
+            <p className="text-xl text-blue-600 font-semibold">Add Service</p>
           </button>
         )}
 
@@ -184,18 +184,17 @@ const Service = () => {
           <div className="flex gap-4">
             <button
               onClick={handleViewHistory}
-              className="flex justify-start items-center hover:bg-blue-500 hover:text-white transition-all duration-300 gap-4 px-5 py-3 bg-white rounded-xl shadow-md active:scale-95"
+              className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
             >
-              <IoIosAddCircleOutline className="text-3xl text-blue-500" />
-              <p className="text-xl text-blue-600">View History</p>
+              <IoMdTime className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl text-blue-600 font-semibold">View History</p>
             </button>
-
             <button
-              onClick={handleRequestForm}
-              className="flex justify-start items-center hover:bg-blue-500 hover:text-white transition-all duration-300 gap-4 px-5 py-3 bg-white rounded-xl shadow-md active:scale-95"
+              onClick={handleNavigateProviderList}
+              className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
             >
-              <IoIosPaper className="text-3xl text-blue-500" />
-              <p className="text-xl text-blue-600">Request Form</p>
+              <IoPerson className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl text-blue-600 font-semibold">Provider List</p>
             </button>
           </div>
         )}
@@ -208,7 +207,10 @@ const Service = () => {
         ) : error ? (
           <p>{error}</p>
         ) : data.length === 0 ? (
-          <p className="text-center text-xl text-gray-500">No services found</p>
+          <div className="flex flex-col items-center justify-center text-center py-16">
+              <FaSadTear className="text-blue-500 text-6xl mb-4" />
+              <p className="text-gray-700 text-lg">No services found.</p>
+            </div>
         ) : (
           filteredData.map((service) => (
             <li key={service.id}>
@@ -219,56 +221,66 @@ const Service = () => {
       </ul>
 
       {/* Pagination Controls */}
-      <div className="flex justify-between p-6">
+      <div className="flex justify-between items-center p-6 bg-blue-50 rounded-lg shadow-md">
+        {/* Previous Button */}
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-300"
+          className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-300 flex items-center gap-2"
         >
-          Previous
+          <IoIosArrowBack className="text-xl" />
+          <span>Previous</span>
         </button>
-        <span className="text-lg font-semibold">Page {currentPage} of {totalPages}</span>
+
+        {/* Page Info */}
+        <span className="text-lg font-semibold text-blue-700">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        {/* Next Button */}
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-300"
+          className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-300 flex items-center gap-2"
         >
-          Next
+          <span>Next</span>
+          <IoIosArrowForward className="text-xl" />
         </button>
       </div>
 
-      {/* Request Form Modal */}
-      <RequestFormModal
-        isOpen={isRequestFormOpen}
-        handleClose={() => setIsRequestFormOpen(false)}
-        services={data}
-        handleSubmit={()=>{}}
-      />
-
-      {/* Add Service Modal */}
       <AddServiceModal
         isOpen={isServiceModalOpen}
         setIsOpen={setIsServiceModalOpen}
         fetchServices={() => { setCurrentPage(1); fetchData(); }}
       />
 
-      {/* Wallet Dialog */}
       <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
-        <div className="p-6">
-          <h3 className="text-2xl font-semibold">You don't have a wallet yet!</h3>
+        <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
+          <h3 className="text-2xl font-semibold text-blue-600 flex items-center gap-2">
+            <IoWallet className="text-blue-500 text-3xl" />
+            You don't have a wallet yet!
+          </h3>
           <p className="my-4 text-lg text-gray-600">
             You need to create a wallet to add services. Do you want to go to the Wallet page?
           </p>
           <div className="flex justify-end gap-4">
-            <button onClick={handleCloseWalletDialog} className="bg-gray-300 px-5 py-2 rounded-full hover:bg-gray-400 transition-all">
+            <button
+              onClick={handleCloseWalletDialog}
+              className="bg-gray-300 px-6 py-2 rounded-full hover:bg-gray-400 transition-all text-lg"
+            >
               Cancel
             </button>
-            <button onClick={handleNavigateToWallet} className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 transition-all">
+            <button
+              onClick={handleNavigateToWallet}
+              className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all text-lg flex items-center gap-2"
+            >
+              <IoIosArrowForward className="text-xl" />
               Yes
             </button>
           </div>
         </div>
       </Dialog>
+
     </div>
 
   );
