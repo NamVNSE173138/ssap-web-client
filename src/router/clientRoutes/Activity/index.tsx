@@ -60,7 +60,7 @@ const Activity = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      if (role === "FUNDER") {
+      if (role === "FUNDER" || role === "Funder") {
         const response = await axios.get(
           `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
         );
@@ -111,7 +111,7 @@ const Activity = () => {
       <div className="col-span-10 gap-1 p-5">
         <div className="relative w-full flex items-center justify-between p-5">
           <div className="flex items-center"></div>
-          {role === "FUNDER" || "Funder" && (
+          {(role == "FUNDER" || role=="Funder") && (
             <Link to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
               // onClick={() => setIsScholarshipModalOpen(true)}
               className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
@@ -136,14 +136,14 @@ const Activity = () => {
             <ScholarshipProgramSkeleton />
           ) : error ? (
             <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
-              {"Error loading " + (role === "FUNDER" ? "scholarship programs." : "services.")}
+              {"Error loading " + ((role == "FUNDER" || role=="Funder") ? "scholarship programs." : "services.")}
             </p>
-          ) : (role === "FUNDER" ? data.length : services.length) === 0 ? (
+          ) : ((role == "FUNDER" || role==="Funder") ? data.length : services.length) === 0 ? (
             <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
-              {"No " + (role === "FUNDER" ? "scholarship programs found." : "services found.")}
+              {"No " + (role === "FUNDER" || "Funder" ? "scholarship programs found." : "services found.")}
             </p>
           ) : (
-            (role === "FUNDER" ? data.map((item: any) => (
+            ((role === "FUNDER" || role==="Funder") ? data.map((item: any) => (
               <li key={item.id}>
                 <CreatedCard {...item} />
               </li>

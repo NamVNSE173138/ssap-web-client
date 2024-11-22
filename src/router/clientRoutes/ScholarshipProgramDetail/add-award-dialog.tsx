@@ -42,7 +42,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards }: AddAwardDialogProps)
             form.reset();
             //console.log("Service created successfully:", response.data);
             setIsOpen(false);
-            fetchMilestones();
+            fetchAwards();
         } catch (error) {
             console.error("Error creating service:", error);
         }

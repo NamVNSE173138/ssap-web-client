@@ -47,7 +47,7 @@ import { LoginUser } from "@/services/ApiServices/authenticationService";
 import { SendNotification } from "@/services/ApiServices/notification";
 import { argv0 } from "process";
 import { updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
-import { FaCalendarAlt, FaCheckCircle, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaTrophy } from "react-icons/fa";
+import { FaCalendarAlt, FaCheckCircle, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaSearch, FaTimes, FaTrophy } from "react-icons/fa";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -178,7 +178,7 @@ const ChooseWinner = () => {
     const selectedRowData = applicants.filter((row: any) =>
       selectionModel.includes(row.id)
     );
-    
+
     setSelectedRows(selectedRowData);
     if (data)
       setAvailableScholarships(
@@ -263,13 +263,13 @@ const ChooseWinner = () => {
           </div>
           <div className="">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={data.imageUrl} />
+              <SchoolLogo imageUrl={data.imageUrl || "https://github.com/shadcn.png"} />
               <div>
                 <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
                   {data.name}
                 </p>
-                <p className="text-white text-3xl  text-heading-5 hidden lg:block mt-[12px]">
-                  {data.description}
+                <p className="text-white text-3xl text-heading-5 hidden lg:block mt-[12px]">
+                  {data.description.length > 50 ? `${data.description.substring(0, 50)}...` : data.description}
                 </p>
               </div>
             </div>
@@ -277,51 +277,51 @@ const ChooseWinner = () => {
         </div>
       </div>
       <div className="bg-white lg:bg-white drop-shadow-lg lg:drop-shadow-xl relative rounded-lg">
-        <section className="max-w-container mx-auto py-[24px] lg:py-[40px]">
+        <section className="max-w-container mx-auto py-[24px] bg-gray-100 lg:py-[40px]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px] lg:gap-[40px] px-[24px] lg:px-0">
             {/* Location */}
-            <div className="flex flex-col items-start bg-blue-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="flex flex-col items-start bg-blue-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
-                <FaMapMarkerAlt className="text-blue-500 text-2xl" />
-                <p className="block text-lg font-semibold">Location</p>
+                <FaMapMarkerAlt className="text-blue-500 text-3xl" />
+                <p className="block text-xl font-semibold text-blue-600">Location</p>
               </div>
-              <p className="text-heading-6 text-gray-700">VietNam</p>
+              <p className="text-heading-6 text-gray-700 mt-2">VietNam</p>
             </div>
 
             {/* Qualification */}
-            <div className="flex flex-col items-start bg-green-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="flex flex-col items-start bg-green-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
-                <FaGraduationCap className="text-green-500 text-2xl" />
-                <p className="block text-lg font-semibold">Qualification</p>
+                <FaGraduationCap className="text-green-500 text-3xl" />
+                <p className="block text-xl font-semibold text-green-600">Qualification</p>
               </div>
-              <p className="text-heading-6 text-gray-700">VietNam</p>
+              <p className="text-heading-6 text-gray-700 mt-2">Bachelor's Degree</p>
             </div>
 
             {/* Funding Type */}
-            <div className="flex flex-col items-start bg-yellow-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="flex flex-col items-start bg-yellow-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
-                <FaMoneyBillWave className="text-yellow-500 text-2xl" />
-                <p className="block text-lg font-semibold">Funding Type</p>
+                <FaMoneyBillWave className="text-yellow-500 text-3xl" />
+                <p className="block text-xl font-semibold text-yellow-600">Funding Type</p>
               </div>
-              <p className="text-heading-6 text-gray-700">VietNam</p>
+              <p className="text-heading-6 text-gray-700 mt-2">Full Scholarship</p>
             </div>
 
             {/* Deadline */}
-            <div className="flex flex-col items-start bg-orange-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="flex flex-col items-start bg-orange-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
-                <FaCalendarAlt className="text-orange-500 text-2xl" />
-                <p className="block text-lg font-semibold">Deadline</p>
+                <FaCalendarAlt className="text-orange-500 text-3xl" />
+                <p className="block text-xl font-semibold text-orange-600">Deadline</p>
               </div>
-              <p className="text-heading-6 text-gray-700">VietNam</p>
+              <p className="text-heading-6 text-gray-700 mt-2">December 31, 2024</p>
             </div>
 
             {/* Value of Award */}
-            <div className="flex flex-col items-start bg-teal-50 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="flex flex-col items-start bg-teal-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
-                <FaTrophy className="text-teal-500 text-2xl" />
-                <p className="block text-lg font-semibold">Value of Award</p>
+                <FaTrophy className="text-teal-500 text-3xl" />
+                <p className="block text-xl font-semibold text-teal-600">Value of Award</p>
               </div>
-              <p className="text-heading-6 text-gray-700">VietNam</p>
+              <p className="text-heading-6 text-gray-700 mt-2">$5,000 USD</p>
             </div>
           </div>
         </section>
@@ -330,7 +330,9 @@ const ChooseWinner = () => {
       <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-            <p className="text-4xl font-semibold text-sky-600">
+            {/* Title Section */}
+            <p className="text-4xl font-semibold text-sky-600 flex items-center gap-2">
+              <FaTrophy className="text-4xl text-sky-500" />
               Choose Scholarship Winner
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
@@ -343,19 +345,35 @@ const ChooseWinner = () => {
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
               {scholarshipWinners.map((winner) => (
                 <div key={winner.id}>
-                  <ListItem alignItems="flex-start" className="hover:bg-sky-50 rounded-lg transition-all duration-200">
+                  <ListItem
+                    alignItems="flex-start"
+                    className="hover:bg-sky-50 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl"
+                  >
                     <ListItemAvatar>
-                      <Avatar alt={winner.applicant.username} src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"} />
+                      <Avatar
+                        alt={winner.applicant.username}
+                        src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"}
+                      />
                     </ListItemAvatar>
                     <ListItemText
-                      primary={winner.applicant.username}
+                      primary={
+                        <span className="font-bold text-sky-600">{winner.applicant.username}</span>
+                      }
                       secondary={
-                        <Typography component="span" variant="body2" sx={{ color: 'text.primary', display: 'inline' }}>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ color: 'text.primary', display: 'inline' }}
+                        >
                           {winner.applicant.email}
                         </Typography>
                       }
                     />
-                    <Link target="_blank" to={`/funder/application/${winner.id}`} className="text-sky-500 underline hover:text-sky-600 transition-all">
+                    <Link
+                      target="_blank"
+                      to={`/funder/application/${winner.id}`}
+                      className="text-sky-500 underline hover:text-sky-600 transition-all"
+                    >
                       <FaExternalLinkAlt className="inline-block text-sky-500 ml-2" />
                       View Profile
                     </Link>
@@ -365,30 +383,53 @@ const ChooseWinner = () => {
               ))}
             </List>
 
-            {/* Scholarships Left */}
             <p className="text-lg font-semibold my-5 text-gray-700">
               <span>Number of scholarships left: </span>
               <span className="text-sky-500">{availableScholarships}</span>
             </p>
 
-            {/* Search Input */}
             <FormControl fullWidth sx={{ marginBottom: '20px' }}>
-              <InputLabel htmlFor="outlined-adornment-search">Search Applicants</InputLabel>
+              <InputLabel
+                htmlFor="outlined-adornment-search"
+                sx={{
+                  zIndex: 1,
+                  backgroundColor: 'white',
+                  paddingLeft: '8px',
+                  paddingRight: '8px',
+                  top: '-8px',
+                  fontSize: '14px',
+                }}
+              >
+                Search Applicants
+              </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-search"
                 startAdornment={
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <FaSearch className="text-sky-500 transition-all duration-300 transform hover:scale-110" />
                   </InputAdornment>
                 }
+                endAdornment={
+                  searchQuery && (
+                    <InputAdornment position="end">
+                      <FaTimes
+                        className="text-sky-500 cursor-pointer transition-all duration-300 transform hover:scale-110"
+                        onClick={() => setSearchQuery('')}
+                      />
+                    </InputAdornment>
+                  )
+                }
                 onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search"
-                className="border-2 border-sky-500 rounded-md"
+                label="Search Applicants"
+                className="border-2 border-sky-500 rounded-md shadow-md transition-all duration-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 hover:shadow-lg"
+                sx={{
+                  paddingTop: '10px',
+                  paddingBottom: '10px',
+                }}
               />
             </FormControl>
 
-            {/* DataGrid */}
-            <Paper sx={{ height: 400, width: "100%", borderRadius: '8px', boxShadow: 3 }}>
+            <Paper sx={{ height: 400, width: '100%', borderRadius: '8px', boxShadow: 3 }}>
               {filteredRows.length > 0 ? (
                 <DataGrid
                   rows={filteredRows.map((app: any) => ({
@@ -411,7 +452,6 @@ const ChooseWinner = () => {
               )}
             </Paper>
 
-            {/* Selected Winners */}
             <div className="my-4 text-lg text-gray-700">
               Selected Winners:{" "}
               {selectedRows.map((row: any, index: number) =>
@@ -419,21 +459,22 @@ const ChooseWinner = () => {
               )}
             </div>
 
-            {/* Apply Button */}
             <div className="flex justify-end mt-4">
               <Button
                 variant="contained"
                 color="primary"
                 onClick={applyForSelectedWinners}
-                className="text-white flex items-center gap-2"
+                className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500"
               >
-                <FaCheckCircle className="text-white" />
-                Apply
+                <FaCheckCircle className="text-white text-2xl" />
+                <span className="text-lg font-semibold">Apply</span>
               </Button>
             </div>
+
           </div>
         </div>
       </section>
+
 
     </div>
   );
