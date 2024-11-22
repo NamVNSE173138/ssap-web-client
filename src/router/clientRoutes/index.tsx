@@ -28,6 +28,7 @@ import Wallet from "./Wallet";
 import ChooseWinner from "./ChooseWinner";
 import History from "./History";
 import Test from "./Test";
+import ProviderList from "./ProviderList";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -159,6 +160,10 @@ const privateRoutes: RouteObject[] = [
     path: RouteNames.HISTORY,
     element: <History/>,
   },
+  {
+    path: RouteNames.PROVIDER_LIST,
+    element: <ProviderList />,
+  }
 
 ];
 

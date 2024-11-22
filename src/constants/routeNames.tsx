@@ -36,7 +36,8 @@ const RouteNames = {
   PAYMENT_RESULT: "/payment/result",
   FORM_CREATE_SCHOLARSHIP_PROGRAM: "/create-scholarship-program",
   TEST: "/test",
-  HISTORY: "/history"
+  HISTORY: "/history",
+  PROVIDER_LIST:"/provider-list"
 };
 
 export default RouteNames;

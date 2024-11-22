@@ -3,6 +3,15 @@ import { BASE_URL } from "@/constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
+export async function createCheckoutSession(checkoutSessionRequest:any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/payments/stripe-checkout`,
+    checkoutSessionRequest,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
 export async function createInvoice(invoiceRequest: any) {
   const response = await axios.post(
     `${BASE_URL}/api/payments/create-invoice`,

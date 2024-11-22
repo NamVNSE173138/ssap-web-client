@@ -5,6 +5,8 @@ import { updateApplicantSkills, deleteApplicantSkill, getApplicantProfileById } 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Sidebar } from "@/components/AccountInfo";
+import { FaPlus, FaEdit, FaTrashAlt } from 'react-icons/fa';
+
 
 const SkillInformation = () => {
     const user = useSelector((state: RootState) => state.token.user);
@@ -34,13 +36,13 @@ const SkillInformation = () => {
                     }
                 }
             } catch (error: any) {
-                
+
                 if (isMounted) {
                     setSkills([]);
                     setError("Failed to load skills.");
                 }
-                if(error.response.data.detail.includes('applicantId')){
-                    setHasProfile(false);   
+                if (error.response.data.detail.includes('applicantId')) {
+                    setHasProfile(false);
                     setError(null);
                 }
             } finally {
@@ -74,7 +76,7 @@ const SkillInformation = () => {
             await updateApplicantSkills(Number(user.id), [formValues]);
             message.success("Skill added successfully!");
             setSkills([...skills, formValues]);
-            setFormValues({ name: "", type: "", description: "", skillId: null, applicantId: user?.id }); 
+            setFormValues({ name: "", type: "", description: "", skillId: null, applicantId: user?.id });
         } catch (error) {
             message.error("Failed to add skill.");
         }
@@ -82,9 +84,9 @@ const SkillInformation = () => {
 
     const handleUpdate = async () => {
         try {
-            if (!user || formValues.skillId === null) return; 
+            if (!user || formValues.skillId === null) return;
 
-            const updatedSkills = skills.map(skill => 
+            const updatedSkills = skills.map(skill =>
                 skill.id === formValues.skillId ? { ...skill, ...formValues } : skill
             );
 
@@ -97,7 +99,7 @@ const SkillInformation = () => {
     };
 
     const handleEdit = (skill: any) => {
-        setFormValues({ ...skill, skillId: skill.id }); 
+        setFormValues({ ...skill, skillId: skill.id });
     };
 
     const handleDelete = async (skillId: number) => {
@@ -105,7 +107,7 @@ const SkillInformation = () => {
             if (!user) return;
             await deleteApplicantSkill(Number(user.id), skillId);
             message.success("Skill deleted successfully!");
-            setSkills(skills.filter(skill => skill.id !== skillId)); 
+            setSkills(skills.filter(skill => skill.id !== skillId));
         } catch (error) {
             message.error("Failed to delete skill.");
         }
@@ -125,80 +127,97 @@ const SkillInformation = () => {
     return (
         <div className="grid grid-cols-12 h-full">
             <Sidebar className="col-start-1 col-end-3" />
+
             <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
                 <div className="lg:px-28 flex flex-col gap-9">
+
+                    {/* Skill Name */}
                     <div className="columns-1">
-                        <label htmlFor="name">Skill Name:</label>
+                        <label htmlFor="name" className="font-semibold text-lg">Skill Name:</label>
                         <input
                             type="text"
                             id="name"
                             name="name"
-                            className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+                            className="lg:w-full w-[95%] h-12 lg:h-16 indent-4 border border-gray-300 rounded-full p-3 bg-white text-base lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={formValues.name}
                             onChange={handleInputChange}
                             required
                         />
                     </div>
+
+                    {/* Skill Type */}
                     <div className="columns-1">
-                        <label htmlFor="type">Type:</label>
+                        <label htmlFor="type" className="font-semibold text-lg">Type:</label>
                         <input
                             type="text"
                             id="type"
                             name="type"
-                            className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+                            className="lg:w-full w-[95%] h-12 lg:h-16 indent-4 border border-gray-300 rounded-full p-3 bg-white text-base lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={formValues.type}
                             onChange={handleInputChange}
                             required
                         />
                     </div>
+
+                    {/* Description */}
                     <div className="columns-1">
-                        <label htmlFor="description">Description:</label>
+                        <label htmlFor="description" className="font-semibold text-lg">Description:</label>
                         <textarea
                             id="description"
                             name="description"
-                            className="lg:w-full lg:h-15 w-[95%] h-9 lg:indent-6 indent-1 border border-gray-300 rounded-[3rem] p-2 bg-white text-base lg:text-xl"
+                            className="lg:w-full w-[80%] h-32 lg:h-40 indent-4 border border-gray-300 rounded-lg p-3 bg-white text-base lg:text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={formValues.description}
                             onChange={handleInputChange}
                             required
                         />
                     </div>
-                    <div className="flex justify-center">
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-center gap-5">
                         <button
                             type="button"
                             onClick={handleAdd}
-                            className="lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                            className="lg:mb-7 mb-5 bg-blue-600 text-white lg:h-16 h-12 lg:w-64 w-48 rounded-full flex items-center justify-center gap-3 lg:text-xl text-base hover:bg-blue-700 transition-all"
                         >
-                            Add Skill
+                            <FaPlus size={20} /> Add Skill
                         </button>
                         <button
                             type="button"
                             onClick={handleUpdate}
-                            className="ml-[10px] lg:mb-7 mb-5 bg-[#067CEB] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
+                            className="ml-[10px] lg:mb-7 mb-5 bg-blue-600 text-white lg:h-16 h-12 lg:w-64 w-48 rounded-full flex items-center justify-center gap-3 lg:text-xl text-base hover:bg-blue-700 transition-all"
                         >
-                            Update Skill
+                            <FaEdit size={20} /> Update Skill
                         </button>
                     </div>
-                    <table className="min-w-full bg-white border border-gray-300">
+
+                    {/* Table to Display Skills */}
+                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                         <thead>
-                            <tr className="bg-gray-200">
-                                <th className="border border-gray-300 text-center py-3">Skill Name</th>
-                                <th className="border border-gray-300 text-center py-3">Type</th>
-                                <th className="border border-gray-300 text-center py-3">Description</th>
-                                <th className="border border-gray-300 text-center py-3">Actions</th>
+                            <tr className="bg-gray-200 text-lg">
+                                <th className="border border-gray-300 text-center py-4">Skill Name</th>
+                                <th className="border border-gray-300 text-center py-4">Type</th>
+                                <th className="border border-gray-300 text-center py-4">Description</th>
+                                <th className="border border-gray-300 text-center py-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {skills.map((skill, index) => (
-                                <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                                    <td className="border border-gray-300 text-center py-2">{skill.name}</td>
-                                    <td className="border border-gray-300 text-center py-2">{skill.type}</td>
-                                    <td className="border border-gray-300 text-center py-2">{skill.description}</td>
-                                    <td className="border border-gray-300 text-center py-2">
-                                        <button onClick={() => handleEdit(skill)} className="text-blue-500 hover:text-blue-700">
-                                            Edit
+                                <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                                    <td className="border border-gray-300 text-center py-3">{skill.name}</td>
+                                    <td className="border border-gray-300 text-center py-3">{skill.type}</td>
+                                    <td className="border border-gray-300 text-center py-3">{skill.description}</td>
+                                    <td className="border border-gray-300 text-center py-3">
+                                        <button
+                                            onClick={() => handleEdit(skill)}
+                                            className="text-blue-500 hover:text-blue-700 flex items-center gap-2"
+                                        >
+                                            <FaEdit size={18} /> Edit
                                         </button>
-                                        <button onClick={() => handleDelete(skill.id)} className="text-red-500 hover:text-red-700 ml-2">
-                                            Delete
+                                        <button
+                                            onClick={() => handleDelete(skill.id)}
+                                            className="text-red-500 hover:text-red-700 ml-4 flex items-center gap-2"
+                                        >
+                                            <FaTrashAlt size={18} /> Delete
                                         </button>
                                     </td>
                                 </tr>

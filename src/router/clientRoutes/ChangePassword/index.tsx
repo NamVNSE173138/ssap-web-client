@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { FaKey, FaLock, FaRegEnvelope } from "react-icons/fa";
 
 const ChangePassword: React.FC = () => {
     const [isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
@@ -37,7 +38,7 @@ const ChangePassword: React.FC = () => {
             variant: "default",
         });
         try {
-            await ChangedPassword({email: user?.email, oldPassword: values.oldPassword, newPassword: values.newPassword });
+            await ChangedPassword({ email: user?.email, oldPassword: values.oldPassword, newPassword: values.newPassword });
             toast({
                 title: "Change Password Successful",
                 description: "Your password has been changed successfully.",
@@ -174,96 +175,115 @@ const ChangePassword: React.FC = () => {
     return (
         <div className="grid grid-cols-12 h-full">
             <Sidebar className="col-start-1 col-end-3" />
-            <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5 ">
-                <div className="mt-10 flex flex-col items-center bg-gray-100">
-                    <h2 className="text-2xl font-bold mb-6">{isForgotPassword ? "Forgot Password" : "Change Password"}</h2>
+
+            <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+                <div className="mt-10 flex flex-col items-center bg-white shadow-lg rounded-xl p-8">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6">{isForgotPassword ? "Forgot Password" : "Change Password"}</h2>
+
                     {isForgotPassword ? (
                         <>
                             {!isOtpVerified ? (
                                 <Form onFinish={handleForgotPassword} className="w-80">
                                     <Form.Item label="Email" name="email" rules={[{ required: true, type: "email" }]}>
-                                        <Input
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="Enter your email"
-                                        />
+                                        <div className="flex items-center border rounded-full border-gray-300 px-4 py-2">
+                                            <FaRegEnvelope size={20} className="text-gray-600" />
+                                            <Input
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                placeholder="Enter your email"
+                                                className="border-none focus:ring-0 outline-none flex-1"
+                                            />
+                                        </div>
                                     </Form.Item>
                                     <Form.Item>
-                                        <Button type="primary" htmlType="submit" className="w-full">
+                                        <Button type="primary" htmlType="submit" className="w-full bg-blue-600 hover:bg-blue-700 rounded-full text-white">
                                             Send OTP
                                         </Button>
                                     </Form.Item>
                                     {emailError && <Alert message={emailError} type="error" />}
-                                    <p className="text-center">
-                                        <Button type="link" onClick={() => setIsForgotPassword(false)}>
+                                    <p className="text-center mt-4">
+                                        <Button type="link" onClick={() => setIsForgotPassword(false)} className="text-blue-600">
                                             Back to Change Password
                                         </Button>
                                     </p>
                                 </Form>
-                            ) : (!isResetPassword ? (
-                                <Form className="w-80">
-                                    <Form.Item label="OTP" name="otp" rules={[{ required: true }]}>
-                                        <Input
-                                            value={otp}
-                                            onChange={(e) => setOtp(e.target.value)}
-                                            placeholder="Enter OTP"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item>
-                                        <p className="text-center">
-                                            <Button htmlType="submit" className="w-full" type="primary" onClick={handleVerifyOtp}>
-                                                Verify OTP
-                                            </Button>
-                                        </p>
-                                    </Form.Item>
-                                </Form>
                             ) : (
-                                <Form onFinish={handleResetPassword} className="w-80">
-                                    <Form.Item label="New Password" name="newPassword" rules={[{ required: true }]}>
-                                        <Input.Password
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            placeholder="Enter new password"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Confirm New Password" name="confirmNewPassword" rules={[{ required: true }]}>
-                                        <Input.Password
-                                            value={confirmNewPassword}
-                                            onChange={(e) => setConfirmNewPassword(e.target.value)}
-                                            placeholder="Confirm new password"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item>
-                                        <Button type="primary" htmlType="submit" className="w-full" onClick={handleResetPassword}>
-                                            Reset Password
-                                        </Button>
-                                    </Form.Item>
-                                </Form>
-                            ))}
+                                !isResetPassword ? (
+                                    <Form className="w-80">
+                                        <Form.Item label="OTP" name="otp" rules={[{ required: true }]}>
+                                            <div className="flex items-center border rounded-full border-gray-300 px-4 py-2">
+                                                <FaKey
+                                                    size={20} className="text-gray-600" />
+                                                <Input
+                                                    value={otp}
+                                                    onChange={(e) => setOtp(e.target.value)}
+                                                    placeholder="Enter OTP"
+                                                    className="border-none focus:ring-0 outline-none flex-1"
+                                                />
+                                            </div>
+                                        </Form.Item>
+                                        <Form.Item>
+                                            <p className="text-center">
+                                                <Button htmlType="submit" className="w-full bg-blue-600 hover:bg-blue-700 rounded-full text-white" onClick={handleVerifyOtp}>
+                                                    Verify OTP
+                                                </Button>
+                                            </p>
+                                        </Form.Item>
+                                    </Form>
+                                ) : (
+                                    <Form onFinish={handleResetPassword} className="w-80">
+                                        <Form.Item label="New Password" name="newPassword" rules={[{ required: true }]}>
+                                            <div className="flex items-center border rounded-full border-gray-300 px-4 py-2">
+                                                <FaLock size={20} className="text-gray-600" />
+                                                <Input.Password
+                                                    value={newPassword}
+                                                    onChange={(e) => setNewPassword(e.target.value)}
+                                                    placeholder="Enter new password"
+                                                    className="border-none focus:ring-0 outline-none flex-1"
+                                                />
+                                            </div>
+                                        </Form.Item>
+                                        <Form.Item label="Confirm New Password" name="confirmNewPassword" rules={[{ required: true }]}>
+                                            <div className="flex items-center border rounded-full border-gray-300 px-4 py-2">
+                                                <FaLock size={20} className="text-gray-600" />
+                                                <Input.Password
+                                                    value={confirmNewPassword}
+                                                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                                    placeholder="Confirm new password"
+                                                    className="border-none focus:ring-0 outline-none flex-1"
+                                                />
+                                            </div>
+                                        </Form.Item>
+                                        <Form.Item>
+                                            <Button type="primary" htmlType="submit" className="w-full bg-blue-600 hover:bg-blue-700 rounded-full text-white">
+                                                Reset Password
+                                            </Button>
+                                        </Form.Item>
+                                    </Form>
+                                )
+                            )}
                         </>
                     ) : (
                         <Form onFinish={handleChangePassword} className="w-80">
-                            <Form.Item
-                                label="Old Password"
-                                name="oldPassword"
-                                rules={[{ required: true, message: "Please input your old password!" }]}
-                            >
-                                <Input.Password value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                            <Form.Item label="Old Password" name="oldPassword" rules={[{ required: true, message: "Please input your old password!" }]}>
+                                <div className="flex items-center border rounded-full border-gray-300 px-4 py-2">
+                                    <FaLock size={20} className="text-gray-600" />
+                                    <Input.Password value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="border-none focus:ring-0 outline-none flex-1" />
+                                </div>
                             </Form.Item>
-                            <Form.Item
-                                label="New Password"
-                                name="newPassword"
-                                rules={[{ required: true, message: "Please input your new password!" }]}
-                            >
-                                <Input.Password value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                            <Form.Item label="New Password" name="newPassword" rules={[{ required: true, message: "Please input your new password!" }]}>
+                                <div className="flex items-center border rounded-full border-gray-300 px-4 py-2">
+                                    <FaLock size={20} className="text-gray-600" />
+                                    <Input.Password value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="border-none focus:ring-0 outline-none flex-1" />
+                                </div>
                             </Form.Item>
                             <Form.Item>
-                                <Button type="primary" htmlType="submit" className="w-full">
+                                <Button type="primary" htmlType="submit" className="w-full bg-blue-600 hover:bg-blue-700 rounded-full text-white">
                                     Change Password
                                 </Button>
                             </Form.Item>
-                            <p className="text-center">
-                                <Button type="link" onClick={() => setIsForgotPassword(true)}>
+                            <p className="text-center mt-4">
+                                <Button type="link" onClick={() => setIsForgotPassword(true)} className="text-blue-600">
                                     Forgot password?
                                 </Button>
                             </p>
@@ -272,6 +292,7 @@ const ChangePassword: React.FC = () => {
                 </div>
             </div>
         </div>
+
     );
 }
 
