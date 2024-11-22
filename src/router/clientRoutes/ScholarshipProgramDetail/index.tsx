@@ -28,23 +28,23 @@ import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
-<!-- import {
-  deleteApplication,
-  getApplicationByApplicantIdAndScholarshipId,
-} from "@/services/ApiServices/applicationService";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../../../components/ui/alert-dialog";
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog"; -->
+// <!-- import {
+//   deleteApplication,
+//   getApplicationByApplicantIdAndScholarshipId,
+// } from "@/services/ApiServices/applicationService";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogTitle,
+//   AlertDialogTrigger,
+// } from "../../../components/ui/alert-dialog";
+// import {
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+// } from "@/components/ui/alert-dialog"; -->
 
 import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
@@ -97,10 +97,6 @@ const ScholarshipProgramDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-
-<!--         } -->
-<!--       ); -->
-
         });
 
       if (response.data.statusCode === 200) {
@@ -108,11 +104,11 @@ const ScholarshipProgramDetail = () => {
         setAuthorized(response.data.message);
         if (user) {
 
-<!--           const application = await getApplicationByApplicantIdAndScholarshipId(
-            parseInt(user?.id),
-            response.data.data.id
-          );
-          setExistingApplication(application.data); -->
+// <!--           const application = await getApplicationByApplicantIdAndScholarshipId(
+//             parseInt(user?.id),
+//             response.data.data.id
+//           );
+//           setExistingApplication(application.data); -->
 
           const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
           setExistingApplication(application.data);
@@ -325,35 +321,35 @@ const ScholarshipProgramDetail = () => {
               </div>
             </div>
 
-<!--             {data.status == "FINISHED" && (
+             {/* {data.status == "FINISHED" && (
               <div className="text-xl font-semibold mr-3">
                 This scholarship has finished
               </div>
-            )} -->
-<!--             {existingApplication &&
+            )}  */}
+{/* <!--             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == "PENDING" &&
               data.status != "FINISHED" && (
                 <div className="text-xl font-semibold mr-3">
                   Your application is being reviewed
                 </div>
-              )} -->
-<!--             {existingApplication &&
+              )} --> */}
+{/* <!--             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status != "APPROVED" && (
                 <div className="text-xl font-semibold mr-3">
                   Your application to this scholarship have not been approved
                 </div>
-              )} -->
-<!--             {existingApplication &&
+              )} --> */}
+{/* <!--             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == "APPROVED" && (
                 <div className="text-xl font-semibold mr-3">
                   You have won this scholarship
                 </div>
-              )} -->
+              )} --> */}
 
-<!--             <div className="text-white text-center flex h-[50px] mt-[26px] "> -->
+{/* <!--             <div className="text-white text-center flex h-[50px] mt-[26px] "> -->
 <!--               {isApplicant == "Applicant"  ? ( -->
 <!--                 <> -->
 <!--                   {existingApplication && -->
@@ -380,8 +376,8 @@ const ScholarshipProgramDetail = () => {
 <!--                       > -->
 <!--                         View applications{" "} -->
 <!--                       </button> -->
-<!--                       {existingApplication[0].status != "APPROVED" && ( -->
-<!--                         <AlertDialog> -->
+<!--                       {existingApplication[0].status != "APPROVED" && ( --> */}
+{/* <!--                         <AlertDialog> -->
 <!--                           <AlertDialogTrigger -->
 <!--                             className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" -->
 <!--                             disabled={cancelLoading} -->
@@ -412,7 +408,7 @@ const ScholarshipProgramDetail = () => {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
-                      )} -->
+                      )} --> */}
 
 
             <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
@@ -483,36 +479,36 @@ const ScholarshipProgramDetail = () => {
               ) : (
                 authorized != "Unauthorized" && (
 
-<!--                   <div className="flex justify-between w-full gap-10">
-                    <button
-                      onClick={() => navigate("")}
-                      className=" text-xl w-full  bg-blue-700 rounded-[25px]"
-                    >
-                      Edit{" "}
-                    </button>
-                    <button
-                      onClick={deleteScholarship}
-                      className=" text-xl w-full  bg-red-900 rounded-[25px]"
-                    >
-                      Delete{" "}
-                    </button>
-                    <button
-                      onClick={() => handleOpenApplicantDialog()}
-                      className=" text-xl w-full bg-green-700 rounded-[25px]"
-                    >
-                      View applications{" "}
-                    </button>
-                    <button
-                      onClick={() => handleAssignExpertDialog()}
-                      className=" text-xl w-full bg-green-700 rounded-[25px]"
-                    >
-                      Assign Expert{" "}
-                    </button>
-                    <button
-                      onClick={() => handleOpenReviewMilestoneDialog()}
-                      className=" text-xl w-full bg-green-700 rounded-[25px]"
-                    >
-                      Review Milestones{" "} -->
+// <!--                   <div className="flex justify-between w-full gap-10">
+//                     <button
+//                       onClick={() => navigate("")}
+//                       className=" text-xl w-full  bg-blue-700 rounded-[25px]"
+//                     >
+//                       Edit{" "}
+//                     </button>
+//                     <button
+//                       onClick={deleteScholarship}
+//                       className=" text-xl w-full  bg-red-900 rounded-[25px]"
+//                     >
+//                       Delete{" "}
+//                     </button>
+//                     <button
+//                       onClick={() => handleOpenApplicantDialog()}
+//                       className=" text-xl w-full bg-green-700 rounded-[25px]"
+//                     >
+//                       View applications{" "}
+//                     </button>
+//                     <button
+//                       onClick={() => handleAssignExpertDialog()}
+//                       className=" text-xl w-full bg-green-700 rounded-[25px]"
+//                     >
+//                       Assign Expert{" "}
+//                     </button>
+//                     <button
+//                       onClick={() => handleOpenReviewMilestoneDialog()}
+//                       className=" text-xl w-full bg-green-700 rounded-[25px]"
+//                     >
+//                       Review Milestones{" "} -->
 
                   <div className="flex justify-between w-full gap-3">
                     <button
@@ -982,7 +978,7 @@ const ScholarshipProgramDetail = () => {
       </div> */}
 
 
-<!--       {authorized != "Unauthorized" && (
+{/* <!--       {authorized != "Unauthorized" && (
         <AccountDialog
           open={applicantDialogOpen}
           onClose={() => setApplicantDialogOpen(false)}
@@ -1009,7 +1005,7 @@ const ScholarshipProgramDetail = () => {
             await fetchReviewMilestones(parseInt(data?.id));
           }}
         />
-      )} -->
+      )} --> */}
 
       {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen}
         onClose={() => setApplicantDialogOpen(false)}
