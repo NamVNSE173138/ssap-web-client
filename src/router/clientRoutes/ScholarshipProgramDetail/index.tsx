@@ -64,7 +64,7 @@ const ScholarshipProgramDetail = () => {
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
-  //const [awardMilestones, setAwardMilestones] = useState<any>(null);
+  const [awardMilestones, setAwardMilestones] = useState<any>(null);
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
@@ -81,6 +81,8 @@ const ScholarshipProgramDetail = () => {
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
+        console.log(response.data.data);
+        
         setAuthorized(response.data.message);
         if (user) {
 
@@ -93,6 +95,7 @@ const ScholarshipProgramDetail = () => {
           const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(response.data.data.id);
+          setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
           //console.log(application.data);
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
@@ -172,7 +175,7 @@ const ScholarshipProgramDetail = () => {
       const response = await getApplicationsByScholarship(scholarshipId);
       //console.log(response);
       if (response.statusCode == 200) {
-        setWinningApplications(response.data.filter((application: any) => application.status === "APPROVED"));
+        setWinningApplications(response.data.filter((application: any) => application.status === ApplicationStatus.Approved || application.status === ApplicationStatus.Awarded));
       } else {
         setError("Failed to get applicants");
       }
@@ -392,7 +395,7 @@ const ScholarshipProgramDetail = () => {
 
 
             <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
-              {isApplicant == "Applicant" || !user ? (
+              {isApplicant == "APPLICANT" || !user ? (
                 <>
                   {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && (
                     <button
@@ -418,8 +421,9 @@ const ScholarshipProgramDetail = () => {
                           Extend Application{" "}
                         </button>
                       )}
-                      {existingApplication[0].status != ApplicationStatus.Approved &&
-                        existingApplication[0].status != ApplicationStatus.NeedExtend && (
+                      {/*JSON.stringify(awardMilestones)*/}
+                      {existingApplication[0].status == ApplicationStatus.Submitted && 
+                        (new Date(awardMilestones?.fromDate) < new Date() && new Date() < new Date(awardMilestones.toDate) ) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"

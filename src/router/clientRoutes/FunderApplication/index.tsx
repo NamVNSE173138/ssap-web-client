@@ -23,6 +23,8 @@ import { transferMoney } from "@/services/ApiServices/paymentService"
 import PayAwardDialog from "./PayAwardDialog"
 import { FaBirthdayCake, FaCheckCircle, FaClock, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
 import { HiOutlinePlusCircle } from 'react-icons/hi';
+import { SendNotificationAndEmail } from "@/services/ApiServices/notification"
+import { getMessaging, onMessage } from "firebase/messaging"
 
 const FunderApplication = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +48,15 @@ const FunderApplication = () => {
     //{ id: 1, name: 'CV', type: "PDF", file: null, isNew: false },
     //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
   ]);
+
+  const statusColor = {
+    [ApplicationStatus.Submitted]: "blue",
+    [ApplicationStatus.Awarded]: "green",
+    [ApplicationStatus.Approved]: "blue",
+    [ApplicationStatus.Rejected]: "red",
+    [ApplicationStatus.NeedExtend]: "yellow",
+    [ApplicationStatus.Reviewing]: "yellow",
+  }
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
@@ -103,6 +114,13 @@ const FunderApplication = () => {
       })
       setRows([]);
 
+      await SendNotificationAndEmail({
+        topic: scholarship.funderId.toString(),
+        link: "/funder/application/"+application.id,
+        title: "Extend Application Submitted",
+        body: `Extend application of ${applicant.username} for ${scholarship.name} has been submitted.`,
+      })
+
       await fetchApplication();
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -120,6 +138,13 @@ const FunderApplication = () => {
       const response = await updateApplication(parseInt(id), {
         status: ApplicationStatus.Approved
       });
+      await SendNotificationAndEmail({
+        topic: applicant.id.toString(),
+        link: "/funder/application/"+application.id,
+        title: "Extend Application Approved",
+        body: `Your Extend application for ${scholarship.name} has been approved.`,
+      })
+
       await fetchApplication();
     } catch (error) {
       setError((error as Error).message);
@@ -136,34 +161,57 @@ const FunderApplication = () => {
     const res = await updateApplication(parseInt(id), {
       status: ApplicationStatus.Awarded
     });
+    await SendNotificationAndEmail({
+        topic: applicant.id.toString(),
+        link: "/wallet",
+        title: "Your scholarship has been awarded",
+        body: `Your application for ${scholarship.name} has been awarded, please check your wallet.`,
+      })
+
     await fetchApplication();
   };
 
 
-  const fetchApplication = async () => {
-    try {
-      if (!id) return;
-      const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
-      const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
-      const award = await getAwardMilestoneByScholarship(parseInt(id));
-      //console.log(response);
-      //console.log(scholarship);
-      if (response.statusCode == 200) {
-        setApplication(response.data);
-        setApplicant(response.data.applicant);
-        setApplicantProfile(response.data.applicant.applicantProfile);
-        setDocuments(response.data.applicationDocuments);
-        setScholarship(scholarship.data);
-        setAwardMilestones(award.data);
-      } else {
-        setError("Failed to get applicants");
-      }
-    } catch (error) {
-      setError((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchApplication = async () => {
+        try {
+          if(!id) return;
+          const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
+          const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
+          const award = await getAwardMilestoneByScholarship(response.data.scholarshipProgramId);
+          //console.log(response);
+          //console.log(scholarship);
+          if (response.statusCode == 200) {
+            setApplication(response.data);
+            setApplicant(response.data.applicant);
+            setApplicantProfile(response.data.applicant.applicantProfile);
+            setDocuments(response.data.applicationDocuments);
+            setScholarship(scholarship.data);
+            setAwardMilestones(award.data);
+          } else {
+            setError("Failed to get applicants");
+          }
+        } catch (error) {
+          setError((error as Error).message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const messaging = getMessaging();
+      navigator.serviceWorker.addEventListener('message', (event) => {
+          console.log("message", event);
+          
+        if (event.data.notification && event.data.messageType == "push-received") {
+          fetchApplication();
+        }
+      });
+
+      onMessage(messaging, (payload: any) => {
+        if (payload.notification && payload.data.messageType == "push-received") {
+          fetchApplication();
+        }
+      });
+
 
   useEffect(() => {
     fetchApplication();
@@ -236,6 +284,16 @@ const FunderApplication = () => {
                   <FaEnvelope className="text-indigo-200" />
                   <span className="lg:block hidden">{applicant.email}</span>
                 </p>
+
+                <p className="text-white text-xl mt-2 flex items-center space-x-2">
+                <span className="flex justify-end gap-2 items-center">
+                        <span className="relative flex h-3 w-3">
+                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[application.status]}-500 opacity-75`}></span>
+                          <span className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[application.status]}-500`}></span>
+                        </span>
+                        <span className={`text-${statusColor[application.status]}-500 font-medium`}>{application.status}</span>
+                      </span>
+                </p>
               </div>
             </div>
           </div>
@@ -293,6 +351,8 @@ const FunderApplication = () => {
                 <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
               </p>
               {application.status === ApplicationStatus.NeedExtend && user?.role === RoleNames.APPLICANT &&
+              awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
+              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
                 <Button onClick={handleAddRow} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
                   <HiOutlinePlusCircle className="text-lg" /> Add Extend Document
                 </Button>
@@ -307,8 +367,9 @@ const FunderApplication = () => {
               handleInputChange={handleDocumentInputChange}
             />
 
-            {application.status === ApplicationStatus.Submitted && user?.role === "Funder" &&
-              awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
+            {application.status === ApplicationStatus.Submitted && (user?.role === "Funder" || user?.role === "FUNDER") &&
+              awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
+              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
               <div className="flex justify-end mt-[24px]">
                 <AlertDialog>
                   <AlertDialogTrigger disabled={applyLoading}>
@@ -344,6 +405,8 @@ const FunderApplication = () => {
             <AwardProgressTable awardMilestone={awardMilestones} application={application} />
 
             {application.status === ApplicationStatus.NeedExtend && user?.role === RoleNames.APPLICANT &&
+            awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
+              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
               <div className="flex justify-end mt-[24px]">
                 <Button
                   disabled={applyLoading}
@@ -355,8 +418,9 @@ const FunderApplication = () => {
               </div>
             }
 
-            {application.status === ApplicationStatus.Approved && user?.role === "Funder" &&
-              awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
+            {application.status === ApplicationStatus.Approved && (user?.role === "Funder" || user?.role === "FUNDER") &&
+              awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
+              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
               <div className="flex justify-end mt-[24px]">
                 <AlertDialog>
                   <AlertDialogTrigger disabled={applyLoading}>
@@ -391,7 +455,7 @@ const FunderApplication = () => {
           scholarship={scholarship}
           awardName={awardMilestones.findIndex((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) + 1}
           handlePayAwardProgress={handlePayAwardProgress}
-          amount={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)).amount}
+          amount={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate))?.amount}
         />
       </section>
 

@@ -6,12 +6,12 @@ import {InsertDriveFile as FileIcon, AccessTime as TimeIcon } from "@mui/icons-m
 
 const DocumentTable = ({ documents, awardMilestones, rows, setRows, handleDeleteRow, handleInputChange }: any) => {
 
-  if (!documents || documents.length == 0)
-    return <p className="text-center font-semibold text-xl">No uploaded documents</p>
   return (
-    <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+    <>
+    {(!documents || documents.length == 0) && (!rows || rows.length == 0) && <div className="text-center w-full font-semibold text-xl">No uploaded documents</div>}
+    <TableContainer className={((!documents || documents.length == 0)&& (!rows || rows.length == 0)) ? "hidden" : ""} component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
       <Table sx={{ minWidth: 700 }} aria-label="document table">
-        <TableHead>
+        <TableHead >
           <TableRow sx={{ backgroundColor: "#e3f2fd" }}>
             <TableCell sx={{ fontWeight: "bold", color: "#0d47a1" }}>Progress</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#0d47a1" }}>Document Name</TableCell>
@@ -21,7 +21,7 @@ const DocumentTable = ({ documents, awardMilestones, rows, setRows, handleDelete
           </TableRow>
         </TableHead>
         <TableBody>
-          {documents.map((doc: any) => (
+          {documents && documents.length > 0 && documents.map((doc: any) => (
             <TableRow
               key={doc.id}
               sx={{
@@ -81,6 +81,7 @@ const DocumentTable = ({ documents, awardMilestones, rows, setRows, handleDelete
         </TableBody>
       </Table>
     </TableContainer>
+    </>
   )
 }
 
