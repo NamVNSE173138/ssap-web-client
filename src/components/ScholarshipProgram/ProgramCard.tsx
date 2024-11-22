@@ -1,9 +1,8 @@
-import scholarshipProgram, {
+import {
   ScholarshipProgramType,
 } from "../../router/clientRoutes/ScholarshipProgram/data";
 import { Separator } from "../ui/separator";
 import { Link } from "react-router-dom";
-// import formatCurrency from "../../lib/currency-formatter";
 import {
   Tooltip,
   TooltipContent,
@@ -35,8 +34,7 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
     scholarshipProgram.description,
     40
   );
-  // const truncatedUniversity = truncateString(sholarshipProgram.universities, 40);
-  // const truncatedMajorSkill = truncateString(sholarshipProgram.majorSkills, 40);
+ 
   return (
     <Link to={`/scholarship-program/${scholarshipProgram.id}`}>
       <div className="columns-1 flex flex-col justify-between gap-8 p-4 rounded-3xl shadow shadow-gray-400 cursor-pointer hover:bg-gray-200 hover:scale-105 hover:shadow-xl transition-all">
@@ -90,7 +88,7 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
             )}
 
 
-<!--             {scholarshipProgram.major?.skills?.length > 0 && (
+{/* <!--             {scholarshipProgram.major?.skills?.length > 0 && (
               <div className="flex items-center gap-2 mb-4">
                 <GiGraduateCap color="#1eb2a6" size={24} />
                 <p className="text-black">
@@ -99,7 +97,7 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
                       .map((skill) => skill.name)
                       .join(", "),
                     40
-                  )} -->
+                  )} --> */}
 
             {/*JSON.stringify(scholarshipProgram?.major)*/}
             {scholarshipProgram.major && (
@@ -107,15 +105,6 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
                 <GiGraduateCap color="#1eb2a6" size={24} />
                 <p className="text-black">
                     {scholarshipProgram.major.name}
-                  {/*scholarshipProgram.major.length > 2
-                    ? scholarshipProgram.major
-                        .slice(0, 2)
-                        .map((majorSkill) => majorSkill.name)
-                        .join(", ") + "..."
-                    : scholarshipProgram.major
-                        .map((majorSkill) => majorSkill.name)
-                        .join(", ")*/}
-
                 </p>
               </div>
             )}
@@ -130,14 +119,9 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
               </p>
             </div>
 
-            {/* <div className='w-[1px] bg-gray-400'></div>
-                        <p>{sholarshipProgram.numberOfRenewals} Đã đặt</p>
-                        <div className='w-[1px] bg-gray-400'></div>
-                        <p>{sholarshipProgram.numberOfScholarships} Đánh giá</p> */}
+    
           </div>
-          {/* <p className="text-2xl text-[#0049FF]">
-            {formatCurrency(sholarshipProgram.scholarshipAmount, "VND")} VND
-          </p> */}
+          
         </div>
       </div>
     </Link>
