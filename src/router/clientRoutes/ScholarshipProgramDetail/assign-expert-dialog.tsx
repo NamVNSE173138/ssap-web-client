@@ -1,15 +1,182 @@
-import { formatDate } from "@/lib/date-formatter";
+// import { formatDate } from "@/lib/date-formatter";
+// import { getAllMajors } from "@/services/ApiServices/majorService";
+// import { Autocomplete, Box, Button, Dialog, DialogTitle, InputAdornment, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, styled, TextField } from "@mui/material";
+// import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "lucide-react";
+// import { useEffect, useState } from "react";
+// import { BiRightArrow } from "react-icons/bi";
+// import { Link, useNavigate } from "react-router-dom";
+
+// const StyledAutocomplete = styled(Autocomplete)({
+//   "& .MuiAutocomplete-popupIndicator": {
+//     display: "none"
+//   }
+// });
+
+// // Custom Paper component to control dropdown height and scroll
+// const CustomPaper = (props: any) => (
+//   <Paper
+//     {...props}
+//     style={{
+//       maxHeight: 200, // Set your desired height here
+//       overflowY: "auto", // Enables scrolling when options exceed max height
+//     }}
+//   />
+// );
+
+// const AssignExpertDialog = ({ open, onClose, experts }: any) => {
+//     const navigate = useNavigate();
+//     const [majors, setMajors] = useState<any>([]);
+//     const [selectedMajor, setSelectedMajor] = useState<any>(null);
+
+//     const [error, setError] = useState<string>("");
+//     const [loading, setLoading] = useState<boolean>(true);
+
+//   const fetchMajors = async () => {
+//     try {
+//       const response = await getAllMajors();
+//       //console.log(response);
+//       if (response.statusCode == 200) {
+//         setMajors(response.data.items);
+//       } else {
+//         setError("Failed to get applicants");
+//       }
+//     } catch (error) {
+//       setError((error as Error).message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     setSelectedMajor(null)
+//     fetchMajors();
+//   }, []);
+    
+//   return (
+//     <Dialog onClose={() => {onClose(); setSelectedMajor(null)}} open={open} fullWidth>
+//       <DialogTitle className="flex items-center gap-5 flex-wrap">
+//         {selectedMajor && 
+//             <Button startIcon={<ArrowLeftIcon/>} onClick={() => setSelectedMajor(null)}>
+//                 Back
+//             </Button>
+//         }
+//         <div>Assign Expert</div>
+//         {selectedMajor && 
+//             <div>Major in {selectedMajor.name}</div>
+//         }
+//       </DialogTitle>
+//         {!selectedMajor && (<>
+//             {experts.length === 0 && 
+//             <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+//                 No applicants applied for this scholarship
+//             </p>}
+//             <List sx={{ pt: 0 }}>
+//                 <p className="text-lg font-semibold pl-5">
+//                     Choose the major of the expert you want to review applications
+//                 </p>
+//                 {majors.length === 0 && 
+//                 <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+//                     No majors
+//                 </p>}
+//                 {majors && majors.map((major:any) => (
+//                   <ListItem disableGutters key={major.id}>
+//                     <ListItemButton onClick={() => setSelectedMajor(major)}>
+//                       <ListItemText primary={major.name} />
+//                       <ArrowRightIcon/>
+//                     </ListItemButton>
+//                   </ListItem>
+//                 ))}
+//             </List>
+//         </>)}
+//         {experts && selectedMajor &&
+//         <div className="h-full">
+//          <StyledAutocomplete
+//             sx={{ height: "200px"  }}
+//             open={open}
+//             disableCloseOnSelect
+//             options={experts}
+//             //PaperComponent={CustomPaper}
+//             getOptionLabel={(option: any) => option.username}
+//             renderOption={(props: any, option: any) => {
+//                 const { key, ...optionProps } = props;
+//                 return (
+//                   <Box
+//                     key={key}
+//                     component="li"
+//                     sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
+//                     {...optionProps}
+//                   >
+//                    <div className="flex w-full justify-between">
+//                        <div className="flex items-center gap-5">
+//                             <img
+//                               loading="lazy"
+//                               width="20"
+//                               height="20"
+//                               className="rounded-full"
+//                               srcSet={option.avatarUrl ?? "https://github.com/shadcn.png"}
+//                               src={option.avatarUrl ?? "https://github.com/shadcn.png"}
+//                               alt=""
+//                             />
+//                             {option.username}
+//                         </div>
+//                         <Link target="_blank" to={`/profile/${option.id}`} className="text-blue-500 underline">
+//                             View profile
+//                         </Link>
+//                     </div>
+//                   </Box>
+//                 );
+//               }}
+//             renderInput={(params) => <TextField {...params} 
+//                 label="Search" 
+//                 InputProps={{
+//                     ...params.InputProps,
+//                     startAdornment:(
+//                         <InputAdornment position="start">
+//                             <SearchIcon/>
+//                         </InputAdornment>
+//                     )
+//                 }}
+//             />}
+//           /> 
+//           <div className="w-full flex justify-end pr-5 mb-5">
+//           <Button onClick={() => {}} 
+//             className="w-1/3"
+//             variant="contained">Assign</Button>
+//           </div>
+//           </div>
+//         }
+//     </Dialog>
+//   )
+// }
+
+// export default AssignExpertDialog;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import axios from "axios";
 import { getAllMajors } from "@/services/ApiServices/majorService";
-import { Autocomplete, Box, Button, Dialog, DialogTitle, InputAdornment, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, styled, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Dialog, DialogTitle, InputAdornment, List, ListItem, ListItemButton, ListItemText, Paper, styled, TextField } from "@mui/material";
 import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { BiRightArrow } from "react-icons/bi";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const StyledAutocomplete = styled(Autocomplete)({
   "& .MuiAutocomplete-popupIndicator": {
-    display: "none"
-  }
+    display: "none",
+  },
 });
 
 // Custom Paper component to control dropdown height and scroll
@@ -23,22 +190,20 @@ const CustomPaper = (props: any) => (
   />
 );
 
-const AssignExpertDialog = ({ open, onClose, experts }: any) => {
-    const navigate = useNavigate();
-    const [majors, setMajors] = useState<any>([]);
-    const [selectedMajor, setSelectedMajor] = useState<any>(null);
-
-    const [error, setError] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(true);
+const AssignExpertDialog = ({ open, onClose, experts, applicantId }: any) => {
+  const [majors, setMajors] = useState<any>([]);
+  const [selectedMajor, setSelectedMajor] = useState<any>(null);
+  const [selectedExpert, setSelectedExpert] = useState<any>(null);
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchMajors = async () => {
     try {
       const response = await getAllMajors();
-      //console.log(response);
-      if (response.statusCode == 200) {
+      if (response.statusCode === 200) {
         setMajors(response.data.items);
       } else {
-        setError("Failed to get applicants");
+        setError("Failed to get majors");
       }
     } catch (error) {
       setError((error as Error).message);
@@ -47,106 +212,160 @@ const AssignExpertDialog = ({ open, onClose, experts }: any) => {
     }
   };
 
+  const assignExpert = async () => {
+    if (!selectedExpert) {
+      alert("Please select an expert!");
+      return;
+    }
+
+    if (!applicantId) {
+      alert("Applicant ID is missing!");
+      return;
+    }
+
+    const payload = {
+      description: "Review assignment",
+      reviewDate: new Date().toISOString(),
+      expertId: selectedExpert.id,
+      applicationId: applicantId  
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5254/api/applications/reviews/assign-expert",
+        payload,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (response.status === 200) {
+        alert("Expert successfully assigned!");
+        onClose();
+      } else {
+        console.error("Unexpected response:", response);
+      }
+    } catch (error: any) {
+      console.error("Error assigning expert:", error.response?.data || error.message);
+      alert(`Failed to assign expert: ${error.response?.data?.message || "Unknown error"}`);
+    }
+  };
+
   useEffect(() => {
-    setSelectedMajor(null)
+    setSelectedMajor(null);
+    setSelectedExpert(null);
     fetchMajors();
   }, []);
-    
+
   return (
-    <Dialog onClose={() => {onClose(); setSelectedMajor(null)}} open={open} fullWidth>
+    <Dialog
+      onClose={() => {
+        onClose();
+        setSelectedMajor(null);
+      }}
+      open={open}
+      fullWidth
+    >
       <DialogTitle className="flex items-center gap-5 flex-wrap">
-        {selectedMajor && 
-            <Button startIcon={<ArrowLeftIcon/>} onClick={() => setSelectedMajor(null)}>
-                Back
-            </Button>
-        }
+        {selectedMajor && (
+          <Button startIcon={<ArrowLeftIcon />} onClick={() => setSelectedMajor(null)}>
+            Back
+          </Button>
+        )}
         <div>Assign Expert</div>
-        {selectedMajor && 
-            <div>Major in {selectedMajor.name}</div>
-        }
+        {selectedMajor && <div>Major in {selectedMajor.name}</div>}
       </DialogTitle>
-        {!selectedMajor && (<>
-            {experts.length === 0 && 
+      {!selectedMajor && (
+        <>
+          {experts.length === 0 && (
             <p className="p-10 text-center text-gray-500 font-semibold text-xl">
-                No applicants applied for this scholarship
-            </p>}
-            <List sx={{ pt: 0 }}>
-                <p className="text-lg font-semibold pl-5">
-                    Choose the major of the expert you want to review applications
-                </p>
-                {majors.length === 0 && 
-                <p className="p-10 text-center text-gray-500 font-semibold text-xl">
-                    No majors
-                </p>}
-                {majors && majors.map((major:any) => (
-                  <ListItem disableGutters key={major.id}>
-                    <ListItemButton onClick={() => setSelectedMajor(major)}>
-                      <ListItemText primary={major.name} />
-                      <ArrowRightIcon/>
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-            </List>
-        </>)}
-        {experts && selectedMajor &&
+              No applicants applied for this scholarship
+            </p>
+          )}
+          <List sx={{ pt: 0 }}>
+            <p className="text-lg font-semibold pl-5">
+              Choose the major of the expert you want to review applications
+            </p>
+            {majors.length === 0 && (
+              <p className="p-10 text-center text-gray-500 font-semibold text-xl">No majors</p>
+            )}
+            {majors &&
+              majors.map((major: any) => (
+                <ListItem disableGutters key={major.id}>
+                  <ListItemButton onClick={() => setSelectedMajor(major)}>
+                    <ListItemText primary={major.name} />
+                    <ArrowRightIcon />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+          </List>
+        </>
+      )}
+      {experts && selectedMajor && (
         <div className="h-full">
-         <StyledAutocomplete
-            sx={{ height: "200px"  }}
+          <StyledAutocomplete
+            sx={{ height: "200px" }}
             open={open}
             disableCloseOnSelect
             options={experts}
-            //PaperComponent={CustomPaper}
             getOptionLabel={(option: any) => option.username}
+            onChange={(_, value) => setSelectedExpert(value)}
             renderOption={(props: any, option: any) => {
-                const { key, ...optionProps } = props;
-                return (
-                  <Box
-                    key={key}
-                    component="li"
-                    sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-                    {...optionProps}
-                  >
-                   <div className="flex w-full justify-between">
-                       <div className="flex items-center gap-5">
-                            <img
-                              loading="lazy"
-                              width="20"
-                              height="20"
-                              className="rounded-full"
-                              srcSet={option.avatarUrl ?? "https://github.com/shadcn.png"}
-                              src={option.avatarUrl ?? "https://github.com/shadcn.png"}
-                              alt=""
-                            />
-                            {option.username}
-                        </div>
-                        <Link target="_blank" to={`/profile/${option.id}`} className="text-blue-500 underline">
-                            View profile
-                        </Link>
+              const { key, ...optionProps } = props;
+              return (
+                <Box
+                  key={key}
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...optionProps}
+                >
+                  <div className="flex w-full justify-between">
+                    <div className="flex items-center gap-5">
+                      <img
+                        loading="lazy"
+                        width="20"
+                        height="20"
+                        className="rounded-full"
+                        srcSet={option.avatarUrl ?? "https://github.com/shadcn.png"}
+                        src={option.avatarUrl ?? "https://github.com/shadcn.png"}
+                        alt=""
+                      />
+                      {option.username}
                     </div>
-                  </Box>
-                );
-              }}
-            renderInput={(params) => <TextField {...params} 
-                label="Search" 
+                    <Link target="_blank" to={`/profile/${option.id}`} className="text-blue-500 underline">
+                      View profile
+                    </Link>
+                  </div>
+                </Box>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search"
                 InputProps={{
-                    ...params.InputProps,
-                    startAdornment:(
-                        <InputAdornment position="start">
-                            <SearchIcon/>
-                        </InputAdornment>
-                    )
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
                 }}
-            />}
-          /> 
+              />
+            )}
+          />
           <div className="w-full flex justify-end pr-5 mb-5">
-          <Button onClick={() => {}} 
-            className="w-1/3"
-            variant="contained">Assign</Button>
+            <Button
+              onClick={assignExpert}
+              className="w-1/3"
+              variant="contained"
+            >
+              Assign
+            </Button>
           </div>
-          </div>
-        }
+        </div>
+      )}
     </Dialog>
-  )
-}
+  );
+};
 
 export default AssignExpertDialog;
