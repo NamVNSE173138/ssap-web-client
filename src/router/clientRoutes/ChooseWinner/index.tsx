@@ -210,8 +210,9 @@ const statusColor = {
     const selectedRowData = applicants.filter((row: any) =>
       selectionModel.includes(row.id)
     );
+    //console.log(selectedRowData.slice(0, availableScholarships));
 
-    setSelectedRows(selectedRowData);
+    setSelectedRows(selectedRowData.slice(0, availableScholarships));
     if (data)
       setAvailableScholarships(
         data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "Approved")).length
@@ -469,7 +470,7 @@ const statusColor = {
             <Paper sx={{ height: 400, width: '100%', borderRadius: '8px', boxShadow: 3 }}>
               {filteredRows.length > 0 ? (
                 <DataGrid
-                  disableMultipleRowSelection
+                  //disableMultipleRowSelection
                   rows={filteredRows.map((app: any) => ({
                     id: app.id,
                     avatarUrl: app.applicant.avatarUrl ?? "https://github.com/shadcn.png",
