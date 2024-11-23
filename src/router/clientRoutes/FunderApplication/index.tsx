@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { extendApplication, getApplicationWithDocumentsAndAccount, updateApplication } from "@/services/ApiServices/applicationService"
 import NotFound from "@/router/commonRoutes/404"
 import { getAllScholarshipProgram, getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService"
-import { Spin } from "antd"
+import { notification, Spin } from "antd"
 import { formatOnlyDate } from "@/lib/date-formatter"
 import DocumentTable from "./document-table"
 import AwardProgressTable from "./award-progress-table"
@@ -113,7 +113,7 @@ const FunderApplication = () => {
         documents: applicationDocuments
       })
       setRows([]);
-
+      notification.success({message: "Submit successfully!"})
       await SendNotificationAndEmail({
         topic: scholarship.funderId.toString(),
         link: "/funder/application/"+application.id,
@@ -138,13 +138,13 @@ const FunderApplication = () => {
       const response = await updateApplication(parseInt(id), {
         status: ApplicationStatus.Approved
       });
+      notification.success({message: "Approve successfully!"})
       await SendNotificationAndEmail({
         topic: applicant.id.toString(),
         link: "/funder/application/"+application.id,
         title: "Extend Application Approved",
         body: `Your Extend application for ${scholarship.name} has been approved.`,
       })
-
       await fetchApplication();
     } catch (error) {
       setError((error as Error).message);
@@ -161,13 +161,13 @@ const FunderApplication = () => {
     const res = await updateApplication(parseInt(id), {
       status: ApplicationStatus.Awarded
     });
+    notification.success({message: "Pay successfully!"})
     await SendNotificationAndEmail({
         topic: applicant.id.toString(),
         link: "/wallet",
         title: "Your scholarship has been awarded",
         body: `Your application for ${scholarship.name} has been awarded, please check your wallet.`,
       })
-
     await fetchApplication();
   };
 

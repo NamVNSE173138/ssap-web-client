@@ -1,12 +1,6 @@
 import { Separator } from "../ui/separator";
 import { Link } from "react-router-dom";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { FaDollarSign, FaClock, FaStar, FaRegCalendarAlt, FaAddressBook, FaClipboardList } from "react-icons/fa";
+import { FaDollarSign, FaStar, FaAddressBook, FaClipboardList } from "react-icons/fa";
 import { ServiceType } from "@/router/clientRoutes/Service/data";
 import { useEffect, useState } from "react";
 import { getServiceById } from "@/services/ApiServices/serviceService";
@@ -48,19 +42,13 @@ const ServiceCard = (service: ServiceType) => {
   return (
     <Link to={`/services/${service.id}`}>
       <div className="flex flex-col justify-between gap-6 p-4 rounded-xl shadow-md bg-gradient-to-r from-blue-50 to-indigo-100 cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:translate-y-1">
-        {/* Service Name */}
         <div>
           <h2 className="text-lg md:text-xl mt-5 font-medium text-gray-800 hover:text-indigo-600 transition-colors">
             {service?.name}
           </h2>
         </div>
-
-
         <Separator orientation="horizontal" className="border-gray-300 my-3" />
-
-        {/* Service Details */}
         <div className="flex flex-col gap-6">
-          {/* Rating Section */}
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaStar
               color="#FFD700"
@@ -70,8 +58,6 @@ const ServiceCard = (service: ServiceType) => {
               {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? "review" : "reviews"})
             </p>
           </div>
-
-          {/* Service Type Section */}
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaAddressBook
               color="#2D3748"
@@ -79,8 +65,6 @@ const ServiceCard = (service: ServiceType) => {
             />
             <p className="text-gray-800">{service.type || "No Type Specified"}</p>
           </div>
-
-          {/* Service Description Section */}
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaClipboardList
               color="#2D3748"
@@ -88,8 +72,6 @@ const ServiceCard = (service: ServiceType) => {
             />
             <p className="text-gray-800">{service.description || "No description Specified"}</p>
           </div>
-
-          {/* Price Section */}
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaDollarSign
               color="#2D3748"
@@ -100,8 +82,6 @@ const ServiceCard = (service: ServiceType) => {
         </div>
       </div>
     </Link>
-
-
   );
 };
 

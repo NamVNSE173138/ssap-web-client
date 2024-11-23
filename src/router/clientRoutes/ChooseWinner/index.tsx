@@ -48,6 +48,7 @@ import { SendNotification } from "@/services/ApiServices/notification";
 import { argv0 } from "process";
 import { updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendarAlt, FaCheckCircle, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaSearch, FaTimes, FaTrophy } from "react-icons/fa";
+import { notification } from "antd";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -112,7 +113,7 @@ const ChooseWinner = () => {
       if (availableScholarships == 0) {
         await updateScholarshipStatus(Number(data?.id), "FINISHED");
       }
-      alert("Selected applicants have been approved!");
+      notification.success({message:"Selected applicants have been approved!"});
       await fetchData();
       for (let row of selectedRows) {
         await SendNotification({

@@ -395,7 +395,7 @@ const ScholarshipProgramDetail = () => {
 
 
             <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
-              {isApplicant == "APPLICANT" || !user ? (
+              { isApplicant == "Applicant" || !user ? (
                 <>
                   {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && (
                     <button
