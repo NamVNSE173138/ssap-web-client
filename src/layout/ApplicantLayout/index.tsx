@@ -52,7 +52,7 @@ const ClientLayout = () => {
           duration: 5000,
           variant: "default",
           onClickCapture: () => {
-            navigate("/");
+            navigate(event.data.data.link);
             //console.log("decrementUnread");
           },
         });

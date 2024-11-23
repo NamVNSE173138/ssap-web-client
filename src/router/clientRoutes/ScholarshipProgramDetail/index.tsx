@@ -397,12 +397,14 @@ const ScholarshipProgramDetail = () => {
             <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
               { isApplicant == "Applicant" || !user ? (
                 <>
-                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && (
+                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && 
+                  new Date(data.deadline) > new Date() && (
                     <button
                       onClick={() => navigate(`/scholarship-program/${id}/application`)}
                       className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
                     >
                       Apply now{" "}
+
                     </button>
                   )}
                   {existingApplication && existingApplication.length > 0 && (
@@ -423,7 +425,7 @@ const ScholarshipProgramDetail = () => {
                       )}
                       {/*JSON.stringify(awardMilestones)*/}
                       {existingApplication[0].status == ApplicationStatus.Submitted && 
-                        (new Date(awardMilestones?.fromDate) < new Date() && new Date() < new Date(awardMilestones.toDate) ) && (
+                        (new Date(existingApplication[0].updatedAt) < new Date(data.deadline) ) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
@@ -856,7 +858,7 @@ const ScholarshipProgramDetail = () => {
                   >
                     <h3 className="text-yellow-600 font-semibold text-lg flex items-center gap-2">
                       <FaUniversity className="text-yellow-500" />
-                      Applicable Universities
+                      Applicable University
                     </h3>
                   </AccordionSummary>
                   <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
