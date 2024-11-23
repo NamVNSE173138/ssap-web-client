@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { extendApplication, getApplicationWithDocumentsAndAccount, updateApplication } from "@/services/ApiServices/applicationService"
 import NotFound from "@/router/commonRoutes/404"
 import { getAllScholarshipProgram, getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService"
-import { Spin } from "antd"
+import { notification, Spin } from "antd"
 import { formatOnlyDate } from "@/lib/date-formatter"
 import DocumentTable from "./document-table"
 import AwardProgressTable from "./award-progress-table"
@@ -116,7 +116,7 @@ const FunderApplication = () => {
         documents: applicationDocuments
       })
       setRows([]);
-
+      notification.success({message: "Submit successfully!"})
       await SendNotificationAndEmail({
         topic: scholarship.funderId.toString(),
         link: "/funder/application/"+application.id,
@@ -142,13 +142,13 @@ const FunderApplication = () => {
       const response = await updateApplication(parseInt(id), {
         status: status,
       });
+      notification.success({message: "Approve successfully!"})
       await SendNotificationAndEmail({
         topic: applicant.id.toString(),
         link: "/funder/application/"+application.id,
         title: "Extend Application Approved",
         body: `Your Extend application for ${scholarship.name} has been approved.`,
       })
-
       await fetchApplication();
     } catch (error) {
       setError((error as Error).message);
@@ -165,6 +165,7 @@ const FunderApplication = () => {
     const res = await updateApplication(parseInt(id), {
       status: ApplicationStatus.Awarded
     });
+    notification.success({message: "Pay successfully!"})
     await SendNotificationAndEmail({
         topic: applicant.id.toString(),
         link: "/wallet",
@@ -193,7 +194,6 @@ const FunderApplication = () => {
         title: "Your scholarship has been awarded",
         body: `Your application for ${scholarship.name} has been awarded for all progress, please check your wallet.`,
       })
-
     await fetchApplication();
   };
 
@@ -366,7 +366,6 @@ const FunderApplication = () => {
         </section>
       </div>
       <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
-        {/* Documents Section */}
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <div className="flex justify-between items-center">
@@ -455,7 +454,6 @@ const FunderApplication = () => {
           </div>
         </div>
 
-        {/* Award Progress Section */}
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <p className="text-4xl mb-8 flex items-center">
