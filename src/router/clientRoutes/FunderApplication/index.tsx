@@ -25,6 +25,7 @@ import { FaBirthdayCake, FaCheckCircle, FaClock, FaCross, FaDollarSign, FaEnvelo
 import { HiOutlinePlusCircle } from 'react-icons/hi';
 import { SendNotificationAndEmail } from "@/services/ApiServices/notification"
 import { getMessaging, onMessage } from "firebase/messaging"
+import scholarshipProgram from "../ScholarshipProgram/data"
 
 const FunderApplication = () => {
   const { id } = useParams<{ id: string }>();
@@ -142,12 +143,12 @@ const FunderApplication = () => {
       const response = await updateApplication(parseInt(id), {
         status: status,
       });
-      notification.success({message: "Approve successfully!"})
+      notification.success({message: "Change successfully!"})
       await SendNotificationAndEmail({
         topic: applicant.id.toString(),
         link: "/funder/application/"+application.id,
-        title: "Extend Application Approved",
-        body: `Your Extend application for ${scholarship.name} has been approved.`,
+        title: "Application has been updated",
+        body: `Your application for ${scholarship.name} has been updated.`,
       })
       await fetchApplication();
     } catch (error) {
@@ -393,13 +394,13 @@ const FunderApplication = () => {
 
             {application.status === ApplicationStatus.Submitted && (user?.role === "Funder" || user?.role === "FUNDER") &&
               awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
-              ) &&
+              ) && new Date(application.updatedAt) > new Date(scholarship.deadline) &&
               <div className="flex justify-end mt-[24px] gap-5">
                 <AlertDialog>
                   <AlertDialogTrigger disabled={applyLoading}>
                     <Button disabled={applyLoading} className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2">
                       {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaCheckCircle className="text-lg" />}
-                      Approve Extend Application
+                      Approve Application
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -417,13 +418,13 @@ const FunderApplication = () => {
                   <AlertDialogTrigger disabled={applyLoading}>
                     <Button disabled={applyLoading} className="bg-red-500 hover:bg-red-600 text-white flex items-center gap-2">
                       {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaStopCircle className="text-lg" />}
-                      Reject Extend Application
+                      Reject Application
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure to reject this application?</AlertDialogTitle>
-                      <AlertDialogDescription>Approve this application will reject this applicants scholarship.</AlertDialogDescription>
+                      <AlertDialogDescription>This applicant will no longer receive money.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>No</AlertDialogCancel>
@@ -435,7 +436,7 @@ const FunderApplication = () => {
                   <AlertDialogTrigger disabled={applyLoading}>
                     <Button disabled={applyLoading} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
                       {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaQuestionCircle className="text-lg" />}
-                      Require more Extend Application
+                      Require more documents 
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
