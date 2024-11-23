@@ -21,7 +21,7 @@ import RoleNames from "@/constants/roleNames"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { transferMoney } from "@/services/ApiServices/paymentService"
 import PayAwardDialog from "./PayAwardDialog"
-import { FaBirthdayCake, FaCheckCircle, FaClock, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
+import { FaBirthdayCake, FaCheckCircle, FaClock, FaCross, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaQuestionCircle, FaStopCircle, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
 import { HiOutlinePlusCircle } from 'react-icons/hi';
 import { SendNotificationAndEmail } from "@/services/ApiServices/notification"
 import { getMessaging, onMessage } from "firebase/messaging"
@@ -41,7 +41,10 @@ const FunderApplication = () => {
 
   const [openPayDialog, setOpenPayDialog] = useState<boolean>(false);
 
+  const [isPayAll, setIsPayAll] = useState<boolean>(false);
+
   const [awardMilestones, setAwardMilestones] = useState<any>(null);
+
 
   const [rowId, setRowId] = useState<number>(0);
   const [rows, setRows] = useState<any[]>([
@@ -131,12 +134,13 @@ const FunderApplication = () => {
 
   }
 
-  const handleApproveExtend = async () => {
+  const handleApproveExtend = async (status: string) => {
     try {
+      
       if (!id) return;
       setApplyLoading(true);
       const response = await updateApplication(parseInt(id), {
-        status: ApplicationStatus.Approved
+        status: status,
       });
       await SendNotificationAndEmail({
         topic: applicant.id.toString(),
@@ -165,7 +169,29 @@ const FunderApplication = () => {
         topic: applicant.id.toString(),
         link: "/wallet",
         title: "Your scholarship has been awarded",
-        body: `Your application for ${scholarship.name} has been awarded, please check your wallet.`,
+        body: `Your application for ${scholarship.name} for Progress ${awardMilestones.findIndex((milestone: any) => 
+            new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+            new Date(application.updatedAt) < new Date(milestone.toDate)) + 1} has been awarded, please check your wallet.`,
+      })
+
+    await fetchApplication();
+  };
+
+  const handlePayAllAwardProgress = async (data: any) => {
+    if (!id) return;
+    setApplyLoading(true);
+    const response = await transferMoney(data);
+    const res = await updateApplication(parseInt(id), {
+      status: ApplicationStatus.Awarded,
+      updatedAt: new Date(new Date(awardMilestones[awardMilestones.length - 1].toDate).setDate(
+        new Date(awardMilestones[awardMilestones.length - 1].toDate).getDate() + 1
+      )),
+    });
+    await SendNotificationAndEmail({
+        topic: applicant.id.toString(),
+        link: "/wallet",
+        title: "Your scholarship has been awarded",
+        body: `Your application for ${scholarship.name} has been awarded for all progress, please check your wallet.`,
       })
 
     await fetchApplication();
@@ -199,15 +225,14 @@ const FunderApplication = () => {
 
       const messaging = getMessaging();
       navigator.serviceWorker.addEventListener('message', (event) => {
-          console.log("message", event);
           
-        if (event.data.notification && event.data.messageType == "push-received") {
+        if (event.data.notification && event.data.data.topic == user?.id) {
           fetchApplication();
         }
       });
 
       onMessage(messaging, (payload: any) => {
-        if (payload.notification && payload.data.messageType == "push-received") {
+        if (payload.notification && payload.data.topic == user?.id) {
           fetchApplication();
         }
       });
@@ -350,9 +375,9 @@ const FunderApplication = () => {
                 Documents
                 <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
               </p>
-              {application.status === ApplicationStatus.NeedExtend && user?.role === RoleNames.APPLICANT &&
+              {application.status === ApplicationStatus.NeedExtend && (user?.role === RoleNames.APPLICANT || user?.role === "Applicant") &&
               awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
-              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
+              ) &&
                 <Button onClick={handleAddRow} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
                   <HiOutlinePlusCircle className="text-lg" /> Add Extend Document
                 </Button>
@@ -369,8 +394,8 @@ const FunderApplication = () => {
 
             {application.status === ApplicationStatus.Submitted && (user?.role === "Funder" || user?.role === "FUNDER") &&
               awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
-              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
-              <div className="flex justify-end mt-[24px]">
+              ) &&
+              <div className="flex justify-end mt-[24px] gap-5">
                 <AlertDialog>
                   <AlertDialogTrigger disabled={applyLoading}>
                     <Button disabled={applyLoading} className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2">
@@ -385,7 +410,43 @@ const FunderApplication = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>No</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleApproveExtend}>Yes</AlertDialogAction>
+                      <AlertDialogAction onClick={() => handleApproveExtend(ApplicationStatus.Approved)}>Yes</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <AlertDialog>
+                  <AlertDialogTrigger disabled={applyLoading}>
+                    <Button disabled={applyLoading} className="bg-red-500 hover:bg-red-600 text-white flex items-center gap-2">
+                      {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaStopCircle className="text-lg" />}
+                      Reject Extend Application
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure to reject this application?</AlertDialogTitle>
+                      <AlertDialogDescription>Approve this application will reject this applicants scholarship.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>No</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleApproveExtend(ApplicationStatus.Rejected)}>Yes</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <AlertDialog>
+                  <AlertDialogTrigger disabled={applyLoading}>
+                    <Button disabled={applyLoading} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
+                      {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaQuestionCircle className="text-lg" />}
+                      Require more Extend Application
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure to require more documents this application?</AlertDialogTitle>
+                      <AlertDialogDescription>Approve this application will require more documents this applicants scholarship.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>No</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleApproveExtend(ApplicationStatus.NeedExtend)}>Yes</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -404,9 +465,9 @@ const FunderApplication = () => {
             </p>
             <AwardProgressTable awardMilestone={awardMilestones} application={application} />
 
-            {application.status === ApplicationStatus.NeedExtend && user?.role === RoleNames.APPLICANT &&
+            {application.status === ApplicationStatus.NeedExtend && (user?.role === RoleNames.APPLICANT || user?.role === "Applicant") &&
             awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
-              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
+            ) &&
               <div className="flex justify-end mt-[24px]">
                 <Button
                   disabled={applyLoading}
@@ -420,8 +481,8 @@ const FunderApplication = () => {
 
             {application.status === ApplicationStatus.Approved && (user?.role === "Funder" || user?.role === "FUNDER") &&
               awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
-              && new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) &&
-              <div className="flex justify-end mt-[24px]">
+              ) &&
+              <div className="flex justify-end mt-[24px] gap-5">
                 <AlertDialog>
                   <AlertDialogTrigger disabled={applyLoading}>
                     <Button disabled={applyLoading} className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2">
@@ -432,7 +493,7 @@ const FunderApplication = () => {
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        {`Are you sure to pay $${awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)).amount} for this application?`}
+                        {`Are you sure to pay $${awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)).amount} for this application?`}
                       </AlertDialogTitle>
                       <AlertDialogDescription>Approve this payment to extend the applicant's scholarship.</AlertDialogDescription>
                     </AlertDialogHeader>
@@ -442,21 +503,52 @@ const FunderApplication = () => {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+                <AlertDialog>
+                  <AlertDialogTrigger disabled={applyLoading}>
+                    <Button disabled={applyLoading} className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2">
+                      {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaDollarSign className="text-lg" />}
+                      Pay for all award progress
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {`Are you sure to pay $${awardMilestones.filter((milestone: any) =>
+                            new Date(application.updatedAt) < new Date(milestone.toDate))
+                            .reduce((sum:any,milestone: any) => sum + milestone.amount, 0)} for all award progress?`}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>Approve this payment to extend the applicant's scholarship.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>No</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => {
+                          setIsPayAll(true)
+                          setOpenPayDialog(true)
+                      }}>Yes</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
+
             }
           </div>
         </div>
 
         {/* Pay Award Dialog */}
-        <PayAwardDialog
+        {openPayDialog && <PayAwardDialog
           isOpen={openPayDialog}
           setIsOpen={setOpenPayDialog}
           application={application}
           scholarship={scholarship}
-          awardName={awardMilestones.findIndex((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate)) + 1}
-          handlePayAwardProgress={handlePayAwardProgress}
-          amount={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date() < new Date(milestone.toDate))?.amount}
-        />
+          awardName={isPayAll ? "All Award Progress" : (awardMilestones.findIndex((milestone: any) => 
+            new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+            new Date(application.updatedAt) < new Date(milestone.toDate)) + 1)}
+          handlePayAwardProgress={isPayAll ? handlePayAllAwardProgress : handlePayAwardProgress}
+          amount={isPayAll ? awardMilestones.filter((milestone: any) => new Date(application.updatedAt) < new Date(milestone.toDate))
+            .reduce((sum:any,milestone: any) => sum + milestone.amount, 0) : 
+            awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) 
+            && new Date(application.updatedAt) < new Date(milestone.toDate))?.amount}
+        />}
       </section>
 
     </div>

@@ -63,8 +63,8 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
 
               {/* Status Cell */}
               <TableCell>
-                {(new Date() < new Date(award.toDate) && new Date() > new Date(award.fromDate) &&
-                new Date(application.updatedAt) > new Date(award.fromDate)) ? (
+                {(new Date(application.updatedAt) < new Date(award.toDate) && new Date(application.updatedAt) > new Date(award.fromDate)
+                ) ? (
                   <>
                     {application.status === "Submitted" && (
                       <div className="flex justify-end gap-2 items-center">
