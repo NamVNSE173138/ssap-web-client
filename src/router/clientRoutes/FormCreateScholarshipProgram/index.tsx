@@ -482,6 +482,7 @@ import { Label } from "@/components/ui/label";
 import Select, { MultiValue } from "react-select";
 import RouteNames from "@/constants/routeNames";
 import { useNavigate } from "react-router-dom";
+import { notification } from "antd";
 
 interface OptionType {
   value: string;
@@ -679,6 +680,7 @@ const FormCreateScholarshipProgram = () => {
       console.log("API response:", response.data);
 
       form.reset();
+      notification.success({ message: "Create scholarship succesfully!" })
       setSelectedCertificates([]); // Clear certificates selection
       setSelectedUniversity(null);
       setSelectedMajor(null);
@@ -778,7 +780,7 @@ const FormCreateScholarshipProgram = () => {
                   />
                 </div>
                 {/* Status */}
-                <div className="space-y-1 grid grid-cols-3 items-center">
+                <div className="space-y-1 grid grid-cols-3 items-center hidden">
                   <Label>Status</Label>
                   <Input
                     type="text"
