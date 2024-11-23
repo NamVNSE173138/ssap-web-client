@@ -1,6 +1,7 @@
 import { formatDate } from "@/lib/date-formatter";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
+import { AddComment } from "@mui/icons-material";
 import {
     Button,
     Dialog,
@@ -16,9 +17,13 @@ import {
     Box,
     Snackbar,
     Alert,
+    CircularProgress,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
+import { HiOutlineUpload } from "react-icons/hi";
+import { IoCloudUpload } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 interface Applicant {
@@ -49,10 +54,10 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     const [selectedApplicantId, setSelectedApplicantId] = useState<number | null>(null);
     const [commentText, setCommentText] = useState("");
     const navigate = useNavigate();
-    const [commentWithFile, setCommentWithFile] = useState(0);
-    const [commentFile, setCommentFile] = useState<any>(null);
+    const [commentFile, setCommentFile] = useState<File[]>([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         setApplicants({
@@ -74,7 +79,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     const handleSubmitComment = async () => {
         if (selectedApplicantId === null) return;
-
+        setIsSubmitting(true);
         try {
             const existingApplicantResponse = await getRequestById(selectedApplicantId);
             const requestDetail = existingApplicantResponse.data.requestDetails[0];
@@ -114,13 +119,14 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 setSnackbarOpen(true);
 
                 setCommentText("");
-                setCommentFile(null);
 
             } else {
                 console.error(`Request details for applicant id:${selectedApplicantId} not found`);
             }
         } catch (error) {
             console.error("Failed to update applicant status", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -332,84 +338,85 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 onClose={() => setCommentDialogOpen(false)}
                 fullWidth
                 maxWidth="sm"
+                sx={{
+                    backdropFilter: "blur(10px)",
+                    borderRadius: "12px",
+                    boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)",
+                }}
             >
-                {/* Dialog Title */}
                 <DialogTitle
                     sx={{
                         fontFamily: "Poppins, sans-serif",
                         fontWeight: "bold",
-                        fontSize: "1.25rem",
+                        fontSize: "1.5rem",
                         color: "#333",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
                         justifyContent: "center",
+                        backgroundColor: "#f4f7fb",
+                        borderBottom: "2px solid #ddd",
                     }}
                 >
-                    <FaCommentDots
-                        style={{
-                            color: "#0078d4",
-                            fontSize: "1.5rem",
-                        }}
-                    />
+                    <FaCommentDots style={{ color: "#0078d4", fontSize: "1.8rem" }} />
                     Add Comment
                 </DialogTitle>
 
-                {/* Dialog Body */}
-                <Box sx={{ p: 3 }}>
-                    {/* File Input */}
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            fontFamily: "Roboto, sans-serif",
-                            fontWeight: "500",
-                            mb: 1,
-                        }}
-                    >
-                        Add updated file:
-                    </Typography>
-                    <input
-                        type="file"
-                        multiple
-                        onChange={handleCommentFile}
-                        style={{
-                            marginTop: "8px",
-                            marginBottom: "20px",
-                            padding: "8px",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            fontSize: "1rem",
-                        }}
-                    />
+                <Box sx={{ p: 3, backgroundColor: "#fff" }}>
+                    <div className="mb-5">
+                        <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <IoCloudUpload className="text-blue-500" />
+                            Add updated file:
+                        </label>
 
-                    {/* Comment Textarea */}
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            fontFamily: "Roboto, sans-serif",
-                            fontWeight: "500",
-                            mb: 1,
-                        }}
-                    >
-                        Add your comment:
-                    </Typography>
-                    <textarea
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Type your comment here..."
-                        style={{
-                            width: "100%",
-                            height: "100px",
-                            marginTop: "8px",
-                            padding: "8px",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            fontSize: "1rem",
-                            fontFamily: "Roboto, sans-serif",
-                            resize: "none",  // Disable resize
-                        }}
-                    />
+                        <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
+                            <input
+                                type="file"
+                                multiple
+                                className="w-full hidden"
+                                id="file-upload"
+                                onChange={handleCommentFile}
+                            />
+                            <label
+                                htmlFor="file-upload"
+                                className="cursor-pointer text-blue-500 hover:underline"
+                            >
+                                <IoCloudUpload className="text-4xl mx-auto text-gray-400 mb-2" />
+                                Click to upload files
+                            </label>
+                        </div>
 
+                        {commentFile.length > 0 && (
+                            <div className="mt-4 text-gray-700">
+                                <h3 className="font-medium">Selected Files:</h3>
+                                <ul className="list-disc pl-5">
+                                    {commentFile.map((file: File, index: number) => (
+                                        <li key={index} className="text-sm">
+                                            {file.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mb-5">
+                        <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <AddComment className="text-blue-500" />
+                            Add your comment:
+                        </label>
+
+                        <textarea
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            placeholder="Type your comment here..."
+                            className="w-full p-2 mb-2 border border-gray-300 rounded-lg resize-y min-h-[100px] hover:border-blue-400 focus:border-blue-500 transition-all"
+                        />
+
+                        {commentText.length === 0 && (
+                            <p className="text-sm text-gray-500 mt-1">Please enter your comment.</p>
+                        )}
+                    </div>
                     {/* Action Buttons */}
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                         <Button
@@ -425,8 +432,14 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 "&:hover": {
                                     backgroundColor: "#f5f5f5",
                                 },
+                                "&:disabled": {
+                                    backgroundColor: "#e0e0e0",
+                                    color: "#b0b0b0",
+                                },
                             }}
+                            disabled={isSubmitting}
                         >
+                            <AiOutlineCloseCircle style={{ marginRight: "5px" }} />
                             Cancel
                         </Button>
                         <Button
@@ -441,9 +454,18 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 "&:hover": {
                                     backgroundColor: "#0064d2",
                                 },
+                                "&:disabled": {
+                                    backgroundColor: "#005bb5",
+                                },
                             }}
+                            disabled={isSubmitting}
                         >
-                            Submit
+                            {isSubmitting ? (
+                                <CircularProgress size={24} sx={{ color: "#fff", mr: 1 }} />
+                            ) : (
+                                <AiOutlineCheckCircle style={{ marginRight: "5px" }} />
+                            )}
+                            {isSubmitting ? "Submitting..." : "Submit"}
                         </Button>
                     </Box>
                 </Box>

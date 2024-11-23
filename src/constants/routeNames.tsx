@@ -37,7 +37,8 @@ const RouteNames = {
   FORM_CREATE_SCHOLARSHIP_PROGRAM: "/create-scholarship-program",
   TEST: "/test",
   HISTORY: "/history",
-  PROVIDER_LIST:"/provider-list"
+  PROVIDER_LIST: "/provider-list",
+  APPLICANT_PROFILE: "/applicant/profile",
 };
 
 export default RouteNames;

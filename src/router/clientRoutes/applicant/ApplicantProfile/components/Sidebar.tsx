@@ -8,13 +8,15 @@ import { IconType } from "react-icons";
 import {
   AiOutlineAudit,
   AiOutlineBarChart,
-  AiOutlineBook,
   AiOutlineHistory,
 } from "react-icons/ai";
 import { BiLogOutCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import useMediaQuery from "../../hooks/useMediaQuery";
+import useMediaQuery from "../../../../../hooks/useMediaQuery";
+import { FaLock } from "react-icons/fa";
+import { ImProfile } from "react-icons/im";
+import { MdOutlineAccountCircle } from "react-icons/md";
 
 type SidebarProps = {
   className?: string;
@@ -75,42 +77,59 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
       if (error.response.data.detail.includes("applicantId")) {
         setHasProfile(false);
       }
-    } finally {
     }
   };
 
-  const listItems: ListItemProps[] = [
-    { Icon: AiOutlineAudit, text: "Account", link: RouteNames.ACCOUNT_INFO },
-    { Icon: AiOutlineBook, text: "Information", link: RouteNames.INFORMATION },
+  // Only keeping relevant sections
+  const listItems = [
     {
-      Icon: AiOutlineBook,
-      text: `Skills ${hasProfile ? "" : "(You need to add profile first)"} `,
-      link: hasProfile ? RouteNames.SKILLS : "",
-    },
-    {
-      Icon: AiOutlineBarChart,
-      text: "Change Password",
-      link: RouteNames.CHANGE_PASSWORD,
-    },
-    { Icon: AiOutlineBook, text: "Activity", link: RouteNames.ACTIVITY },
-    { Icon: AiOutlineHistory, text: "History", link: RouteNames.HISTORY },
-  ];
+      section: "User",
+      items: [
+        {
+          Icon: MdOutlineAccountCircle,
+          text: "My Account",
+          link: RouteNames.ACCOUNT_INFO,
+        },
+        {
+          Icon: ImProfile,
+          text: "Applicant Profile",
+          link: RouteNames.ACCOUNT_INFO,
+        },
 
-  // const handleLogout = () => {
-  //     // dispatch(clearAuth());
-  //     localStorage.removeItem('token');
-  //     navigate(RouteNames.HOME);
-  // };
-  const handleLogout = () => {
-    // setIsLoading(true);
-    setTimeout(() => {
-      dispatch(removeToken());
-      dispatch(removeUser());
-      localStorage.removeItem("token");
-      navigate(RouteNames.HOME);
-      //   setIsLoading(false);
-    }, 500);
-  };
+        {
+          Icon: FaLock,
+          text: "Password & Authentication",
+          link: RouteNames.CHANGE_PASSWORD,
+        },
+      ],
+    },
+    {
+      section: "History",
+      items: [
+        {
+          Icon: AiOutlineHistory,
+          text: "Service Request",
+          link: RouteNames.ACTIVITY,
+        },
+        {
+          Icon: AiOutlineHistory,
+          text: "Scholarship Application",
+          link: RouteNames.HISTORY,
+        },
+      ],
+    },
+
+    {
+      section: "Other",
+      items: [
+        {
+          Icon: BiLogOutCircle,
+          text: "Log Out",
+          link: "/",
+        },
+      ],
+    },
+  ];
 
   useEffect(() => {
     fetchSkills();
@@ -118,26 +137,27 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
 
   return (
     <>
-      <div className={`${className} flex flex-col py-10 border-r-2 `}>
+      <div className={`${className} flex flex-col py-10 border-r-2`}>
         <div className="flex flex-col items-center gap-8">
-          {/* <div className='flex justify-center items-center gap-4'>
-                        <img src='https://via.placeholder.com/150' alt='profile' className='rounded-full w-24' />
-                        
-                    </div> */}
           <div className="h-[1px] bg-gray-100 w-2/3"></div>
         </div>
         {isAboveMediumScreens ? (
           <menu className="w-full flex flex-col">
-            {listItems.map((item, index) => (
-              <ListItem
-                key={index}
-                Icon={item.Icon}
-                text={item.text}
-                link={item.link}
-              />
+            {listItems.map((section, index) => (
+              <div key={index}>
+                <h2 className="px-5 py-2 font-semibold text-lg text-gray-700">
+                  {section.section}
+                </h2>
+                {section.items.map((item, idx) => (
+                  <ListItem
+                    key={idx}
+                    Icon={item.Icon}
+                    text={item.text}
+                    link={item.link}
+                  />
+                ))}
+              </div>
             ))}
-            {/* <li className='lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-blue-400 group rounded-lg'>
-                        </li> */}
           </menu>
         ) : (
           <motion.div
@@ -161,14 +181,12 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
 
         {!isAboveMediumScreens && isMenuToggled && (
           <div className="fixed left-0 bottom-0 z-40 h-full w-[50%] bg-blue-400 shadow drop-shadow-xl">
-            {/* CLOSE ICON */}
             <div className="flex justify-end p-12">
               <button onClick={() => setIsMenuToggled(!isMenuToggled)}>
                 <XMarkIcon className="h-6 w-6 text-gray-500" />
               </button>
             </div>
 
-            {/* MENU ITEMS */}
             <div className="">
               <div className="flex justify-center items-center gap-4 mb-5">
                 <img
@@ -178,28 +196,21 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
                 />
               </div>
               <ul className="flex justify-around flex-col gap-10">
-                {listItems.map((item) => (
-                  <ListItem
-                    key={item.link}
-                    Icon={item.Icon}
-                    text={item.text}
-                    link={item.link}
-                  />
-                ))}
-                <li
-                  onClick={handleLogout}
-                  className="lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-blue-400 group"
-                >
-                  <div className="flex justify-start gap-8">
-                    <BiLogOutCircle
-                      size={24}
-                      className="text-[#067CEB] group-hover:text-white duration-200 transition-colors"
-                    />
-                    <p className="lg:text-[#067CEB] text-[#2968a4] lg:text-lg text-xl group-hover:text-white">
-                      Log out
-                    </p>
+                {listItems.map((section) => (
+                  <div key={section.section}>
+                    <h2 className="px-5 py-2 font-semibold text-lg text-gray-700">
+                      {section.section}
+                    </h2>
+                    {section.items.map((item) => (
+                      <ListItem
+                        key={item.link}
+                        Icon={item.Icon}
+                        text={item.text}
+                        link={item.link}
+                      />
+                    ))}
                   </div>
-                </li>
+                ))}
               </ul>
             </div>
           </div>

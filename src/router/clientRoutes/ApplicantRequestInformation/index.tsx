@@ -9,8 +9,9 @@ import { formatOnlyDate } from "@/lib/date-formatter"
 import { getRequestWithApplicantAndRequestDetails } from "@/services/ApiServices/requestService"
 import RequestDetailTable from "./request-detail-table"
 import { useSelector } from "react-redux"
+import { FaBirthdayCake, FaFlag, FaTransgender, FaUsers } from "react-icons/fa"
 
-const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
+const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => {
   const { id } = requestId ?? useParams<{ id: string }>();
   const [request, setRequest] = useState<any>(null);
   const [applicant, setApplicant] = useState<any>(null);
@@ -105,7 +106,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
           </div>
           <div className="w-full">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={applicant.avatarUrl??"https://github.com/shadcn.png"} />
+              <SchoolLogo imageUrl={applicant.avatarUrl ?? "https://github.com/shadcn.png"} />
               <div>
                 <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
                   {applicant.username}
@@ -118,32 +119,39 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }:any) => {
           </div>
         </div>
       </div>
-      <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
-        <section className="max-w-container mx-auto py-[24px] lg:py-[40px]">
-          <div className="grid grid-cols-2 mx-[150px] lg:px-0 lg:flex gap-[30px] flex-row flex-wrap justify-between lg:gap-[40px]">
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Nationality
-              </p>
-              <p className="text-heading-6">{applicantProfile ? applicantProfile?.nationality : "N/a"}</p>
+      <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative rounded-lg overflow-hidden">
+        <section className="max-w-container flex items-center justify-center mx-auto py-[24px] lg:py-[40px] px-4 lg:px-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[30px] lg:gap-[40px]">
+            <div className="flex items-center mr-30 gap-3 flex-col lg:flex-row">
+              <FaFlag className="text-indigo-600 text-3xl" />
+              <div>
+                <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Nationality</p>
+                <p className="text-heading-6 text-gray-800">{applicantProfile ? applicantProfile.nationality : "N/A"}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Ethnicity
-              </p>
-              <p className="text-heading-6">{applicantProfile ? applicantProfile?.ethnicity : "N/a"}</p>
+
+            <div className="flex items-center ml-30 gap-3 flex-col lg:flex-row">
+              <FaUsers className="text-green-600 text-3xl" />
+              <div>
+                <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Ethnicity</p>
+                <p className="text-heading-6 text-gray-800">{applicantProfile ? applicantProfile.ethnicity : "N/A"}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Gender
-              </p>
-              <p className="text-heading-6">{applicantProfile ? applicantProfile.gender : "N/a"}</p>
+
+            <div className="flex items-center mr-30 gap-3 flex-col lg:flex-row">
+              <FaTransgender className="text-purple-600 text-3xl" />
+              <div>
+                <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Gender</p>
+                <p className="text-heading-6 text-gray-800">{applicantProfile ? applicantProfile.gender : "N/A"}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Birth Date
-              </p>
-              <p className="text-heading-6">{formatOnlyDate(applicantProfile ? applicantProfile.birthDate : "N/a")}</p>
+
+            <div className="flex items-center ml-30 gap-3 flex-col lg:flex-row">
+              <FaBirthdayCake className="text-orange-600 text-3xl" />
+              <div>
+                <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Birth Date</p>
+                <p className="text-heading-6 text-gray-800">{applicantProfile ? formatOnlyDate(applicantProfile.birthDate) : "N/A"}</p>
+              </div>
             </div>
           </div>
         </section>

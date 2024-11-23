@@ -48,6 +48,7 @@ import { SendNotification } from "@/services/ApiServices/notification";
 import { argv0 } from "process";
 import { updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendarAlt, FaCheckCircle, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaSearch, FaTimes, FaTrophy } from "react-icons/fa";
+import { notification } from "antd";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,10 +67,10 @@ const ChooseWinner = () => {
     try {
       const response = await getApplicationsByScholarship(scholarshipId);
       if (response.statusCode == 200) {
-        setApplicants(response.data.filter((row: any) => row.status != "APPROVED"));
-        if (data) {
-          setScholarshipWinners(response.data.filter((row: any) => row.status == "APPROVED"));
-          setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "APPROVED")).length);
+        setApplicants(response.data.filter((row: any) => row.status != "Approved"));
+        if(data){
+            setScholarshipWinners(response.data.filter((row: any) => row.status == "Approved"));
+            setAvailableScholarships(data?.numberOfScholarships - (response.data.filter((row: any) => row.status == "Approved")).length);
         }
       } else {
         setError("Failed to get applicants");
@@ -87,7 +88,7 @@ const ChooseWinner = () => {
         const payload = {
           id: row.id,
           appliedDate: new Date().toISOString(),
-          status: "APPROVED",
+          status: "Approved",
           applicantId: row.applicantId,
           scholarshipProgramId: id,
           applicationDocuments: [],
@@ -112,7 +113,7 @@ const ChooseWinner = () => {
       if (availableScholarships == 0) {
         await updateScholarshipStatus(Number(data?.id), "FINISHED");
       }
-      alert("Selected applicants have been approved!");
+      notification.success({message:"Selected applicants have been approved!"});
       await fetchData();
       for (let row of selectedRows) {
         await SendNotification({
@@ -182,11 +183,11 @@ const ChooseWinner = () => {
     setSelectedRows(selectedRowData);
     if (data)
       setAvailableScholarships(
-        data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "APPROVED")).length
-          - selectedRowData.length <= 0
+        data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "Approved")).length
+         - selectedRowData.length <= 0
           ? 0
-          : data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "APPROVED")).length
-          - selectedRowData.length
+          : data?.numberOfScholarships - (applicants.filter((row: any) => row.status == "Approved")).length
+ - selectedRowData.length
       );
   };
 
