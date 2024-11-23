@@ -8,7 +8,6 @@ import AccountsManagement from "./Dashboard/pages/AccountsManagement";
 import RoleNames from "@/constants/roleNames";
 import TransactionsManagement from "./Dashboard/pages/TransactionsManagement";
 
-
 const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.DASHBOARD,
@@ -25,13 +24,13 @@ const privateRoutes: RouteObject[] = [
   {
     path: "/admin/transactionsmanagement",
     element: <TransactionsManagement />,
-  }
+  },
 ];
 const publicRoutes: RouteObject[] = [
-//   {
-//     path: RouteNames.ACCOUNT_INFO,
-//     element: <Dashboard />,
-//   },
+  //   {
+  //     path: RouteNames.ACCOUNT_INFO,
+  //     element: <Dashboard />,
+  //   },
 ];
 const adminRoutes: RouteObject[] = [
   {

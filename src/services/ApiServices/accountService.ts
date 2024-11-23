@@ -42,9 +42,9 @@ export async function changeAvatar(id: number, accountData: any) {
     `${BASE_URL}/api/accounts/${id}/change-avatar`,
     accountData,
     {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        }
+      headers: {
+        "Content-Type": "multipart/form-data",
+      }
     }
   );
   return response.data;
@@ -66,6 +66,11 @@ export async function deleteAccount(id: number) {
   );
   return response.data;
 }
+
+export async function getAllWallets() {
+  const response = await axios.get(`${BASE_URL}/api/accounts/wallets`, ngrokSkipWarning);
+  return response.data;
+};
 
 export async function getAccountWallet(id: number) {
   const response = await axios.get(

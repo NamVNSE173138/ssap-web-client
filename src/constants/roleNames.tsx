@@ -1,9 +1,9 @@
 const RoleNames = {
-    ADMIN: 'ADMIN',
-    APPLICANT: 'APPLICANT',
-    FUNDER: 'FUNDER',
-    PROVIDER: 'PROVIDER',
-    EXPERT: 'EXPERT',
-}
+  ADMIN: "Admin",
+  APPLICANT: "Applicant",
+  FUNDER: "Funder",
+  PROVIDER: "Provider",
+  EXPERT: "Expert",
+};
 
-export default RoleNames
+export default RoleNames;

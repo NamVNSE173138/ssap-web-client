@@ -1,3 +1,4 @@
+import ApplicationStatus from "@/constants/applicationStatus";
 import { Avatar, Button, Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
 import { FaRegEye, FaTrophy, FaUserCircle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -8,6 +9,15 @@ interface AwardDialogProps {
   setIsOpen: (isOpen: boolean) => void;
   winningApplications: any[];
 }
+
+const statusColor = {
+    [ApplicationStatus.Submitted]: "blue",
+    [ApplicationStatus.Awarded]: "green",
+    [ApplicationStatus.Approved]: "blue",
+    [ApplicationStatus.Rejected]: "red",
+    [ApplicationStatus.NeedExtend]: "yellow",
+    [ApplicationStatus.Reviewing]: "yellow",
+  }
 
 const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProps) => {
   return (
@@ -47,6 +57,7 @@ const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProp
                       <div className="flex items-center gap-2">
                         <FaUserCircle className="text-blue-500 text-lg" />
                         <span className="font-semibold text-lg text-gray-800">{application.applicant.username}</span>
+                        
                       </div>
                     }
                     secondary={
@@ -58,9 +69,19 @@ const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProp
                         >
                           {application.applicant.email}
                         </Typography>
+                        
                       </>
                     }
                   />
+                      <span className="flex justify-end gap-2 items-center mr-[45%] mt-[2%]">
+                        <span className="relative flex h-3 w-3">
+                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[application.status]}-500 opacity-75`}></span>
+                          <span className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[application.status]}-500`}></span>
+                        </span>
+                        <span className={`text-${statusColor[application.status]}-500 font-medium`}>{application.status}</span>
+                      </span>
+
+                      
                   <Link
                     target="_blank"
                     to={`/funder/application/${application.id}`}

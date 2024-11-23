@@ -11,11 +11,9 @@ import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import Accordion from "@mui/material/Accordion";
-import AccordionActions from "@mui/material/AccordionActions";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Button from "@mui/material/Button";
 import SchoolLogo from "./logo";
 import { useSelector } from "react-redux";
 import RouteNames from "@/constants/routeNames";
@@ -28,35 +26,19 @@ import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
-import {
-  deleteApplication,
-  getApplicationByApplicantIdAndScholarshipId,
-} from "@/services/ApiServices/applicationService";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../../../components/ui/alert-dialog";
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
+import { format } from 'date-fns';
+import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
+import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
+
 import AwardDialog from "./award-dialog";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
-import {
-  FaCheckCircle,
-  FaEdit,
-  FaEye,
-  FaTrash,
-  FaTrophy,
-  FaUserTie,
-} from "react-icons/fa";
+
+import { FaAward, FaBook, FaCalendarAlt, FaCertificate, FaCheckCircle, FaCode, FaCreditCard, FaDollarSign, FaEdit, FaEye, FaGraduationCap, FaInfoCircle, FaMapMarkerAlt, FaMoneyBillWave, FaRegListAlt, FaTag, FaTrash, FaTrophy, FaUniversity, FaUserTie } from "react-icons/fa";
+
+
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -86,7 +68,7 @@ const ScholarshipProgramDetail = () => {
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
-  //const [awardMilestones, setAwardMilestones] = useState<any>(null);
+  const [awardMilestones, setAwardMilestones] = useState<any>(null);
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
@@ -104,17 +86,24 @@ const ScholarshipProgramDetail = () => {
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
+        console.log(response.data.data);
+        
         setAuthorized(response.data.message);
         if (user) {
-          const application = await getApplicationByApplicantIdAndScholarshipId(
-            parseInt(user?.id),
-            response.data.data.id
-          );
+
+
+          // <!--           const application = await getApplicationByApplicantIdAndScholarshipId(
+          //             parseInt(user?.id),
+          //             response.data.data.id
+          //           );
+          //           setExistingApplication(application.data); -->
+
+          const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
           setExistingApplication(application.data);
-          const award = await getAwardMilestoneByScholarship(
-            response.data.data.id
-          );
-          console.log("APPLICATIONDATA", application);
+          const award = await getAwardMilestoneByScholarship(response.data.data.id);
+          setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
+          //console.log(application.data);
+
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
               if (
@@ -194,11 +183,15 @@ const ScholarshipProgramDetail = () => {
       const response = await getApplicationsByScholarship(scholarshipId);
       //console.log(response);
       if (response.statusCode == 200) {
-        setWinningApplications(
-          response.data.filter(
-            (application: any) => application.status === "APPROVED"
-          )
-        );
+
+      //  setWinningApplications(
+       //   response.data.filter(
+        //    (application: any) => application.status === "APPROVED"
+       //   )
+        //);
+
+        setWinningApplications(response.data.filter((application: any) => application.status === ApplicationStatus.Approved || application.status === ApplicationStatus.Awarded));
+
       } else {
         setError("Failed to get applicants");
       }
@@ -282,7 +275,7 @@ const ScholarshipProgramDetail = () => {
   console.log("UNIVERSITY", data?.university);
   console.log("iUser", user);
   console.log("authorize", authorized);
-  console.log("Existing Application:", existingApplication);
+
 
   return (
     <div>
@@ -329,21 +322,22 @@ const ScholarshipProgramDetail = () => {
                 </p>
               </div>
             </div>
+
             <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
-              {isApplicant == "Applicant" || !user ? (
+              { isApplicant == "Applicant" || !user ? (
                 <>
-                  {existingApplication &&
-                    existingApplication.length == 0 &&
-                    data.status != "FINISHED" && (
-                      <button
-                        onClick={() =>
-                          navigate(`/scholarship-program/${id}/application`)
-                        }
-                        className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
-                      >
-                        Apply now{" "}
-                      </button>
-                    )}
+
+                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && 
+                  new Date(data.deadline) > new Date() && (
+                    <button
+                      onClick={() => navigate(`/scholarship-program/${id}/application`)}
+                      className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
+                    >
+                      Apply now{" "}
+
+                    </button>
+                  )}
+
                   {existingApplication && existingApplication.length > 0 && (
                     <>
                       <button
@@ -369,10 +363,11 @@ const ScholarshipProgramDetail = () => {
                           Extend Application{" "}
                         </button>
                       )}
-                      {existingApplication[0].status !=
-                        ApplicationStatus.Approved &&
-                        existingApplication[0].status !=
-                          ApplicationStatus.NeedExtend && (
+
+                      {/*JSON.stringify(awardMilestones)*/}
+                      {existingApplication[0].status == ApplicationStatus.Submitted && 
+                        (new Date(existingApplication[0].updatedAt) < new Date(data.deadline) ) && (
+
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
@@ -410,6 +405,7 @@ const ScholarshipProgramDetail = () => {
                 </>
               ) : (
                 authorized != "Unauthorized" && (
+
                   <div className="flex justify-between w-full gap-3">
                     <button
                       onClick={() => navigate("")}
@@ -491,49 +487,81 @@ const ScholarshipProgramDetail = () => {
         </div>
       </div>
       <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
-        <section className="max-w-container mx-auto py-[24px] lg:py-[40px]">
-          <div className="grid grid-cols-2 mx-[150px] lg:px-0 lg:flex gap-[30px] flex-row flex-wrap justify-between lg:gap-[40px]">
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Location
-              </p>
-              <p className="text-heading-6">VietNam</p>
+        <section className="max-w-container flex justify-center mx-auto py-6 lg:py-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 px-4 lg:px-0">
+
+            <div className="flex mr-55 items-center gap-3">
+              <FaMapMarkerAlt className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Location</p>
+                <p className="text-lg font-semibold text-gray-800">{'VietNam'}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Qualification
-              </p>
-              <p className="text-heading-6">{data.category.description}</p>
+
+            <div className="flex ml-40 items-center gap-3">
+              <FaGraduationCap className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Qualification</p>
+                <p className="text-lg font-semibold text-gray-800">{data.category.description || 'Not specified'}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Funding type
-              </p>
-              <p className="text-heading-6">VietNam</p>
+
+            <div className="flex items-center gap-3">
+              <FaCreditCard className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Funding Type</p>
+                <p className="text-lg font-semibold text-gray-800">{'Not specified'}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Deadline
-              </p>
-              <p className="text-heading-6">{data.deadline}</p>
+
+            <div className="flex ml-40 items-center gap-3">
+              <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Deadline</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.deadline ? format(new Date(data.deadline), 'dd/MM/yyyy') : 'Not specified'}
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="block mb-[4px] lg:mb-[8px] font-semibold">
-                Value of Award
-              </p>
-              <p className="text-heading-6">{data.scholarshipAmount}</p>
+
+            <div className="flex items-center gap-3">
+              <FaAward className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Value of Award</p>
+                <p className="text-lg font-semibold text-gray-800">{data.scholarshipAmount || 'Not specified'}$</p>
+              </div>
             </div>
           </div>
         </section>
       </div>
+
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
-          <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-            <p className="text-4xl">
-              About the scholarship
-              <span className="block bg-[#1eb2a6] w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
-            </p>
+          <div className="mb-6 px-4 sm:px-6 xl:px-0">
+            <div className="relative flex items-center gap-3">
+              <div className="p-2 bg-[#1eb2a6] rounded-full">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="white"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.75 9.75L15.75 15.75M15.75 9.75L9.75 15.75M6 4.5H18M6 19.5H18M3 9H21M3 15H21"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                About the Scholarship
+              </h2>
+            </div>
+            <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
           </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-4">
             <div className="lg:col-span-3 px-[16px] xsm:px-[24px] 2xl:px-0">
               <div className="lg:pe-[112px]">
@@ -542,90 +570,101 @@ const ScholarshipProgramDetail = () => {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1-content"
                     id="panel1-header"
+                    className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
                   >
-                    Overview
+                    <h3 className="text-blue-600 font-semibold text-lg flex items-center gap-2">
+                      <FaInfoCircle className="text-blue-500" />
+                      Overview
+                    </h3>
                   </AccordionSummary>
-                  <AccordionDetails>
-                    <div>
-                      <div className="flex gap-[16px] flex-wrap justify-between mb-[20px] md:mb-[40px]">
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Awarding institution:
-                          </p>
-                          <Link to="" className="hover:underline">
-                            {data.name}
-                          </Link>
-                        </div>
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Average applications per year:
-                          </p>
-                          Not specified
-                        </div>
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                    {/* Awarding institution & Applications */}
+                    <div className="flex gap-4 flex-wrap justify-between mb-6">
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaUniversity className="text-gray-500" />
+                          Awarding institution:
+                        </p>
+                        <Link to="" className="text-blue-500 hover:underline">
+                          {data.name}
+                        </Link>
+                      </div>
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaRegListAlt className="text-gray-500" />
+                          Average applications per year:
+                        </p>
+                        <span>Not specified</span>
                       </div>
                     </div>
-                    <div>
-                      <div className="flex gap-[16px] flex-wrap justify-between mb-[20px] md:mb-[40px]">
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Qualification:
-                          </p>
-                          Not specified
-                        </div>
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Number of awards available:
-                          </p>
-                          {data.numberOfScholarships}
-                        </div>
+
+                    {/* Qualification & Number of awards */}
+                    <div className="flex gap-4 flex-wrap justify-between mb-6">
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaAward className="text-gray-500" />
+                          Qualification:
+                        </p>
+                        <span>Not specified</span>
+                      </div>
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaRegListAlt className="text-gray-500" />
+                          Number of awards available:
+                        </p>
+                        <span>{data.numberOfScholarships}</span>
                       </div>
                     </div>
-                    <div>
-                      <div className="flex gap-[16px] flex-wrap justify-between mb-[20px] md:mb-[40px]">
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Value of Award
-                          </p>
-                          {data.scholarshipAmount}
-                        </div>
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Eligible intake:
-                          </p>
-                          Not specified
-                        </div>
+
+                    <div className="flex gap-4 flex-wrap justify-between mb-6">
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaDollarSign className="text-gray-500" />
+                          Value of Award:
+                        </p>
+                        <span>{data.scholarshipAmount}$</span>
+                      </div>
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaInfoCircle className="text-gray-500" />
+                          Eligible intake:
+                        </p>
+                        <span>Not specified</span>
                       </div>
                     </div>
-                    <div>
-                      <div className="flex gap-[16px] flex-wrap justify-between mb-[20px] md:mb-[40px]">
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Funding details:
-                          </p>
-                          {data.description}
-                        </div>
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Funding type:
-                          </p>
-                          Not specified
-                        </div>
+
+                    <div className="flex gap-4 flex-wrap justify-between mb-6">
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaInfoCircle className="text-gray-500" />
+                          Funding details:
+                        </p>
+                        <span>{data.description}</span>
+                      </div>
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaInfoCircle className="text-gray-500" />
+                          Funding type:
+                        </p>
+                        <span>Not specified</span>
                       </div>
                     </div>
-                    <div>
-                      <div className="flex gap-[16px] flex-wrap justify-between mb-[20px] md:mb-[40px]">
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Delivery mode:
-                          </p>
-                          Not specified
-                        </div>
-                        <div className="md:w-[48%] w-full">
-                          <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                            Course/offer application deadline:
-                          </p>
-                          Not specified
-                        </div>
+
+                    {/* Delivery mode & Deadline */}
+                    <div className="flex gap-4 flex-wrap justify-between">
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaInfoCircle className="text-gray-500" />
+                          Delivery mode:
+                        </p>
+                        <span>Not specified</span>
+                      </div>
+                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <p className="text-gray-700 font-bold flex items-center gap-2">
+                          <FaInfoCircle className="text-gray-500" />
+                          Course/offer application deadline:
+                        </p>
+                        <span>Not specified</span>
                       </div>
                     </div>
                   </AccordionDetails>
@@ -635,21 +674,30 @@ const ScholarshipProgramDetail = () => {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel2-content"
                     id="panel2-header"
+                    className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
                   >
-                    Scholarship Category
+                    <h3 className="text-green-600 font-semibold text-lg flex items-center gap-2">
+                      <FaTag className="text-green-500" />
+                      Scholarship Category
+                    </h3>
                   </AccordionSummary>
-                  <AccordionDetails>
-                    <div className="w-full flex gap-3 flex-wrap">
-                      <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                        Category Name:
-                      </p>
-                      {data.category.name}
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                    {/* Category Name */}
+                    <div className="w-full flex items-start gap-3 mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
+                      <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
+                      <div>
+                        <p className="text-gray-700 font-bold">Category Name:</p>
+                        <p className="text-gray-600">{data.category.name}</p>
+                      </div>
                     </div>
-                    <div className="w-full flex gap-3 flex-wrap">
-                      <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                        Description:
-                      </p>
-                      {data.category.description}
+
+                    {/* Description */}
+                    <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                      <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
+                      <div>
+                        <p className="text-gray-700 font-bold">Description:</p>
+                        <p className="text-gray-600">{data.category.description}</p>
+                      </div>
                     </div>
                   </AccordionDetails>
                 </Accordion>
@@ -658,50 +706,63 @@ const ScholarshipProgramDetail = () => {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel2-content"
                     id="panel2-header"
+                    className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
                   >
-                    Applicable Majors &amp; Skills
+                    <h3 className="text-blue-600 font-semibold text-lg flex items-center gap-2">
+                      <FaBook className="text-blue-500" />
+                      Applicable Majors & Skills
+                    </h3>
                   </AccordionSummary>
-                  <AccordionDetails>
-                    {data?.major && (
+
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                    {data?.major ? (
                       <Accordion key={data.major.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
-                          aria-controls="panel3-content"
-                          id="panel3-header"
+                          aria-controls={`major-${data.major.id}-content`}
+                          id={`major-${data.major.id}-header`}
+                          className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
                         >
-                          <span className="font-bold mr-2">
-                            {data.major.name}{" "}
-                          </span>
+                          <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                            <FaBook className="text-gray-500" />
+                            {data.major.name}
+                          </h4>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <div className="w-full flex gap-3 flex-wrap">
-                            <p className="text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                              Description:
-                            </p>
-                            {data.major.description}
-                          </div>
-                          <div className="w-full mt-3 flex gap-3 flex-wrap">
-                            <p className="text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                              Skills:
-                            </p>
+                          <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
+                            <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                             <div>
-                              {data.major.skills.map((skill: any) => (
+                              <p className="text-gray-700 font-bold">Description:</p>
+                              <p className="text-gray-600">{data.major.description}</p>
+                            </div>
+                          </div>
+
+                          <div className="w-full">
+                            <h5 className="font-bold text-gray-700 mb-3">Skills:</h5>
+
+                            <div>
+                              {data.major.skills.map((skill) => (
                                 <Accordion key={skill.id}>
                                   <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel3-content"
-                                    id="panel3-header"
+                                    aria-controls={`skill-${skill.id}-content`}
+                                    id={`skill-${skill.id}-header`}
+                                    className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
                                   >
-                                    <span className="font-bold mr-2">
+                                    <h6 className="font-bold text-gray-700 flex items-center gap-2">
+                                      <FaCode className="text-gray-500" />
                                       {skill.name}
-                                    </span>
+                                    </h6>
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    <div className="w-full flex gap-3 flex-wrap">
-                                      <p className="text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                                        Description:
-                                      </p>
-                                      {skill.description}
+                                    <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                                      <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                                      <div>
+                                        <p className="text-gray-700 font-bold">
+                                          Description:
+                                        </p>
+                                        <p className="text-gray-600">{skill.description}</p>
+                                      </div>
                                     </div>
                                   </AccordionDetails>
                                 </Accordion>
@@ -710,6 +771,10 @@ const ScholarshipProgramDetail = () => {
                           </div>
                         </AccordionDetails>
                       </Accordion>
+                    ) : (
+                      <p className="text-gray-600 italic">
+                        No majors or skills available at the moment.
+                      </p>
                     )}
                   </AccordionDetails>
                 </Accordion>
@@ -718,31 +783,51 @@ const ScholarshipProgramDetail = () => {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel3-content"
                     id="panel3-header"
+                    className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
                   >
-                    Applicable Universities
+                    <h3 className="text-yellow-600 font-semibold text-lg flex items-center gap-2">
+                      <FaUniversity className="text-yellow-500" />
+                      Applicable University
+                    </h3>
                   </AccordionSummary>
-                  <AccordionDetails>
-                    {data?.university && (
+
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                    {data?.university ? (
+
                       <Accordion key={data.university.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
-                          aria-controls="panel3-content"
-                          id="panel3-header"
+                          aria-controls={`university-${data.university.id}-content`}
+                          id={`university-${data.university.id}-header`}
+                          className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
                         >
-                          <span className="font-bold mr-2">
-                            {data.university.name}{" "}
-                          </span>
-                          <span>at {data.university.city}</span>
+
+                          <div className="flex flex-col">
+                            <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                              <FaUniversity className="text-gray-500" />
+                              {data.university.name}
+                            </h4>
+                            <span className="text-gray-600 flex items-center gap-1">
+                              <FaMapMarkerAlt className="text-gray-400" />
+                              {data.university.city}
+                            </span>
+                          </div>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <div className="w-full flex gap-3 flex-wrap">
-                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                              Description:
-                            </p>
-                            {data.university.description}
+                          <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                            <div>
+                              <p className="text-gray-700 font-bold">Description:</p>
+                              <p className="text-gray-600">{data.university.description}</p>
+                            </div>
                           </div>
                         </AccordionDetails>
                       </Accordion>
+                    ) : (
+                      <p className="text-gray-600 italic">
+                        No applicable universities available at the moment.
+                      </p>
+
                     )}
                   </AccordionDetails>
                 </Accordion>
@@ -751,37 +836,53 @@ const ScholarshipProgramDetail = () => {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel3-content"
                     id="panel3-header"
+                    className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
                   >
-                    Required Certificates
+                    <h3 className="text-green-600 font-semibold text-lg flex items-center gap-2">
+                      <FaCertificate className="text-green-500" />
+                      Required Certificates
+                    </h3>
                   </AccordionSummary>
-                  <AccordionDetails>
-                    {data.certificates.map((certificate: any) => (
-                      <Accordion key={certificate.id}>
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-controls="panel3-content"
-                          id="panel3-header"
-                        >
-                          <span className="font-bold mr-2">
-                            {certificate.name}{" "}
-                          </span>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <div className="w-full flex gap-3 flex-wrap">
-                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                              Description:
-                            </p>
-                            {certificate.description}
-                          </div>
-                          <div className="w-full flex gap-3 flex-wrap">
-                            <p className=" text-grey-darkest md:!mb-[8px] !mb-[4px] font-bold">
-                              Type:
-                            </p>
-                            {certificate.type}
-                          </div>
-                        </AccordionDetails>
-                      </Accordion>
-                    ))}
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                    {data.certificates && data.certificates.length > 0 ? (
+                      data.certificates.map((certificate) => (
+                        <Accordion key={certificate.id} className="mt-4">
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls={`certificate-${certificate.id}-content`}
+                            id={`certificate-${certificate.id}-header`}
+                            className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FaCertificate className="text-gray-500" />
+                              <span className="font-bold text-gray-700">
+                                {certificate.name}
+                              </span>
+                            </div>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
+                              <div className="flex items-start gap-3">
+                                <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                                <div>
+                                  <p className="text-gray-700 font-bold">Description:</p>
+                                  <p className="text-gray-600">{certificate.description}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <FaTag className="text-gray-400 text-xl mt-1" />
+                                <div>
+                                  <p className="text-gray-700 font-bold">Type:</p>
+                                  <p className="text-gray-600">{certificate.type}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </AccordionDetails>
+                        </Accordion>
+                      ))
+                    ) : (
+                      <p className="text-gray-600 italic">No certificates required.</p>
+                    )}
                   </AccordionDetails>
                 </Accordion>
               </div>
@@ -790,34 +891,25 @@ const ScholarshipProgramDetail = () => {
         </div>
       </section>
 
-      {authorized != "Unauthorized" && (
-        <AccountDialog
-          open={applicantDialogOpen}
-          onClose={() => setApplicantDialogOpen(false)}
-          applications={applicants ?? []}
-          scholarship={data}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <AssignExpertDialog
-          open={assignExpertDialogOpen}
-          onClose={() => setAssignExpertDialogOpen(false)}
-          resetMajor={null}
-          experts={experts ?? []}
-          scholarshipId={id}
-          // applicationId={existingApplication?.[0]?.id}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <ReviewMilestoneDialog
-          open={reviewMilestoneDialogOpen}
-          onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
-          reviewMilestones={reviewMilestones ?? []}
-          fetchReviewMilestones={async () => {
-            if (!data) return;
-            await fetchReviewMilestones(parseInt(data?.id));
-          }}
-        />
+      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen}
+        onClose={() => setApplicantDialogOpen(false)}
+        applications={applicants ?? []}
+        scholarship={data} />)}
+      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen}
+        onClose={() => setAssignExpertDialogOpen(false)}
+        resetMajor={null}
+        experts={experts ?? []} />)}
+      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen}
+        onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
+        reviewMilestones={reviewMilestones ?? []}
+        fetchReviewMilestones={async () => {
+          if (!data) return;
+          await fetchReviewMilestones(parseInt(data?.id));
+        }} />)}
+      {authorized != "Unauthorized" && (<AwardDialog isOpen={awardDialogOpen}
+        setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
+        winningApplications={winningApplications ?? []} />
+
       )}
       {authorized != "Unauthorized" && (
         <AwardDialog

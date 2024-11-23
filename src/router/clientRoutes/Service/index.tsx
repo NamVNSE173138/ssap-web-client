@@ -18,6 +18,7 @@ import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
 import { IoPerson, IoWallet } from "react-icons/io5";
 import { FaSadTear } from "react-icons/fa";
+import { current } from "@reduxjs/toolkit";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -37,18 +38,34 @@ const Service = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BASE_URL}/api/services/paginated`, {
+      let response:any = {};
+      if(user?.role === "Provider"){
+        response = await axios.get(`${BASE_URL}/api/services/by-provider-paginated/${user.id}`, {
+          params: {
+            pageIndex: currentPage,
+            pageSize: pageSize,
+          },
+        });
+        console.log(response);
+        
+      }
+      else{
+      response = await axios.get(`${BASE_URL}/api/services/paginated`, {
         params: {
           pageIndex: currentPage,
           pageSize: pageSize,
         },
       });
+    }
       if (response.data.statusCode === 200) {
         const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
         if (user?.role === "Provider") {
           const filteredServices = activeServices.filter((service: any) => service.providerId == user.id);
+          console.log(filteredServices)
           setData(filteredServices);
-          setTotalPages(Math.ceil(filteredServices.length / pageSize));
+          setTotalPages(response.data.data.totalPages);
+//          setTotalPages(Math.ceil(filteredServices.length / pageSize));
+
         } else {
           setData(activeServices);
           setFilteredData(activeServices);
@@ -90,17 +107,17 @@ const Service = () => {
     );
   }, [searchTerm, data]);
 
-  const handleNextPage = () => {
+  const handleNextPage = async () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
-      fetchData();
+      //await fetchData();
     }
   };
 
-  const handlePrevPage = () => {
+  const handlePrevPage = async () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
-      fetchData();
+      //await fetchData();
     }
   };
 
@@ -131,7 +148,6 @@ const Service = () => {
 
   return (
     <div>
-      {/* Header Section with Background Image */}
       <div className="relative">
         <ScholarshipProgramBackground />
         <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[70px] z-10">
@@ -151,7 +167,6 @@ const Service = () => {
         </div>
       </div>
 
-      {/* Search and Action Buttons */}
       <div className="flex bg-gradient-to-r from-blue-300 to-blue-500 justify-between p-6 items-center shadow-lg">
         <div className="relative w-full max-w-md">
           <Input
@@ -169,7 +184,6 @@ const Service = () => {
           )}
         </div>
 
-        {/* Conditional Button based on User Role */}
         {user?.role === "Provider" && (
           <button
             onClick={handleAddServiceClick}
@@ -200,7 +214,6 @@ const Service = () => {
         )}
       </div>
 
-      {/* Services Grid */}
       <ul className="grid grid-cols-1 bg-blue-100 md:grid-cols-2 lg:grid-cols-3 gap-10 p-10">
         {loading ? (
           <ServiceSkeleton />
@@ -220,9 +233,7 @@ const Service = () => {
         )}
       </ul>
 
-      {/* Pagination Controls */}
       <div className="flex justify-between items-center p-6 bg-blue-50 rounded-lg shadow-md">
-        {/* Previous Button */}
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
@@ -232,12 +243,10 @@ const Service = () => {
           <span>Previous</span>
         </button>
 
-        {/* Page Info */}
         <span className="text-lg font-semibold text-blue-700">
           Page {currentPage} of {totalPages}
         </span>
 
-        {/* Next Button */}
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
