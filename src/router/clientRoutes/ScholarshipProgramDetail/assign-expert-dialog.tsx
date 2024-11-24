@@ -1,5 +1,3 @@
-
-
 // import axios from "axios";
 // import { getAllMajors } from "@/services/ApiServices/majorService";
 // import {
@@ -345,6 +343,7 @@ import { SearchIcon } from "lucide-react";
 import { BASE_URL } from "@/constants/api";
 import { formatDate } from "@/lib/date-formatter";
 import { getAllMajors } from "@/services/ApiServices/majorService";
+import { FaBook, FaUsers } from "react-icons/fa";
 
 const StyledAutocomplete = styled(Autocomplete)(() => ({
   "& .MuiAutocomplete-popupIndicator": {
@@ -362,7 +361,13 @@ const CustomPaper = (props: any) => (
   />
 );
 
-const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
+const AssignExpertDialog = ({
+  open,
+  onClose,
+  resetMajor,
+  experts,
+  scholarshipId,
+}: any) => {
   const [majors, setMajors] = useState<any>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [selectedApplications, setSelectedApplications] = useState<any[]>([]);
@@ -373,11 +378,16 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
-    if (scholarshipId) {
+    if (open) {
+      if (!scholarshipId) {
+        console.warn("scholarshipId is null or undefined. Cannot fetch data.");
+        return;
+      }
+      console.log("Fetching data for scholarshipId:", scholarshipId); // Debugging
       fetchApplications();
       fetchMajors();
     }
-  }, [scholarshipId]);
+  }, [open, scholarshipId]);
 
   const fetchMajors = async () => {
     setLoading(true);
@@ -400,11 +410,10 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
       const response = await axios.get(
         `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`
       );
-      const filteredApplications = response.data.data.filter(
-        (application: any) => application.status !== "Assigned"
-      );
-      setApplications(filteredApplications || []);
+      console.log("Applications API Response:", response.data.data); // Debugging
+      setApplications(response.data.data || []);
     } catch (error) {
+      console.error("Error fetching applications:", error);
       setError("Failed to fetch applications.");
     }
   };
@@ -431,10 +440,10 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
   };
 
   const resetForm = () => {
-    setSelectedApplications([]); 
-    setSelectedExpert(null); 
-    setSelectedMajor(null); 
-    setStep(1); 
+    setSelectedApplications([]);
+    setSelectedExpert(null);
+    setSelectedMajor(null);
+    setStep(1);
   };
 
   const assignExpert = async () => {
@@ -457,7 +466,8 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
       );
       if (response.status === 200) {
         alert("Expert successfully assigned!");
-        resetForm(); 
+        resetForm();
+        onClose(); // Close dialog after success
       } else {
         alert("Failed to assign expert. Please try again.");
       }
@@ -478,22 +488,25 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
       maxWidth="lg"
       className="p-5"
     >
-      <DialogTitle className="text-center text-xl font-semibold bg-blue-600 text-white">
+      <DialogTitle className="flex items-center justify-between gap-5 flex-wrap bg-gradient-to-r from-blue-500 to-teal-500 text-white p-6 shadow-lg">
         {step === 1
-          ? "Select Applications"
+          ? "Assign Expert"
           : step === 2
-          ? "Select Major"
-          : "Select Expert"}
+          ? "Assign Expert"
+          : "Assign Expert"}
       </DialogTitle>
       <div className="p-5 space-y-4">
         {/* Step 1: Applications List */}
         {step === 1 ? (
           <>
-            <h3 className="font-semibold text-gray-700">
-              Select Applications:
-            </h3>
+            <p className="text-xl font-bold flex items-center justify-center bg-gradient-to-r text-blue-500 p-4 rounded-lg shadow-lg mt-5 mb-5">
+              {/* <FaBook className="mr-3 text-blue text-3xl" /> */}
+              <span>Select Applications</span>
+            </p>
             {applications.length === 0 ? (
-              <p className="text-gray-500">No applications found.</p>
+              <p className="text-gray-500">
+                No applications found for this scholarship.
+              </p>
             ) : (
               <List>
                 {applications.map((application: any) => (
@@ -551,7 +564,12 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
         ) : step === 2 ? (
           /* Step 2: Major Selection */
           <>
-            <h3 className="font-semibold text-gray-700">Select a Major:</h3>
+            <p className="text-xl font-bold flex items-center justify-center bg-gradient-to-r text-blue-500 p-4 rounded-lg shadow-lg mt-5 mb-5">
+              <FaBook className="mr-3 text-blue text-3xl" />
+              <span>
+                Choose the major of the expert you want to review applications
+              </span>
+            </p>
             {loading ? (
               <CircularProgress className="m-auto" />
             ) : error ? (
@@ -567,9 +585,10 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
                     onClick={() => handleMajorSelection(major)}
                   >
                     <ListItemAvatar>
-                      <FaUniversity />
+                      <FaUniversity className="text-blue-600 text-3xl"/>
                     </ListItemAvatar>
-                    <ListItemText primary={major.name} />
+                    <ListItemText primary={major.name} className="text-xl font-medium text-gray-800 font-poppins"/>
+                    <MdArrowForward className="text-blue-500 text-2xl" />
                   </ListItem>
                 ))}
               </List>
@@ -580,6 +599,7 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
           <>
             <h3 className="font-semibold text-gray-700">Select an Expert:</h3>
             <StyledAutocomplete
+            sx={{ height: "200px" }}
               options={experts}
               getOptionLabel={(option: any) => option.username}
               value={selectedExpert}
@@ -633,7 +653,6 @@ const AssignExpertDialog = ({ open, onClose, experts, scholarshipId }: any) => {
           </Button>
         )}
 
-        
         {step === 3 && (
           <Button
             variant="contained"
