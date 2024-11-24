@@ -34,6 +34,7 @@ import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
 import { FaAward, FaBook, FaCalendarAlt, FaCertificate, FaCheckCircle, FaCode, FaCreditCard, FaDollarSign, FaEdit, FaEye, FaGraduationCap, FaInfoCircle, FaMapMarkerAlt, FaMoneyBillWave, FaRegListAlt, FaTag, FaTrash, FaTrophy, FaUniversity, FaUserTie } from "react-icons/fa";
+import AwardMilestoneDialog from "./award-milestone-dialog";
 
 
 const ScholarshipProgramDetail = () => {
@@ -67,6 +68,9 @@ const ScholarshipProgramDetail = () => {
   const [awardMilestones, setAwardMilestones] = useState<any>(null);
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
+  const [awardMilestoneDialogOpen, setAwardMilestoneDialogOpen] =
+    useState<boolean>(false);
+
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
   const fetchData = async () => {
@@ -95,7 +99,7 @@ const ScholarshipProgramDetail = () => {
           const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(response.data.data.id);
-          setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
+          //setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
           //console.log(application.data);
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
@@ -130,6 +134,22 @@ const ScholarshipProgramDetail = () => {
         setApplicants(response.data);
       } else {
         setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAwardMilestones = async (scholarshipId: number) => {
+    try {
+      const response = await getAwardMilestoneByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setAwardMilestones(response.data);
+      } else {
+        setError("Failed to get award milestones");
       }
     } catch (error) {
       setError((error as Error).message);
@@ -207,6 +227,15 @@ const ScholarshipProgramDetail = () => {
     setLoading(true);
     if (!data) return;
     await fetchReviewMilestones(parseInt(data?.id));
+    await fetchAwardMilestones(parseInt(data?.id));
+    setLoading(false);
+  };
+
+  const handleOpenAwardMilestoneDialog = async () => {
+    setAwardMilestoneDialogOpen(true);
+    setLoading(true);
+    if (!data) return;
+    await fetchAwardMilestones(parseInt(data?.id));
     setLoading(false);
   };
 
@@ -528,12 +557,20 @@ const ScholarshipProgramDetail = () => {
                       <FaCheckCircle className="mr-2" /> Review Milestones
                     </button>
                     <button
+                      onClick={() => handleOpenAwardMilestoneDialog()}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrophy className="mr-2" /> Award Milestones
+
+                    </button>
+                    <button
                       onClick={() => handleOpenAwardDialog()}
                       className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Progress
 
                     </button>
+                    
                   </div>
                 )
               )}
@@ -967,6 +1004,8 @@ const ScholarshipProgramDetail = () => {
         experts={experts ?? []} />)}
       {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen}
         onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
+        scholarship={data}
+        awardMilestones={awardMilestones ?? []}
         reviewMilestones={reviewMilestones ?? []}
         fetchReviewMilestones={async () => {
           if (!data) return;
@@ -976,6 +1015,15 @@ const ScholarshipProgramDetail = () => {
         setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
         winningApplications={winningApplications ?? []} />
       )}
+      {authorized != "Unauthorized" && data && (<AwardMilestoneDialog open={awardMilestoneDialogOpen}
+        onClose={(open: boolean) => setAwardMilestoneDialogOpen(open)}
+        awardMilestones={awardMilestones ?? []}
+        reviewMilestones={reviewMilestones ?? []}
+        scholarship={data}
+        fetchAwardMilestones={async () => {
+          if (!data) return;
+          await fetchAwardMilestones(parseInt(data?.id));
+        }} />)}
 
 
     </div>

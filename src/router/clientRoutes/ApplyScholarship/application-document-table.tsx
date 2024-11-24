@@ -1,9 +1,19 @@
 import React, { useRef, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, IconButton, Tooltip } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, IconButton, Tooltip, Select, MenuItem } from '@mui/material';
 import { CloudUploadIcon, TrashIcon } from 'lucide-react';
 
 function EditableTable({ rows, setRows, handleDeleteRow, handleInputChange }: any) {
-
+const typeOptions = [
+    { value: 'Academic Transcript', label: 'Academic Transcript' },
+    { value: 'Recommendation Letter', label: 'Recommendation Letter' },
+    { value: 'Personal Statement', label: 'Personal Statement' },
+    { value: 'CV/Resume', label: 'CV/Resume' },
+    { value: 'Research Proposal', label: 'Research Proposal' },
+    { value: 'Portfolio', label: 'Portfolio' },
+    { value: 'Certification', label: 'Certification' },
+    { value: 'Exam Scores', label: 'Exam Scores' },
+    { value: 'Financial Report', label: 'Financial Report' },
+];
     return (
         <TableContainer component={Paper}>
             <Table>
@@ -28,12 +38,28 @@ function EditableTable({ rows, setRows, handleDeleteRow, handleInputChange }: an
                                     />
                             </TableCell>
                             <TableCell>
-                                    <TextField
+                                <Select
+                                    value={row.type || ''}
+                                    error={row.errors?.type}
+                                    onChange={(e) => handleInputChange(row.id, 'type', e.target.value)}
+                                    displayEmpty
+                                    sx={{ width: '100%' }}
+                                >
+                                    <MenuItem value="" disabled>
+                                        Select Type
+                                    </MenuItem>
+                                    {typeOptions.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                    {/*<TextField
                                         error={row.errors?.type}
                                         value={row.type}
                                         onChange={(e) => handleInputChange(row.id, 'type', e.target.value)}
                                         placeholder="Enter type"
-                                    />
+                                    />*/}
                             </TableCell>
 
                             <TableCell>
