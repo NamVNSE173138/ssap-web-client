@@ -1,7 +1,7 @@
 import ApplicationStatus from "@/constants/applicationStatus";
 import { Avatar, Button, Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
 import { FaRegEye, FaTrophy, FaUserCircle } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
+import { IoIosAddCircleOutline, IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 interface AwardDialogProps {
@@ -42,6 +42,7 @@ const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProp
       </DialogTitle>
 
       <div className="p-6">
+        <span className="font-bold text-xl text-sky-500">Winners Applications</span>
         {!winningApplications || !winningApplications.length ? (
           <p className="text-center text-xl text-gray-600">No winning applications</p>
         ) : (
@@ -97,6 +98,7 @@ const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProp
           </List>
         )}
       </div>
+
     </Dialog>
   );
 };

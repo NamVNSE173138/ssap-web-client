@@ -14,6 +14,8 @@ import { addApplicationDocument } from "@/services/ApiServices/applicationDocume
 import Background from "../../../assets/back.webp";
 import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
+
+
 const ApplyScholarship = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -69,12 +71,15 @@ const ApplyScholarship = () => {
 
     if (!program) {
       alert("Program not found");
+      setApplyLoading(false);
       return;
     }
     if(program.data.status == "FINISHED") {
       alert("Program is finished");
+      setApplyLoading(false);
       return;
     }
+
 
     setRows(
       rows.map((row) => ({
@@ -89,7 +94,10 @@ const ApplyScholarship = () => {
 
     const applicationDocuments = [];
     for (const row of rows) {
-      if (!row.name || !row.type || !row.file) return;
+      if (!row.name || !row.type || !row.file) {
+          setApplyLoading(false);
+          return;
+      }
       const formData = new FormData();
       formData.append("File", row.file);
       const name = await uploadFile(formData);
