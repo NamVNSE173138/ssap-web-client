@@ -25,17 +25,54 @@ import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
-import { format } from 'date-fns';
-import { deleteApplication, getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from '../../../components/ui/alert-dialog';;
-import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
+
+import { format } from "date-fns";
+import {
+  deleteApplication,
+  getApplicationByApplicantIdAndScholarshipId,
+} from "@/services/ApiServices/applicationService";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../../../components/ui/alert-dialog";
+import {
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "@/components/ui/alert-dialog";
+
 import AwardDialog from "./award-dialog";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
-import { FaAward, FaBook, FaCalendarAlt, FaCertificate, FaCheckCircle, FaCode, FaCreditCard, FaDollarSign, FaEdit, FaEye, FaGraduationCap, FaInfoCircle, FaMapMarkerAlt, FaMoneyBillWave, FaRegListAlt, FaTag, FaTrash, FaTrophy, FaUniversity, FaUserTie } from "react-icons/fa";
 import AwardMilestoneDialog from "./award-milestone-dialog";
 
+import {
+  FaAward,
+  FaBook,
+  FaCalendarAlt,
+  FaCertificate,
+  FaCheckCircle,
+  FaCode,
+  FaCreditCard,
+  FaDollarSign,
+  FaEdit,
+  FaEye,
+  FaGraduationCap,
+  FaInfoCircle,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaRegListAlt,
+  FaTag,
+  FaTrash,
+  FaTrophy,
+  FaUniversity,
+  FaUserTie,
+} from "react-icons/fa";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,35 +118,41 @@ const ScholarshipProgramDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        }
+      );
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
         console.log(response.data.data);
-        
+
         setAuthorized(response.data.message);
         if (user) {
-
           // <!--           const application = await getApplicationByApplicantIdAndScholarshipId(
           //             parseInt(user?.id),
           //             response.data.data.id
           //           );
           //           setExistingApplication(application.data); -->
 
-          const application = await getApplicationByApplicantIdAndScholarshipId(parseInt(user?.id), response.data.data.id);
+          const application = await getApplicationByApplicantIdAndScholarshipId(
+            parseInt(user?.id),
+            response.data.data.id
+          );
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(response.data.data.id);
           //setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
           //console.log(application.data);
+
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
-              if (new Date(milestone.fromDate) > new Date() || new Date() > new Date(milestone.toDate)) {
+              if (
+                new Date(milestone.fromDate) > new Date() ||
+                new Date() > new Date(milestone.toDate)
+              ) {
                 return;
               }
               setExtendBeforeDate(milestone.fromDate);
-            })
+            });
           }
-
         }
       } else {
         setError("Failed to fetch data");
@@ -122,14 +165,13 @@ const ScholarshipProgramDetail = () => {
   };
 
   useEffect(() => {
-
     fetchData();
   }, [id]);
 
   const fetchApplicants = async (scholarshipId: number) => {
     try {
       const response = await getApplicationsByScholarship(scholarshipId);
-      //console.log(response);
+      console.log("fetchApplicant", response);
       if (response.statusCode == 200) {
         setApplicants(response.data);
       } else {
@@ -195,7 +237,19 @@ const ScholarshipProgramDetail = () => {
       const response = await getApplicationsByScholarship(scholarshipId);
       //console.log(response);
       if (response.statusCode == 200) {
-        setWinningApplications(response.data.filter((application: any) => application.status === ApplicationStatus.Approved || application.status === ApplicationStatus.Awarded));
+        //  setWinningApplications(
+        //   response.data.filter(
+        //    (application: any) => application.status === "APPROVED"
+        //   )
+        //);
+
+        setWinningApplications(
+          response.data.filter(
+            (application: any) =>
+              application.status === ApplicationStatus.Approved ||
+              application.status === ApplicationStatus.Awarded
+          )
+        );
       } else {
         setError("Failed to get applicants");
       }
@@ -284,11 +338,10 @@ const ScholarshipProgramDetail = () => {
   };
 
   if (!data) return <Spinner size="large" />;
-  console.log("MAJOR", data?.major);
-  console.log("UNIVERSITY", data?.university);
-  console.log("iUser", user);
-  console.log("authorize", authorized);
-
+  // console.log("MAJOR", data?.major);
+  // console.log("UNIVERSITY", data?.university);
+  // console.log("iUser", user);
+  // console.log("authorize", authorized);
 
   return (
     <div>
@@ -321,140 +374,69 @@ const ScholarshipProgramDetail = () => {
           </div>
           <div className="">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={data.imageUrl || "https://github.com/shadcn.png"} />
+              <SchoolLogo
+                imageUrl={data.imageUrl || "https://github.com/shadcn.png"}
+              />
               <div>
                 <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
                   {data.name}
                 </p>
                 <p className="text-white text-3xl text-heading-5 hidden lg:block mt-[12px]">
-                  {data.description.length > 50 ? `${data.description.substring(0, 50)}...` : data.description}
+                  {data.description.length > 50
+                    ? `${data.description.substring(0, 50)}...`
+                    : data.description}
                 </p>
-
               </div>
             </div>
 
-            {/* {data.status == "FINISHED" && (
-              <div className="text-xl font-semibold mr-3">
-                This scholarship has finished
-              </div>
-            )}  */}
-            {/* <!--             {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status == "PENDING" &&
-              data.status != "FINISHED" && (
-                <div className="text-xl font-semibold mr-3">
-                  Your application is being reviewed
-                </div>
-              )} --> */}
-            {/* <!--             {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status != "APPROVED" && (
-                <div className="text-xl font-semibold mr-3">
-                  Your application to this scholarship have not been approved
-                </div>
-              )} --> */}
-            {/* <!--             {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status == "APPROVED" && (
-                <div className="text-xl font-semibold mr-3">
-                  You have won this scholarship
-                </div>
-              )} --> */}
-
-            {/* <!--             <div className="text-white text-center flex h-[50px] mt-[26px] "> -->
-<!--               {isApplicant == "Applicant"  ? ( -->
-<!--                 <> -->
-<!--                   {existingApplication && -->
-<!--                     existingApplication.length == 0 && -->
-<!--                     data.status != "FINISHED" && ( -->
-<!--                       <button -->
-<!--                         onClick={() => -->
-<!--                           navigate(`/scholarship-program/${id}/application`) -->
-<!--                         } -->
-<!--                         className=" text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]" -->
-<!--                       > -->
-<!--                         Apply now{" "} -->
-<!--                       </button> -->
-<!--                     )} -->
-<!--                   {existingApplication && existingApplication.length > 0 && ( -->
-<!--                     <> -->
-<!--                       <button -->
-<!--                         onClick={() => -->
-<!--                           navigate( -->
-<!--                             `/funder/application/${existingApplication[0].id}` -->
-<!--                           ) -->
-<!--                         } -->
-<!--                         className=" text-xl w-full bg-green-700 rounded-[25px] mr-3" -->
-<!--                       > -->
-<!--                         View applications{" "} -->
-<!--                       </button> -->
-<!--                       {existingApplication[0].status != "APPROVED" && ( --> */}
-            {/* <!--                         <AlertDialog> -->
-<!--                           <AlertDialogTrigger -->
-<!--                             className="text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center" -->
-<!--                             disabled={cancelLoading} -->
-<!--                           > -->
-<!--                             {cancelLoading ? ( -->
-<!--                               <div -->
-<!--                                 className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" -->
-<!--                                 aria-hidden="true" -->
-<!--                               ></div> -->
-<!--                             ) : ( -->
-<!--                               <span>Cancel applications </span> -->
-<!--                             )} -->
-<!--                           </AlertDialogTrigger> -->
-<!--                           <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                You wanna cancel your application?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Cancel will delete your application.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>No</AlertDialogCancel>
-                              <AlertDialogAction onClick={cancelApplication}>
-                                Yes
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      )} --> */}
-
-
             <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
-              { isApplicant == "Applicant" || !user ? (
+              {isApplicant == "Applicant" || !user ? (
                 <>
-                  {existingApplication && existingApplication.length == 0 && data.status != "FINISHED" && 
-                  new Date(data.deadline) > new Date() && (
-                    <button
-                      onClick={() => navigate(`/scholarship-program/${id}/application`)}
-                      className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
-                    >
-                      Apply now{" "}
+                  {existingApplication &&
+                    existingApplication.length == 0 &&
+                    data.status != "FINISHED" &&
+                    new Date(data.deadline) > new Date() && (
+                      <button
+                        onClick={() =>
+                          navigate(`/scholarship-program/${id}/application`)
+                        }
+                        className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
+                      >
+                        Apply now{" "}
+                      </button>
+                    )}
 
-                    </button>
-                  )}
                   {existingApplication && existingApplication.length > 0 && (
                     <>
                       <button
-                        onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
+                        onClick={() =>
+                          navigate(
+                            `/funder/application/${existingApplication[0].id}`
+                          )
+                        }
                         className="flex-1 text-xl w-full bg-green-700 rounded-[25px] mr-3"
                       >
                         View applications{" "}
                       </button>
-                      {existingApplication[0].status == ApplicationStatus.NeedExtend && (
-                        <button
-                          onClick={() => navigate(`/funder/application/${existingApplication[0].id}`)}
-                          className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
-                        >
-                          Extend Application{" "}
-                        </button>
-                      )}
+                      {existingApplication[0].status ==
+                        ApplicationStatus.NeedExtend && (
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/funder/application/${existingApplication[0].id}`
+                              )
+                            }
+                            className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                          >
+                            Extend Application{" "}
+                          </button>
+                        )}
+
                       {/*JSON.stringify(awardMilestones)*/}
-                      {existingApplication[0].status == ApplicationStatus.Submitted && 
-                        (new Date(existingApplication[0].updatedAt) < new Date(data.deadline) ) && (
+                      {existingApplication[0].status ==
+                        ApplicationStatus.Submitted &&
+                        new Date(existingApplication[0].updatedAt) <
+                        new Date(data.deadline) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
@@ -466,7 +448,7 @@ const ScholarshipProgramDetail = () => {
                                   aria-hidden="true"
                                 ></div>
                               ) : (
-                                <span>Cancel applications{" "}</span>
+                                <span>Cancel applications </span>
                               )}
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -487,44 +469,11 @@ const ScholarshipProgramDetail = () => {
                             </AlertDialogContent>
                           </AlertDialog>
                         )}
-
                     </>
                   )}
                 </>
               ) : (
                 authorized != "Unauthorized" && (
-
-                  // <!--                   <div className="flex justify-between w-full gap-10">
-                  //                     <button
-                  //                       onClick={() => navigate("")}
-                  //                       className=" text-xl w-full  bg-blue-700 rounded-[25px]"
-                  //                     >
-                  //                       Edit{" "}
-                  //                     </button>
-                  //                     <button
-                  //                       onClick={deleteScholarship}
-                  //                       className=" text-xl w-full  bg-red-900 rounded-[25px]"
-                  //                     >
-                  //                       Delete{" "}
-                  //                     </button>
-                  //                     <button
-                  //                       onClick={() => handleOpenApplicantDialog()}
-                  //                       className=" text-xl w-full bg-green-700 rounded-[25px]"
-                  //                     >
-                  //                       View applications{" "}
-                  //                     </button>
-                  //                     <button
-                  //                       onClick={() => handleAssignExpertDialog()}
-                  //                       className=" text-xl w-full bg-green-700 rounded-[25px]"
-                  //                     >
-                  //                       Assign Expert{" "}
-                  //                     </button>
-                  //                     <button
-                  //                       onClick={() => handleOpenReviewMilestoneDialog()}
-                  //                       className=" text-xl w-full bg-green-700 rounded-[25px]"
-                  //                     >
-                  //                       Review Milestones{" "} -->
-
                   <div className="flex justify-between w-full gap-3">
                     <button
                       onClick={() => navigate("")}
@@ -568,59 +517,85 @@ const ScholarshipProgramDetail = () => {
                       className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Progress
-
                     </button>
-                    
+
                   </div>
                 )
               )}
             </div>
 
-
-            {data.status == "FINISHED" &&
-              <div className="text-xl font-semibold mr-3">This scholarship has finished</div>
-            }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Submitted &&
-              data.status != "FINISHED" &&
-              <div className="text-xl font-semibold mr-3">Your application is being reviewed</div>
-            }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Rejected &&
-              <div className="text-xl font-semibold mr-3">Your application to this scholarship have not been approved</div>
-            }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.Approved &&
-              <div className="text-xl font-semibold mr-3">You have won this scholarship</div>
-            }
-            {existingApplication && existingApplication.length > 0 && existingApplication[0].status == ApplicationStatus.NeedExtend &&
-              <div className="text-xl font-semibold mr-3">You need to extend this scholarship before {formatDate(extendBeforeDate)}</div>
-            }
+            {data.status == "FINISHED" && (
+              <div className="text-xl font-semibold mr-3">
+                This scholarship has finished
+              </div>
+            )}
+            {existingApplication &&
+              existingApplication.length > 0 &&
+              existingApplication[0].status == ApplicationStatus.Submitted &&
+              data.status != "FINISHED" && (
+                <div className="text-xl font-semibold mr-3">
+                  Your application is being reviewed
+                </div>
+              )}
+            {existingApplication &&
+              existingApplication.length > 0 &&
+              existingApplication[0].status == ApplicationStatus.Rejected && (
+                <div className="text-xl font-semibold mr-3">
+                  Your application to this scholarship have not been approved
+                </div>
+              )}
+            {existingApplication &&
+              existingApplication.length > 0 &&
+              existingApplication[0].status == ApplicationStatus.Approved && (
+                <div className="text-xl font-semibold mr-3">
+                  You have won this scholarship
+                </div>
+              )}
+            {existingApplication &&
+              existingApplication.length > 0 &&
+              existingApplication[0].status == ApplicationStatus.NeedExtend && (
+                <div className="text-xl font-semibold mr-3">
+                  You need to extend this scholarship before{" "}
+                  {formatDate(extendBeforeDate)}
+                </div>
+              )}
           </div>
         </div>
       </div>
       <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
         <section className="max-w-container flex justify-center mx-auto py-6 lg:py-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 px-4 lg:px-0">
-
             <div className="flex mr-55 items-center gap-3">
               <FaMapMarkerAlt className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
                 <p className="text-sm font-semibold text-gray-500">Location</p>
-                <p className="text-lg font-semibold text-gray-800">{'VietNam'}</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {"VietNam"}
+                </p>
               </div>
             </div>
 
             <div className="flex ml-40 items-center gap-3">
               <FaGraduationCap className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Qualification</p>
-                <p className="text-lg font-semibold text-gray-800">{data.category.description || 'Not specified'}</p>
+                <p className="text-sm font-semibold text-gray-500">
+                  Qualification
+                </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.category.description || "Not specified"}
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <FaCreditCard className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Funding Type</p>
-                <p className="text-lg font-semibold text-gray-800">{'Not specified'}</p>
+                <p className="text-sm font-semibold text-gray-500">
+                  Funding Type
+                </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {"Not specified"}
+                </p>
               </div>
             </div>
 
@@ -629,7 +604,9 @@ const ScholarshipProgramDetail = () => {
               <div className="flex flex-col">
                 <p className="text-sm font-semibold text-gray-500">Deadline</p>
                 <p className="text-lg font-semibold text-gray-800">
-                  {data.deadline ? format(new Date(data.deadline), 'dd/MM/yyyy') : 'Not specified'}
+                  {data.deadline
+                    ? format(new Date(data.deadline), "dd/MM/yyyy")
+                    : "Not specified"}
                 </p>
               </div>
             </div>
@@ -637,8 +614,12 @@ const ScholarshipProgramDetail = () => {
             <div className="flex items-center gap-3">
               <FaAward className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Value of Award</p>
-                <p className="text-lg font-semibold text-gray-800">{data.scholarshipAmount || 'Not specified'}$</p>
+                <p className="text-sm font-semibold text-gray-500">
+                  Value of Award
+                </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.scholarshipAmount || "Not specified"}$
+                </p>
               </div>
             </div>
           </div>
@@ -796,7 +777,9 @@ const ScholarshipProgramDetail = () => {
                     <div className="w-full flex items-start gap-3 mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
                       <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
                       <div>
-                        <p className="text-gray-700 font-bold">Category Name:</p>
+                        <p className="text-gray-700 font-bold">
+                          Category Name:
+                        </p>
                         <p className="text-gray-600">{data.category.name}</p>
                       </div>
                     </div>
@@ -806,7 +789,9 @@ const ScholarshipProgramDetail = () => {
                       <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
                       <div>
                         <p className="text-gray-700 font-bold">Description:</p>
-                        <p className="text-gray-600">{data.category.description}</p>
+                        <p className="text-gray-600">
+                          {data.category.description}
+                        </p>
                       </div>
                     </div>
                   </AccordionDetails>
@@ -823,6 +808,7 @@ const ScholarshipProgramDetail = () => {
                       Applicable Majors & Skills
                     </h3>
                   </AccordionSummary>
+
                   <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                     {data?.major ? (
                       <Accordion key={data.major.id}>
@@ -841,13 +827,20 @@ const ScholarshipProgramDetail = () => {
                           <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
                             <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                             <div>
-                              <p className="text-gray-700 font-bold">Description:</p>
-                              <p className="text-gray-600">{data.major.description}</p>
+                              <p className="text-gray-700 font-bold">
+                                Description:
+                              </p>
+                              <p className="text-gray-600">
+                                {data.major.description}
+                              </p>
                             </div>
                           </div>
 
                           <div className="w-full">
-                            <h5 className="font-bold text-gray-700 mb-3">Skills:</h5>
+                            <h5 className="font-bold text-gray-700 mb-3">
+                              Skills:
+                            </h5>
+
                             <div>
                               {data.major.skills.map((skill) => (
                                 <Accordion key={skill.id}>
@@ -869,7 +862,9 @@ const ScholarshipProgramDetail = () => {
                                         <p className="text-gray-700 font-bold">
                                           Description:
                                         </p>
-                                        <p className="text-gray-600">{skill.description}</p>
+                                        <p className="text-gray-600">
+                                          {skill.description}
+                                        </p>
                                       </div>
                                     </div>
                                   </AccordionDetails>
@@ -898,6 +893,7 @@ const ScholarshipProgramDetail = () => {
                       Applicable University
                     </h3>
                   </AccordionSummary>
+
                   <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                     {data?.university ? (
                       <Accordion key={data.university.id}>
@@ -922,8 +918,12 @@ const ScholarshipProgramDetail = () => {
                           <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
                             <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                             <div>
-                              <p className="text-gray-700 font-bold">Description:</p>
-                              <p className="text-gray-600">{data.university.description}</p>
+                              <p className="text-gray-700 font-bold">
+                                Description:
+                              </p>
+                              <p className="text-gray-600">
+                                {data.university.description}
+                              </p>
                             </div>
                           </div>
                         </AccordionDetails>
@@ -969,15 +969,23 @@ const ScholarshipProgramDetail = () => {
                               <div className="flex items-start gap-3">
                                 <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                                 <div>
-                                  <p className="text-gray-700 font-bold">Description:</p>
-                                  <p className="text-gray-600">{certificate.description}</p>
+                                  <p className="text-gray-700 font-bold">
+                                    Description:
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {certificate.description}
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-start gap-3">
                                 <FaTag className="text-gray-400 text-xl mt-1" />
                                 <div>
-                                  <p className="text-gray-700 font-bold">Type:</p>
-                                  <p className="text-gray-600">{certificate.type}</p>
+                                  <p className="text-gray-700 font-bold">
+                                    Type:
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {certificate.type}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -985,7 +993,9 @@ const ScholarshipProgramDetail = () => {
                         </Accordion>
                       ))
                     ) : (
-                      <p className="text-gray-600 italic">No certificates required.</p>
+                      <p className="text-gray-600 italic">
+                        No certificates required.
+                      </p>
                     )}
                   </AccordionDetails>
                 </Accordion>

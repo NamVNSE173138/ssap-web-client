@@ -110,14 +110,12 @@ const Service = () => {
   const handleNextPage = async () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
-      //await fetchData();
     }
   };
 
   const handlePrevPage = async () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
-      //await fetchData();
     }
   };
 
