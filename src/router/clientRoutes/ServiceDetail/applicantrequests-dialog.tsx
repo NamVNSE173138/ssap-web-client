@@ -1,6 +1,8 @@
 import { formatDate } from "@/lib/date-formatter";
+import { NotifyApplicantServiceComment, NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
 import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
+import { RootState } from "@/store/store";
 import { AddComment } from "@mui/icons-material";
 import {
     Button,
@@ -25,6 +27,7 @@ import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
 import { HiOutlineUpload } from "react-icons/hi";
 import { IoCloudUpload } from "react-icons/io5";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 interface Applicant {
@@ -51,6 +54,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
         finished: [] as Applicant[],
     });
 
+    const user = useSelector((state: RootState) => state.token.user);
     const [commentDialogOpen, setCommentDialogOpen] = useState(false);
     const [selectedApplicantId, setSelectedApplicantId] = useState<number | null>(null);
     const [commentText, setCommentText] = useState("");
@@ -80,6 +84,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     const handleSubmitComment = async () => {
         if (selectedApplicantId === null) return;
+        if(!user) return null;
         setIsSubmitting(true);
         try {
             const existingApplicantResponse = await getRequestById(selectedApplicantId);
@@ -117,7 +122,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 notification.success({message:"Comment successfully!"})
                 setCommentDialogOpen(false);
-
+                await NotifyApplicantServiceComment(Number(requestDetail.serviceId), Number(existingApplicantResponse.data.applicantId));
                 setCommentText("");
 
             } else {

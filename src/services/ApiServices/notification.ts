@@ -59,3 +59,10 @@ export async function NotifyProviderNewRequest(applicantId: number, serviceId: n
   );
   return response.data;
 }
+
+export async function NotifyApplicantServiceComment(serviceId: number, applicantId: number) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/notify-applicant-service-comment?serviceId=${serviceId}&applicantId=${applicantId}`
+  );
+  return response.data;
+}
