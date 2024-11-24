@@ -102,6 +102,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
     const [isContractOpen, setContractOpen] = useState(false);
+    const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
 
     const fetchService = async () => {
         try {
@@ -215,7 +216,22 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         }
     };
 
+    const checkWallet = async () => {
+        try {
+          const response = await getAccountWallet(Number(user?.id));
+          if (response.statusCode === 200) {
+            setIsServiceModalOpen(true);
+          }
+        } catch (error: any) {
+          if (error.response.data.statusCode === 400) {
+            setIsWalletDialogOpen(true);
+          }
+          console.error('Error checking wallet:', error);
+        }
+      };
+
     const handleRequestNow = async () => {
+        checkWallet();
         if (!serviceData) {
             notification.error({ message: "Service data is missing. Please try again." });
             return;

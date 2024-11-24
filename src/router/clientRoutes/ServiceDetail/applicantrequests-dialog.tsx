@@ -19,6 +19,7 @@ import {
     Alert,
     CircularProgress,
 } from "@mui/material";
+import { notification } from "antd";
 import { useState, useEffect } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
@@ -114,9 +115,8 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 setApplicants(updatedApplicants);
 
-                setSnackbarMessage("Comment successfully!");
+                notification.success({message:"Comment successfully!"})
                 setCommentDialogOpen(false);
-                setSnackbarOpen(true);
 
                 setCommentText("");
 
@@ -470,13 +470,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     </Box>
                 </Box>
             </Dialog>
-
-
-            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
         </>
 
     );
