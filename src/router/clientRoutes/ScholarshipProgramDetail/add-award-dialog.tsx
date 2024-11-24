@@ -7,24 +7,49 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { createAwardMilestone } from "@/services/ApiServices/awardMilestoneService";
+import { formatDate } from "@/lib/date-formatter";
 
 interface AddAwardDialogProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
-    fetchAwards: () => void
+    fetchAwards: () => void;
+    reviewMilestones: any[];
+    awardMilestones: any[];
+    scholarship: any;
 }
 
-const awardFormSchema = z.object({
-    fromDate: z.string(),
-    toDate: z.string(),
-    scholarshipProgramId: z.number()
-}).refine(data => new Date(data.fromDate) < new Date(data.toDate), {
-    message: "The 'From' date must be earlier than the 'To' date.",
-    path: ["toDate"], // This will add the error message to `toDate`
-});
 
-const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards }: AddAwardDialogProps) => {
+
+const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awardMilestones, scholarship}: AddAwardDialogProps) => {
     const { id } = useParams<{ id: string }>();
+    
+
+    const awardFormSchema = z.object({
+        fromDate: z.string(),
+        toDate: z.string(),
+        amount: z.string().min(1, "Please enter the amount"),
+        scholarshipProgramId: z.number()
+    }).refine(data => new Date(data.fromDate) < new Date(data.toDate), {
+        message: "The 'From' date must be earlier than the 'To' date.",
+        path: ["toDate"], // This will add the error message to `toDate`
+    }).refine(data => new Date(data.fromDate) > new Date(scholarship.deadline) && new Date(data.toDate) > new Date(scholarship.deadline), {
+        message: `The 'From' and 'To' date must be later than the scholarship deadline. which is ${formatDate(scholarship.deadline)}`,
+        path: ["toDate"], // This will add the error message to `toDate`
+    }).refine(data => !reviewMilestones || reviewMilestones.length === 0 || reviewMilestones.every((review: any) => new Date(review.toDate) < new Date(data.fromDate)), {
+        message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${reviewMilestones.length > 0 ? formatDate(reviewMilestones.sort((a: any, b: any) => 
+            new Date(a.toDate).getTime() - new Date(b.toDate).getTime())[reviewMilestones.length - 1].toDate) : ""}`,
+        path: ["toDate"], // This will add the error message to `toDate`
+    }).refine(data => !awardMilestones || awardMilestones.length === 0 || awardMilestones.every((award: any) => new Date(award.toDate) < new Date(data.fromDate)), {
+        message: `The 'From' and 'To' date must be later than the all of award milestones before. which is ${awardMilestones.length > 0 ? formatDate(awardMilestones.sort((a: any, b: any) => 
+            new Date(a.toDate).getTime() - new Date(b.toDate).getTime())[awardMilestones.length - 1].toDate) : ""}`,
+        path: ["toDate"], // This will add the error message to `toDate`
+    }).refine(data => Number(data.amount) <= scholarship.scholarshipAmount - awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0) , {
+        message: `The 'Amount' must be less than or equal to the remaining amount. which is ${scholarship.scholarshipAmount -
+            awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0)}`,
+        path: ["amount"], // This will add the error message to `toDate`
+    }); 
+
     const form = useForm<z.infer<typeof awardFormSchema>>({
         resolver: zodResolver(awardFormSchema),
     });
@@ -38,7 +63,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards }: AddAwardDialogProps)
     const handleSubmit = async (values: z.infer<typeof awardFormSchema>) => {
         try {
             //console.log(values);
-            //const response = await createReviewMilestone(values);
+            const response = await createAwardMilestone(values);
             form.reset();
             //console.log("Service created successfully:", response.data);
             setIsOpen(false);
@@ -69,14 +94,22 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards }: AddAwardDialogProps)
                             <div>
                                 <Label>From Date</Label>
                                 <Input {...form.register("fromDate")} placeholder="From Date" type="datetime-local" />
-                                {form.formState.errors.fromDate && <p>{form.formState.errors.fromDate.message}</p>}
+                                {form.formState.errors.fromDate && <p className="text-red-500 text-sm">{form.formState.errors.fromDate.message}</p>}
                             </div>
                             <div>
                                 <Label>To Date</Label>
                                 <Input {...form.register("toDate")} placeholder="To Date" type="datetime-local" />
-                                {form.formState.errors.toDate && <p>{form.formState.errors.toDate.message}</p>}
+                                {form.formState.errors.toDate && <p className="text-red-500 text-sm">{form.formState.errors.toDate.message}</p>}
                             </div>
-                            <Button type="submit">Add Review Milestone</Button>
+                            <div>
+                                <Label>Amount</Label>
+                                <div className="flex items-center">
+                                    <span className="text-md text-green-500 bg-gray-100 border border-gray-200 p-2 rounded-sm">$</span>
+                                    <Input {...form.register("amount")} placeholder="Amount" type="number" />
+                                </div>
+                                {form.formState.errors.amount && <p className="text-red-500 text-sm">{form.formState.errors.amount.message}</p>}
+                            </div>
+                            <Button className="bg-sky-500 hover:bg-sky-600" type="submit">Add Award Milestone</Button>
                         </form>
                     </motion.div>
                 </div>

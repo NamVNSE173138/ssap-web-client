@@ -49,6 +49,7 @@ import AwardDialog from "./award-dialog";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
+import AwardMilestoneDialog from "./award-milestone-dialog";
 
 import {
   FaAward,
@@ -104,6 +105,9 @@ const ScholarshipProgramDetail = () => {
   const [awardMilestones, setAwardMilestones] = useState<any>(null);
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
+  const [awardMilestoneDialogOpen, setAwardMilestoneDialogOpen] =
+    useState<boolean>(false);
+
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
   const fetchData = async () => {
@@ -134,16 +138,8 @@ const ScholarshipProgramDetail = () => {
             response.data.data.id
           );
           setExistingApplication(application.data);
-          const award = await getAwardMilestoneByScholarship(
-            response.data.data.id
-          );
-          setAwardMilestones(
-            award.data.find(
-              (milestone: any) =>
-                new Date(milestone.fromDate) < new Date() &&
-                new Date(milestone.toDate) > new Date()
-            )
-          );
+          const award = await getAwardMilestoneByScholarship(response.data.data.id);
+          //setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
           //console.log(application.data);
 
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
@@ -180,6 +176,22 @@ const ScholarshipProgramDetail = () => {
         setApplicants(response.data);
       } else {
         setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAwardMilestones = async (scholarshipId: number) => {
+    try {
+      const response = await getAwardMilestoneByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setAwardMilestones(response.data);
+      } else {
+        setError("Failed to get award milestones");
       }
     } catch (error) {
       setError((error as Error).message);
@@ -269,6 +281,15 @@ const ScholarshipProgramDetail = () => {
     setLoading(true);
     if (!data) return;
     await fetchReviewMilestones(parseInt(data?.id));
+    await fetchAwardMilestones(parseInt(data?.id));
+    setLoading(false);
+  };
+
+  const handleOpenAwardMilestoneDialog = async () => {
+    setAwardMilestoneDialogOpen(true);
+    setLoading(true);
+    if (!data) return;
+    await fetchAwardMilestones(parseInt(data?.id));
     setLoading(false);
   };
 
@@ -399,23 +420,23 @@ const ScholarshipProgramDetail = () => {
                       </button>
                       {existingApplication[0].status ==
                         ApplicationStatus.NeedExtend && (
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/funder/application/${existingApplication[0].id}`
-                            )
-                          }
-                          className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
-                        >
-                          Extend Application{" "}
-                        </button>
-                      )}
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/funder/application/${existingApplication[0].id}`
+                              )
+                            }
+                            className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                          >
+                            Extend Application{" "}
+                          </button>
+                        )}
 
                       {/*JSON.stringify(awardMilestones)*/}
                       {existingApplication[0].status ==
                         ApplicationStatus.Submitted &&
                         new Date(existingApplication[0].updatedAt) <
-                          new Date(data.deadline) && (
+                        new Date(data.deadline) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
@@ -485,11 +506,19 @@ const ScholarshipProgramDetail = () => {
                       <FaCheckCircle className="mr-2" /> Review Milestones
                     </button>
                     <button
+                      onClick={() => handleOpenAwardMilestoneDialog()}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrophy className="mr-2" /> Award Milestones
+
+                    </button>
+                    <button
                       onClick={() => handleOpenAwardDialog()}
                       className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Progress
                     </button>
+
                   </div>
                 )
               )}
@@ -975,49 +1004,38 @@ const ScholarshipProgramDetail = () => {
           </div>
         </div>
       </section>
+      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen}
+        onClose={() => setApplicantDialogOpen(false)}
+        applications={applicants ?? []}
+        scholarship={data} />)}
+      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen}
+        onClose={() => setAssignExpertDialogOpen(false)}
+        resetMajor={null}
+        experts={experts ?? []} />)}
+      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen}
+        onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
+        scholarship={data}
+        awardMilestones={awardMilestones ?? []}
+        reviewMilestones={reviewMilestones ?? []}
+        fetchReviewMilestones={async () => {
+          if (!data) return;
+          await fetchReviewMilestones(parseInt(data?.id));
+        }} />)}
+      {authorized != "Unauthorized" && (<AwardDialog isOpen={awardDialogOpen}
+        setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
+        winningApplications={winningApplications ?? []} />
+      )}
+      {authorized != "Unauthorized" && data && (<AwardMilestoneDialog open={awardMilestoneDialogOpen}
+        onClose={(open: boolean) => setAwardMilestoneDialogOpen(open)}
+        awardMilestones={awardMilestones ?? []}
+        reviewMilestones={reviewMilestones ?? []}
+        scholarship={data}
+        fetchAwardMilestones={async () => {
+          if (!data) return;
+          await fetchAwardMilestones(parseInt(data?.id));
+        }} />)}
 
-      {authorized != "Unauthorized" && (
-        <AccountDialog
-          open={applicantDialogOpen}
-          onClose={() => setApplicantDialogOpen(false)}
-          applications={applicants ?? []}
-          scholarship={data}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <AssignExpertDialog
-          open={assignExpertDialogOpen}
-          onClose={() => setAssignExpertDialogOpen(false)}
-          resetMajor={null}
-          experts={experts ?? []}
-          scholarshipId={id}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <ReviewMilestoneDialog
-          open={reviewMilestoneDialogOpen}
-          onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
-          reviewMilestones={reviewMilestones ?? []}
-          fetchReviewMilestones={async () => {
-            if (!data) return;
-            await fetchReviewMilestones(parseInt(data?.id));
-          }}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <AwardDialog
-          isOpen={awardDialogOpen}
-          setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
-          winningApplications={winningApplications ?? []}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <AwardDialog
-          isOpen={awardDialogOpen}
-          setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
-          winningApplications={winningApplications ?? []}
-        />
-      )}
+
     </div>
   );
 };

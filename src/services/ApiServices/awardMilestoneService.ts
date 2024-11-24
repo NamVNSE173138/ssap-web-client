@@ -9,3 +9,12 @@ export async function getAwardMilestoneByScholarship(id: number) {
   );
   return response.data;
 }
+
+export async function createAwardMilestone(data: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/award-milestones`,
+    data,
+    ngrokSkipWarning
+  );
+  return response.data;
+}

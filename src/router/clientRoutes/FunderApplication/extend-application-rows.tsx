@@ -3,14 +3,8 @@ import { Button, IconButton, MenuItem, Select, TableCell, TableRow, TextField, T
 import { CloudUploadIcon, TrashIcon } from "lucide-react";
 
 const typeOptions = [
-    { value: 'Transcript', label: 'Transcript' },
-    { value: 'Recommendation Letter', label: 'Recommendation Letter' },
-    { value: 'Personal Statement', label: 'Personal Statement' },
-    { value: 'CV/Resume', label: 'CV/Resume' },
-    { value: 'Research Proposal', label: 'Research Proposal' },
-    { value: 'Portfolio', label: 'Portfolio' },
-    { value: 'Certification', label: 'Certification' },
-    { value: 'Exam Scores', label: 'Exam Scores' },
+    { value: 'Academic Transcript', label: 'Academic Transcript' },
+    { value: 'Financial Report', label: 'Financial Report' },
 ];
 
 const ExtendApplicationRows = ({ row, setRows, handleDeleteRow, handleInputChange }: any) => {
