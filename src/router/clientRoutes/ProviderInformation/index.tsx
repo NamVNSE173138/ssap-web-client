@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import Spinner from "@/components/Spinner";
-import { getAccountById } from "@/services/ApiServices/accountService";
+import { getAccountById, getAccountWallet } from "@/services/ApiServices/accountService";
 import { getServicesByProvider } from "@/services/ApiServices/serviceService";
 import ServiceCard from "@/components/Services/ServiceCard";
-import { FaSadTear, FaServicestack, FaStar, FaTasks, FaUser } from "react-icons/fa";
+import { FaExclamationTriangle, FaSadTear, FaServicestack, FaStar, FaTasks, FaTimes, FaUser, FaWallet } from "react-icons/fa";
 import { IoIosPaper } from "react-icons/io";
 import RequestFormModal from "../ServiceDetail/applicantRequestForm-dialog";
+import RouteNames from "@/constants/routeNames";
+import { useSelector } from "react-redux";
+import { Dialog } from "@mui/material";
 
 const ProviderInformation = () => {
   const { id } = useParams();
@@ -17,6 +20,10 @@ const ProviderInformation = () => {
   const [loading, setLoading] = useState(true);
   const [averageRatings, setAverageRatings] = useState<number>(0);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
+  const navigate = useNavigate();
+  const user = useSelector((state: any) => state.token.user);
 
   useEffect(() => {
     const fetchProviderData = async () => {
@@ -57,11 +64,35 @@ const ProviderInformation = () => {
   const totalServices = services.length;
 
   const handleRequestForm = () => {
+    checkWallet();
     setIsRequestFormOpen(true);
   };
 
   const handleCloseRequestFormModal = () => {
     setIsRequestFormOpen(false);
+  };
+
+  const handleNavigateToWallet = () => {
+    navigate(RouteNames.WALLET);
+    setIsWalletDialogOpen(false);
+  };
+
+  const handleCloseWalletDialog = () => {
+    setIsWalletDialogOpen(false);
+  };
+
+  const checkWallet = async () => {
+    try {
+      const response = await getAccountWallet(Number(user?.id));
+      if (response.statusCode === 200) {
+        setIsServiceModalOpen(true);
+      }
+    } catch (error: any) {
+      if (error.response.data.statusCode === 400) {
+        setIsWalletDialogOpen(true);
+      }
+      console.error('Error checking wallet:', error);
+    }
   };
 
   return (
@@ -153,6 +184,30 @@ const ProviderInformation = () => {
         services={services}
         handleSubmit={() => { }}
       />
+
+      <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
+        <div className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto">
+          <div className="flex items-center mb-6">
+            <FaExclamationTriangle className="text-yellow-500 text-4xl mr-4" />
+            <h3 className="text-2xl font-semibold text-gray-800">You don't have a wallet yet!</h3>
+          </div>
+          <p className="my-4 text-lg text-gray-600">
+            You need to create a wallet to add services. Do you want to go to the Wallet page?
+          </p>
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              onClick={handleCloseWalletDialog}
+              className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-all flex items-center gap-2">
+              <FaTimes className="text-gray-700" /> Cancel
+            </button>
+            <button
+              onClick={handleNavigateToWallet}
+              className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all flex items-center gap-2">
+              <FaWallet className="text-white" /> Yes, Go to Wallet
+            </button>
+          </div>
+        </div>
+      </Dialog>
     </>
 
   );
