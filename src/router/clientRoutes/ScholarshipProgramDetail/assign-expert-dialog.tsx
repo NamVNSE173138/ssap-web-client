@@ -355,7 +355,7 @@ const CustomPaper = (props: any) => (
   <Paper
     {...props}
     style={{
-      maxHeight: 200,
+      maxHeight: 150,
       overflowY: "auto",
     }}
   />
@@ -683,6 +683,7 @@ const AssignExpertDialog = ({
                 className="bg-gray-100 rounded-full"
               />
             )}
+            PaperComponent={CustomPaper}
           />
           </>
         )}
