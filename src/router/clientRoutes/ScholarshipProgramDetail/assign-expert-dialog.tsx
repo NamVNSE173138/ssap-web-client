@@ -598,7 +598,7 @@ const AssignExpertDialog = ({
           /* Step 3: Expert Selection */
           <>
             <h3 className="font-semibold text-gray-700">Select an Expert:</h3>
-            <StyledAutocomplete
+            {/* <StyledAutocomplete
             sx={{ height: "200px" }}
               options={experts}
               getOptionLabel={(option: any) => option.username}
@@ -620,7 +620,70 @@ const AssignExpertDialog = ({
                 />
               )}
               PaperComponent={CustomPaper}
-            />
+            /> */}
+                       <StyledAutocomplete
+            sx={{ height: "200px" }}
+            open={open}
+            disableCloseOnSelect
+            options={experts}
+            value={selectedExpert}
+            onChange={(event, newValue) => setSelectedExpert(newValue)}
+            getOptionLabel={(option: any) => option.username}
+            renderOption={(props, option: any) => {
+              const { key, ...optionProps } = props;
+              return (
+                <Box
+                  key={key}
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...optionProps}
+                >
+                  <div className="flex w-full justify-between items-center">
+                    <div className="flex items-center gap-5">
+                      <img
+                        loading="lazy"
+                        width="35"
+                        height="35"
+                        className="rounded-full border-2 border-gray-200"
+                        src={
+                          option.avatarUrl ?? "https://github.com/shadcn.png"
+                        }
+                        alt=""
+                      />
+                      <span className="font-semibold text-lg">
+                        {option.username}
+                      </span>
+                    </div>
+                    <a
+                      href={`/profile/${option.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <h2 className="flex items-center text-base font-semibold text-gray-800 bg-gradient-to-r from-cyan-500 to-blue-500 p-1 rounded-lg shadow-xl">
+                        <FaUsers className="mr-3 text-white text-2xl" />
+                        <span className="text-white">View Profile</span>
+                      </h2>
+                    </a>
+                  </div>
+                </Box>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search Experts"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                className="bg-gray-100 rounded-full"
+              />
+            )}
+          />
           </>
         )}
       </div>
