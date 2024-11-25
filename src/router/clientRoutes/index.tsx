@@ -32,6 +32,7 @@ import PaymentResult from "./Payment";
 import ProtectedRoute from "../ProtectedRoute";
 import RoleNames from "@/constants/roleNames";
 import ApplicantProfile from "./applicant/ApplicantProfile";
+import TrackingExpert from "./TrackingExpert";
 
 const publicRoutes: RouteObject[] = [
     {
@@ -161,6 +162,10 @@ const privateRoutes: RouteObject[] = [
     {
         path: RouteNames.HISTORY,
         element: <History />,
+    },
+    {
+        path: RouteNames.TRACKING_EXPERT,
+        element: <TrackingExpert />,
     },
     {
         path: RouteNames.PROVIDER_LIST,
