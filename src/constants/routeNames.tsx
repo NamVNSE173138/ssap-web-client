@@ -39,6 +39,7 @@ const RouteNames = {
   HISTORY: "/history",
   PROVIDER_LIST: "/provider-list",
   APPLICANT_PROFILE: "/applicant/profile",
+  APPLICATION_REVIEW: "/experts/application-review"
 };
 
 export default RouteNames;
