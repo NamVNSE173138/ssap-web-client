@@ -39,10 +39,9 @@ const RouteNames = {
   HISTORY: "/history",
   PROVIDER_LIST: "/provider-list",
   APPLICANT_PROFILE: "/applicant/profile",
-  TRACKING_EXPERT: "/funder/tracking-expert"
+  TRACKING_EXPERT: "/funder/tracking-expert",
   FUNDER_PROFILE: "/funder/profile",
   PROVIDER_PROFILE: "/provider/profile",
-
 };
 
 export default RouteNames;
