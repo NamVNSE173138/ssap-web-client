@@ -15,7 +15,7 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
         setSelectedTab(newValue);
     };
     const winnersApplications = applications.filter((application: any) => application.status == "Approved"
-     || application.status == "Awarded"
+     || application.status == "Awarded" || application.status == "NeedExtend" 
      || (new Date(application.updatedAt) > new Date(scholarship.deadline))
      );
 

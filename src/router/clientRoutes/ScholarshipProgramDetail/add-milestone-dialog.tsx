@@ -13,12 +13,22 @@ import { RootState } from "@/store/store";
 import { createReviewMilestone } from "@/services/ApiServices/reviewMilestoneService";
 import { useParams } from "react-router-dom";
 import { FaTimes, FaCalendarAlt, FaPen, FaCheckCircle } from 'react-icons/fa';
+import Select from "react-select";
+import { formatDate } from "@/lib/date-formatter";
 
 interface AddMilestoneModalProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
-    fetchMilestones: () => void
+    fetchMilestones: () => void;
+    scholarship: any;
+    awardMilestones: any[];
+    reviewMilestones: any[];
 }
+
+
+
+const AddMilestoneModal = ({ isOpen, setIsOpen, scholarship,awardMilestones, reviewMilestones, fetchMilestones }: AddMilestoneModalProps) => {
+    const { id } = useParams<{ id: string }>();
 
 const milestoneFormSchema = z.object({
     description: z.string().min(1, "Please enter a description"),
@@ -28,10 +38,17 @@ const milestoneFormSchema = z.object({
 }).refine(data => new Date(data.fromDate) < new Date(data.toDate), {
     message: "The 'From' date must be earlier than the 'To' date.",
     path: ["toDate"],
-});
+}).refine(data => new Date(data.fromDate) > new Date(scholarship.deadline) && new Date(data.toDate) > new Date(scholarship.deadline), {
+        message: "The 'From' and 'To' date must be later than the scholarship deadline. which is " + formatDate(scholarship.deadline),
+        path: ["toDate"], // This will add the error message to `toDate`
+    }).refine(data => !reviewMilestones || reviewMilestones.length === 0 || reviewMilestones.every((review: any) => new Date(review.toDate) < new Date(data.fromDate)), {
+        message: "The 'From' and 'To' date must be later then all of review milestones before.",
+        path: ["toDate"], // This will add the error message to `toDate`
+    }).refine(data => !awardMilestones || awardMilestones.length === 0 || awardMilestones.every((award: any) => new Date(award.fromDate) > new Date(data.toDate)), {
+        message: "The 'From' and 'To' date must be earlier than all of award milestones.",
+        path: ["toDate"], // This will add the error message to `toDate`
+    });
 
-const AddMilestoneModal = ({ isOpen, setIsOpen, fetchMilestones }: AddMilestoneModalProps) => {
-    const { id } = useParams<{ id: string }>();
     const form = useForm<z.infer<typeof milestoneFormSchema>>({
         resolver: zodResolver(milestoneFormSchema),
     });
@@ -56,6 +73,11 @@ const AddMilestoneModal = ({ isOpen, setIsOpen, fetchMilestones }: AddMilestoneM
         }
     };
 
+    const descriptionOptions = [
+        { value: 'Application Review', label: 'Application Review'}, 
+        { value: 'Interview', label: 'Interview'},
+    ]
+
     return (
         <AnimatePresence>
   {isOpen && (
@@ -72,7 +94,7 @@ const AddMilestoneModal = ({ isOpen, setIsOpen, fetchMilestones }: AddMilestoneM
             <FaPen className="text-sky-500" />
             Add New Review Milestone
           </h3>
-          <button onClick={() => setIsOpen(false)} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
+          <button onClick={() => {setIsOpen(false); form.reset()}} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
             <FaTimes />
           </button>
         </div>
@@ -81,11 +103,18 @@ const AddMilestoneModal = ({ isOpen, setIsOpen, fetchMilestones }: AddMilestoneM
           <div className="flex flex-col">
             <Label className="mb-3">Description</Label>
             <div className="relative">
-              <Input
-                {...form.register("description")}
-                placeholder="Enter description"
-                className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-              />
+                <div className="">
+                  <Select
+                    options={descriptionOptions}
+                    value={
+                        descriptionOptions.find(
+                            (category: any) => category.value === form.getValues("description")
+                        )}
+                    onChange={(option:any) => form.setValue("description", option.value)}
+                    placeholder="Select scholarship type"
+                    className="col-span-2 text-center"
+                  />
+                </div>
               <FaPen className="absolute left-3 top-3 text-gray-500" />
             </div>
             {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
