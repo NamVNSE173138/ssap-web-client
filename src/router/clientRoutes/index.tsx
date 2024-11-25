@@ -35,6 +35,7 @@ import ApplicantProfile from "./applicant/ApplicantProfile";
 import TrackingExpert from "./TrackingExpert";
 import FunderProfile from "./funder/FunderProfile";
 import ProviderProfile from "./provider/ProviderProfile";
+import ApplicationReview from "./Expert";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -166,12 +167,12 @@ const privateRoutes: RouteObject[] = [
     element: <History />,
   },
   {
-    path: RouteNames.TRACKING_EXPERT,
-    element: <TrackingExpert />,
-  },
-  {
     path: RouteNames.PROVIDER_LIST,
     element: <ProviderList />,
+  },
+  {
+    path: RouteNames.APPLICATION_REVIEW,
+    element: <ApplicationReview />,
   },
 ];
 
@@ -208,14 +209,6 @@ const clientRoutes: RouteObject[] = [
   {
     element: <ProtectedRoute allowedRoles={[RoleNames.APPLICANT]} />,
     children: [...applicantRoutes],
-  },
-  {
-    element: <ProtectedRoute allowedRoles={[RoleNames.FUNDER]} />,
-    children: [...funderRoutes],
-  },
-  {
-    element: <ProtectedRoute allowedRoles={[RoleNames.PROVIDER]} />,
-    children: [...providerRoutes],
   },
   ...publicRoutes,
 ];
