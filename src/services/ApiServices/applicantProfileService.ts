@@ -5,54 +5,57 @@ const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 export async function getAllApplicantProfiles() {
   const response = await axios.get(
     `${BASE_URL}/api/applicants`,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
 
 export async function getApplicantProfileById(id: number) {
-
   const response = await axios.get(
     `${BASE_URL}/api/applicants/${id}`,
-    ngrokSkipWarning
+    ngrokSkipWarning,
+  );
+  return response.data;
+}
+
+export async function getApplicantProfileDetails(id: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/applicants/${id}/profile`,
+    ngrokSkipWarning,
   );
   return response.data;
 }
 
 export async function getAllApplicantProfilesByApplicant(id: number) {
-
   const response = await axios.get(
     `${BASE_URL}/api/applicants/${id}`,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
 
 export async function addApplicantProfile(profileData: any) {
-
   const response = await axios.post(
     `${BASE_URL}/api/applicants`,
     profileData,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
 
 export async function updateApplicantProfile(id: number, profileData: any) {
-
   const response = await axios.put(
     `${BASE_URL}/api/applicants/${id}`,
     profileData,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
 
 export async function deleteApplicantProfile(id: number) {
-
   const response = await axios.delete(
     `${BASE_URL}/api/applicants/${id}`,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
@@ -61,28 +64,32 @@ export async function exportApplicantProfileToPdf(id: number) {
   const response = await axios.get(
     `${BASE_URL}/api/applicants/${id}/profile/pdf`,
     {
-      responseType: 'blob',
-      ...ngrokSkipWarning
-    }
+      responseType: "blob",
+      ...ngrokSkipWarning,
+    },
   );
   return response.data;
 }
 
-
-export async function updateApplicantSkills(applicantId: number, skillData: any[]) {
+export async function updateApplicantSkills(
+  applicantId: number,
+  skillData: any[],
+) {
   const response = await axios.put(
     `${BASE_URL}/api/applicants/${applicantId}/skills`,
     skillData,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
 
-export async function deleteApplicantSkill(applicantId: number, skillId: number) {
+export async function deleteApplicantSkill(
+  applicantId: number,
+  skillId: number,
+) {
   const response = await axios.delete(
     `${BASE_URL}/api/applicants/${applicantId}/skills/${skillId}`,
-    ngrokSkipWarning
+    ngrokSkipWarning,
   );
   return response.data;
 }
-
