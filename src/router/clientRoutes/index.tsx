@@ -188,6 +188,10 @@ const funderRoutes: RouteObject[] = [
     path: RouteNames.FUNDER_PROFILE,
     element: <FunderProfile />,
   },
+  {
+    path: RouteNames.TRACKING_EXPERT,
+    element: <TrackingExpert />,
+  },
 ];
 
 const providerRoutes: RouteObject[] = [
@@ -210,6 +214,15 @@ const clientRoutes: RouteObject[] = [
     element: <ProtectedRoute allowedRoles={[RoleNames.APPLICANT]} />,
     children: [...applicantRoutes],
   },
+  {
+    element: <ProtectedRoute allowedRoles={[RoleNames.FUNDER]} />,
+    children: [...funderRoutes],
+  },
+  {
+    element: <ProtectedRoute allowedRoles={[RoleNames.PROVIDER]} />,
+    children: [...providerRoutes],
+  },
+
   ...publicRoutes,
 ];
 
