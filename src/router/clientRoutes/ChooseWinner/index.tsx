@@ -135,8 +135,8 @@ const statusColor = {
       for (let row of selectedRows) {
         await SendNotification({
           topic: row.applicantId.toString(),
-          link: "string",
-          title: "string",
+          link: `/funder/application/${row.id}`,
+          title: "Your application has been approved",
           body: `Your application for ${data?.name} has been approved.`,
         });
       }
