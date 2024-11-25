@@ -118,7 +118,7 @@ const ScholarshipProgramDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.statusCode === 200) {
@@ -135,10 +135,12 @@ const ScholarshipProgramDetail = () => {
 
           const application = await getApplicationByApplicantIdAndScholarshipId(
             parseInt(user?.id),
-            response.data.data.id
+            response.data.data.id,
           );
           setExistingApplication(application.data);
-          const award = await getAwardMilestoneByScholarship(response.data.data.id);
+          const award = await getAwardMilestoneByScholarship(
+            response.data.data.id,
+          );
           //setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
           //console.log(application.data);
 
@@ -324,7 +326,7 @@ const ScholarshipProgramDetail = () => {
   const deleteScholarship = async () => {
     try {
       const response = await axios.delete(
-        `${BASE_URL}/api/scholarship-programs/${id}`
+        `${BASE_URL}/api/scholarship-programs/${id}`,
       );
       if (response.data.statusCode == 200) {
         setData(response.data.data);
@@ -413,7 +415,7 @@ const ScholarshipProgramDetail = () => {
                       <button
                         onClick={() =>
                           navigate(
-                            `/funder/application/${existingApplication[0].id}`
+                            `/funder/application/${existingApplication[0].id}`,
                           )
                         }
                         className="flex-1 text-xl w-full bg-green-700 rounded-[25px] mr-3"
@@ -422,23 +424,23 @@ const ScholarshipProgramDetail = () => {
                       </button>
                       {existingApplication[0].status ==
                         ApplicationStatus.NeedExtend && (
-                          <button
-                            onClick={() =>
-                              navigate(
-                                `/funder/application/${existingApplication[0].id}`
-                              )
-                            }
-                            className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
-                          >
-                            Extend Application{" "}
-                          </button>
-                        )}
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/funder/application/${existingApplication[0].id}`,
+                            )
+                          }
+                          className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                        >
+                          Extend Application{" "}
+                        </button>
+                      )}
 
                       {/*JSON.stringify(awardMilestones)*/}
                       {existingApplication[0].status ==
                         ApplicationStatus.Submitted &&
                         new Date(existingApplication[0].updatedAt) <
-                        new Date(data.deadline) && (
+                          new Date(data.deadline) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
@@ -512,7 +514,6 @@ const ScholarshipProgramDetail = () => {
                       className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Milestones
-
                     </button>
                     <button
                       onClick={() => handleOpenAwardDialog()}
@@ -520,7 +521,6 @@ const ScholarshipProgramDetail = () => {
                     >
                       <FaTrophy className="mr-2" /> Award Progress
                     </button>
-
                   </div>
                 )
               )}
@@ -627,7 +627,6 @@ const ScholarshipProgramDetail = () => {
           </div>
         </section>
       </div>
-
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-6 px-4 sm:px-6 xl:px-0">
@@ -1006,38 +1005,56 @@ const ScholarshipProgramDetail = () => {
           </div>
         </div>
       </section>
-      {authorized != "Unauthorized" && (<AccountDialog open={applicantDialogOpen}
-        onClose={() => setApplicantDialogOpen(false)}
-        applications={applicants ?? []}
-        scholarship={data} />)}
-      {authorized != "Unauthorized" && (<AssignExpertDialog open={assignExpertDialogOpen}
-        onClose={() => setAssignExpertDialogOpen(false)}
-        resetMajor={null}
-        experts={experts ?? []} />)}
-      {authorized != "Unauthorized" && (<ReviewMilestoneDialog open={reviewMilestoneDialogOpen}
-        onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
-        scholarship={data}
-        awardMilestones={awardMilestones ?? []}
-        reviewMilestones={reviewMilestones ?? []}
-        fetchReviewMilestones={async () => {
-          if (!data) return;
-          await fetchReviewMilestones(parseInt(data?.id));
-        }} />)}
-      {authorized != "Unauthorized" && (<AwardDialog isOpen={awardDialogOpen}
-        setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
-        winningApplications={winningApplications ?? []} />
+      {authorized != "Unauthorized" && (
+        <AccountDialog
+          open={applicantDialogOpen}
+          onClose={() => setApplicantDialogOpen(false)}
+          applications={applicants ?? []}
+          scholarship={data}
+        />
       )}
-      {authorized != "Unauthorized" && data && (<AwardMilestoneDialog open={awardMilestoneDialogOpen}
-        onClose={(open: boolean) => setAwardMilestoneDialogOpen(open)}
-        awardMilestones={awardMilestones ?? []}
-        reviewMilestones={reviewMilestones ?? []}
-        scholarship={data}
-        fetchAwardMilestones={async () => {
-          if (!data) return;
-          await fetchAwardMilestones(parseInt(data?.id));
-        }} />)}
-
-
+      {authorized != "Unauthorized" && (
+        <AssignExpertDialog
+          open={assignExpertDialogOpen}
+          onClose={() => setAssignExpertDialogOpen(false)}
+          resetMajor={null}
+          experts={experts ?? []}
+          scholarshipId={id}
+        />
+      )}
+      {authorized != "Unauthorized" && (
+        <ReviewMilestoneDialog
+          open={reviewMilestoneDialogOpen}
+          onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
+          scholarship={data}
+          awardMilestones={awardMilestones ?? []}
+          reviewMilestones={reviewMilestones ?? []}
+          fetchReviewMilestones={async () => {
+            if (!data) return;
+            await fetchReviewMilestones(parseInt(data?.id));
+          }}
+        />
+      )}
+      {authorized != "Unauthorized" && (
+        <AwardDialog
+          isOpen={awardDialogOpen}
+          setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
+          winningApplications={winningApplications ?? []}
+        />
+      )}
+      {authorized != "Unauthorized" && data && (
+        <AwardMilestoneDialog
+          open={awardMilestoneDialogOpen}
+          onClose={(open: boolean) => setAwardMilestoneDialogOpen(open)}
+          awardMilestones={awardMilestones ?? []}
+          reviewMilestones={reviewMilestones ?? []}
+          scholarship={data}
+          fetchAwardMilestones={async () => {
+            if (!data) return;
+            await fetchAwardMilestones(parseInt(data?.id));
+          }}
+        />
+      )}
     </div>
   );
 };
