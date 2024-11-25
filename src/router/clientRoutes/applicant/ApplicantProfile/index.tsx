@@ -18,6 +18,8 @@ import ApplicationHistorySection from "./components/ApplicationHistorySection";
 import RequestHistorySection from "./components/RequestHistorySection";
 import { getApplicantProfileDetails } from "@/services/ApiServices/applicantProfileService";
 import { RootState } from "@/store/store";
+import { Spinner } from "@radix-ui/themes";
+import ToastMessage from "@/components/ToastMessage";
 
 const ApplicantProfile = () => {
   const dispatch = useDispatch();
@@ -26,8 +28,10 @@ const ApplicantProfile = () => {
   const user = useSelector((state: RootState) => state.token.user);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("account");
-  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("account");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [profile, setProfile] = useState({
     avatar: "/placeholder.svg?height=96&width=96",
     firstName: "John",
@@ -48,15 +52,19 @@ const ApplicantProfile = () => {
     certificates: ["Certified Web Developer", "React Specialist Certification"],
   });
 
-  // useEffect(() => {
-  //   // Fetch or load user profile data here
-  //   // For now, it's statically initialized above
-  //   // const fetchProfile = async () => {
-  //   //   const data = await getApplicantProfileDetails(Number(user?.id));
-  //   //   setProfile(data);
-  //   // };
-  //   // fetchProfile();
-  // }, [user?.id]);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getApplicantProfileDetails(Number(user?.id));
+        setProfile(data);
+        console.log(profile);
+      } catch (error) {
+        setError("Failed to get profile details");
+      }
+    };
+
+    fetchProfile();
+  }, [user?.id]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -106,6 +114,10 @@ const ApplicantProfile = () => {
   };
 
   const handleExportPDF = () => {};
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -181,20 +193,20 @@ const ApplicantProfile = () => {
           setIsEditing={setIsEditing}
         />
 
-        <ProfileSection
-          avatarPreview={avatarPreview}
-          profile={profile}
-          setProfile={setProfile}
-          handleAvatarChange={handleAvatarChange}
-          handleInputChange={handleInputChange}
-          handleListChange={handleListChange}
-          handleAddField={handleAddField}
-          handleRemoveField={handleRemoveField}
-          isEditing={isEditing}
-          handleSaveClick={handleSaveClick}
-          handleEditClick={handleEditClick}
-          handleExportPDF={handleExportPDF}
-        />
+        {/* <ProfileSection */}
+        {/*   avatarPreview={avatarPreview} */}
+        {/*   profile={profile} */}
+        {/*   setProfile={setProfile} */}
+        {/*   handleAvatarChange={handleAvatarChange} */}
+        {/*   handleInputChange={handleInputChange} */}
+        {/*   handleListChange={handleListChange} */}
+        {/*   handleAddField={handleAddField} */}
+        {/*   handleRemoveField={handleRemoveField} */}
+        {/*   isEditing={isEditing} */}
+        {/*   handleSaveClick={handleSaveClick} */}
+        {/*   handleEditClick={handleEditClick} */}
+        {/*   handleExportPDF={handleExportPDF} */}
+        {/* /> */}
 
         <ApplicationHistorySection />
 
