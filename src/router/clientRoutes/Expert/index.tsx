@@ -216,7 +216,6 @@ const ApprovalList = () => {
         </div>
       )}
 
-      {/* Modal */}
       <Dialog.Root
         open={!!selectedItem}
         onOpenChange={() => setSelectedItem(null)}
