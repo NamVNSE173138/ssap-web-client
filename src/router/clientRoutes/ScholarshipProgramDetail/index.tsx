@@ -247,7 +247,9 @@ const ScholarshipProgramDetail = () => {
           response.data.filter(
             (application: any) =>
               application.status === ApplicationStatus.Approved ||
-              application.status === ApplicationStatus.Awarded
+              application.status === ApplicationStatus.Awarded ||
+              application.status === ApplicationStatus.NeedExtend ||
+              new Date(application.updatedAt) > new Date(data?.deadline)
           )
         );
       } else {
