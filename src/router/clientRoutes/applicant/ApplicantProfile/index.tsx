@@ -1,239 +1,211 @@
-import React, { useState } from "react";
-import * as Avatar from "@radix-ui/react-avatar";
-import { Upload } from "lucide-react";
 import * as Tabs from "@radix-ui/react-tabs";
-import Sidebar from "./components/Sidebar"; // Assuming Sidebar is already created
-import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
+import {
+  AiOutlineUser,
+  AiOutlineLock,
+  AiOutlineProfile,
+  AiOutlineAudit,
+  AiOutlineClockCircle,
+} from "react-icons/ai";
+import { BiLogOutCircle } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import ProfileSection from "./components/ProfileSection";
+import AccountSection from "./components/AccountSection";
+import AuthSection from "./components/AuthSection";
+import LogoutSection from "./components/LogoutSection";
+import ApplicationHistorySection from "./components/ApplicationHistorySection";
+import RequestHistorySection from "./components/RequestHistorySection";
+import { getApplicantProfileDetails } from "@/services/ApiServices/applicantProfileService";
+import { RootState } from "@/store/store";
 
-interface ApplicantProfile {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  dateOfBirth: string;
-  address: string;
-  gender: string; // Added gender field
-  avatarUrl: string;
-}
+const ApplicantProfile = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-export default function ApplicantProfile() {
-  const { toast } = useToast();
-  const [profile, setProfile] = useState<ApplicantProfile>({
-    id: 1,
+  const user = useSelector((state: RootState) => state.token.user);
+
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("account");
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState({
+    avatar: "/placeholder.svg?height=96&width=96",
     firstName: "John",
     lastName: "Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "123-456-7890",
-    dateOfBirth: "1990-01-01",
-    address: "123 Main St, Anytown, USA",
-    gender: "Male", // Added gender default value
-    avatarUrl: "/placeholder.svg?height=100&width=100",
+    username: "@johndoe",
+    email: "johndoe@example.com",
+    phone: "+1 (555) 123-4567",
+    address: "123 Main St, Anytown, USA 12345",
+    gender: "Male",
+    birthdate: "January 1, 1990",
+    nationality: "Vietnam",
+    ethnicity: "Asian",
+    skills: ["JavaScript", "React", "Node.js"],
+    achievements: ["Dean's List, 4 semesters", "Hackathon 2021 Winner"],
+    experience: [
+      "Software Developer Intern at Tech Solutions Inc., Summer 2021",
+    ],
+    certificates: ["Certified Web Developer", "React Specialist Certification"],
   });
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // useEffect(() => {
+  //   // Fetch or load user profile data here
+  //   // For now, it's statically initialized above
+  //   // const fetchProfile = async () => {
+  //   //   const data = await getApplicantProfileDetails(Number(user?.id));
+  //   //   setProfile(data);
+  //   // };
+  //   // fetchProfile();
+  // }, [user?.id]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = () => {
+    setIsEditing(false);
+    console.log(profile);
+    // Save the updated profile data (API call to save changes)
+    // Example: api.saveProfile(profileData);
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProfile((prev) => ({
-        ...prev,
-        avatarUrl: URL.createObjectURL(file),
-      }));
+      const fileUrl = URL.createObjectURL(file);
+      setAvatarPreview(fileUrl);
     }
   };
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast({
-        title: "Profile updated",
-        description: "Your profile was successfully updated.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfile({ ...profile, [name]: value });
   };
+
+  const handleAddField = (type: "skills" | "achievements") => {
+    setProfile({ ...profile, [type]: [...profile[type], ""] });
+  };
+
+  const handleRemoveField = (
+    type: "skills" | "achievements" | "experience" | "certificates",
+    index: number,
+  ) => {
+    const updatedList = [...profile[type]];
+    updatedList.splice(index, 1);
+    setProfile({ ...profile, [type]: updatedList });
+  };
+
+  const handleListChange = (
+    type: "skills" | "achievements" | "experience" | "certificates",
+    index: number,
+    value: string,
+  ) => {
+    const updatedList = [...profile[type]];
+    updatedList[index] = value;
+    setProfile({ ...profile, [type]: updatedList });
+  };
+
+  const handleExportPDF = () => {};
 
   return (
-    <div className="flex">
-      {/* Sidebar Navigation */}
-      <Sidebar className="w-1/4" />
+    <div className="w-full max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <Tabs.Root
+        defaultValue={activeTab}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex flex-col"
+      >
+        {/* Tab List */}
+        <Tabs.List
+          aria-label="Applicant Profile Tabs"
+          className="flex space-x-4 border-b border-gray-200 pb-2"
+        >
+          {/* Account Info Tab */}
+          <Tabs.Trigger
+            value="account"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <AiOutlineUser className="text-lg" />
+            My Account
+          </Tabs.Trigger>
 
-      <div className="w-3/4 p-8">
-        {/* Tabs for Sections */}
-        <Tabs.Root defaultValue="account" orientation="vertical">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold">Applicant Profile</h1>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
+          {/* Applicant Profile Tab */}
+          <Tabs.Trigger
+            value="profile"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <AiOutlineProfile className="text-lg" />
+            Applicant Profile
+          </Tabs.Trigger>
 
-          <Tabs.List className="mb-6 flex space-x-4">
-            <Tabs.Trigger
-              value="account"
-              className="px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-200 cursor-pointer"
-            >
-              Account
-            </Tabs.Trigger>
-            <Tabs.Trigger
-              value="profile"
-              className="px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-200 cursor-pointer"
-            >
-              Profile
-            </Tabs.Trigger>
-          </Tabs.List>
+          {/* Application History Tab */}
+          <Tabs.Trigger
+            value="application-history"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <AiOutlineAudit className="text-lg" />
+            Application History
+          </Tabs.Trigger>
 
-          {/* Tab Panels */}
-          <Tabs.TabsContent value="account">
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <Avatar.Root className="w-24 h-24 rounded-full overflow-hidden">
-                  <Avatar.Image
-                    src={profile.avatarUrl}
-                    alt={`${profile.firstName} ${profile.lastName}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600 text-xl font-semibold">
-                    {profile.firstName[0]}
-                    {profile.lastName[0]}
-                  </Avatar.Fallback>
-                </Avatar.Root>
-                <label
-                  htmlFor="avatar"
-                  className="cursor-pointer text-sm text-blue-500 hover:text-blue-700 flex items-center space-x-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  <span>Change Avatar</span>
-                  <input
-                    type="file"
-                    id="avatar"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                  />
-                </label>
-              </div>
+          {/* Request History Tab */}
+          <Tabs.Trigger
+            value="request-history"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <AiOutlineClockCircle className="text-lg" />
+            Request History
+          </Tabs.Trigger>
 
-              <div className="space-y-4">
-                {/* Name */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={profile.firstName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
+          {/* Authentication Tab */}
+          <Tabs.Trigger
+            value="password"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <AiOutlineLock className="text-lg" />
+            Authentication
+          </Tabs.Trigger>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={profile.lastName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
+          {/* Logout Tab */}
+          <Tabs.Trigger
+            value="logout"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <BiLogOutCircle className="text-lg" />
+            Log Out
+          </Tabs.Trigger>
+        </Tabs.List>
 
-                {/* Gender */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Gender
-                  </label>
-                  <input
-                    type="text"
-                    name="gender"
-                    value={profile.gender}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
+        {/* Tab Panels */}
+        <AccountSection
+          setActiveTab={setActiveTab}
+          setIsEditing={setIsEditing}
+        />
 
-                {/* Email and Phone Number */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={profile.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
+        <ProfileSection
+          avatarPreview={avatarPreview}
+          profile={profile}
+          setProfile={setProfile}
+          handleAvatarChange={handleAvatarChange}
+          handleInputChange={handleInputChange}
+          handleListChange={handleListChange}
+          handleAddField={handleAddField}
+          handleRemoveField={handleRemoveField}
+          isEditing={isEditing}
+          handleSaveClick={handleSaveClick}
+          handleEditClick={handleEditClick}
+          handleExportPDF={handleExportPDF}
+        />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Phone Number
-                    </label>
-                    <input
-                      type="text"
-                      name="phoneNumber"
-                      value={profile.phoneNumber}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
+        <ApplicationHistorySection />
 
-                {/* Address */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={profile.address}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-              </div>
-            </div>
-          </Tabs.TabsContent>
+        <RequestHistorySection />
 
-          {/* Profile Tab Content */}
-          <Tabs.TabsContent value="profile">
-            <div className="space-y-6">
-              {/* Additional Profile Information (Skills, Achievements, etc.) */}
-              {/* You can add more sections here if needed */}
-            </div>
-          </Tabs.TabsContent>
-        </Tabs.Root>
-      </div>
+        <AuthSection />
+
+        <LogoutSection dispatch={dispatch} navigate={navigate} />
+      </Tabs.Root>
     </div>
   );
-}
+};
+
+export default ApplicantProfile;

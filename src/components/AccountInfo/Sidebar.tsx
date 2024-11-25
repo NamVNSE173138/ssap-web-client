@@ -10,6 +10,7 @@ import {
   AiOutlineBarChart,
   AiOutlineBook,
   AiOutlineHistory,
+  AiOutlineContacts
 } from "react-icons/ai";
 import { BiLogOutCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,7 +41,9 @@ const ListItem = ({ Icon, text, link }: ListItemProps) => {
   return (
     <li
       onClick={handleClick}
-      className={`lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-[#179d8f] group rounded-lg ${isActive && "bg-[#1eb2a6] text-black"}`}
+      className={`lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-[#179d8f] group rounded-lg ${
+        isActive && "bg-[#1eb2a6] text-black"
+      }`}
     >
       <div className="flex justify-start items-center gap-8">
         <Icon
@@ -66,6 +69,7 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.token.user);
   const id = user?.id;
+  const role = user?.role;
 
   const fetchSkills = async () => {
     try {
@@ -95,6 +99,13 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
     { Icon: AiOutlineBook, text: "Activity", link: RouteNames.ACTIVITY },
     { Icon: AiOutlineHistory, text: "History", link: RouteNames.HISTORY },
   ];
+  if (role === "Funder") {
+    listItems.push({
+      Icon: AiOutlineContacts,
+      text: "Expert",
+      link: RouteNames.TRACKING_EXPERT,
+    });
+  }
 
   // const handleLogout = () => {
   //     // dispatch(clearAuth());
