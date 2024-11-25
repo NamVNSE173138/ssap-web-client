@@ -1,12 +1,36 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-01.png';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { deleteToken } from 'firebase/messaging';
+import { messaging } from '@/services/firebase';
+import { removeToken, removeUser } from '@/reducers/tokenSlice';
+import RouteNames from '@/constants/routeNames';
+import ScreenSpinner from '@/components/ScreenSpinner';
 
-const DropdownUser = () => {
+const DropdownUser = ({ setIsLoading }: any) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const user = useSelector((state: RootState) => state.token.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+const handleLogout = () => {
+    setIsLoading(true);
+    deleteToken(messaging);
+    setTimeout(() => {
+      dispatch(removeToken());
+      dispatch(removeUser());
+      localStorage.removeItem('token');
+      navigate(RouteNames.HOME);
+      setIsLoading(false);
+    }, 500);
+  };
 
   return (
+    <>
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -15,9 +39,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {user?.username}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{user?.role}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
@@ -46,7 +70,7 @@ const DropdownUser = () => {
         <div
           className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         >
-          <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
+          {/*<ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
                 to="/profile"
@@ -118,8 +142,8 @@ const DropdownUser = () => {
                 Account Settings
               </Link>
             </li>
-          </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          </ul>*/}
+          <button onClick={handleLogout} className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
             <svg
               className="fill-current"
               width="22"
@@ -143,6 +167,8 @@ const DropdownUser = () => {
       )}
       {/* <!-- Dropdown End --> */}
     </ClickOutside>
+
+    </>
   );
 };
 

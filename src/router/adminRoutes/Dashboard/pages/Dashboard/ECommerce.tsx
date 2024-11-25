@@ -1,17 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartThree from '../../components/Charts/ChartThree';
 import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import TableOne from '../../components/Tables/TableOne';
+import { getAllAccounts } from '@/services/ApiServices/accountService';
+import ScreenSpinner from '@/components/ScreenSpinner';
 
 const ECommerce: React.FC = () => {
+    
+    const [accounts, setAccounts] = useState<any>(null);
+    const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+
+   const fetchAccounts = async () => {
+        try {
+            const response = await getAllAccounts();
+            //console.log(response);
+            setAccounts(response);
+        } catch (error) {
+            setError((error as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    }; 
+
+    useEffect(() => {
+        fetchAccounts();
+    }, []);
+
   return (
     <>
+      {error && <p className="text-red-500">{error}</p>}
+      {loading && <ScreenSpinner/>}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        
-        <CardDataStats title="Total Users" total="3.456" rate="0.95%" levelDown>
+        {accounts && <CardDataStats title="Total Users" total={accounts.length} rate="" levelDown={false} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -33,7 +57,7 @@ const ECommerce: React.FC = () => {
               fill=""
             />
           </svg>
-        </CardDataStats>
+        </CardDataStats>}
       </div>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">

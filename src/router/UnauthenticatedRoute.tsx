@@ -15,11 +15,11 @@ const UnauthenticatedRoute = () => {
     const isAuthPath = location.pathname === '/login' || location.pathname === '/register';
 
     return (
-        (isAuthenticated && isAuthPath) ? (
+        /*(isAuthenticated && isAuthPath) ? (
             <Navigate to="/" replace />
-        ) : (
+        ) : (*/
             <Outlet />
-        )
+        //)
     );
 };
 

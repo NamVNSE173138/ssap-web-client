@@ -101,11 +101,12 @@ const { errors } = formState;
       setIsLoading(false);
       dispatch(setToken(user.token));
       const userInfo = parseJwt(user.token);
+      //alert(userInfo.role==RoleNames.ADMIN);
       dispatch(setUser(userInfo));
       if(userInfo.role === RoleNames.ADMIN) {
         navigate("/admin");
       }
-      else if(userInfo.role === RoleNames.FUNDER) {
+      /*else if(userInfo.role === RoleNames.FUNDER) {
         navigate("/funder");
       }
       else if(userInfo.role === RoleNames.PROVIDER) {
@@ -113,7 +114,7 @@ const { errors } = formState;
       }
       else if(userInfo.role === RoleNames.EXPERT) {
         navigate("/expert");
-      }
+      }*/
       else {
         navigate("/");
       }
@@ -318,7 +319,7 @@ const { errors } = formState;
 
               <div className="w-full flex flex-col space-y-3 items-center">
                 <button
-                  // onClick={handleLoginSubmit}
+                  //onClick={handleLoginSubmit}
                   type="submit"
                   className="w-[60%] text-lg text-white  bg-blue-500 rounded-3xl py-3"
                 >
