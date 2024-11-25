@@ -8,7 +8,7 @@ import {
   AiOutlineClockCircle,
 } from "react-icons/ai";
 import { BiLogOutCircle } from "react-icons/bi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProfileSection from "./components/ProfileSection";
 import AccountSection from "./components/AccountSection";
@@ -16,10 +16,14 @@ import AuthSection from "./components/AuthSection";
 import LogoutSection from "./components/LogoutSection";
 import ApplicationHistorySection from "./components/ApplicationHistorySection";
 import RequestHistorySection from "./components/RequestHistorySection";
+import { getApplicantProfileDetails } from "@/services/ApiServices/applicantProfileService";
+import { RootState } from "@/store/store";
 
 const ApplicantProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const user = useSelector((state: RootState) => state.token.user);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("account");
@@ -44,10 +48,15 @@ const ApplicantProfile = () => {
     certificates: ["Certified Web Developer", "React Specialist Certification"],
   });
 
-  useEffect(() => {
-    // Fetch or load user profile data here
-    // For now, it's statically initialized above
-  }, []);
+  // useEffect(() => {
+  //   // Fetch or load user profile data here
+  //   // For now, it's statically initialized above
+  //   // const fetchProfile = async () => {
+  //   //   const data = await getApplicantProfileDetails(Number(user?.id));
+  //   //   setProfile(data);
+  //   // };
+  //   // fetchProfile();
+  // }, [user?.id]);
 
   const handleEditClick = () => {
     setIsEditing(true);
