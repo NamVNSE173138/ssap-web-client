@@ -42,6 +42,7 @@ const RouteNames = {
   TRACKING_EXPERT: "/funder/tracking-expert",
   FUNDER_PROFILE: "/funder/profile",
   PROVIDER_PROFILE: "/provider/profile",
+  APPLICATION_REVIEW: "/experts/application-review"
 };
 
 export default RouteNames;
