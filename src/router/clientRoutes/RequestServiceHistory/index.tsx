@@ -4,11 +4,12 @@ import { RootState } from "@/store/store";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { List, Tabs, Tab } from "@mui/material";
-import { FaTasks, FaCalendarAlt, FaChevronRight, FaSearch, FaInfoCircle } from "react-icons/fa"; // Added icons for search and info
+import { FaTasks, FaCalendarAlt, FaChevronRight, FaSearch, FaInfoCircle, FaUserTie, FaChevronUp, FaSpinner, FaChevronDown, FaListOl, FaClipboardList, FaHashtag, FaClock, FaExclamationTriangle, FaCheckCircle } from "react-icons/fa"; // Added icons for search and info
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
 import ServiceDetails from "../ServiceDetail";
 import ApplicantRequestInfo from "../ApplicantRequestInformation";
+import { getAllAccounts } from "@/services/ApiServices/accountService";
 
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -23,90 +24,149 @@ const RequestHistory = () => {
     });
     const [activeTab, setActiveTab] = useState<number>(0);
     const [openServiceDetail, setOpenServiceDetail] = useState({ open: "", id: 0 });
+    const [providers, setProviders] = useState<any[]>([]);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [expandedProvider, setExpandedProvider] = useState<number | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [tabValue, setTabValue] = useState(0);
 
-    const fetchRequests = async () => {
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+    };
+
+    const fetchRequestsAndProviders = async () => {
+        setLoading(true);
         try {
             if (!user) return;
 
-            const response = await getRequestsByApplicantId(parseInt(user?.id));
-            if (response.statusCode === 200) {
-                const requests = response.data;
-                setApplicants({
-                    pending: requests.filter((req: any) => req.status === "Pending"),
-                    finished: requests.filter((req: any) => req.status === "Finished"),
-                });
+            const [accountsResponse, requestsResponse] = await Promise.all([
+                getAllAccounts(),
+                getRequestsByApplicantId(parseInt(user.id)),
+            ]);
+
+            const providerAccounts = accountsResponse.filter(
+                (account: any) => account.roleName === "Provider"
+            );
+            setProviders(providerAccounts);
+
+            if (requestsResponse.statusCode === 200) {
+                setRequests(requestsResponse.data);
+                console.log(accountsResponse)
+                console.log(requestsResponse)
             } else {
-                setApplicants({
-                    pending: [],
-                    finished: [],
-                });
+                setRequests([]);
             }
         } catch (error) {
-            console.error("Failed to fetch requests", error);
+            console.error("Failed to fetch data", error);
+            setError("Failed to fetch data.");
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchRequests();
+        fetchRequestsAndProviders();
     }, [user]);
 
-    const renderApplicants = (requests: any) => {
-        return (
-            <div className="space-y-6 bg-gray-100 p-6 rounded-lg shadow-xl">
-                <div className="flex items-center justify-center mb-6">
-                    <h2 className="flex items-center text-4xl font-bold text-white bg-gradient-to-r from-cyan-500 to-blue-500 p-4 rounded-lg shadow-xl">
-                        <FaTasks className="mr-3 text-white text-2xl" />
-                        <span className="text-white">Request History</span>
-                    </h2>
-                </div>
-
-                <div className="flex justify-center">
-                    <div className="space-y-4 w-4/5">
-                        <div className="flex justify-between items-center p-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-lg shadow-md">
-                            <p className="w-1/12 text-center">No.</p>
-                            <p className="w-4/12 ml-5">Service Name</p>
-                            <p className="w-4/12 text-center">Request Date</p>
-                            <p className="w-4/12 text-right">Action</p>
-                        </div>
-
-                        {requests.map((request: any, index: any) => (
-                            <div
-                                key={request.id}
-                                className="flex justify-between items-center p-4 bg-white border hover:shadow-lg rounded-lg transition-transform transform hover:scale-105 duration-200"
-                            >
-                                <p className="w-1/12 text-center text-gray-800">{index + 1}</p>
-                                <Link
-                                    to={`/services-history/services/${request.requestDetails[0].serviceId}`}
-                                    className="w-4/12 ml-5 text-blue-600 font-medium underline hover:text-blue-800 transition"
-                                >
-                                    <FaChevronRight className="mr-2 inline" />
-                                    {request.service.name}
-                                </Link>
-                                <p className="w-4/12 text-center text-gray-600">
-                                    <FaCalendarAlt className="inline mr-2" />
-                                    {formatDate(request.requestDate)}
-                                </p>
-                                <Link
-                                    to={`/services-history/request/${request.id}`}
-                                    className="w-4/12 text-right text-blue-600 font-medium underline hover:text-blue-800 transition"
-                                >
-                                    <FaInfoCircle className="inline mr-2" />
-                                    View Request
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        );
+    const toggleProvider = (id: number) => {
+        setExpandedProvider(expandedProvider === id ? null : id);
     };
 
-    if (openServiceDetail.open === "ServiceDetail") {
-        return <ServiceDetails showButtons={false} serviceId={{ id: openServiceDetail.id }} />;
+    const filteredRequests = tabValue === 0
+        ? requests.filter(request => request.status === "Pending")
+        : requests.filter(request => request.status === "Finished");
+
+    const renderProviderServices = (providerId: number) => {
+        const providerRequests = filteredRequests.filter(
+            (req) => req.service?.providerId === providerId
+        );
+
+        if (providerRequests.length === 0) {
+            return (
+                <p className="text-gray-500 italic text-center">
+                    No request to this Provider's Service
+                </p>
+            );
+        }
+
+        return providerRequests.map((request, index) => (
+            <div className="flex justify-center" key={request.id}>
+
+                <p className="w-1/12 text-center text-gray-800 flex items-center justify-center">
+                    <FaHashtag className="mr-1 text-cyan-500" /> {index + 1}
+                </p>
+
+                <Link
+                    to={`/services-history/services/${request.requestDetails[0].serviceId}`}
+                    className="w-4/12 ml-5 text-blue-600 font-medium underline hover:text-blue-800 transition flex items-center"
+                >
+                    <FaChevronRight className="mr-2 text-cyan-500" /> {request.service.name}
+                </Link>
+
+                <p className="w-4/12 text-center text-gray-600 flex items-center justify-center">
+                    <FaClock className="mr-2 text-green-500" />
+                    {formatDate(request.requestDate)}
+                </p>
+
+                <Link
+                    to={`/services-history/request/${request.id}`}
+                    className="w-4/12 text-right text-blue-600 font-medium underline hover:text-blue-800 transition flex items-center justify-end"
+                >
+                    <FaInfoCircle className="mr-2 text-indigo-500" />
+                    View Request
+                </Link>
+            </div>
+        ));
+    };
+
+
+    const renderProviders = () => (
+        <div className="space-y-6 bg-gradient-to-r from-blue-100 to-grey-300 p-8 rounded-lg shadow-2xl">
+            <div className="space-y-4">
+                {providers.map((provider) => (
+                    <div
+                        key={provider.id}
+                        className="bg-white border-2 border-gray-200 rounded-lg shadow-md overflow-hidden transition-all transform hover:scale-105 hover:shadow-xl"
+                    >
+                        <div
+                            className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-400 to-blue-200 text-white font-semibold cursor-pointer hover:shadow-lg transition-shadow"
+                            onClick={() => toggleProvider(provider.id)}
+                        >
+                            <div className="flex items-center space-x-3">
+                                <FaUserTie className="text-2xl text-white" />
+                                <span className="text-lg font-medium">{provider.username}</span>
+                            </div>
+                            {expandedProvider === provider.id ? (
+                                <FaChevronUp className="text-xl text-white" />
+                            ) : (
+                                <FaChevronDown className="text-xl text-white" />
+                            )}
+                        </div>
+
+                        {expandedProvider === provider.id && (
+                            <div className="p-4 space-y-3 bg-gray-50 rounded-b-lg transition-all transform">
+                                <div className="text-lg font-medium text-gray-700">
+                                    {renderProviderServices(provider.id)}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center p-10">
+                <FaSpinner className="animate-spin text-3xl text-blue-500" />
+            </div>
+        );
     }
 
-    if (openServiceDetail.open === "RequestDetail") {
-        return <ApplicantRequestInfo showButtons={true} requestId={{ id: openServiceDetail.id }} />;
+    if (error) {
+        return <p className="text-center text-red-500 mt-6">{error}</p>;
     }
 
     return (
@@ -117,11 +177,15 @@ const RequestHistory = () => {
                     <Breadcrumb>
                         <BreadcrumbList className="text-white">
                             <BreadcrumbItem>
-                                <Link to="/" className="md:text-xl text-lg">Home</Link>
+                                <Link to="/" className="md:text-xl text-lg">
+                                    Home
+                                </Link>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem>
-                                <Link to="/services" className="md:text-xl text-lg">Services</Link>
+                                <Link to="/services" className="md:text-xl text-lg">
+                                    Services
+                                </Link>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem>
@@ -132,38 +196,70 @@ const RequestHistory = () => {
                 </div>
             </div>
 
-            <div className="p-10 bg-white rounded-lg shadow-xl">
-                <Tabs
-                    value={activeTab}
-                    onChange={(e, newValue) => setActiveTab(newValue)}
-                    centered
-                    indicatorColor="primary"
-                    textColor="inherit"
+            <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                aria-label="Request Status"
+                centered
+                indicatorColor="primary"
+                textColor="primary"
+                className="mb-6 mt-7"
+                sx={{
+                    "& .MuiTabs-indicator": {
+                        backgroundColor: "#4F8EF7",
+                        borderRadius: "16px",
+                        height: "4px",
+                    },
+                }}
+            >
+                <Tab
+                    label={
+                        <div className="flex items-center space-x-2">
+                            <FaClipboardList className="text-xl text-blue-500" />
+                            <span className="text-lg font-semibold">Pending</span>
+                        </div>
+                    }
                     sx={{
-                        "& .MuiTab-root": {
-                            fontFamily: "'Roboto', sans-serif",
-                            fontWeight: 'bold',
-                            padding: '10px 20px',
-                            borderRadius: '10px',
-                            transition: 'background-color 0.3s',
-                        },
-                        "& .Mui-selected": {
-                            backgroundColor: 'rgba(255, 223, 186, 0.8)',
-                            color: '#444',
-                        },
-                        "& .MuiTab-root:not(.Mui-selected):hover": {
-                            backgroundColor: 'rgba(255, 223, 186, 0.6)',
+                        textTransform: "none",
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                        color: "#1D4ED8",
+                        borderRadius: "10px",
+                        padding: "10px 20px",
+                        '&:hover': { backgroundColor: '#E0F7FF' },
+                        '&.Mui-selected': {
+                            backgroundColor: '#A7C7FF',
+                            color: '#1D4ED8',
+                            transform: "scale(1.1)",
                         },
                     }}
-                >
-                    <Tab label="Pending" />
-                    <Tab label="Finished" />
-                </Tabs>
+                />
+                <Tab
+                    label={
+                        <div className="flex items-center space-x-2">
+                            <FaCheckCircle className="text-xl text-green-500" />
+                            <span className="text-lg font-semibold">Finished</span>
+                        </div>
+                    }
+                    sx={{
+                        textTransform: "none",
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                        color: "#10B981",
+                        borderRadius: "10px",
+                        padding: "10px 20px",
+                        '&:hover': { backgroundColor: '#D1FAE5' },
+                        '&.Mui-selected': {
+                            backgroundColor: '#A7F3D0',
+                            color: '#10B981',
+                            transform: "scale(1.1)",
+                        },
+                    }}
+                />
+            </Tabs>
 
-                <List sx={{ maxHeight: 400, overflow: "auto", p: 2 }}>
-                    {activeTab === 0 && renderApplicants(applicants.pending)}
-                    {activeTab === 1 && renderApplicants(applicants.finished)}
-                </List>
+            <div className="p-10 bg-white rounded-lg shadow-xl">
+                {renderProviders()}
             </div>
         </div>
     );
