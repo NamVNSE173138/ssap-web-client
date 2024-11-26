@@ -571,6 +571,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                                     <th className="p-4 text-left font-semibold">Applicant Name</th>
                                                     <th className="p-4 text-left font-semibold">Rating</th>
                                                     <th className="p-4 text-left font-semibold">Comment</th>
+                                                    <th className="p-4 text-left font-semibold">Date</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -587,6 +588,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                                             ))}
                                                         </td>
                                                         <td className="p-4">{feedback.content}</td>
+                                                        <td className="p-4">{new Date(feedback.feedbackDate).toLocaleDateString()}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -598,11 +600,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                                                     <th className="p-4 text-left font-semibold">Applicant Name</th>
                                                     <th className="p-4 text-left font-semibold">Rating</th>
                                                     <th className="p-4 text-left font-semibold">Comment</th>
+                                                    <th className="p-4 text-left font-semibold">Date</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td colSpan={3} className="p-4 text-center text-gray-600">
+                                                    <td colSpan={4} className="p-4 text-center text-gray-600">
                                                         No feedback available.
                                                     </td>
                                                 </tr>

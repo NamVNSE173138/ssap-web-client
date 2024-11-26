@@ -17,8 +17,11 @@ import { Input } from "@/components/ui/input";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
 import { IoPerson, IoWallet } from "react-icons/io5";
-import { FaSadTear } from "react-icons/fa";
+import { FaCreditCard, FaSadTear } from "react-icons/fa";
 import { current } from "@reduxjs/toolkit";
+import SubscriptionModal from "../Activity/SubscriptionModal";
+import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
+import { notification } from "antd";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -34,12 +37,22 @@ const Service = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [numberOfServicesLeft, setNumberOfServicesLeft] = useState(20);
+
+  const fetchSubscriptions = () => {
+    console.log("Fetching subscriptions...");
+  };
+
+  const handleBuySubscriptionClick = () => {
+    setIsSubscriptionModalOpen(true);
+  };
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      let response:any = {};
-      if(user?.role === "Provider"){
+      let response: any = {};
+      if (user?.role === "Provider") {
         response = await axios.get(`${BASE_URL}/api/services/by-provider-paginated/${user.id}`, {
           params: {
             pageIndex: currentPage,
@@ -47,16 +60,16 @@ const Service = () => {
           },
         });
         console.log(response);
-        
+
       }
-      else{
-      response = await axios.get(`${BASE_URL}/api/services/paginated`, {
-        params: {
-          pageIndex: currentPage,
-          pageSize: pageSize,
-        },
-      });
-    }
+      else {
+        response = await axios.get(`${BASE_URL}/api/services/paginated`, {
+          params: {
+            pageIndex: currentPage,
+            pageSize: pageSize,
+          },
+        });
+      }
       if (response.data.statusCode === 200) {
         const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
         if (user?.role === "Provider") {
@@ -64,7 +77,7 @@ const Service = () => {
           console.log(filteredServices)
           setData(filteredServices);
           setTotalPages(response.data.data.totalPages);
-//          setTotalPages(Math.ceil(filteredServices.length / pageSize));
+          //          setTotalPages(Math.ceil(filteredServices.length / pageSize));
 
         } else {
           setData(activeServices);
@@ -128,7 +141,14 @@ const Service = () => {
   };
 
   const handleAddServiceClick = () => {
-    checkWallet();
+    if (numberOfServicesLeft === 0) {
+      notification.success({
+        message: "You need to buy a subscription to add services",
+        description: "Please buy a subscription to continue adding services.",
+      });
+    } else {
+      checkWallet();
+    }
   };
 
   const handleCloseWalletDialog = () => {
@@ -182,14 +202,37 @@ const Service = () => {
           )}
         </div>
 
+        {/* New section displaying the number of services left */}
+        <div className="ml-4 text-white text-lg">
+          <span>Number of services created left: </span>
+          <span className="font-semibold">{numberOfServicesLeft}</span>
+        </div>
+
         {user?.role === "Provider" && (
-          <button
-            onClick={handleAddServiceClick}
-            className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
-          >
-            <IoIosAddCircleOutline className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
-            <p className="text-xl text-blue-600 font-semibold">Add Service</p>
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={handleAddServiceClick}
+              className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95 ${numberOfServicesLeft === 0 ? 'bg-gray-400 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+              disabled={numberOfServicesLeft === 0}
+              title={numberOfServicesLeft === 0 ? "You need to buy a subscription to add service" : ""}
+            >
+              <IoIosAddCircleOutline
+                className={`text-3xl ${numberOfServicesLeft === 0 ? 'text-gray-500' : 'text-blue-500'} transition-all duration-300 ease-in-out transform hover:scale-110`}
+              />
+              <p className={`text-xl ${numberOfServicesLeft === 0 ? 'text-gray-500' : 'text-blue-600'} font-semibold`}>
+                Add Service
+              </p>
+            </button>
+
+
+            <button
+              onClick={handleBuySubscriptionClick}
+              className="flex justify-center items-center hover:bg-green-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
+            >
+              <FaCreditCard className="text-3xl text-green-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl text-green-600 font-semibold">Buy Subscription</p>
+            </button>
+          </div>
         )}
 
         {user?.role === "Applicant" && (
@@ -219,9 +262,9 @@ const Service = () => {
           <p>{error}</p>
         ) : data.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-16">
-              <FaSadTear className="text-blue-500 text-6xl mb-4" />
-              <p className="text-gray-700 text-lg">No services found.</p>
-            </div>
+            <FaSadTear className="text-blue-500 text-6xl mb-4" />
+            <p className="text-gray-700 text-lg">No services found.</p>
+          </div>
         ) : (
           filteredData.map((service) => (
             <li key={service.id}>
@@ -260,6 +303,13 @@ const Service = () => {
         setIsOpen={setIsServiceModalOpen}
         fetchServices={() => { setCurrentPage(1); fetchData(); }}
       />
+
+      <MultiStepSubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        setIsOpen={setIsSubscriptionModalOpen}
+        fetchSubscriptions={fetchSubscriptions}
+      />
+
 
       <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
         <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
