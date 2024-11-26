@@ -43,10 +43,14 @@ const ServiceCard = (service: ServiceType) => {
     <Link to={`/services/${service.id}`}>
       <div className="flex flex-col justify-between gap-6 p-4 rounded-xl shadow-md bg-gradient-to-r from-blue-50 to-indigo-100 cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:translate-y-1">
         <div>
-          <h2 className="text-lg md:text-xl mt-5 font-medium text-gray-800 hover:text-indigo-600 transition-colors">
+          <h2
+            className="text-lg md:text-xl mt-5 font-medium text-gray-800 hover:text-indigo-600 transition-colors truncate"
+            style={{ maxWidth: 'calc(100% - 0px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             {service?.name}
           </h2>
         </div>
+
         <Separator orientation="horizontal" className="border-gray-300 my-3" />
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
@@ -70,8 +74,11 @@ const ServiceCard = (service: ServiceType) => {
               color="#2D3748"
               className="transition-all transform hover:scale-125 hover:animate-ping ease-in-out duration-300"
             />
-            <p className="text-gray-800">{service.description || "No description Specified"}</p>
+            <p className="text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap max-w-full" style={{ maxWidth: '50ch' }}>
+              {service.description || "No description Specified"}
+            </p>
           </div>
+
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaDollarSign
               color="#2D3748"

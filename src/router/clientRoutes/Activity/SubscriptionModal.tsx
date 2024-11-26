@@ -5,8 +5,8 @@ import { RootState } from "@/store/store";
 import { Dialog } from "@mui/material";
 import { notification } from "antd";
 import React, { useState } from "react";
-import { FaCreditCard, FaExclamationTriangle, FaTimes, FaWallet } from "react-icons/fa";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { FaClock, FaCreditCard, FaDollarSign, FaExclamationTriangle, FaInfoCircle, FaRocket, FaTag, FaTimes, FaWallet } from "react-icons/fa";
+import { IoIosApps, IoIosArrowDown, IoIosArrowUp, IoMdClose } from "react-icons/io";
 import { IoCashOutline, IoInformationCircle, IoWalletOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -134,25 +134,21 @@ const MultiStepSubscriptionModal = ({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-xl w-11/12 max-w-3xl p-6 relative">
+            <div className="bg-white rounded-xl shadow-xl w-11/12 max-w-3xl p-6 relative transition-all duration-300">
                 <button
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors"
                     onClick={() => setIsOpen(false)}
                     aria-label="Close Modal"
                 >
-                    ✕
+                    <IoMdClose className="text-2xl" />
                 </button>
 
                 <div className="flex items-center justify-center mb-6">
-                    <div
-                        className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"}`}
-                    >
+                    <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"}`}>
                         1
                     </div>
                     <div className="h-1 w-20 bg-gray-300 mx-2"></div>
-                    <div
-                        className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 2 ? "bg-blue-600" : "bg-gray-300"}`}
-                    >
+                    <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 2 ? "bg-blue-600" : "bg-gray-300"}`}>
                         2
                     </div>
                 </div>
@@ -167,13 +163,16 @@ const MultiStepSubscriptionModal = ({
                             {subscriptionData.map((sub) => (
                                 <div
                                     key={sub.id}
-                                    className={`border rounded-lg shadow-sm p-4 hover:shadow-md transition ${selectedSubscription === sub.id ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
+                                    className={`border rounded-lg shadow-sm p-4 hover:shadow-xl transition-all cursor-pointer ${selectedSubscription === sub.id ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
                                     onClick={() => setSelectedSubscription(sub.id)}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <span className="font-medium text-gray-800">{sub.name}</span>
+                                        <span className="font-medium text-gray-800 flex items-center gap-2">
+                                            <FaRocket className="text-blue-500" />
+                                            {sub.name}
+                                        </span>
                                         <button
-                                            className="text-blue-500 hover:text-blue-700"
+                                            className="text-blue-500 hover:text-blue-700 transition-colors"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setSelectedSubscription(sub.id);
@@ -182,32 +181,33 @@ const MultiStepSubscriptionModal = ({
                                             {selectedSubscription === sub.id ? <IoIosArrowUp /> : <IoIosArrowDown />}
                                         </button>
                                     </div>
+
                                     {selectedSubscription === sub.id && (
                                         <div className="mt-3 text-gray-600 space-y-2">
-                                            <p>
+                                            <p className="flex items-center gap-2">
                                                 <strong>Description:</strong> {sub.description}
                                             </p>
-                                            <p>
+                                            <p className="flex items-center gap-2">
                                                 <strong>Amount:</strong> {sub.amount}
                                             </p>
-                                            <p>
+                                            <p className="flex items-center gap-2">
                                                 <strong>Number of Services:</strong> {sub.numberOfServices}
                                             </p>
-                                            <p>
+                                            <p className="flex items-center gap-2">
                                                 <strong>Valid for:</strong> {sub.validMonths} months
                                             </p>
                                         </div>
                                     )}
                                 </div>
                             ))}
+
                         </div>
                         <div className="flex justify-between mt-6">
                             <div />
                             <button
                                 className={`px-6 py-2 rounded-lg font-medium ${selectedSubscription
-                                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    }`}
+                                    ? "bg-blue-600 text-white hover:bg-blue-700 transition-all"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
                                 onClick={handleNext}
                                 disabled={!selectedSubscription}
                             >
@@ -222,21 +222,31 @@ const MultiStepSubscriptionModal = ({
                             Checkout
                         </h2>
                         <div className="border rounded-lg p-4 bg-blue-50">
-                            <p>
+                            <p className="flex items-center gap-2">
+                                <FaTag className="text-blue-500" />
                                 <strong>Name:</strong> {selectedPlan?.name}
                             </p>
-                            <p>
+
+                            <p className="flex items-center gap-2">
+                                <FaInfoCircle className="text-gray-600" />
                                 <strong>Description:</strong> {selectedPlan?.description}
                             </p>
-                            <p>
+
+                            <p className="flex items-center gap-2">
+                                <FaDollarSign className="text-green-500" />
                                 <strong>Amount:</strong> {selectedPlan?.amount}
                             </p>
-                            <p>
+
+                            <p className="flex items-center gap-2">
+                                <IoIosApps className="text-purple-500" />
                                 <strong>Number of Services:</strong> {selectedPlan?.numberOfServices}
                             </p>
-                            <p>
+
+                            <p className="flex items-center gap-2">
+                                <FaClock className="text-orange-500" />
                                 <strong>Valid for:</strong> {selectedPlan?.validMonths} months
                             </p>
+
                         </div>
 
                         <div className="mt-6">
@@ -246,10 +256,7 @@ const MultiStepSubscriptionModal = ({
                             <div className="flex gap-4">
                                 <div
                                     onClick={() => setPaymentMethod("Wallet")}
-                                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition ${paymentMethod === "Wallet"
-                                        ? "border-blue-500 bg-blue-100"
-                                        : "border-gray-300 hover:bg-gray-100"
-                                        }`}
+                                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet" ? "border-blue-500 bg-blue-100" : "border-gray-300 hover:bg-gray-100"}`}
                                 >
                                     <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
                                         <IoWalletOutline className="text-2xl" />
@@ -259,10 +266,7 @@ const MultiStepSubscriptionModal = ({
 
                                 <div
                                     onClick={() => setPaymentMethod("Cash")}
-                                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition ${paymentMethod === "Cash"
-                                        ? "border-green-500 bg-green-100"
-                                        : "border-gray-300 hover:bg-gray-100"
-                                        }`}
+                                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash" ? "border-green-500 bg-green-100" : "border-gray-300 hover:bg-gray-100"}`}
                                 >
                                     <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
                                         <IoCashOutline className="text-2xl" />
@@ -297,8 +301,7 @@ const MultiStepSubscriptionModal = ({
                             <button
                                 className={`px-6 py-2 rounded-lg font-medium ${paymentMethod
                                     ? "bg-blue-600 text-white hover:bg-blue-700"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    }`}
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
                                 onClick={handleCheckout}
                                 disabled={loading || !paymentMethod}
                             >
@@ -312,7 +315,6 @@ const MultiStepSubscriptionModal = ({
                                 )}
                             </button>
                         </div>
-
                     </>
                 )}
             </div>
@@ -329,12 +331,14 @@ const MultiStepSubscriptionModal = ({
                     <div className="flex justify-end gap-4 mt-6">
                         <button
                             onClick={handleCloseWalletDialog}
-                            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-all flex items-center gap-2">
+                            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-all flex items-center gap-2"
+                        >
                             <FaTimes className="text-gray-700" /> Cancel
                         </button>
                         <button
                             onClick={handleNavigateToWallet}
-                            className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all flex items-center gap-2">
+                            className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all flex items-center gap-2"
+                        >
                             <FaWallet className="text-white" /> Yes, Go to Wallet
                         </button>
                     </div>
@@ -346,6 +350,7 @@ const MultiStepSubscriptionModal = ({
                 onClose={() => setContractOpen(false)}
             />
         </div>
+
 
     );
 };
