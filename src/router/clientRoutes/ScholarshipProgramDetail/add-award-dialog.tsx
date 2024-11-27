@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createAwardMilestone } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate } from "@/lib/date-formatter";
+import Select, { MultiValue } from "react-select";
+import QuillEditor from "@/components/Quill/QuillEditor";
 
 interface AddAwardDialogProps {
     isOpen: boolean;
@@ -23,7 +25,14 @@ interface AddAwardDialogProps {
 
 const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awardMilestones, scholarship}: AddAwardDialogProps) => {
     const { id } = useParams<{ id: string }>();
-    
+
+    const [quillValue, setQuillValue] = useState('');
+    const [fileType, setFileType] = useState<any>([]);
+
+     const typeOptions = [
+        { value: 'Academic Transcript', label: 'Academic Transcript' },
+        { value: 'Financial Report', label: 'Financial Report' },
+    ];   
 
     const awardFormSchema = z.object({
         fromDate: z.string(),
@@ -82,7 +91,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.5 }}
                         transition={{ duration: 0.2 }}
-                        className="bg-white p-6 rounded-lg shadow-lg w-1/2"
+                        className="bg-white max-h-[500px] overflow-y-scroll p-6 rounded-lg shadow-lg w-1/2"
                     >
                         <div className="flex justify-between items-center">
                             <h3 className="text-2xl mb-10">Add New Award Milestone</h3>
@@ -102,6 +111,18 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                 {form.formState.errors.toDate && <p className="text-red-500 text-sm">{form.formState.errors.toDate.message}</p>}
                             </div>
                             <div>
+                                <Label>Required File Types</Label>
+                                    <Select
+                                        isMulti
+                                        options={typeOptions}
+                                        value={fileType}
+                                        onChange={setFileType}
+                                        
+                                        className="col-span-2"
+                                      />                                
+                                {form.formState.errors.amount && <p className="text-red-500 text-sm">{form.formState.errors.amount.message}</p>}
+                            </div>
+                            <div>
                                 <Label>Amount</Label>
                                 <div className="flex items-center">
                                     <span className="text-md text-green-500 bg-gray-100 border border-gray-200 p-2 rounded-sm">$</span>
@@ -109,6 +130,15 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                 </div>
                                 {form.formState.errors.amount && <p className="text-red-500 text-sm">{form.formState.errors.amount.message}</p>}
                             </div>
+                            
+
+                                {/*<div>
+                                    <h1>Submission Guide</h1>
+                                    <QuillEditor value={quillValue} onChange={(value: string) => {
+                                        //console.log(value);
+                                        setQuillValue(value)
+                                    }} />
+                                </div>*/}
                             <Button className="bg-sky-500 hover:bg-sky-600" type="submit">Add Award Milestone</Button>
                         </form>
                     </motion.div>
