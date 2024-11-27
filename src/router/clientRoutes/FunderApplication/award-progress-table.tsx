@@ -1,11 +1,28 @@
 import { formatDate } from "@/lib/date-formatter"
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material"
-import { InsertDriveFile as FileIcon } from "@mui/icons-material";
+import { Accordion, AccordionDetails, AccordionSummary, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material"
+import { ArrowDropDownCircleRounded, InsertDriveFile as FileIcon } from "@mui/icons-material";
 import { TimerIcon } from "lucide-react"
 import { BsDashCircle } from "react-icons/bs"
 import ApplicationStatus from "@/constants/applicationStatus";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown";
+import { Link } from "react-router-dom";
+import { Tag } from "antd";
 
 const AwardProgressTable = ({ awardMilestone, application }: any) => {
+    const transformToMarkdown = (text: string) => {
+      return text.replace(/\\n/gi, "\n").replace(/\n/gi, "<br/>");
+  }
+
+  const CustomLink = ({ children, href }: any) => {
+      return (
+        <Link target="_blank" to={href} className="text-blue-400 no-underline">
+          {children}
+        </Link>
+      );
+  };
+
   if (!awardMilestone || awardMilestone.length == 0)
     return <p className="text-center font-semibold text-xl">No award milestone for this scholarship</p>
   return (
@@ -32,6 +49,7 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
         {/* Table Body */}
         <TableBody>
           {awardMilestone.map((award: any, index: any) => (
+          <>
             <TableRow
               key={award.id}
               sx={{
@@ -129,6 +147,74 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                 )}
               </TableCell>
             </TableRow>
+              {/* Accordion Row */}
+          <TableRow>
+            <TableCell colSpan={5} sx={{ padding: 0 }}>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ArrowDropDownCircleRounded />}
+                  aria-controls="panel2-content"
+                  id={`panel2-header-${index}`}
+                >
+                <Tooltip title={`Click to expand`}>
+                  <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
+                    Submission Guides for Progress {index + 1}
+                  </Typography>
+                </Tooltip>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Accordion expanded>
+                        <AccordionSummary
+                          expandIcon={<ArrowDropDownCircleRounded />}
+                          aria-controls="panel2-content"
+                          id={`panel2-header-${index}`}
+                        >
+                        <Tooltip title={`Click to expand`}>
+                          <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
+                            Required Files
+                          </Typography>
+                        </Tooltip>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Typography className="mb-3">
+                              {award.awardMilestoneDocuments && award.awardMilestoneDocuments.length == 0 && "No required files"}
+                              {award.awardMilestoneDocuments?.map((document:any, index:number) => (
+                                <Tag key={index} color="magenta">{document.type}</Tag>
+                              ))}
+                          </Typography>
+                        </AccordionDetails>
+                  </Accordion>
+                  <Accordion expanded>
+                        <AccordionSummary
+                          expandIcon={<ArrowDropDownCircleRounded />}
+                          aria-controls="panel2-content"
+                          id={`panel2-header-${index}`}
+                        >
+                        <Tooltip title={`Click to expand`}>
+                          <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
+                              Notes
+                          </Typography>
+                        </Tooltip>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Typography>
+                          <ReactMarkdown 
+                                components={{ a: CustomLink }}
+                                children={transformToMarkdown(award.note ?? 
+                                `No notes for this award milestone`)}
+                                rehypePlugins={[rehypeRaw]}
+                                remarkPlugins={[remarkGfm]}
+                            ></ReactMarkdown>
+                      </Typography>
+
+                        </AccordionDetails>
+                  </Accordion>
+
+                </AccordionDetails>
+              </Accordion>
+            </TableCell>
+            </TableRow>
+        </>
           ))}
         </TableBody>
       </Table>
