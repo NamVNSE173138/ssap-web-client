@@ -180,16 +180,15 @@ const Chat: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-blue-50 p-8">
-      {/* Sidebar */}
-      <div className="w-1/3 bg-blue-200 border-r border-gray-300 p-5 overflow-y-auto rounded-lg shadow-lg">
+      <div className="w-1/3 bg-blue-200 border-r border-gray-200 p-5 overflow-y-auto rounded-lg shadow-lg">
         <ul className="space-y-4">
           {accounts.map((account) => (
             <li
               key={account.id}
               onClick={() => handleAccountClick(account)}
               className={`p-3 rounded-lg flex items-center cursor-pointer transition-all duration-200 transform hover:scale-105 ${selectedUser?.id === account.id
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-white hover:bg-blue-50"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-white hover:bg-blue-50"
                 }`}
             >
               <img
@@ -209,9 +208,7 @@ const Chat: React.FC = () => {
         </ul>
       </div>
 
-      {/* Chat Area */}
       <div className="flex-1 flex flex-col bg-blue-200 p-6 rounded-lg shadow-lg">
-        {/* Chat Header */}
         <div className="mb-4 flex items-center justify-between">
           {selectedUser ? (
             <h2 className="text-xl md:text-2xl font-semibold text-gray-800 flex items-center gap-2">
@@ -225,7 +222,6 @@ const Chat: React.FC = () => {
           )}
         </div>
 
-        {/* Chat History */}
         <div className="flex-1 overflow-y-auto space-y-3 pb-5">
           {selectedUser && chatHistory.length > 0 ? (
             chatHistory.map((msg, index) => (
@@ -236,8 +232,8 @@ const Chat: React.FC = () => {
               >
                 <div
                   className={`p-4 rounded-lg shadow-md max-w-sm text-sm ${msg.senderId === parseInt(user?.id)
-                      ? "bg-green-200 text-right"
-                      : "bg-gray-100"
+                    ? "bg-green-200 text-right"
+                    : "bg-gray-100"
                     }`}
                 >
                   <p>{msg.message}</p>
@@ -256,7 +252,6 @@ const Chat: React.FC = () => {
           )}
         </div>
 
-        {/* Message Input */}
         {selectedUser && (
           <div className="flex items-center mt-4">
             <input
@@ -275,8 +270,8 @@ const Chat: React.FC = () => {
               onClick={handleSendMessage}
               disabled={!isChatEnabled}
               className={`px-6 py-2 rounded-full font-medium text-white transition-all duration-200 ${isChatEnabled
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-gray-400 cursor-not-allowed"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-gray-400 cursor-not-allowed"
                 }`}
             >
               <AiOutlineSend className="inline-block mr-2" size={20} />
@@ -286,9 +281,6 @@ const Chat: React.FC = () => {
         )}
       </div>
     </div>
-
-
-
   );
 };
 

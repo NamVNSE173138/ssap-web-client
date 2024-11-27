@@ -188,7 +188,7 @@ const Wallet = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
-        <span className={`text-${status === 'Completed' ? 'green' : 'red'}-500`}>{status}</span>
+        <span className={`text-${status === 'Successful' ? 'green' : 'red'}-500`}>{status}</span>
       ),
     },
     {
