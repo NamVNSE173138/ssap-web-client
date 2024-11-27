@@ -22,6 +22,8 @@ import { current } from "@reduxjs/toolkit";
 import SubscriptionModal from "../Activity/SubscriptionModal";
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { notification } from "antd";
+import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
+import { getAllServices, getServicesByProvider } from "@/services/ApiServices/serviceService";
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -38,14 +40,37 @@ const Service = () => {
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
-  const [numberOfServicesLeft, setNumberOfServicesLeft] = useState(20);
+  const [numberOfServicesLeft, setNumberOfServicesLeft] = useState<number>(0);
+  const [allServices, setAllServices] = useState<number>(0);
 
-  const fetchSubscriptions = () => {
-    console.log("Fetching subscriptions...");
+  const fetchSubscriptionForProvider = async () => {
+    try {
+      if (user?.role === "Provider") {
+        const subscription = await getSubscriptionByProviderId(Number(user?.id));
+        
+        if (subscription && subscription.data) {
+          const numberOfServices = subscription.data.numberOfServices ?? 0;
+          const createdServices = allServices;
+          const servicesLeft = numberOfServices - createdServices;
+          updateNumberOfServicesLeft(Math.max(servicesLeft, 0));
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching subscription for provider:", error);
+      setError("Failed to fetch subscription details");
+    }
+  };
+
+  const updateNumberOfServicesLeft = (newLimit: number) => {
+    setNumberOfServicesLeft(newLimit);
   };
 
   const handleBuySubscriptionClick = () => {
     setIsSubscriptionModalOpen(true);
+  };
+
+  const fetchSubscriptions = () => {
+    console.log("Fetching subscriptions...");
   };
 
   const fetchData = async () => {
@@ -53,6 +78,8 @@ const Service = () => {
     try {
       let response: any = {};
       if (user?.role === "Provider") {
+        const allServicesData = await getServicesByProvider(Number(user.id));
+        
         response = await axios.get(`${BASE_URL}/api/services/by-provider-paginated/${user.id}`, {
           params: {
             pageIndex: currentPage,
@@ -71,13 +98,15 @@ const Service = () => {
         });
       }
       if (response.data.statusCode === 200) {
+        if(!user) return null;
+        const allServicesData = await getServicesByProvider(Number(user.id));
         const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
         if (user?.role === "Provider") {
           const filteredServices = activeServices.filter((service: any) => service.providerId == user.id);
           console.log(filteredServices)
           setData(filteredServices);
+          setAllServices(allServicesData.data.length)
           setTotalPages(response.data.data.totalPages);
-          //          setTotalPages(Math.ceil(filteredServices.length / pageSize));
 
         } else {
           setData(activeServices);
@@ -119,6 +148,7 @@ const Service = () => {
       data.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [searchTerm, data]);
+
 
   const handleNextPage = async () => {
     if (currentPage < totalPages) {
@@ -164,6 +194,13 @@ const Service = () => {
     navigate(RouteNames.PROVIDER_LIST);
   };
 
+  const isBuySubscriptionDisabled = numberOfServicesLeft > 0;
+  const buySubscriptionTitle =
+    numberOfServicesLeft > 0
+      ? `You have ${numberOfServicesLeft} service creation attempts left. You cannot buy a subscription at this time.`
+      : "Buy a subscription to enable more service creation.";
+
+
   return (
     <div>
       <div className="relative">
@@ -202,14 +239,13 @@ const Service = () => {
           )}
         </div>
 
-        {/* New section displaying the number of services left */}
-        <div className="ml-4 text-white text-lg">
-          <span>Number of services created left: </span>
-          <span className="font-semibold">{numberOfServicesLeft}</span>
-        </div>
-
         {user?.role === "Provider" && (
           <div className="flex gap-4">
+            <div className="mt-3 mr-20 text-white text-lg">
+              <span>Number of services created left: </span>
+              <span className="font-semibold">{numberOfServicesLeft}</span>
+            </div>
+
             <button
               onClick={handleAddServiceClick}
               className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95 ${numberOfServicesLeft === 0 ? 'bg-gray-400 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
@@ -227,11 +263,17 @@ const Service = () => {
 
             <button
               onClick={handleBuySubscriptionClick}
-              className="flex justify-center items-center hover:bg-green-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
+              disabled={isBuySubscriptionDisabled}
+              title={buySubscriptionTitle}
+              className={`flex justify-center items-center gap-4 px-6 py-3 rounded-xl shadow-lg active:scale-95 transition-all duration-300 ${isBuySubscriptionDisabled
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                : "bg-white hover:bg-green-600 hover:text-white"
+                }`}
             >
-              <FaCreditCard className="text-3xl text-green-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
-              <p className="text-xl text-green-600 font-semibold">Buy Subscription</p>
+              <FaCreditCard className="text-3xl transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl font-semibold">Buy Subscription</p>
             </button>
+
           </div>
         )}
 
