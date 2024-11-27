@@ -106,6 +106,13 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
       link: RouteNames.TRACKING_EXPERT,
     });
   }
+  if (role === "Expert") {
+    listItems.push({
+      Icon: AiOutlineContacts,
+      text: "Review",
+      link: RouteNames.APPLICATION_REVIEW,
+    });
+  }
 
   // const handleLogout = () => {
   //     // dispatch(clearAuth());
@@ -129,16 +136,16 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
 
   return (
     <>
-      <div className={`${className} flex flex-col py-10 border-r-2 `}>
+      <div className={`${className} flex flex-col my-10 shadow-2  bg-white`}>
         <div className="flex flex-col items-center gap-8">
           {/* <div className='flex justify-center items-center gap-4'>
                         <img src='https://via.placeholder.com/150' alt='profile' className='rounded-full w-24' />
                         
                     </div> */}
-          <div className="h-[1px] bg-gray-100 w-2/3"></div>
+          {/* <div className="h-[1px] bg-gray-100 w-2/3"></div> */}
         </div>
         {isAboveMediumScreens ? (
-          <menu className="w-full flex flex-col">
+          <menu className="w-full flex flex-col ">
             {listItems.map((item, index) => (
               <ListItem
                 key={index}

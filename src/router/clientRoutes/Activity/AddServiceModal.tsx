@@ -140,11 +140,11 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
       console.log("Service created successfully:", response.data);
       setIsOpen(false);
       setSuccess(true);
-      notification.success({message:"Add service successfully!"})
+      notification.success({ message: "Add service successfully!" })
       await fetchServices();
     } catch (error) {
       console.error("Error creating service:", error);
-      notification.error({message:"Add service error!"})
+      notification.error({ message: "Add service error!" })
     } finally {
       setIsSubmitting(false);
     }
