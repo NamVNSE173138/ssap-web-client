@@ -7,12 +7,13 @@ import axios from "axios";
 import ExpertForm from "./createExpertForm";
 import ExpertList from "./expertList"; // Import ExpertList component
 import * as Tabs from "@radix-ui/react-tabs";
+import AssigningExpert from "./assigningExpert";
 
 const TrackingExpert = () => {
   const user = useSelector((state: any) => state.token.user);
   const userId = user?.id;
 
-  const [experts, setExperts] = useState<any[]>([]); // Store the experts data
+  const [experts, setExperts] = useState<any[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -112,6 +113,9 @@ const TrackingExpert = () => {
 
             <Tabs.Content value="list">
               <ExpertList experts={experts} loading={loading} error={error} />
+            </Tabs.Content>
+            <Tabs.Content value="assign">
+              <AssigningExpert/>
             </Tabs.Content>
           </div>
         </Tabs.Root>
