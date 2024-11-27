@@ -8,6 +8,7 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
+import { Tag } from "antd";
 
 const AwardProgressTable = ({ awardMilestone, application }: any) => {
     const transformToMarkdown = (text: string) => {
@@ -162,24 +163,53 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                 </Tooltip>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>
-                  <ReactMarkdown 
-                        components={{ a: CustomLink }}
-                        children={transformToMarkdown(award.awardDocuments ? award.awardDocuments[0].type : 
-                        `To apply for the scholarship, you will need to provide the following documents:
+                    <Accordion expanded>
+                        <AccordionSummary
+                          expandIcon={<ArrowDropDownCircleRounded />}
+                          aria-controls="panel2-content"
+                          id={`panel2-header-${index}`}
+                        >
+                        <Tooltip title={`Click to expand`}>
+                          <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
+                            Required Files
+                          </Typography>
+                        </Tooltip>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Typography className="mb-3">
+                              {award.awardMilestoneDocuments && award.awardMilestoneDocuments.length == 0 && "No required files"}
+                              {award.awardMilestoneDocuments?.map((document:any, index:number) => (
+                                <Tag key={index} color="magenta">{document.type}</Tag>
+                              ))}
+                          </Typography>
+                        </AccordionDetails>
+                  </Accordion>
+                  <Accordion expanded>
+                        <AccordionSummary
+                          expandIcon={<ArrowDropDownCircleRounded />}
+                          aria-controls="panel2-content"
+                          id={`panel2-header-${index}`}
+                        >
+                        <Tooltip title={`Click to expand`}>
+                          <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
+                              Notes
+                          </Typography>
+                        </Tooltip>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Typography>
+                          <ReactMarkdown 
+                                components={{ a: CustomLink }}
+                                children={transformToMarkdown(award.note ?? 
+                                `No notes for this award milestone`)}
+                                rehypePlugins={[rehypeRaw]}
+                                remarkPlugins={[remarkGfm]}
+                            ></ReactMarkdown>
+                      </Typography>
 
-1. A **valid ID** for identification purposes.  
-2. A **proof of enrollment** or admission letter from your institution.  
-3. Your most recent **academic transcripts**.  
-4. A well-written **personal statement**.  
-5. Two **letters of recommendation**.
+                        </AccordionDetails>
+                  </Accordion>
 
-For more details, visit the [official scholarship requirements](https://example.com/scholarship-documents).
-                        `)}
-                        rehypePlugins={[rehypeRaw]}
-                        remarkPlugins={[remarkGfm]}
-                    ></ReactMarkdown>
-                  </Typography>
                 </AccordionDetails>
               </Accordion>
             </TableCell>

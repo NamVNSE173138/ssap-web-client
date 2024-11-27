@@ -37,8 +37,15 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
     const awardFormSchema = z.object({
         fromDate: z.string(),
         toDate: z.string(),
-        amount: z.string().min(1, "Please enter the amount"),
-        scholarshipProgramId: z.number()
+        amount: z.number().min(1, "Amount must be greater than 0"),
+        scholarshipProgramId: z.number(),
+        note: z.string().optional(), // Optional note field
+        awardMilestoneDocuments: z
+          .array(
+            z.object({
+                type: z.string(), // Validate each document
+            })
+        ).optional(),
     }).refine(data => new Date(data.fromDate) < new Date(data.toDate), {
         message: "The 'From' date must be earlier than the 'To' date.",
         path: ["toDate"], // This will add the error message to `toDate`
@@ -69,10 +76,18 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
         }
     }, [isOpen, id, form]);
 
+    useEffect(() => {
+        form.setValue(
+          "awardMilestoneDocuments",
+          fileType.map((certificate:any) => ({type: certificate.value}))
+        );
+      }, [fileType, form]);
+
+
     const handleSubmit = async (values: z.infer<typeof awardFormSchema>) => {
         try {
-            //console.log(values);
             const response = await createAwardMilestone(values);
+            setFileType([]);
             form.reset();
             //console.log("Service created successfully:", response.data);
             setIsOpen(false);
@@ -120,25 +135,24 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                         
                                         className="col-span-2"
                                       />                                
-                                {form.formState.errors.amount && <p className="text-red-500 text-sm">{form.formState.errors.amount.message}</p>}
+                                {form.formState.errors.awardMilestoneDocuments && <p className="text-red-500 text-sm">{form.formState.errors.awardMilestoneDocuments.message}</p>}
                             </div>
                             <div>
                                 <Label>Amount</Label>
                                 <div className="flex items-center">
                                     <span className="text-md text-green-500 bg-gray-100 border border-gray-200 p-2 rounded-sm">$</span>
-                                    <Input {...form.register("amount")} placeholder="Amount" type="number" />
+                                    <Input onChange={(e) => form.setValue("amount", Number(e.target.value))} placeholder="Amount" type="number" />
                                 </div>
                                 {form.formState.errors.amount && <p className="text-red-500 text-sm">{form.formState.errors.amount.message}</p>}
                             </div>
-                            
 
-                                {/*<div>
-                                    <h1>Submission Guide</h1>
-                                    <QuillEditor value={quillValue} onChange={(value: string) => {
-                                        //console.log(value);
-                                        setQuillValue(value)
-                                    }} />
-                                </div>*/}
+                            <div>
+                                <h1>Submission Guide</h1>
+                                <QuillEditor value={form.getValues("note")??""} onChange={(value: string) => {
+                                    //console.log(value);
+                                    form.setValue("note",value)
+                                }} />
+                            </div>
                             <Button className="bg-sky-500 hover:bg-sky-600" type="submit">Add Award Milestone</Button>
                         </form>
                     </motion.div>

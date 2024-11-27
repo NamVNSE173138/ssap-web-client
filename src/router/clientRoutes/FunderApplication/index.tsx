@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { extendApplication, getApplicationWithDocumentsAndAccount, updateApplication } from "@/services/ApiServices/applicationService"
 import NotFound from "@/router/commonRoutes/404"
 import { getAllScholarshipProgram, getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService"
-import { notification, Spin } from "antd"
+import { notification, Spin, Tag } from "antd"
 import { formatOnlyDate } from "@/lib/date-formatter"
 import DocumentTable from "./document-table"
 import AwardProgressTable from "./award-progress-table"
@@ -46,6 +46,8 @@ const FunderApplication = () => {
 
   const [awardMilestones, setAwardMilestones] = useState<any>(null);
 
+  const [extendError, setExtendError] = useState<string>("");
+
 
   const [rowId, setRowId] = useState<number>(0);
   const [rows, setRows] = useState<any[]>([
@@ -81,35 +83,41 @@ const FunderApplication = () => {
   const handleSubmit = async () => {
     if (!id) return;
     try {
-      if (rows.length === 0) {
-
-        return;
-      }
-      setRows(
-        rows.map((row) => ({
-          ...row,
-          errors: {
-            name: !row.name,
-            type: !row.type,
-            file: !row.file,
-          },
-        }))
-      );
-      setApplyLoading(true);
-
       const applicationDocuments = [];
-      for (const row of rows) {
-        if (!row.name || !row.type || !row.file) return;
-        const formData = new FormData();
-        formData.append("File", row.file);
-        const name = await uploadFile(formData);
+      if (rows.length !== 0) {
+          setRows(
+            rows.map((row) => ({
+              ...row,
+              errors: {
+                name: !row.name,
+                type: !row.type,
+                file: !row.file,
+              },
+            }))
+          );
+          setApplyLoading(true);
 
-        const documentData = {
-          name: row.name,
-          type: row.type,
-          fileUrl: name.urls[0],
-        };
-        applicationDocuments.push(documentData);
+          for (const row of rows) {
+            if (!row.name || !row.type || !row.file) return;
+            const currentAward = awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+                new Date(application.updatedAt) < new Date(milestone.toDate)
+            )
+            if(currentAward.awardMilestoneDocuments.length != 0 && !currentAward.awardMilestoneDocuments.map((doc: any) => doc.type).includes(row.type)) {
+                setExtendError("Please only upload required documents of types " + currentAward.awardMilestoneDocuments.map((doc: any) => doc.type).join(", "));
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("File", row.file);
+            const name = await uploadFile(formData);
+
+            const documentData = {
+              name: row.name,
+              type: row.type,
+              fileUrl: name.urls[0],
+            };
+            applicationDocuments.push(documentData);
+          }
       }
 
       const response = await extendApplication({
@@ -142,6 +150,7 @@ const FunderApplication = () => {
       setApplyLoading(true);
       const response = await updateApplication(parseInt(id), {
         status: status,
+        updatedAt: new Date(),
       });
       notification.success({message: "Change successfully!"})
       await SendNotificationAndEmail({
@@ -378,9 +387,19 @@ const FunderApplication = () => {
               {application.status === ApplicationStatus.NeedExtend && (user?.role === RoleNames.APPLICANT || user?.role === "Applicant") &&
               awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
               ) &&
-                <Button onClick={handleAddRow} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
-                  <HiOutlinePlusCircle className="text-lg" /> Add Extend Document
-                </Button>
+                <div className="flex items-center gap-2">
+                    <p className="text-lg">Required Documents: </p>
+                    {awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+                        new Date(application.updatedAt) < new Date(milestone.toDate)
+                    )?.awardMilestoneDocuments.map((doc: any) => (
+                        <div className="flex items-center gap-2" key={doc.id}>
+                            <Tag color="magenta">{doc.type}</Tag>
+                        </div>
+                    ))}
+                    <Button onClick={handleAddRow} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
+                      <HiOutlinePlusCircle className="text-lg" /> Add Extend Document
+                    </Button>
+                </div>
               }
             </div>
             <DocumentTable
@@ -467,7 +486,9 @@ const FunderApplication = () => {
             {application.status === ApplicationStatus.NeedExtend && (user?.role === RoleNames.APPLICANT || user?.role === "Applicant") &&
             awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
             ) &&
-              <div className="flex justify-end mt-[24px]">
+              <div className="flex justify-between mt-[24px]">
+
+                <div className="text-red-500">{extendError}</div>
                 <Button
                   disabled={applyLoading}
                   onClick={handleSubmit}
