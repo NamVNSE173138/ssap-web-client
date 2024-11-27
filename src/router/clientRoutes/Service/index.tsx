@@ -9,21 +9,29 @@ import ServiceCard from "@/components/Services/ServiceCard";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { IoIosAddCircleOutline, IoIosArrowBack, IoIosArrowForward, IoIosPaper, IoMdTime } from "react-icons/io";
+import { IoIosAddCircleOutline, IoIosApps, IoIosArrowBack, IoIosArrowForward, IoIosInformationCircle, IoMdCheckmarkCircleOutline, IoMdTime } from "react-icons/io";
 import { IoIosSearch, IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
 import { Input } from "@/components/ui/input";
-import { getAccountWallet } from "@/services/ApiServices/accountService";
+import { getAccountById, getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
 import { IoPerson, IoWallet } from "react-icons/io5";
-import { FaCreditCard, FaSadTear } from "react-icons/fa";
-import { current } from "@reduxjs/toolkit";
-import SubscriptionModal from "../Activity/SubscriptionModal";
+import { FaClock, FaCreditCard, FaDollarSign, FaInfoCircle, FaSadTear } from "react-icons/fa";
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
-import { notification } from "antd";
+import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
-import { getAllServices, getServicesByProvider } from "@/services/ApiServices/serviceService";
+import { getServicesByProvider } from "@/services/ApiServices/serviceService";
+import { MdDateRange } from "react-icons/md";
+
+interface SubscriptionDetails {
+  name: string;
+  description: string;
+  amount: number;
+  numberOfServices: number;
+  validMonths: number;
+  subscriptionEndDate: string;
+}
 
 const Service = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -38,16 +46,63 @@ const Service = () => {
   const [filteredData, setFilteredData] = useState<ServiceType[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
-  const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [numberOfServicesLeft, setNumberOfServicesLeft] = useState<number>(0);
   const [allServices, setAllServices] = useState<number>(0);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
+  const [isSubscriptionDetailModalOpen, setIsSubscriptionDetailModalOpen] = useState(false);
+
+  const formatDate = (dateString: string | null): string => {
+    if (!dateString) return 'N/A';
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
+  const fetchSubscriptionDetails = async () => {
+    try {
+      if (user?.role === "Provider") {
+        const subscriptionResponse = await getSubscriptionByProviderId(Number(user?.id));
+        const accountResponse = await getAccountById(Number(user?.id));
+
+        const subscriptionData = subscriptionResponse?.data || {};
+
+
+        setSubscriptionDetails({
+          name: subscriptionData.name || 'N/A',
+          description: subscriptionData.description || 'No description available.',
+          amount: subscriptionData.amount || 0,
+          numberOfServices: subscriptionData.numberOfServices || 0,
+          validMonths: subscriptionData.validMonths || 0,
+          subscriptionEndDate: formatDate(accountResponse.subscriptionEndDate) || 'N/A',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching subscription details:', error);
+      setError('Failed to fetch subscription details');
+    }
+  };
+
+  const handleInfoIconClick = () => {
+    fetchSubscriptionDetails();
+    setIsSubscriptionDetailModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsSubscriptionDetailModalOpen(false);
+  };
 
   const fetchSubscriptionForProvider = async () => {
     try {
       if (user?.role === "Provider") {
         const subscription = await getSubscriptionByProviderId(Number(user?.id));
-        
+
         if (subscription && subscription.data) {
           const numberOfServices = subscription.data.numberOfServices ?? 0;
           const createdServices = allServices;
@@ -79,7 +134,7 @@ const Service = () => {
       let response: any = {};
       if (user?.role === "Provider") {
         const allServicesData = await getServicesByProvider(Number(user.id));
-        
+
         response = await axios.get(`${BASE_URL}/api/services/by-provider-paginated/${user.id}`, {
           params: {
             pageIndex: currentPage,
@@ -98,7 +153,7 @@ const Service = () => {
         });
       }
       if (response.data.statusCode === 200) {
-        if(!user) return null;
+        if (!user) return null;
         const allServicesData = await getServicesByProvider(Number(user.id));
         const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
         if (user?.role === "Provider") {
@@ -149,6 +204,11 @@ const Service = () => {
     );
   }, [searchTerm, data]);
 
+  // useEffect(() => {
+  //   if (user?.role === "Provider") {
+  //     fetchSubscriptionForProvider();
+  //   }
+  // }, [data, user]);
 
   const handleNextPage = async () => {
     if (currentPage < totalPages) {
@@ -241,11 +301,18 @@ const Service = () => {
 
         {user?.role === "Provider" && (
           <div className="flex gap-4">
-            <div className="mt-3 mr-20 text-white text-lg">
+            <div className=" mr-30 text-white text-lg flex items-center">
               <span>Number of services created left: </span>
               <span className="font-semibold">{numberOfServicesLeft}</span>
-            </div>
 
+              {numberOfServicesLeft > 0 && (
+                <IoIosInformationCircle
+                  onClick={handleInfoIconClick}
+                  className="text-white text-xl cursor-pointer hover:text-blue-500 transition-all duration-300 ml-2"
+                />
+              )}
+            </div>
+            
             <button
               onClick={handleAddServiceClick}
               className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95 ${numberOfServicesLeft === 0 ? 'bg-gray-400 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
@@ -352,6 +419,77 @@ const Service = () => {
         fetchSubscriptions={fetchSubscriptions}
       />
 
+      <Modal
+        title={
+          <div className="flex items-center gap-2 text-blue-400">
+            <FaInfoCircle className="text-3xl" />
+            <span className="text-2xl font-semibold">Subscription Details</span>
+          </div>
+        }
+        open={isSubscriptionDetailModalOpen}
+        onCancel={handleCloseModal}
+        footer={[
+          <Button
+            key="close"
+            onClick={handleCloseModal}
+            className="bg-blue-400 hover:bg-blue-500 text-white"
+          >
+            Close
+          </Button>,
+        ]}
+        width={600}
+        className="subscription-modal"
+        style={{
+          borderRadius: '10px',
+          background: '#f0f8ff',
+          padding: '20px',
+        }}
+      >
+        {subscriptionDetails ? (
+          <div className="text-gray-800">
+            <br></br>
+            <div className="flex items-center mb-3">
+              <h3 className="text-2xl font-semibold text-blue-400">{subscriptionDetails.name}</h3>
+            </div>
+            <div className="flex items-center mb-3">
+              <IoMdCheckmarkCircleOutline className="text-blue-400 text-2xl mr-2" />
+              <p className="text-lg">
+                <strong>Description:</strong> {subscriptionDetails.description}
+              </p>
+            </div>
+            <div className="flex items-center mb-3">
+              <FaDollarSign className="text-yellow-500 text-2xl mr-2" />
+              <p className="text-lg">
+                <strong>Amount:</strong> ${subscriptionDetails.amount}
+              </p>
+            </div>
+            <div className="flex items-center mb-3">
+              <IoIosApps className="text-blue-400 text-2xl mr-2" />
+              <p className="text-lg">
+                <strong>Number of Services:</strong> {subscriptionDetails.numberOfServices}
+              </p>
+            </div>
+            <div className="flex items-center mb-3">
+              <FaClock className="text-blue-400 text-2xl mr-2" />
+              <p className="text-lg">
+                <strong>Valid Months:</strong> {subscriptionDetails.validMonths}
+              </p>
+            </div>
+            <div className="flex items-center mb-3">
+              <MdDateRange className="text-blue-400 text-2xl mr-2" />
+              <p className="text-lg">
+                <strong>Subscription End Date:</strong> {subscriptionDetails.subscriptionEndDate}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-lg text-blue-400">
+              Loading subscription details...
+            </p>
+          </div>
+        )}
+      </Modal>
 
       <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
         <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
