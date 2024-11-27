@@ -1,10 +1,10 @@
 import RouteNames from "@/constants/routeNames";
-import { getAccountWallet } from "@/services/ApiServices/accountService";
+import { getAccountById, getAccountWallet, updateAccount } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
 import { RootState } from "@/store/store";
 import { Dialog } from "@mui/material";
 import { notification } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaClock, FaCreditCard, FaDollarSign, FaExclamationTriangle, FaInfoCircle, FaRocket, FaTag, FaTimes, FaWallet } from "react-icons/fa";
 import { IoIosApps, IoIosArrowDown, IoIosArrowUp, IoMdClose } from "react-icons/io";
 import { IoCashOutline, IoInformationCircle, IoWalletOutline } from "react-icons/io5";
@@ -12,34 +12,16 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import SubscriptionContractDialog from "../ServiceDetail/SubscriptionContractDialog";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { getAllSubscriptions } from "@/services/ApiServices/subscriptionService";
 
-
-const subscriptionData = [
-    {
-        id: 1,
-        name: "Basic Plan",
-        description: "Perfect for individuals starting out.",
-        amount: "$10",
-        numberOfServices: 5,
-        validMonths: 1,
-    },
-    {
-        id: 2,
-        name: "Standard Plan",
-        description: "Best for small businesses.",
-        amount: "$30",
-        numberOfServices: 20,
-        validMonths: 6,
-    },
-    {
-        id: 3,
-        name: "Premium Plan",
-        description: "Ideal for growing enterprises.",
-        amount: "$50",
-        numberOfServices: 50,
-        validMonths: 12,
-    },
-];
+type Subscription = {
+    name: string;
+    id: number;
+    description: string;
+    amount: number;
+    numberOfServices: number;
+    validMonths: number;
+};
 
 const MultiStepSubscriptionModal = ({
     isOpen,
@@ -58,6 +40,26 @@ const MultiStepSubscriptionModal = ({
     const user = useSelector((state: RootState) => state.token.user);
     const [loading, setLoading] = useState<boolean>(false);
     const [isContractOpen, setContractOpen] = useState(false);
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchSubscriptionsFromAPI();
+        }
+    }, [isOpen]);
+
+    const fetchSubscriptionsFromAPI = async () => {
+        try {
+            setLoading(true);
+            const data = await getAllSubscriptions();
+            console.log(data)
+            setSubscriptions(data.data);
+        } catch (error) {
+            console.error("Failed to fetch subscriptions:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleNext = () => {
         if (step === 1 && selectedSubscription !== null) setStep(2);
@@ -71,29 +73,29 @@ const MultiStepSubscriptionModal = ({
         setContractOpen(true);
     };
 
-    const closeContractDialog = () => {
-        setContractOpen(false);
-    };
-
     const handleCheckout = async () => {
-        if (!paymentMethod || !selectedPlan) return;
+        if (!paymentMethod || !selectedSubscription) return;
         if (!user) return null;
 
         try {
-            const walletResponse = await getAccountWallet(Number(user?.id));
-            const userBalance = walletResponse.data.balance;
-            const totalPrice = parseFloat(selectedPlan.amount.replace('$', ''));
+            const accountData = await getAccountById(Number(user.id));
+            const selectedSubscrip = subscriptions.find((sub) => sub.id === selectedSubscription);
+            const totalPrice = selectedSubscrip?.amount ?? 0;
 
-            if (userBalance < totalPrice) {
-                notification.error({
-                    message: "Insufficient funds to request this service. Please add funds to your account."
-                });
-                setLoading(false);
-                return;
+            if (paymentMethod === "Wallet") {
+                const userBalance = accountData.wallet?.balance;
+
+                if (userBalance < totalPrice) {
+                    notification.error({
+                        message: "Insufficient funds to request this service. Please add funds to your account."
+                    });
+                    setLoading(false);
+                    return;
+                }
             }
 
             const transferRequest = {
-                senderId: Number(user.id),
+                senderId: user.id,
                 receiverId: 1,
                 amount: totalPrice,
                 paymentMethod: paymentMethod,
@@ -101,11 +103,34 @@ const MultiStepSubscriptionModal = ({
             };
 
             const paymentResponse = await transferMoney(transferRequest);
-            notification.success({ message: "Buy subscription successfullly!" })
 
-            if (paymentResponse.success) {
-                fetchSubscriptions();
-                setIsOpen(false);
+            if (paymentResponse.statusCode === 200) {
+                const validMonths = selectedSubscrip?.validMonths ?? 0;
+                const currentDate = new Date();
+                const subscriptionEndDate = new Date(currentDate.setMonth(currentDate.getMonth() + validMonths));
+
+                const updatedAccountData = {
+                    id: user.id,
+                    username: accountData.username,
+                    email: accountData.email,
+                    phoneNumber: accountData.phoneNumber,
+                    subscriptionEndDate: subscriptionEndDate.toISOString(),
+                    subscriptionId: selectedSubscrip?.id,
+                    hashedPassword: accountData.hashedPassword,
+                    address: accountData.address,
+                    avatarUrl: accountData.avatarUrl,
+                    loginWithGoogle: accountData.loginWithGoogle,
+                    status: accountData.status,
+                    roleId: accountData.roleId
+                };
+
+                const updateResponse = await updateAccount(updatedAccountData);
+                notification.success({ message: "Buy subscription successfully!" });
+
+                if (updateResponse) {
+                    fetchSubscriptions();
+                    setIsOpen(false);
+                }
             } else {
                 notification.error({ message: "Payment failed. Please try again." });
             }
@@ -128,7 +153,7 @@ const MultiStepSubscriptionModal = ({
         setIsWalletDialogOpen(false);
     };
 
-    const selectedPlan = subscriptionData.find((sub) => sub.id === selectedSubscription);
+    const selectedSubscrip = subscriptions.find((sub) => sub.id === selectedSubscription);
 
     if (!isOpen) return null;
 
@@ -160,7 +185,7 @@ const MultiStepSubscriptionModal = ({
                             Choose Your Subscription
                         </h2>
                         <div className="space-y-4">
-                            {subscriptionData.map((sub) => (
+                            {subscriptions.map((sub) => (
                                 <div
                                     key={sub.id}
                                     className={`border rounded-lg shadow-sm p-4 hover:shadow-xl transition-all cursor-pointer ${selectedSubscription === sub.id ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
@@ -224,27 +249,27 @@ const MultiStepSubscriptionModal = ({
                         <div className="border rounded-lg p-4 bg-blue-50">
                             <p className="flex items-center gap-2">
                                 <FaTag className="text-blue-500" />
-                                <strong>Name:</strong> {selectedPlan?.name}
+                                <strong>Name:</strong> {selectedSubscrip?.name}
                             </p>
 
                             <p className="flex items-center gap-2">
                                 <FaInfoCircle className="text-gray-600" />
-                                <strong>Description:</strong> {selectedPlan?.description}
+                                <strong>Description:</strong> {selectedSubscrip?.description}
                             </p>
 
                             <p className="flex items-center gap-2">
                                 <FaDollarSign className="text-green-500" />
-                                <strong>Amount:</strong> {selectedPlan?.amount}
+                                <strong>Amount:</strong> {selectedSubscrip?.amount}
                             </p>
 
                             <p className="flex items-center gap-2">
                                 <IoIosApps className="text-purple-500" />
-                                <strong>Number of Services:</strong> {selectedPlan?.numberOfServices}
+                                <strong>Number of Services:</strong> {selectedSubscrip?.numberOfServices}
                             </p>
 
                             <p className="flex items-center gap-2">
                                 <FaClock className="text-orange-500" />
-                                <strong>Valid for:</strong> {selectedPlan?.validMonths} months
+                                <strong>Valid for:</strong> {selectedSubscrip?.validMonths} months
                             </p>
 
                         </div>
@@ -278,7 +303,6 @@ const MultiStepSubscriptionModal = ({
                                 <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
                             )}
                         </div>
-
                         <div className="mt-6 text-gray-600 text-base flex items-center gap-2">
                             <IoInformationCircle className="text-blue-500 inline" />
                             By clicking <span className="font-medium">"Confirm & Pay"</span>, you agree to our{" "}
@@ -294,25 +318,19 @@ const MultiStepSubscriptionModal = ({
                             <button
                                 className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
                                 onClick={handleBack}
-                                disabled={loading} // Vô hiệu hóa nút "Back" khi đang xử lý
+                                disabled={loading}
                             >
                                 Back
                             </button>
                             <button
                                 className={`px-6 py-2 rounded-lg font-medium ${paymentMethod
-                                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                                    ? "bg-blue-600 text-white hover:bg-blue-700 transition-all"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    }`}
+                                disabled={!paymentMethod}
                                 onClick={handleCheckout}
-                                disabled={loading || !paymentMethod}
                             >
-                                {loading ? (
-                                    "Processing..."
-                                ) : (
-                                    <>
-                                        <CheckCircleOutlineIcon className="mr-2" />
-                                        Confirm & Pay
-                                    </>
-                                )}
+                                Confirm & Pay
                             </button>
                         </div>
                     </>
@@ -323,10 +341,10 @@ const MultiStepSubscriptionModal = ({
                 <div className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto">
                     <div className="flex items-center mb-6">
                         <FaExclamationTriangle className="text-yellow-500 text-4xl mr-4" />
-                        <h3 className="text-2xl font-semibold text-gray-800">You don't have a wallet yet!</h3>
+                        <h3 className="text-2xl font-semibold text-gray-800">You don't have enough money!</h3>
                     </div>
                     <p className="my-4 text-lg text-gray-600">
-                        You need to create a wallet to add services. Do you want to go to the Wallet page?
+                        You need to deposit money into the system. Do you want to go to the Wallet page?
                     </p>
                     <div className="flex justify-end gap-4 mt-6">
                         <button
