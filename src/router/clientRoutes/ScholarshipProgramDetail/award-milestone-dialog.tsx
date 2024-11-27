@@ -62,11 +62,11 @@ const AwardMilestoneDialog = ({ open, onClose, awardMilestones, reviewMilestones
 
             <span className="flex justify-end gap-2 items-center">
                 <span className="relative flex h-3 w-3">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${new Date() > new Date(milestone.fromDate) && new Date() < new Date(milestone.toDate) ? "green" : "gray"}-500 opacity-75`}></span>
-                  <span className={`relative inline-flex rounded-full h-3 w-3 bg-${new Date() > new Date(milestone.fromDate) && new Date() < new Date(milestone.toDate) ? "green" : "gray"}-500`}></span>
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${new Date() > new Date(milestone.fromDate)  ? "green" : "gray"}-500 opacity-75`}></span>
+                  <span className={`relative inline-flex rounded-full h-3 w-3 bg-${new Date() > new Date(milestone.fromDate)  ? "green" : "gray"}-500`}></span>
                 </span>
-                <span className={`text-${new Date() > new Date(milestone.fromDate) && new Date() < new Date(milestone.toDate) ? "green" : "gray"}-500 font-medium`}>{new Date() > new Date(milestone.fromDate) &&
-                    new Date() < new Date(milestone.toDate) ? "Happening" : "Not started"}</span>
+                <span className={`text-${new Date() > new Date(milestone.fromDate)  ? "green" : "gray"}-500 font-medium`}>{new Date() > new Date(milestone.fromDate) &&
+                    new Date() < new Date(milestone.toDate) ? "Progressing" : new Date() > new Date(milestone.toDate) ? "Completed" : "Not started"}</span>
               </span>
 
             {/*<Button
