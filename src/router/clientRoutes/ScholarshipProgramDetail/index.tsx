@@ -352,6 +352,10 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+
+  console.log("IMAGE",data?.imageUrl);
+  
+
   if (!data) return <Spinner size="large" />;
 
   return (
