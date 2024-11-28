@@ -1,5 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   AiOutlineUser,
   AiOutlineLock,
@@ -16,78 +16,127 @@ import AuthSection from "./components/AuthSection";
 import LogoutSection from "./components/LogoutSection";
 import ApplicationHistorySection from "./components/ApplicationHistorySection";
 import RequestHistorySection from "./components/RequestHistorySection";
-import { getApplicantProfileDetails } from "@/services/ApiServices/applicantProfileService";
+import {
+  exportApplicantProfileToPdf,
+  getApplicantProfileDetails,
+  updateApplicantProfileDetails,
+} from "@/services/ApiServices/applicantProfileService";
 import { RootState } from "@/store/store";
-import { Spinner } from "@radix-ui/themes";
-import ToastMessage from "@/components/ToastMessage";
+import Spinner from "@/components/Spinner";
+import { ToastMessage } from "@/components/ToastMessage";
+import { uploadFile } from "@/services/ApiServices/fileUploadService";
 
 const ApplicantProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const user = useSelector((state: RootState) => state.token.user);
 
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<File[]>([]);
   const [activeTab, setActiveTab] = useState<string>("account");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isProfileUpdated, setIsProfileUpdated] = useState<boolean>(false);
   const [profile, setProfile] = useState({
-    avatar: "/placeholder.svg?height=96&width=96",
-    firstName: "John",
-    lastName: "Doe",
-    username: "@johndoe",
-    email: "johndoe@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Main St, Anytown, USA 12345",
-    gender: "Male",
-    birthdate: "January 1, 1990",
-    nationality: "Vietnam",
-    ethnicity: "Asian",
-    skills: ["JavaScript", "React", "Node.js"],
-    achievements: ["Dean's List, 4 semesters", "Hackathon 2021 Winner"],
-    experience: [
-      "Software Developer Intern at Tech Solutions Inc., Summer 2021",
-    ],
-    certificates: ["Certified Web Developer", "React Specialist Certification"],
+    avatar: "",
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    phone: "",
+    address: "",
+    gender: "",
+    birthdate: "",
+    nationality: "",
+    ethnicity: "",
+    major: "",
+    gpa: "",
+    school: "",
+    skills: [],
+    achievements: [],
+    experience: [],
+    certificates: [],
   });
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const data = await getApplicantProfileDetails(Number(user?.id));
-        setProfile(data);
-        console.log(profile);
+        const response = await getApplicantProfileDetails(Number(user?.id));
+        setProfile(response.data);
       } catch (error) {
         setError("Failed to get profile details");
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+        setIsProfileUpdated(false);
       }
     };
 
     fetchProfile();
-  }, [user?.id]);
+  }, [user?.id, isProfileUpdated]);
 
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsEditing(false);
+    setIsLoading(true);
     console.log(profile);
-    // Save the updated profile data (API call to save changes)
-    // Example: api.saveProfile(profileData);
+    try {
+      const uploadFileResponse = await uploadFile(avatar);
+      const fileUrls = uploadFileResponse.data;
+
+      setProfile((prevData) => ({ ...prevData, avatar: fileUrls[0] || "" }));
+      const postData = {
+        avatarUrl: profile.avatar,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        username: profile.username,
+        phone: profile.phone,
+        address: profile.address,
+        gender: profile.gender,
+        birthdate: profile.birthdate,
+        nationality: profile.nationality,
+        ethnicity: profile.ethnicity,
+        major: profile.major,
+        gpa: Number(profile.gpa),
+        school: profile.school,
+        achievements: profile.achievements,
+        skills: profile.skills,
+        experience: profile.experience,
+        certificates: profile.certificates,
+      };
+
+      console.log("Post data", postData);
+
+      await updateApplicantProfileDetails(Number(user?.id), postData);
+      setIsProfileUpdated(true);
+    } catch (error) {
+      setError("Update profile failed");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const fileUrl = URL.createObjectURL(file);
-      setAvatarPreview(fileUrl);
+      setProfile((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }));
+      setAvatar([file]);
     }
+    console.log("Profile after avatar change:", profile);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfile({ ...profile, [name]: value });
+
+    console.log(profile);
   };
 
   const handleAddField = (type: "skills" | "achievements") => {
@@ -113,10 +162,31 @@ const ApplicantProfile = () => {
     setProfile({ ...profile, [type]: updatedList });
   };
 
-  const handleExportPDF = () => {};
+  const handleExportPDF = async () => {
+    try {
+      const pdfBlob = await exportApplicantProfileToPdf(Number(user?.id));
+      console.log("PDF Blob:", pdfBlob);
+
+      const url = window.URL.createObjectURL(
+        new Blob([pdfBlob], { type: "application/pdf" }),
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${profile.firstName}_${profile.lastName}_CV.pdf`;
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      console.log("Exported PDF successfully!");
+    } catch (error) {
+      console.log("Failed to export PDF.");
+    }
+  };
 
   if (isLoading) {
-    return <Spinner />;
+    return <Spinner size="large" />;
   }
 
   return (
@@ -189,24 +259,23 @@ const ApplicantProfile = () => {
 
         {/* Tab Panels */}
         <AccountSection
+          profile={profile}
           setActiveTab={setActiveTab}
           setIsEditing={setIsEditing}
         />
 
-        {/* <ProfileSection */}
-        {/*   avatarPreview={avatarPreview} */}
-        {/*   profile={profile} */}
-        {/*   setProfile={setProfile} */}
-        {/*   handleAvatarChange={handleAvatarChange} */}
-        {/*   handleInputChange={handleInputChange} */}
-        {/*   handleListChange={handleListChange} */}
-        {/*   handleAddField={handleAddField} */}
-        {/*   handleRemoveField={handleRemoveField} */}
-        {/*   isEditing={isEditing} */}
-        {/*   handleSaveClick={handleSaveClick} */}
-        {/*   handleEditClick={handleEditClick} */}
-        {/*   handleExportPDF={handleExportPDF} */}
-        {/* /> */}
+        <ProfileSection
+          profile={profile}
+          handleAvatarChange={handleAvatarChange}
+          handleInputChange={handleInputChange}
+          handleListChange={handleListChange}
+          handleAddField={handleAddField}
+          handleRemoveField={handleRemoveField}
+          isEditing={isEditing}
+          handleSaveClick={handleSaveClick}
+          handleEditClick={handleEditClick}
+          handleExportPDF={handleExportPDF}
+        />
 
         <ApplicationHistorySection />
 

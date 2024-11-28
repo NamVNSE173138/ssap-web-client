@@ -1,6 +1,8 @@
 import * as Tabs from "@radix-ui/react-tabs";
 
 const AccountSection = (props: any) => {
+  const { profile, setActiveTab, setIsEditing } = props;
+
   return (
     <Tabs.Content value="account" className="pt-4">
       <h2 className="text-xl font-bold mb-6">My Account</h2>
@@ -8,7 +10,7 @@ const AccountSection = (props: any) => {
         {/* Avatar */}
         <div className="flex-shrink-0">
           <img
-            src="https://via.placeholder.com/150"
+            src={profile.avatar}
             alt="User Avatar"
             className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover"
           />
@@ -29,7 +31,7 @@ const AccountSection = (props: any) => {
                 Username
               </label>
               <div className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed">
-                JohnDoe
+                {profile.username || "N/A"}
               </div>
             </div>
 
@@ -42,7 +44,7 @@ const AccountSection = (props: any) => {
                 Email
               </label>
               <div className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed">
-                johndoe@example.com
+                {profile.email || "N/A"}
               </div>
             </div>
 
@@ -55,7 +57,7 @@ const AccountSection = (props: any) => {
                 Phone Number
               </label>
               <div className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed">
-                +1 (555) 123-4567
+                {profile.phone || "N/A"}
               </div>
             </div>
             {/* Address */}
@@ -67,7 +69,7 @@ const AccountSection = (props: any) => {
                 Address
               </label>
               <div className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed">
-                Ho Chi Minh, Vietnam
+                {profile.address || "N/A"}
               </div>
             </div>
           </div>
@@ -75,8 +77,8 @@ const AccountSection = (props: any) => {
             {/* Edit Profile Button */}
             <button
               onClick={() => {
-                props.setActiveTab("profile");
-                props.setIsEditing(true);
+                setActiveTab("profile");
+                setIsEditing(true);
               }}
               className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none"
             >
@@ -85,7 +87,7 @@ const AccountSection = (props: any) => {
 
             {/* Change Password Button */}
             <button
-              onClick={() => props.setActiveTab("password")}
+              onClick={() => setActiveTab("password")}
               className="px-6 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none"
             >
               Change Password
