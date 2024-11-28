@@ -157,7 +157,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             },
                         }}
                     >
-                        {/* Avatar */}
                         <ListItemAvatar>
                             <img
                                 src={app.applicant?.avatarUrl ?? "https://github.com/shadcn.png"}
@@ -167,7 +166,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             />
                         </ListItemAvatar>
 
-                        {/* User Info */}
                         <ListItemText
                             primary={
                                 <Typography
@@ -191,9 +189,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             sx={{ flex: 1, ml: 2 }}
                         />
 
-                        {/* Actions */}
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            {/* View Request Button */}
                             <Button
                                 onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
                                 variant="contained"
@@ -214,7 +210,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                                 View Request
                             </Button>
 
-                            {/* Add Comment Button (if Pending) */}
                             {app.status === "Pending" && (
                                 <Button
                                     onClick={() => handleOpenCommentDialog(app.id)}
@@ -263,11 +258,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     );
 
-
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);
-    };
-
     return (
         <>
             <Dialog
@@ -276,7 +266,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 fullWidth
                 maxWidth="sm"
             >
-                {/* Dialog Title */}
                 <DialogTitle
                     sx={{
                         textAlign: "center",
@@ -299,7 +288,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     Applicants Request Information
                 </DialogTitle>
 
-                {/* Tabs for Switching */}
                 <Tabs
                     value={activeTab}
                     onChange={(e, newValue) => setActiveTab(newValue)}
@@ -320,7 +308,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     <Tab label="Finished" />
                 </Tabs>
 
-                {/* Applicants List */}
                 <List
                     sx={{
                         maxHeight: 400,
@@ -422,7 +409,6 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                             <p className="text-sm text-gray-500 mt-1">Please enter your comment.</p>
                         )}
                     </div>
-                    {/* Action Buttons */}
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                         <Button
                             onClick={() => setCommentDialogOpen(false)}
