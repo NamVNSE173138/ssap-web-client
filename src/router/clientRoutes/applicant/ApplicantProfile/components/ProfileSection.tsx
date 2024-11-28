@@ -1,12 +1,11 @@
+import { formatOnlyDate } from "@/lib/date-formatter";
 import * as Avatar from "@radix-ui/react-avatar";
 import * as Separator from "@radix-ui/react-separator";
 import * as Tabs from "@radix-ui/react-tabs";
 
 const ProfileSection = (props: any) => {
   const {
-    avatarPreview,
     profile,
-    setProfile,
     handleAvatarChange,
     handleInputChange,
     handleListChange,
@@ -27,7 +26,7 @@ const ProfileSection = (props: any) => {
               <div className="relative">
                 <Avatar.Root className="inline-flex h-24 w-24 select-none items-center justify-center overflow-hidden rounded-full bg-gray-100 ">
                   <img
-                    src={avatarPreview || profile.avatar}
+                    src={profile.avatar}
                     alt="User Avatar"
                     className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover"
                   />
@@ -57,7 +56,7 @@ const ProfileSection = (props: any) => {
                       name="firstName"
                       value={profile.firstName}
                       onChange={handleInputChange}
-                      className="border rounded p-1"
+                      className="border rounded p-1 mb-3"
                     />
                   ) : (
                     profile.firstName
@@ -68,58 +67,138 @@ const ProfileSection = (props: any) => {
                       name="lastName"
                       value={profile.lastName}
                       onChange={handleInputChange}
-                      className="border rounded p-1"
+                      className="border rounded p-1 mb-3"
                     />
                   ) : (
                     profile.lastName
                   )}{" "}
                 </h1>
-                <p className="text-gray-500">{profile.username}</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="username"
+                    value={profile.username}
+                    onChange={handleInputChange}
+                    className="border rounded p-1"
+                  />
+                ) : (
+                  <p className="text-gray-500">{profile.username}</p>
+                )}
               </div>{" "}
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               {[
-                { label: "Email", name: "email", value: profile.email },
-                { label: "Phone", name: "phone", value: profile.phone },
+                {
+                  label: "Email",
+                  name: "email",
+                  value: profile.email,
+                  type: "text",
+                  editable: false,
+                },
+                {
+                  label: "Phone",
+                  name: "phone",
+                  value: profile.phone,
+                  type: "text",
+                  editable: true,
+                },
                 {
                   label: "Address",
                   name: "address",
                   value: profile.address,
+                  type: "text",
+                  editable: true,
                 },
                 {
                   label: "Gender",
                   name: "gender",
                   value: profile.gender,
+                  type: "select",
+                  options: ["Male", "Female", "Other"],
+                  editable: true,
                 },
                 {
                   label: "Birthdate",
                   name: "birthdate",
                   value: profile.birthdate,
+                  type: "date",
+                  editable: true,
                 },
                 {
                   label: "Nationality",
                   name: "nationality",
                   value: profile.nationality,
+                  type: "text",
+                  editable: true,
                 },
                 {
                   label: "Ethnicity",
                   name: "ethnicity",
                   value: profile.ethnicity,
+                  type: "text",
+                  editable: true,
                 },
-              ].map(({ label, name, value }) => (
+                {
+                  label: "Major",
+                  name: "major",
+                  value: profile.major,
+                  type: "text",
+                  editable: true,
+                },
+                {
+                  label: "Current School",
+                  name: "school",
+                  value: profile.school,
+                  type: "text",
+                  editable: true,
+                },
+                {
+                  label: "GPA",
+                  name: "gpa",
+                  value: profile.gpa,
+                  type: "number",
+                  editable: true,
+                },
+              ].map(({ label, name, value, type, editable, options }) => (
                 <div key={name}>
                   <h2 className="text-sm font-medium text-gray-500">{label}</h2>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name={name}
-                      value={value}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full border rounded p-1"
-                    />
+                  {isEditing && editable ? (
+                    type === "select" ? (
+                      <select
+                        name={name}
+                        value={value}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full border rounded p-1"
+                      >
+                        {options?.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={type}
+                        name={name}
+                        defaultValue={
+                          type === "date"
+                            ? new Date(value).toISOString().split("T")[0]
+                            : value
+                        }
+                        value={value}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full border rounded p-1"
+                      />
+                    )
                   ) : (
-                    <p className="mt-1 text-sm text-gray-900">{value}</p>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {value !== null
+                        ? type === "date"
+                          ? formatOnlyDate(value)
+                          : value
+                        : "N/A"}
+                    </p>
                   )}
                 </div>
               ))}{" "}
