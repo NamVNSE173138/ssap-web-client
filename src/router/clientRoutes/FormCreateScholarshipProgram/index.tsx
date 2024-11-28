@@ -843,6 +843,7 @@ import Select, { MultiValue } from "react-select";
 import RouteNames from "@/constants/routeNames";
 import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
+import { uploadFile } from "@/services/ApiServices/fileUploadService";
 
 interface OptionType {
   value: string;
@@ -890,7 +891,7 @@ const FormCreateScholarshipProgram = () => {
   const [certificates, setCertificates] = useState<OptionType[]>([]);
   const [universities, setUniversities] = useState<OptionType[]>([]);
   const [majors, setMajors] = useState<OptionType[]>([]);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File[]>([]);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedUniversity, setSelectedUniversity] = useState<OptionType | null>(null);
@@ -924,34 +925,17 @@ const FormCreateScholarshipProgram = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setImageFile(file);
+      if (!file.type.startsWith("image/")) {
+        notification.error({
+          message: "Invalid File",
+          description: "Please upload an image file.",
+        });
+        return;
+      }
+      setImageFile([file]);
     }
   };
-
-  // Handle file upload to the API
-  const uploadImageAndGetUrl = async (): Promise<string | null> => {
-    if (!imageFile) return null;
-
-    const formData = new FormData();
-    formData.append("file", imageFile);
-
-    try {
-      const response = await axios.post(
-        "https://ssap-backend.azurewebsites.net/api/file-upload",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      return response.data.url; // assuming the response has `url` in the response data
-    } catch (error) {
-      notification.error({
-        message: "Error uploading image",
-        description: "Failed to upload image. Please try again.",
-      });
-      console.error("Upload Error:", error);
-      return null;
-    }
-  };
-
+  
   const { fields: criteriaFields, append: appendCriteria } = useFieldArray({
     name: "criteria",
     control: form.control,
@@ -1044,13 +1028,12 @@ const FormCreateScholarshipProgram = () => {
   const handleAddNewScholarshipProgram = async (values: z.infer<typeof formSchema>) => {
     try {
       if (!funderId) throw new Error("Funder ID not available");
-
-      // Upload image and get URL
-      const imageUrl = await uploadImageAndGetUrl();
+  
+      const imageUrl = await uploadFile(imageFile);
       if (imageUrl) {
-        form.setValue("imageUrl", imageUrl);
+        values.imageUrl = imageUrl.data.toString(); 
       }
-
+  
       const postData = {
         ...values,
         scholarshipAmount: parseFloat(values.price),
@@ -1063,17 +1046,25 @@ const FormCreateScholarshipProgram = () => {
         majorId: parseInt(values.major),
         deadline: new Date(values.deadline).toISOString(),
       };
-
+  
       const response = await axios.post(`${BASE_URL}/api/scholarship-programs`, postData);
-      if (response.status === 200 || 201) {
-        notification.success({ message: "Scholarship Program Created", description: "The program was successfully created." });
+      
+      if (response.status === 200 || response.status === 201) {
+        notification.success({
+          message: "Scholarship Program Created",
+          description: "The program was successfully created.",
+        });
         navigate(RouteNames.ACTIVITY);
       }
     } catch (error) {
       console.error("Error creating scholarship program", error);
-      notification.error({ message: "Error", description: "Failed to create the scholarship program. Please try again." });
+      notification.error({
+        message: "Error",
+        description: "Failed to create the scholarship program. Please try again.",
+      });
     }
   };
+  
   return (
     <form onSubmit={form.handleSubmit(handleAddNewScholarshipProgram)} className="space-y-6">
       <Card>

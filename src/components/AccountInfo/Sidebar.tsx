@@ -86,11 +86,11 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
   const listItems: ListItemProps[] = [
     { Icon: AiOutlineAudit, text: "Account", link: RouteNames.ACCOUNT_INFO },
     { Icon: AiOutlineBook, text: "Information", link: RouteNames.INFORMATION },
-    {
-      Icon: AiOutlineBook,
-      text: `Skills ${hasProfile ? "" : "(You need to add profile first)"} `,
-      link: hasProfile ? RouteNames.SKILLS : "",
-    },
+    // {
+    //   Icon: AiOutlineBook,
+    //   text: `Skills ${hasProfile ? "" : "(You need to add profile first)"} `,
+    //   link: hasProfile ? RouteNames.SKILLS : "",
+    // },
     {
       Icon: AiOutlineBarChart,
       text: "Change Password",
@@ -113,20 +113,21 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
       link: RouteNames.APPLICATION_REVIEW,
     });
   }
+  if (role === "Applicant") {
+    listItems.push({
+      Icon: AiOutlineBook,
+      text: `Skills ${hasProfile ? "" : "(You need to add profile first)"} `,
+      link: hasProfile ? RouteNames.SKILLS : "",
+    });
+  }
 
-  // const handleLogout = () => {
-  //     // dispatch(clearAuth());
-  //     localStorage.removeItem('token');
-  //     navigate(RouteNames.HOME);
-  // };
+  
   const handleLogout = () => {
-    // setIsLoading(true);
     setTimeout(() => {
       dispatch(removeToken());
       dispatch(removeUser());
       localStorage.removeItem("token");
       navigate(RouteNames.HOME);
-      //   setIsLoading(false);
     }, 500);
   };
 
@@ -136,7 +137,7 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
 
   return (
     <>
-      <div className={`${className} flex flex-col my-10 shadow-2  bg-white`}>
+      <div className={`${className} flex flex-col my-10 shadow-2 bg-white rounded-lg`}>
         <div className="flex flex-col items-center gap-8">
           {/* <div className='flex justify-center items-center gap-4'>
                         <img src='https://via.placeholder.com/150' alt='profile' className='rounded-full w-24' />
