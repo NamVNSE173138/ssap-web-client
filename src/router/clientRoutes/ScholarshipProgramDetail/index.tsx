@@ -24,6 +24,7 @@ import { getApplicationsByScholarship } from "@/services/ApiServices/accountServ
 import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewMilestoneDialog from "./review-milestone-dialog";
+import ReviewingApplicationDialog from "./expert-reviewing-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 import { format } from "date-fns";
@@ -93,12 +94,17 @@ const ScholarshipProgramDetail = () => {
   const [assignExpertDialogOpen, setAssignExpertDialogOpen] =
     useState<boolean>(false);
 
+  const [reviewingDialogOpen, setReviewingDialogOpen] =
+    useState<boolean>(false);
+  const [selectedExpert, setSelectedExpert] = useState<any>(null);
+
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] =
     useState<boolean>(false);
 
   const [winningApplications, setWinningApplications] = useState<any>(null);
   const [awardDialogOpen, setAwardDialogOpen] = useState<boolean>(false);
+  // const [reviewingDialogOpen, setReviewingDialogOpen] = useState<boolean>(false);
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
@@ -118,7 +124,7 @@ const ScholarshipProgramDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (response.data.statusCode === 200) {
@@ -135,11 +141,11 @@ const ScholarshipProgramDetail = () => {
 
           const application = await getApplicationByApplicantIdAndScholarshipId(
             parseInt(user?.id),
-            response.data.data.id,
+            response.data.data.id
           );
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(
-            response.data.data.id,
+            response.data.data.id
           );
           //setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
           //console.log(application.data);
@@ -305,6 +311,11 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
+  const handleOpenReviewingDialog = async () => {
+    setSelectedExpert(experts);
+    setReviewingDialogOpen(true);
+  };
+
   const cancelApplication = async () => {
     try {
       if (!existingApplication[0]) return;
@@ -326,7 +337,7 @@ const ScholarshipProgramDetail = () => {
   const deleteScholarship = async () => {
     try {
       const response = await axios.delete(
-        `${BASE_URL}/api/scholarship-programs/${id}`,
+        `${BASE_URL}/api/scholarship-programs/${id}`
       );
       if (response.data.statusCode == 200) {
         setData(response.data.data);
@@ -341,18 +352,18 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
+
+  console.log("IMAGE",data?.imageUrl);
+  
+
   if (!data) return <Spinner size="large" />;
-  // console.log("MAJOR", data?.major);
-  // console.log("UNIVERSITY", data?.university);
-  // console.log("iUser", user);
-  // console.log("authorize", authorized);
 
   return (
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
         <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
-          <div>
+          <div className="">
             <Breadcrumb className="">
               <BreadcrumbList className="text-white">
                 <BreadcrumbItem>
@@ -415,7 +426,7 @@ const ScholarshipProgramDetail = () => {
                       <button
                         onClick={() =>
                           navigate(
-                            `/funder/application/${existingApplication[0].id}`,
+                            `/funder/application/${existingApplication[0].id}`
                           )
                         }
                         className="flex-1 text-xl w-full bg-green-700 rounded-[25px] mr-3"
@@ -427,7 +438,7 @@ const ScholarshipProgramDetail = () => {
                         <button
                           onClick={() =>
                             navigate(
-                              `/funder/application/${existingApplication[0].id}`,
+                              `/funder/application/${existingApplication[0].id}`
                             )
                           }
                           className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
@@ -521,6 +532,12 @@ const ScholarshipProgramDetail = () => {
                     >
                       <FaTrophy className="mr-2" /> Award Progress
                     </button>
+                    <button
+                      onClick={() => handleOpenReviewingDialog()}
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                    >
+                      <FaTrophy className="mr-2" /> Expert Reviewing
+                    </button>
                   </div>
                 )
               )}
@@ -565,9 +582,9 @@ const ScholarshipProgramDetail = () => {
         </div>
       </div>
       <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
-        <section className="max-w-container flex justify-center mx-auto py-6 lg:py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 px-4 lg:px-0">
-            <div className="flex mr-55 items-center gap-3">
+        <section className="w-full max-w-none flex justify-between items-center mx-auto py-6 lg:py-10 px-4 lg:px-0">
+          <div className="flex w-full justify-around gap-12">
+            <div className="flex items-center gap-3">
               <FaMapMarkerAlt className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
                 <p className="text-sm font-semibold text-gray-500">Location</p>
@@ -577,7 +594,7 @@ const ScholarshipProgramDetail = () => {
               </div>
             </div>
 
-            <div className="flex ml-40 items-center gap-3">
+            <div className="flex items-center gap-3">
               <FaGraduationCap className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
                 <p className="text-sm font-semibold text-gray-500">
@@ -601,7 +618,7 @@ const ScholarshipProgramDetail = () => {
               </div>
             </div>
 
-            <div className="flex ml-40 items-center gap-3">
+            <div className="flex items-center gap-3">
               <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
                 <p className="text-sm font-semibold text-gray-500">Deadline</p>
@@ -627,6 +644,7 @@ const ScholarshipProgramDetail = () => {
           </div>
         </section>
       </div>
+
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-6 px-4 sm:px-6 xl:px-0">
@@ -1052,6 +1070,20 @@ const ScholarshipProgramDetail = () => {
           fetchAwardMilestones={async () => {
             if (!data) return;
             await fetchAwardMilestones(parseInt(data?.id));
+          }}
+        />
+      )}
+      {authorized != "Unauthorized" && data && (
+        <ReviewingApplicationDialog
+          open={reviewingDialogOpen}
+          onClose={(open: boolean) => setReviewingDialogOpen(open)}
+          expert={selectedExpert}
+          fetchApplications={async () => {
+            if (!selectedExpert) return;
+            const response = await axios.get(
+              `${BASE_URL}/api/experts/${selectedExpert.id}/assigned-applications`
+            );
+            return response.data.data || [];
           }}
         />
       )}
