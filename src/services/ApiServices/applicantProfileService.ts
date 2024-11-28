@@ -26,6 +26,21 @@ export async function getApplicantProfileDetails(id: number) {
   return response.data;
 }
 
+export async function updateApplicantProfileDetails(
+  id: number,
+  profileData: any,
+) {
+  const response = await axios.put(
+    `${BASE_URL}/api/applicants/${id}/profile`,
+    profileData,
+    ngrokSkipWarning,
+  );
+
+  console.log(response.data);
+
+  return response.data;
+}
+
 export async function getAllApplicantProfilesByApplicant(id: number) {
   const response = await axios.get(
     `${BASE_URL}/api/applicants/${id}`,
