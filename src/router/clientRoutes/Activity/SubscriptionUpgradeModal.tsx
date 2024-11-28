@@ -5,13 +5,13 @@ import { RootState } from "@/store/store";
 import { Dialog } from "@mui/material";
 import { notification } from "antd";
 import React, { useEffect, useState } from "react";
-import { FaClock, FaCreditCard, FaDollarSign, FaExclamationTriangle, FaInfoCircle, FaRocket, FaTag, FaTimes, FaWallet } from "react-icons/fa";
+import { FaCheckCircle, FaClock, FaCreditCard, FaDollarSign, FaExclamationTriangle, FaInfoCircle, FaRocket, FaTag, FaTimes, FaWallet } from "react-icons/fa";
 import { IoIosApps, IoIosArrowDown, IoIosArrowUp, IoMdClose } from "react-icons/io";
-import { IoCashOutline, IoInformationCircle, IoWalletOutline } from "react-icons/io5";
+import { IoCashOutline, IoInformationCircle, IoPricetag, IoPricetagOutline, IoWalletOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import SubscriptionContractDialog from "../ServiceDetail/SubscriptionContractDialog";
-import { getAllSubscriptions } from "@/services/ApiServices/subscriptionService";
+import { getAllSubscriptions, getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
 
 type Subscription = {
     name: string;
@@ -22,7 +22,7 @@ type Subscription = {
     validMonths: number;
 };
 
-const MultiStepSubscriptionModal = ({
+const MultiStepUpgradeSubscriptionModal = ({
     isOpen,
     setIsOpen,
     fetchSubscriptions,
@@ -40,10 +40,12 @@ const MultiStepSubscriptionModal = ({
     const [loading, setLoading] = useState<boolean>(false);
     const [isContractOpen, setContractOpen] = useState(false);
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+    const [currentSubscription, setCurrentSubscription] = useState<Subscription | null>(null);
 
     useEffect(() => {
         if (isOpen) {
             fetchSubscriptionsFromAPI();
+            fetchSubscriptionByProviderId();
         }
     }, [isOpen]);
 
@@ -57,6 +59,41 @@ const MultiStepSubscriptionModal = ({
             console.error("Failed to fetch subscriptions:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchSubscriptionByProviderId = async () => {
+        if (!user || !user.id) {
+            console.error("User information is missing.");
+            return null;
+        }
+
+        try {
+            const response = await getSubscriptionByProviderId(Number(user.id));
+
+            if (response?.statusCode === 200) {
+                setCurrentSubscription(response.data);
+                return response.data;
+            } else {
+                console.error("Failed to fetch subscription. Response:", response);
+                return null;
+            }
+        } catch (error) {
+            console.error("Failed to fetch subscription by provider ID:", error);
+            return null;
+        }
+    };
+
+    const handleSubscriptionClick = (sub: Subscription) => {
+        if (currentSubscription && (sub.amount <= currentSubscription.amount)) {
+            notification.error({
+                message: 'Error',
+                description: 'You cannot upgrade your subscription to the same price or less.',
+                placement: 'topRight',
+            });
+        } else {
+            // Chọn subscription hợp lệ
+            setSelectedSubscription(sub.id);
         }
     };
 
@@ -77,12 +114,24 @@ const MultiStepSubscriptionModal = ({
         if (!user) return null;
 
         try {
+            setLoading(true);
+
             const accountData = await getAccountById(Number(user.id));
+            const currentSubscription = await fetchSubscriptionByProviderId();
+
             const selectedSubscrip = subscriptions.find((sub) => sub.id === selectedSubscription);
-            const totalPrice = selectedSubscrip?.amount ?? 0;
+
+            if (!selectedSubscrip) {
+                notification.error({ message: "Invalid subscription selection." });
+                return;
+            }
+
+            const currentPrice = currentSubscription?.amount || 0;
+            const selectedPrice = selectedSubscrip.amount;
+            const totalPrice = Math.max(selectedPrice - currentPrice, 0);
 
             if (paymentMethod === "Wallet") {
-                const userBalance = accountData.wallet?.balance;
+                const userBalance = accountData.wallet?.balance || 0;
 
                 if (userBalance < totalPrice) {
                     notification.error({
@@ -98,33 +147,25 @@ const MultiStepSubscriptionModal = ({
                 receiverId: 1,
                 amount: totalPrice,
                 paymentMethod: paymentMethod,
-                description: "Pay for subscription"
+                description: "Pay for subscription upgrade"
             };
 
             const paymentResponse = await transferMoney(transferRequest);
 
             if (paymentResponse.statusCode === 200) {
-                const validMonths = selectedSubscrip?.validMonths ?? 0;
+                const validMonths = selectedSubscrip.validMonths ?? 0;
                 const currentDate = new Date();
                 const subscriptionEndDate = new Date(currentDate.setMonth(currentDate.getMonth() + validMonths));
 
                 const updatedAccountData = {
-                    id: user.id,
-                    username: accountData.username,
-                    email: accountData.email,
-                    phoneNumber: accountData.phoneNumber,
+                    ...accountData,
                     subscriptionEndDate: subscriptionEndDate.toISOString(),
                     subscriptionId: selectedSubscrip?.id,
-                    hashedPassword: accountData.hashedPassword,
-                    address: accountData.address,
-                    avatarUrl: accountData.avatarUrl,
-                    loginWithGoogle: accountData.loginWithGoogle,
-                    status: accountData.status,
-                    roleId: accountData.roleId
                 };
 
                 const updateResponse = await updateAccount(updatedAccountData);
-                notification.success({ message: "Buy subscription successfully!" });
+
+                notification.success({ message: "Upgrade subscription successfully!" });
 
                 if (updateResponse) {
                     fetchSubscriptions();
@@ -140,6 +181,8 @@ const MultiStepSubscriptionModal = ({
                 notification.error({ message: "Failed to process payment." });
                 console.error("Payment error:", error);
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -187,8 +230,10 @@ const MultiStepSubscriptionModal = ({
                             {subscriptions.map((sub) => (
                                 <div
                                     key={sub.id}
-                                    className={`border rounded-lg shadow-sm p-4 hover:shadow-xl transition-all cursor-pointer ${selectedSubscription === sub.id ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
-                                    onClick={() => setSelectedSubscription(sub.id)}
+                                    className={`border rounded-lg shadow-sm p-4 hover:shadow-xl transition-all cursor-pointer 
+                                    ${selectedSubscription === sub.id ? "border-blue-500 bg-blue-50" : "border-gray-300"} 
+                                    ${currentSubscription && (sub.amount < currentSubscription.amount || sub.amount === currentSubscription.amount) ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    onClick={() => handleSubscriptionClick(sub)}
                                 >
                                     <div className="flex items-center justify-between">
                                         <span className="font-medium text-gray-800 flex items-center gap-2">
@@ -199,7 +244,7 @@ const MultiStepSubscriptionModal = ({
                                             className="text-blue-500 hover:text-blue-700 transition-colors"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setSelectedSubscription(sub.id);
+                                                handleSubscriptionClick(sub);
                                             }}
                                         >
                                             {selectedSubscription === sub.id ? <IoIosArrowUp /> : <IoIosArrowDown />}
@@ -224,7 +269,6 @@ const MultiStepSubscriptionModal = ({
                                     )}
                                 </div>
                             ))}
-
                         </div>
                         <div className="flex justify-between mt-6">
                             <div />
@@ -239,78 +283,109 @@ const MultiStepSubscriptionModal = ({
                             </button>
                         </div>
                     </>
+
                 ) : (
                     <>
                         <h2 className="text-2xl font-bold text-blue-600 mb-6 flex items-center">
                             <FaCreditCard className="text-3xl mr-3" />
                             Checkout
                         </h2>
-                        <div className="border rounded-lg p-4 bg-blue-50">
-                            <p className="flex items-center gap-2">
-                                <FaTag className="text-blue-500" />
-                                <strong>Name:</strong> {selectedSubscrip?.name}
-                            </p>
 
-                            <p className="flex items-center gap-2">
-                                <FaInfoCircle className="text-gray-600" />
-                                <strong>Description:</strong> {selectedSubscrip?.description}
-                            </p>
+                        <div className="overflow-y-auto max-h-[calc(100vh-250px)]">
+                            <div className="border rounded-lg p-4 bg-blue-50">
+                                <p className="flex items-center gap-2">
+                                    <FaTag className="text-blue-500" />
+                                    <strong>Name:</strong> {selectedSubscrip?.name}
+                                </p>
 
-                            <p className="flex items-center gap-2">
-                                <FaDollarSign className="text-green-500" />
-                                <strong>Amount:</strong> {selectedSubscrip?.amount}
-                            </p>
+                                <p className="flex items-center gap-2">
+                                    <FaInfoCircle className="text-gray-600" />
+                                    <strong>Description:</strong> {selectedSubscrip?.description}
+                                </p>
 
-                            <p className="flex items-center gap-2">
-                                <IoIosApps className="text-purple-500" />
-                                <strong>Number of Services:</strong> {selectedSubscrip?.numberOfServices}
-                            </p>
+                                <p className="flex items-center gap-2">
+                                    <FaDollarSign className="text-green-500" />
+                                    <strong>Amount:</strong> {selectedSubscrip?.amount}
+                                </p>
 
-                            <p className="flex items-center gap-2">
-                                <FaClock className="text-orange-500" />
-                                <strong>Valid for:</strong> {selectedSubscrip?.validMonths} months
-                            </p>
+                                <p className="flex items-center gap-2">
+                                    <IoIosApps className="text-purple-500" />
+                                    <strong>Number of Services:</strong> {selectedSubscrip?.numberOfServices}
+                                </p>
 
-                        </div>
-
-                        <div className="mt-6">
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
-                                Choose Payment Method
-                            </label>
-                            <div className="flex gap-4">
-                                <div
-                                    onClick={() => setPaymentMethod("Wallet")}
-                                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet" ? "border-blue-500 bg-blue-100" : "border-gray-300 hover:bg-gray-100"}`}
-                                >
-                                    <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
-                                        <IoWalletOutline className="text-2xl" />
-                                    </div>
-                                    <span className="font-medium text-gray-800">Pay by Wallet</span>
-                                </div>
-
-                                <div
-                                    onClick={() => setPaymentMethod("Cash")}
-                                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash" ? "border-green-500 bg-green-100" : "border-gray-300 hover:bg-gray-100"}`}
-                                >
-                                    <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
-                                        <IoCashOutline className="text-2xl" />
-                                    </div>
-                                    <span className="font-medium text-gray-800">Cash</span>
-                                </div>
+                                <p className="flex items-center gap-2">
+                                    <FaClock className="text-orange-500" />
+                                    <strong>Valid for:</strong> {selectedSubscrip?.validMonths} months
+                                </p>
                             </div>
-                            {!paymentMethod && (
-                                <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
+
+                            <br />
+
+                            {currentSubscription && selectedSubscrip && (
+                                <div className="mb-4 p-4 bg-blue-50 text-black-700 rounded-lg">
+                                    <p className="flex items-center gap-2">
+                                        <FaCheckCircle className="text-green-500" size={20} />
+                                        You have bought <strong>{currentSubscription.name}</strong> with price{" "}
+                                        <strong>{currentSubscription.amount}</strong>$, so you need to pay with price{" "}
+                                        <strong>{selectedSubscrip.amount > currentSubscription.amount ? selectedSubscrip.amount - currentSubscription.amount : 0}</strong>$.
+                                    </p>
+
+                                    <div className="mt-4">
+                                        <label className="block text-gray-700 font-semibold mb-2 flex items-center gap-2">
+                                            <IoPricetagOutline className="text-blue-500" size={20} />
+                                            Total Price
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={`$${selectedSubscrip ? (selectedSubscrip.amount > currentSubscription?.amount ? selectedSubscrip.amount - currentSubscription.amount : 0) : 0}`}
+                                            readOnly
+                                            className="w-full border rounded-xl p-4 text-gray-700 bg-white focus:outline-none shadow-md transition-all duration-300 ease-in-out hover:shadow-lg"
+                                        />
+                                    </div>
+                                </div>
                             )}
-                        </div>
-                        <div className="mt-6 text-gray-600 text-base flex items-center gap-2">
-                            <IoInformationCircle className="text-blue-500 inline" />
-                            By clicking <span className="font-medium">"Confirm & Pay"</span>, you agree to our{" "}
-                            <span
-                                className="text-blue-500 font-medium cursor-pointer hover:underline"
-                                onClick={openContractDialog}
-                            >
-                                Subscription Contract
-                            </span>.
+
+                            {/* Phần tiếp theo của modal */}
+                            <div className="mt-6">
+                                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                    Choose Payment Method
+                                </label>
+                                <div className="flex gap-4">
+                                    <div
+                                        onClick={() => setPaymentMethod("Wallet")}
+                                        className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet" ? "border-blue-500 bg-blue-100" : "border-gray-300 hover:bg-gray-100"}`}
+                                    >
+                                        <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
+                                            <IoWalletOutline className="text-2xl" />
+                                        </div>
+                                        <span className="font-medium text-gray-800">Pay by Wallet</span>
+                                    </div>
+
+                                    <div
+                                        onClick={() => setPaymentMethod("Cash")}
+                                        className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash" ? "border-green-500 bg-green-100" : "border-gray-300 hover:bg-gray-100"}`}
+                                    >
+                                        <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
+                                            <IoCashOutline className="text-2xl" />
+                                        </div>
+                                        <span className="font-medium text-gray-800">Cash</span>
+                                    </div>
+                                </div>
+                                {!paymentMethod && (
+                                    <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
+                                )}
+                            </div>
+
+                            <div className="mt-6 text-gray-600 text-base flex items-center gap-2">
+                                <IoInformationCircle className="text-blue-500 inline" />
+                                By clicking <span className="font-medium">"Confirm & Pay"</span>, you agree to our{" "}
+                                <span
+                                    className="text-blue-500 font-medium cursor-pointer hover:underline"
+                                    onClick={openContractDialog}
+                                >
+                                    Subscription Contract
+                                </span>.
+                            </div>
                         </div>
 
                         <div className="flex justify-between mt-6">
@@ -333,6 +408,7 @@ const MultiStepSubscriptionModal = ({
                             </button>
                         </div>
                     </>
+
                 )}
             </div>
 
@@ -372,4 +448,4 @@ const MultiStepSubscriptionModal = ({
     );
 };
 
-export default MultiStepSubscriptionModal;
+export default MultiStepUpgradeSubscriptionModal;

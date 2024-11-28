@@ -309,7 +309,7 @@ const FunderApplication = () => {
           </div>
           <div className="w-full">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={applicant.avatarUrl} />
+              <SchoolLogo imageUrl={applicant.avatarUrl || "https://github.com/shadcn.png"} />
               <div>
                 <p className="text-white text-4xl font-semibold hover:text-indigo-300 transition-colors duration-300">
                   <FaUserCircle className="inline-block mr-2 text-indigo-200" />

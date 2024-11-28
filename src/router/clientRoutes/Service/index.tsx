@@ -17,12 +17,13 @@ import { Input } from "@/components/ui/input";
 import { getAccountById, getAccountWallet } from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
 import { IoPerson, IoWallet } from "react-icons/io5";
-import { FaClock, FaCreditCard, FaDollarSign, FaInfoCircle, FaSadTear } from "react-icons/fa";
+import { FaArrowUp, FaCalendarAlt, FaClock, FaCreditCard, FaDollarSign, FaInfoCircle, FaSadTear } from "react-icons/fa";
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
 import { getServicesByProvider } from "@/services/ApiServices/serviceService";
 import { MdDateRange } from "react-icons/md";
+import MultiStepUpgradeSubscriptionModal from "../Activity/SubscriptionUpgradeModal";
 
 interface SubscriptionDetails {
   name: string;
@@ -31,6 +32,7 @@ interface SubscriptionDetails {
   numberOfServices: number;
   validMonths: number;
   subscriptionEndDate: string;
+  purchaseDate: string;
 }
 
 const Service = () => {
@@ -48,9 +50,57 @@ const Service = () => {
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [numberOfServicesLeft, setNumberOfServicesLeft] = useState<number>(0);
-  const [allServices, setAllServices] = useState<number>(0);
+  const [allServices, setAllServices] = useState<any>(null);
   const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
   const [isSubscriptionDetailModalOpen, setIsSubscriptionDetailModalOpen] = useState(false);
+  const [isSubscriptionUpgradeModalOpen, setIsSubscriptionUpgradeModalOpen] = useState(false);
+  const [hasSubcription, setHasSubcription] = useState(false);
+
+  const fetchSubscriptionDetails = async () => {
+    try {
+      if (user?.role === "Provider") {
+        const subscriptionResponse = await getSubscriptionByProviderId(Number(user?.id));
+        console.log(subscriptionResponse)
+        const accountResponse = await getAccountById(Number(user?.id));
+
+        if (subscriptionResponse && subscriptionResponse.statusCode === 200) {
+          const subscriptionData = subscriptionResponse?.data || {};
+          const formattedEndDate = formatDate(accountResponse.subscriptionEndDate);
+          const purchaseDate = calculatePurchaseDate(formattedEndDate, subscriptionData.validMonths);
+
+          setSubscriptionDetails({
+            name: subscriptionData.name || 'N/A',
+            description: subscriptionData.description || 'No description available.',
+            amount: subscriptionData.amount || 0,
+            numberOfServices: subscriptionData.numberOfServices || 0,
+            validMonths: subscriptionData.validMonths || 0,
+            subscriptionEndDate: formattedEndDate || 'N/A',
+            purchaseDate: purchaseDate,
+          });
+          setHasSubcription(true);
+        } else {
+          setHasSubcription(false);
+        }
+      }
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        setHasSubcription(false);
+      } else {
+        console.error('Error fetching subscription details:', error);
+        setError('Failed to fetch subscription details');
+      }
+    }
+  };
+
+  const calculatePurchaseDate = (subscriptionEndDate: string, validMonths: number): string => {
+    const endDate = parseFormattedDate(subscriptionEndDate);
+    if (!endDate) return 'N/A';
+
+    endDate.setMonth(endDate.getMonth() - validMonths);
+
+    return formatDate(endDate.toISOString());
+  };
+
 
   const formatDate = (dateString: string | null): string => {
     if (!dateString) return 'N/A';
@@ -65,28 +115,25 @@ const Service = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const fetchSubscriptionDetails = async () => {
-    try {
-      if (user?.role === "Provider") {
-        const subscriptionResponse = await getSubscriptionByProviderId(Number(user?.id));
-        const accountResponse = await getAccountById(Number(user?.id));
+  const parseFormattedDate = (dateString: string): Date | null => {
+    const [day, month, year] = dateString.split('/').map(Number);
+    if (!day || !month || !year) return null;
+    return new Date(year, month - 1, day);
+  };
 
-        const subscriptionData = subscriptionResponse?.data || {};
-
-
-        setSubscriptionDetails({
-          name: subscriptionData.name || 'N/A',
-          description: subscriptionData.description || 'No description available.',
-          amount: subscriptionData.amount || 0,
-          numberOfServices: subscriptionData.numberOfServices || 0,
-          validMonths: subscriptionData.validMonths || 0,
-          subscriptionEndDate: formatDate(accountResponse.subscriptionEndDate) || 'N/A',
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching subscription details:', error);
-      setError('Failed to fetch subscription details');
+  const isSubscriptionExpiringSoon = (): boolean => {
+    if (!subscriptionDetails?.subscriptionEndDate || subscriptionDetails.subscriptionEndDate === 'N/A') {
+      return false;
     }
+
+    const endDate = parseFormattedDate(subscriptionDetails.subscriptionEndDate);
+    if (!endDate) return false;
+
+    const today = new Date();
+    const diffInTime = endDate.getTime() - today.getTime();
+    const diffInDays = diffInTime / (1000 * 3600 * 24);
+
+    return diffInDays <= 7 && diffInDays > 0;
   };
 
   const handleInfoIconClick = () => {
@@ -112,7 +159,7 @@ const Service = () => {
       }
     } catch (error) {
       console.error("Error fetching subscription for provider:", error);
-      setError("Failed to fetch subscription details");
+      setError("All your services 'Inactive'. Please buy subscription to view them!");
     }
   };
 
@@ -133,8 +180,6 @@ const Service = () => {
     try {
       let response: any = {};
       if (user?.role === "Provider") {
-        const allServicesData = await getServicesByProvider(Number(user.id));
-
         response = await axios.get(`${BASE_URL}/api/services/by-provider-paginated/${user.id}`, {
           params: {
             pageIndex: currentPage,
@@ -155,6 +200,7 @@ const Service = () => {
       if (response.data.statusCode === 200) {
         if (!user) return null;
         const allServicesData = await getServicesByProvider(Number(user.id));
+
         const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
         if (user?.role === "Provider") {
           const filteredServices = activeServices.filter((service: any) => service.providerId == user.id);
@@ -204,11 +250,11 @@ const Service = () => {
     );
   }, [searchTerm, data]);
 
-  // useEffect(() => {
-  //   if (user?.role === "Provider") {
-  //     fetchSubscriptionForProvider();
-  //   }
-  // }, [data, user]);
+  useEffect(() => {
+    if (user?.role === "Provider") {
+      fetchSubscriptionForProvider();
+    }
+  }, [data, user]);
 
   const handleNextPage = async () => {
     if (currentPage < totalPages) {
@@ -254,11 +300,20 @@ const Service = () => {
     navigate(RouteNames.PROVIDER_LIST);
   };
 
+  const handleUpgradeSubscriptionClick = () => {
+    setIsSubscriptionUpgradeModalOpen(true);
+  };
+
   const isBuySubscriptionDisabled = numberOfServicesLeft > 0;
-  const buySubscriptionTitle =
-    numberOfServicesLeft > 0
-      ? `You have ${numberOfServicesLeft} service creation attempts left. You cannot buy a subscription at this time.`
-      : "Buy a subscription to enable more service creation.";
+  const isUpgradeSubscriptionDisabled = numberOfServicesLeft === 0;
+
+  const buySubscriptionTitle = numberOfServicesLeft > 0
+    ? "You already have services left. Upgrade your subscription for more benefits."
+    : "You need to buy a subscription to create more services.";
+
+  const upgradeSubscriptionTitle = numberOfServicesLeft === 0
+    ? "You can't upgrade without an active subscription. Please buy a subscription first."
+    : "Upgrade your subscription for enhanced benefits.";
 
 
   return (
@@ -282,7 +337,7 @@ const Service = () => {
         </div>
       </div>
 
-      <div className="flex bg-gradient-to-r from-blue-300 to-blue-500 justify-between p-6 items-center shadow-lg">
+      <div className="flex bg-gradient-to-r from-blue-300 to-blue-500 justify-between p-4 items-center shadow-lg">
         <div className="relative w-full max-w-md">
           <Input
             className="w-full pl-12 pr-12 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
@@ -301,7 +356,7 @@ const Service = () => {
 
         {user?.role === "Provider" && (
           <div className="flex gap-4">
-            <div className=" mr-30 text-white text-lg flex items-center">
+            <div className=" text-white text-lg flex items-center flex-wrap">
               <span>Number of services created left: </span>
               <span className="font-semibold">{numberOfServicesLeft}</span>
 
@@ -311,8 +366,15 @@ const Service = () => {
                   className="text-white text-xl cursor-pointer hover:text-blue-500 transition-all duration-300 ml-2"
                 />
               )}
+
+              {isSubscriptionExpiringSoon() && (
+                <p className="text-red-500 font-bold mt-2">
+                  Your subscription will expire in less than 7 days!
+                </p>
+              )}
             </div>
-            
+
+
             <button
               onClick={handleAddServiceClick}
               className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95 ${numberOfServicesLeft === 0 ? 'bg-gray-400 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
@@ -327,19 +389,33 @@ const Service = () => {
               </p>
             </button>
 
-
             <button
               onClick={handleBuySubscriptionClick}
               disabled={isBuySubscriptionDisabled}
               title={buySubscriptionTitle}
-              className={`flex justify-center items-center gap-4 px-6 py-3 rounded-xl shadow-lg active:scale-95 transition-all duration-300 ${isBuySubscriptionDisabled
+              className={`flex justify-center items-center gap-1 px-4 py-3 rounded-xl shadow-lg active:scale-95 transition-all duration-300 ${isBuySubscriptionDisabled
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
                 : "bg-white hover:bg-green-600 hover:text-white"
                 }`}
             >
-              <FaCreditCard className="text-3xl transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <FaCreditCard className="text-2xl transition-all duration-300 ease-in-out transform hover:scale-110" />
               <p className="text-xl font-semibold">Buy Subscription</p>
             </button>
+
+
+            <button
+              onClick={handleUpgradeSubscriptionClick}
+              disabled={isUpgradeSubscriptionDisabled}
+              title={upgradeSubscriptionTitle}
+              className={`flex justify-center items-center gap-1 px-4 py-3 rounded-xl shadow-lg active:scale-95 transition-all duration-300 ${isUpgradeSubscriptionDisabled
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                : "bg-white hover:bg-yellow-600 hover:text-white"
+                }`}
+            >
+              <FaArrowUp className="text-2xl transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl font-semibold">Upgrade Subscription</p>
+            </button>
+
 
           </div>
         )}
@@ -419,6 +495,12 @@ const Service = () => {
         fetchSubscriptions={fetchSubscriptions}
       />
 
+      <MultiStepUpgradeSubscriptionModal
+        isOpen={isSubscriptionUpgradeModalOpen}
+        setIsOpen={setIsSubscriptionUpgradeModalOpen}
+        fetchSubscriptions={fetchSubscriptions}
+      />
+
       <Modal
         title={
           <div className="flex items-center gap-2 text-blue-400">
@@ -458,7 +540,7 @@ const Service = () => {
               </p>
             </div>
             <div className="flex items-center mb-3">
-              <FaDollarSign className="text-yellow-500 text-2xl mr-2" />
+              <FaDollarSign className="text-blue-400 text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Amount:</strong> ${subscriptionDetails.amount}
               </p>
@@ -473,6 +555,12 @@ const Service = () => {
               <FaClock className="text-blue-400 text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Valid Months:</strong> {subscriptionDetails.validMonths}
+              </p>
+            </div>
+            <div className="flex items-center mb-3">
+              <FaCalendarAlt className="text-blue-400 text-2xl mr-2" />
+              <p className="text-lg">
+                <strong>Purchase Date:</strong> {subscriptionDetails.purchaseDate}
               </p>
             </div>
             <div className="flex items-center mb-3">
@@ -517,9 +605,7 @@ const Service = () => {
           </div>
         </div>
       </Dialog>
-
     </div>
-
   );
 };
 

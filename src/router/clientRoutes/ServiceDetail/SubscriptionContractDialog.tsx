@@ -1,5 +1,16 @@
 import React from "react";
-import { IoCalendarOutline, IoClose, IoCloseCircleOutline, IoDocumentText, IoListCircle, IoShieldCheckmarkOutline, IoWarningOutline, IoPersonOutline, IoLockClosedOutline } from "react-icons/io5";
+import {
+    IoCalendarOutline,
+    IoClose,
+    IoCloseCircleOutline,
+    IoDocumentText,
+    IoListCircle,
+    IoShieldCheckmarkOutline,
+    IoWarningOutline,
+    IoPersonOutline,
+    IoLockClosedOutline,
+    IoMailOutline,
+} from "react-icons/io5";
 
 const SubscriptionContractDialog = ({
     isOpen,
@@ -53,6 +64,14 @@ const SubscriptionContractDialog = ({
                         <li className="flex items-start gap-2">
                             <IoCalendarOutline className="text-purple-500 mt-1" />
                             Subscription is effective immediately upon payment and cannot be canceled.
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <IoMailOutline className="text-blue-400 mt-1" />
+                            If your subscription is 7 days from expiration, we will email you a renewal notice.
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <IoWarningOutline className="text-red-400 mt-1" />
+                            If your subscription expires and is not renewed, all your services will become inactive.
                         </li>
                     </ul>
                 </div>
