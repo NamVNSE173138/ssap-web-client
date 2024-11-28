@@ -107,9 +107,9 @@ const Activity = () => {
 
   return (
     <div className="grid grid-cols-12">
-      <Sidebar className="col-start-1 col-end-3" />
-      <div className="col-span-10 gap-1 p-5">
-        <div className="relative w-full flex items-center justify-between p-5">
+      <Sidebar className="col-start-2 col-end-4 h-auto self-start" />
+      <div className="col-span-8 gap-1 p-5">
+        <div className="relative w-full flex items-center justify-between my-5">
           <div className="flex items-center"></div>
           {(role == "FUNDER" || role=="Funder") && (
             <Link to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
@@ -130,8 +130,7 @@ const Activity = () => {
             </button>
           )}
         </div>
-        <div className="h-[1px] bg-gray-300"></div>
-        <menu className="mt-4 grid md:grid-cols-2 grid-cols-1 gap-12 md:px-16 px-2">
+        <menu className="mt-4 grid md:grid-cols-2 grid-cols-1 gap-12 md:px-16 px-2 bg-white rounded-lg">
           {loading ? (
             <ScholarshipProgramSkeleton />
           ) : error ? (

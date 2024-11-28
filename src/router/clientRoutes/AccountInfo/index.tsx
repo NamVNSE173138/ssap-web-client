@@ -134,10 +134,10 @@ const AccountInfo = () => {
   }
 
   return (
-    <div className="grid grid-cols-12 h-full">
-      <Sidebar className="col-start-1 col-end-3" />
+    <div className="grid grid-cols-12 ">
+      <Sidebar className="col-start-2 col-end-4 h-auto self-start" />
       {isEditing ? (
-        <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5 ">
+        <div className="col-span-8 flex flex-col justify-start gap-1 p-5 ">
           <form className="lg:px-28 flex flex-col gap-9 " onSubmit={handleSave}>
             <div className="flex justify-start items-center gap-8">
               <label className="relative cursor-pointer">
@@ -261,7 +261,7 @@ const AccountInfo = () => {
           </form>
         </div>
       ) : (
-        <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5 ">
+        <div className="col-span-8 flex flex-col justify-start gap-1 p-5 ">
           <form className="lg:px-28 flex flex-col gap-12">
             <div className="flex justify-start items-center gap-8">
               <label className="relative cursor-pointer">

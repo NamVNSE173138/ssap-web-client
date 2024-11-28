@@ -140,11 +140,11 @@ const Information = () => {
   }
 
   return (
-    <div className="grid grid-cols-12 h-full">
-      <Sidebar className="col-start-1 col-end-3" needRefresh={hasProfile} />
+    <div className="grid grid-cols-12 ">
+      <Sidebar className="col-start-2 col-end-4 h-auto self-start" needRefresh={hasProfile} />
 
       {isEditing ? (
-        <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-5 p-6 bg-white shadow-lg rounded-xl">
+        <div className="mt-10 ml-5 mb-2 col-span-8 flex flex-col justify-start gap-5 p-6 bg-white shadow-lg rounded-xl">
           <form className="lg:px-28 flex flex-col gap-9" onSubmit={handleSave}>
             {/* Name Fields */}
             <div className="grid grid-cols-2 lg:gap-8 gap-4">
@@ -273,7 +273,7 @@ const Information = () => {
           </form>
         </div>
       ) : (
-        <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-5 p-6 bg-white shadow-lg rounded-xl">
+        <div className="mt-10 ml-5 mb-2 col-span-8 flex flex-col justify-start gap-5 p-6 bg-white shadow-lg rounded-xl">
           <div className="lg:px-28 flex flex-col gap-12">
             {/* Profile Fields */}
             <div className="grid grid-cols-2 lg:gap-8 gap-4">
