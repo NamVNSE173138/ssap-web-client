@@ -173,10 +173,10 @@ const ChangePassword: React.FC = () => {
     };
 
     return (
-        <div className="grid grid-cols-12 h-full">
-            <Sidebar className="col-start-1 col-end-3" />
+        <div className="grid grid-cols-12 ">
+            <Sidebar className="col-start-2 col-end-4 h-auto self-start" />
 
-            <div className="col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+            <div className="col-span-8 flex flex-col justify-start gap-1 p-5">
                 <div className="mt-10 flex flex-col items-center bg-white shadow-lg rounded-xl p-8">
                     <h2 className="text-3xl font-bold text-gray-800 mb-6">{isForgotPassword ? "Forgot Password" : "Change Password"}</h2>
 
