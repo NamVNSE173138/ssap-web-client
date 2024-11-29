@@ -33,17 +33,18 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
         borderRadius: "12px",
         boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
         overflow: "hidden",
+        backgroundColor: "#fafafa",  // Slight background color for the whole container
       }}
     >
       <Table sx={{ minWidth: 650 }}>
         {/* Table Header */}
         <TableHead sx={{ backgroundColor: "#e3f2fd" }}>
           <TableRow>
-            <TableCell sx={{ color: "#0d47a1", fontWeight: "bold" }}>Milestone</TableCell>
-            <TableCell sx={{ color: "#0d47a1", fontWeight: "bold" }}>From Date</TableCell>
-            <TableCell sx={{ color: "#0d47a1", fontWeight: "bold" }}>To Date</TableCell>
-            <TableCell sx={{ color: "#0d47a1", fontWeight: "bold" }}>Amount</TableCell>
-            <TableCell sx={{ color: "#0d47a1", fontWeight: "bold" }}>Status</TableCell>
+            {['Milestone', 'From Date', 'To Date', 'Amount', 'Status'].map((header, index) => (
+              <TableCell key={index} sx={{ color: "#0d47a1", fontWeight: "bold", fontSize: 16 }}>
+                {header}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
 
@@ -62,7 +63,7 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                 <FileIcon style={{ color: "#0d47a1" }} />
                 {"Progress " + (index + 1)}
               </TableCell>
-              <TableCell >
+              {/* <TableCell >
                 <Tooltip title={`Uploaded on ${formatDate(award.fromDate)}`}>
                   <span style={{ display: "flex", alignItems: "center" }}>
                     <TimerIcon style={{ verticalAlign: "middle", marginRight: 1, color: "#0d47a1" }} />
@@ -77,142 +78,167 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                     {formatDate(award.toDate)}
                   </span>
                 </Tooltip>
-              </TableCell>
-              <TableCell sx={{ color: "#388e3c", fontWeight: "bold" }}>${award.amount}</TableCell>
+              </TableCell> */}
+              {/* <TableCell sx={{ color: "#388e3c", fontWeight: "bold" }}>${award.amount}</TableCell> */}
 
-              {/* Status Cell */}
-              <TableCell>
-                {(new Date(application.updatedAt) < new Date(award.toDate) && new Date(application.updatedAt) > new Date(award.fromDate)
-                ) ? (
-                  <>
-                    {application.status === "Submitted" && (
-                      <div className="flex justify-end gap-2 items-center">
-                        <span className="relative flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
-                        </span>
-                        <span className="text-yellow-500 font-medium">Reviewing</span>
-                      </div>
-                    )}
-                    {application.status === "Awarded" && (
-                      <div className="flex justify-end gap-2 items-center">
-                        <span className="relative flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                        </span>
-                        <span className="text-green-500 font-medium">Awarded</span>
-                      </div>
-                    )}
-                    {application.status === "NeedExtend" && (
-                      <div className="flex justify-end gap-2 items-center">
-                        <span className="relative flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
-                        </span>
-                        <span className="text-orange-500 font-medium">Need Extend</span>
-                      </div>
-                    )}
-                    {application.status == ApplicationStatus.Approved && 
-                    <div className="flex justify-end gap-2 items-center">
-                        <span className="relative flex h-3 w-3">
+                {/* From Date Cell */}
+                <TableCell>
+                  <Tooltip title={`Uploaded on ${formatDate(award.fromDate)}`}>
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      <TimerIcon style={{ verticalAlign: "middle", marginRight: 8, color: "#0d47a1" }} />
+                      {formatDate(award.fromDate)}
+                    </span>
+                  </Tooltip>
+                </TableCell>
+
+                {/* To Date Cell */}
+                <TableCell>
+                  <Tooltip title={`Uploaded on ${formatDate(award.toDate)}`}>
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      <TimerIcon style={{ verticalAlign: "middle", marginRight: 8, color: "#0d47a1" }} />
+                      {formatDate(award.toDate)}
+                    </span>
+                  </Tooltip>
+                </TableCell>
+
+                {/* Amount Cell */}
+                <TableCell sx={{ color: "#388e3c", fontWeight: "bold" }}>${award.amount}</TableCell>
+
+                {/* Status Cell */}
+                <TableCell>
+                  {new Date(application.updatedAt) < new Date(award.toDate) && new Date(application.updatedAt) > new Date(award.fromDate) ? (
+                    <>
+                      {application.status === "Submitted" && (
+                        <div className="flex justify-end gap-2 items-center">
+                          <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                          </span>
+                          <span className="text-yellow-500 font-medium">Reviewing</span>
+                        </div>
+                      )}
+                      {application.status === "Awarded" && (
+                        <div className="flex justify-end gap-2 items-center">
+                          <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                          </span>
+                          <span className="text-green-500 font-medium">Awarded</span>
+                        </div>
+                      )}
+                      {application.status === "NeedExtend" && (
+                        <div className="flex justify-end gap-2 items-center">
+                          <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                          </span>
+                          <span className="text-orange-500 font-medium">Need Extend</span>
+                        </div>
+                      )}
+                      {application.status === ApplicationStatus.Approved && (
+                        <div className="flex justify-end gap-2 items-center">
+                          <span className="relative flex h-3 w-3">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
-                        </span>
-                        <span className="text-sky-500">Approved</span>
-                    </div>
-                    }
-                    {application.status == ApplicationStatus.Rejected && 
-                    <div className="flex justify-end gap-2 items-center">
-                        <span className="relative flex h-3 w-3">
+                          </span>
+                          <span className="text-sky-500">Approved</span>
+                        </div>
+                      )}
+                      {application.status === ApplicationStatus.Rejected && (
+                        <div className="flex justify-end gap-2 items-center">
+                          <span className="relative flex h-3 w-3">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                        </span>
-                        <span className="text-red-500">Rejected</span>
+                          </span>
+                          <span className="text-red-500">Rejected</span>
+                        </div>
+                      )}
+                    </>
+                  ) : new Date(application.updatedAt) > new Date(award.toDate) ? (
+                    <div className="flex justify-end gap-2 items-center">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                      </span>
+                      <span className="text-green-500 font-medium">Awarded</span>
                     </div>
-                    }
-                  </>
-                ) : new Date(application.updatedAt) > new Date(award.toDate) ? (
-                  <div className="flex justify-end gap-2 items-center">
-                    <span className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                    </span>
+                  ) : (
+                    <div className="flex justify-end gap-2 items-center">
+                      <BsDashCircle size={20} color="#9e9e9e" />
+                      <span className="text-gray-500 font-medium">Not Started</span>
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
 
-                    <span className="text-green-500 font-medium">Awarded</span>
-                  </div>
-                ) : (
-                  <div className="flex justify-end gap-2 items-center">
-                    <BsDashCircle size={20} color="#9e9e9e" />
-                    <span className="text-gray-500 font-medium">Not Started</span>
-                  </div>
-                )}
-              </TableCell>
-            </TableRow>
               {/* Accordion Row */}
-          <TableRow>
-            <TableCell colSpan={5} sx={{ padding: 0 }}>
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ArrowDropDownCircleRounded />}
-                  aria-controls="panel2-content"
-                  id={`panel2-header-${index}`}
-                >
-                <Tooltip title={`Click to expand`}>
-                  <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
-                    Submission Guides for Progress {index + 1}
-                  </Typography>
-                </Tooltip>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Accordion expanded>
+              <TableRow>
+                <TableCell colSpan={5} sx={{ padding: 0 }}>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ArrowDropDownCircleRounded />}
+                      aria-controls="panel2-content"
+                      id={`panel2-header-${index}`}
+                    >
+                      <Tooltip title={`Click to expand`}>
+                        <Typography sx={{ color: "#0d47a1", fontWeight: "semibold" }}>
+                          Submission Guides for Progress {index + 1}
+                        </Typography>
+                      </Tooltip>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Accordion expanded>
                         <AccordionSummary
                           expandIcon={<ArrowDropDownCircleRounded />}
                           aria-controls="panel2-content"
                           id={`panel2-header-${index}`}
                         >
-                        <Tooltip title={`Click to expand`}>
-                          <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
-                            Required Files
-                          </Typography>
-                        </Tooltip>
+                          <Tooltip title={`Click to expand`}>
+                            <Typography sx={{ color: "#0d47a1", fontWeight: "semibold" }}>
+                              Required Files
+                            </Typography>
+                          </Tooltip>
                         </AccordionSummary>
                         <AccordionDetails>
                           <Typography className="mb-3">
-                              {award.awardMilestoneDocuments && award.awardMilestoneDocuments.length == 0 && "No required files"}
-                              {award.awardMilestoneDocuments?.map((document:any, index:number) => (
-                                <Tag key={index} color="magenta">{document.type}</Tag>
-                              ))}
+                            {award.awardMilestoneDocuments && award.awardMilestoneDocuments.length === 0
+                              ? "No required files"
+                              : award.awardMilestoneDocuments?.map((document: any, index: number) => (
+                                  <Tag key={index} color="magenta">
+                                    {document.type}
+                                  </Tag>
+                                ))}
                           </Typography>
                         </AccordionDetails>
-                  </Accordion>
-                  <Accordion expanded>
+                      </Accordion>
+                      <Accordion expanded>
                         <AccordionSummary
                           expandIcon={<ArrowDropDownCircleRounded />}
                           aria-controls="panel2-content"
                           id={`panel2-header-${index}`}
                         >
-                        <Tooltip title={`Click to expand`}>
-                          <Typography sx={{ color: "#0d47a1",fontWeight: "semibold" }} >
+                          <Tooltip title={`Click to expand`}>
+                            <Typography sx={{ color: "#0d47a1", fontWeight: "semibold" }}>
                               Notes
-                          </Typography>
-                        </Tooltip>
+                            </Typography>
+                          </Tooltip>
                         </AccordionSummary>
                         <AccordionDetails>
                           <Typography>
-                          <ReactMarkdown 
-                                components={{ a: CustomLink }}
-                                children={transformToMarkdown(award.note ?? 
-                                `No notes for this award milestone`)}
-                                rehypePlugins={[rehypeRaw]}
-                                remarkPlugins={[remarkGfm]}
+                            <ReactMarkdown
+                              components={{ a: CustomLink }}
+                              children={transformToMarkdown(award.note ?? `No notes for this award milestone`)}
+                              rehypePlugins={[rehypeRaw]}
+                              remarkPlugins={[remarkGfm]}
                             ></ReactMarkdown>
-                      </Typography>
-
+                          </Typography>
                         </AccordionDetails>
+                      </Accordion>
+                    </AccordionDetails>
                   </Accordion>
 
-                </AccordionDetails>
-              </Accordion>
+                {/* </AccordionDetails> */}
+              {/* </Accordion> */}
             </TableCell>
             </TableRow>
         </React.Fragment>
