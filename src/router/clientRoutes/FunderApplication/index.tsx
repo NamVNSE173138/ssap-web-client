@@ -106,7 +106,11 @@ const FunderApplication = () => {
             const currentAward = awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
                 new Date(application.updatedAt) < new Date(milestone.toDate)
             )
-            if(currentAward.awardMilestoneDocuments.length != 0 && !currentAward.awardMilestoneDocuments.map((doc: any) => doc.type).includes(row.type)) {
+            //console.log(new Set(rows.map((row: any) => row.type)))
+            //console.log(new Set(new Set(currentAward.awardMilestoneDocuments.map((doc: any) => doc.type))))
+            const areSetsEqual = (setA: Set<any>, setB: Set<any>): boolean =>
+                setA.size === setB.size && [...setA].every(item => setB.has(item));
+            if(currentAward.awardMilestoneDocuments.length != 0 && !areSetsEqual(new Set(rows.map((row: any) => row.type)), new Set(currentAward.awardMilestoneDocuments.map((doc: any) => doc.type)))) {
                 setExtendError("Please only upload required documents of types " + currentAward.awardMilestoneDocuments.map((doc: any) => doc.type).join(", "));
                 return;
             }
@@ -436,6 +440,9 @@ const FunderApplication = () => {
             <DocumentTable
               documents={documents}
               awardMilestones={awardMilestones}
+              documentType={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+                new Date(application.updatedAt) < new Date(milestone.toDate)
+              ).awardMilestoneDocuments.map((doc: any) => doc.type)}
               rows={rows}
               setRows={setRows}
               handleDeleteRow={handleDeleteRow}
