@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
 import { Tag } from "antd";
+import React from "react";
 
 const AwardProgressTable = ({ awardMilestone, application }: any) => {
     const transformToMarkdown = (text: string) => {
@@ -50,19 +51,35 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
         {/* Table Body */}
         <TableBody>
           {awardMilestone.map((award: any, index: any) => (
-            <>
-              <TableRow
-                key={award.id}
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  "&:hover": { backgroundColor: "#e3f2fd" },
-                }}
-              >
-                {/* Milestone Cell */}
-                <TableCell component="th" scope="row" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <FileIcon style={{ color: "#0d47a1" }} />
-                  {"Progress " + (index + 1)}
-                </TableCell>
+          <React.Fragment key={award.id}>
+            <TableRow
+              key={award.id}
+              sx={{
+                "&:last-child td, &:last-child th": { border: 0 },
+                "&:hover": { backgroundColor: "#e3f2fd" },
+              }}
+            >
+              <TableCell component="th" scope="row" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <FileIcon style={{ color: "#0d47a1" }} />
+                {"Progress " + (index + 1)}
+              </TableCell>
+              {/* <TableCell >
+                <Tooltip title={`Uploaded on ${formatDate(award.fromDate)}`}>
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    <TimerIcon style={{ verticalAlign: "middle", marginRight: 1, color: "#0d47a1" }} />
+                    {formatDate(award.fromDate)}
+                  </span>
+                </Tooltip>
+              </TableCell>
+              <TableCell>
+                <Tooltip title={`Uploaded on ${formatDate(award.toDate)}`}>
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    <TimerIcon style={{ verticalAlign: "middle", marginRight: 1, color: "#0d47a1" }} />
+                    {formatDate(award.toDate)}
+                  </span>
+                </Tooltip>
+              </TableCell> */}
+              {/* <TableCell sx={{ color: "#388e3c", fontWeight: "bold" }}>${award.amount}</TableCell> */}
 
                 {/* From Date Cell */}
                 <TableCell>
@@ -219,9 +236,12 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                       </Accordion>
                     </AccordionDetails>
                   </Accordion>
-                </TableCell>
-              </TableRow>
-            </>
+
+                {/* </AccordionDetails> */}
+              {/* </Accordion> */}
+            </TableCell>
+            </TableRow>
+        </React.Fragment>
           ))}
         </TableBody>
       </Table>
