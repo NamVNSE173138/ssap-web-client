@@ -74,3 +74,10 @@ export async function NotifyApplicantServiceComment(serviceId: number, applicant
   );
   return response.data;
 }
+
+export async function NotifySubscriptionPurchase(subscriptionId: number, userId: number) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/notify-subscription-purchase?subscriptionId=${subscriptionId}&userId=${userId}`
+  );
+  return response.data;
+}

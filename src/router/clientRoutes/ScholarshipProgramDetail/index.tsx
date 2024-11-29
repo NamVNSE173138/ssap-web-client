@@ -74,6 +74,7 @@ import {
   FaUniversity,
   FaUserTie,
 } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -352,9 +353,7 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
-
-  console.log("IMAGE",data?.imageUrl);
-  
+  console.log("IMAGE", data?.imageUrl);
 
   if (!data) return <Spinner size="large" />;
 
@@ -362,10 +361,10 @@ const ScholarshipProgramDetail = () => {
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px]  z-10">
           <div className="">
             <Breadcrumb className="">
-              <BreadcrumbList className="text-white">
+              <BreadcrumbList className="text-[#000]">
                 <BreadcrumbItem>
                   <Link to="/" className="md:text-xl text-lg">
                     Home
@@ -375,14 +374,16 @@ const ScholarshipProgramDetail = () => {
                 <BreadcrumbItem>
                   <Link
                     to="/scholarship-program"
-                    className=" text-white md:text-xl text-lg"
+                    className=" text-[#000] md:text-xl font-medium text-lg"
                   >
                     Scholarship Program
                   </Link>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <p className="text-white md:text-xl text-lg">{data.name}</p>
+                  <p className="text-[#000] md:text-xl text-lg font-semibold">
+                    {data.name}
+                  </p>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -393,10 +394,10 @@ const ScholarshipProgramDetail = () => {
                 imageUrl={data.imageUrl || "https://github.com/shadcn.png"}
               />
               <div>
-                <p className="text-white text-5xl  lg:line-clamp-3 line-clamp-5">
+                <p className="text-[#000] text-5xl  lg:line-clamp-3 line-clamp-5 font-medium">
                   {data.name}
                 </p>
-                <p className="text-white text-3xl text-heading-5 hidden lg:block mt-[12px]">
+                <p className="text-[#000] text-3xl text-heading-5 hidden lg:block mt-[12px]">
                   {data.description.length > 50
                     ? `${data.description.substring(0, 50)}...`
                     : data.description}
@@ -411,40 +412,40 @@ const ScholarshipProgramDetail = () => {
                     existingApplication.length == 0 &&
                     data.status != "FINISHED" &&
                     new Date(data.deadline) > new Date() && (
-                      <button
+                      <Button
                         onClick={() =>
                           navigate(`/scholarship-program/${id}/application`)
                         }
-                        className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#179d8f] rounded-[25px]"
+                        className="flex-1 text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f] "
                       >
                         Apply now{" "}
-                      </button>
+                      </Button>
                     )}
 
                   {existingApplication && existingApplication.length > 0 && (
                     <>
-                      <button
+                      <Button
                         onClick={() =>
                           navigate(
                             `/funder/application/${existingApplication[0].id}`
                           )
                         }
-                        className="flex-1 text-xl w-full bg-green-700 rounded-[25px] mr-3"
+                        className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#0d978b] h-full mr-3"
                       >
                         View applications{" "}
-                      </button>
+                      </Button>
                       {existingApplication[0].status ==
                         ApplicationStatus.NeedExtend && (
-                        <button
+                        <Button
                           onClick={() =>
                             navigate(
                               `/funder/application/${existingApplication[0].id}`
                             )
                           }
-                          className="flex-1 text-xl w-full bg-yellow-500 rounded-[25px] mr-3"
+                          className="flex-1 text-xl w-full bg-yellow-500 h-full mr-3"
                         >
                           Extend Application{" "}
-                        </button>
+                        </Button>
                       )}
 
                       {/*JSON.stringify(awardMilestones)*/}
@@ -454,7 +455,7 @@ const ScholarshipProgramDetail = () => {
                           new Date(data.deadline) && (
                           <AlertDialog>
                             <AlertDialogTrigger
-                              className="flex-1 text-xl w-full bg-red-700 rounded-[25px] cursor-pointer flex justify-center items-center"
+                              className="flex-1 text-xl w-full h-full bg-transparent border text-red-700 hover:bg-red-800 hover:text-white border-red-700 rounded-[5px] cursor-pointer flex justify-center items-center"
                               disabled={cancelLoading}
                             >
                               {cancelLoading ? (
@@ -490,54 +491,55 @@ const ScholarshipProgramDetail = () => {
               ) : (
                 authorized != "Unauthorized" && (
                   <div className="flex justify-between w-full gap-3">
-                    <button
+                    {/* <Button
                       onClick={() => navigate("")}
-                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-blue-700 py-2 w-full h-full flex items-center justify-center"
                     >
                       <FaEdit className="mr-2" /> Edit
-                    </button>
-                    <button
-                      onClick={deleteScholarship}
-                      className="flex-1 text-lg bg-red-900 hover:bg-red-800 rounded-xl py-2 transition duration-300 flex items-center justify-center"
-                    >
-                      <FaTrash className="mr-2" /> Delete
-                    </button>
-                    <button
+                    </Button> */}
+
+                    <Button
                       onClick={() => handleOpenApplicantDialog()}
-                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaEye className="mr-2" /> View Applications
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleAssignExpertDialog()}
-                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaUserTie className="mr-2" /> Assign Expert
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleOpenReviewMilestoneDialog()}
-                      className="flex-1 text-lg bg-green-700 hover:bg-green-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaCheckCircle className="mr-2" /> Review Milestones
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleOpenAwardMilestoneDialog()}
-                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Milestones
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleOpenAwardDialog()}
-                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Progress
-                    </button>
-                    <button
+                    </Button>
+                    {/* <Button
                       onClick={() => handleOpenReviewingDialog()}
-                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 rounded-xl py-2 transition duration-300 flex items-center justify-center"
+                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 w-full h-full flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Expert Reviewing
-                    </button>
+                    </Button> */}
+                    <Button
+                      onClick={deleteScholarship}
+                      className="flex-1 text-lg bg-transparent text-red-700 border border-red-700 hover:bg-red-800 hover:text-white w-full h-full  flex items-center justify-center"
+                    >
+                      <FaTrash className="mr-2" /> Delete
+                    </Button>
                   </div>
                 )
               )}
@@ -682,8 +684,8 @@ const ScholarshipProgramDetail = () => {
                     id="panel1-header"
                     className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
                   >
-                    <h3 className="text-blue-600 font-semibold text-lg flex items-center gap-2">
-                      <FaInfoCircle className="text-blue-500" />
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaInfoCircle className="text-[#1eb2a6]" />
                       Overview
                     </h3>
                   </AccordionSummary>
@@ -786,8 +788,8 @@ const ScholarshipProgramDetail = () => {
                     id="panel2-header"
                     className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
                   >
-                    <h3 className="text-green-600 font-semibold text-lg flex items-center gap-2">
-                      <FaTag className="text-green-500" />
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaTag className="text-[#1eb2a6]" />
                       Scholarship Category
                     </h3>
                   </AccordionSummary>
@@ -822,8 +824,8 @@ const ScholarshipProgramDetail = () => {
                     id="panel2-header"
                     className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
                   >
-                    <h3 className="text-blue-600 font-semibold text-lg flex items-center gap-2">
-                      <FaBook className="text-blue-500" />
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaBook className="text-[#1eb2a6]" />
                       Applicable Majors & Skills
                     </h3>
                   </AccordionSummary>
@@ -907,8 +909,8 @@ const ScholarshipProgramDetail = () => {
                     id="panel3-header"
                     className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
                   >
-                    <h3 className="text-yellow-600 font-semibold text-lg flex items-center gap-2">
-                      <FaUniversity className="text-yellow-500" />
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaUniversity className="text-[#1eb2a6]" />
                       Applicable University
                     </h3>
                   </AccordionSummary>
@@ -961,8 +963,8 @@ const ScholarshipProgramDetail = () => {
                     id="panel3-header"
                     className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
                   >
-                    <h3 className="text-green-600 font-semibold text-lg flex items-center gap-2">
-                      <FaCertificate className="text-green-500" />
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaCertificate className="text-[#1eb2a6]" />
                       Required Certificates
                     </h3>
                   </AccordionSummary>

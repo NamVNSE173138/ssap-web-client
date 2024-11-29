@@ -56,12 +56,12 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
           <div>
             <Breadcrumb className="">
-              <BreadcrumbList className="text-white">
+              <BreadcrumbList className="text-black">
                 <BreadcrumbItem>
-                  <Link to="/" className="md:text-xl text-lg">
+                  <Link to="/" className="md:text-xl text-lg ">
                     Home
                   </Link>
                 </BreadcrumbItem>
@@ -69,7 +69,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
                 <BreadcrumbItem>
                   <Link
                     to="/services"
-                    className=" text-white md:text-xl text-lg"
+                    className=" text-[#000] md:text-xl font-medium text-lg"
                   >
                     Services
                   </Link>
@@ -78,7 +78,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
                 <BreadcrumbItem>
                   <Link
                     to={`/services/${service.id}`}
-                    className=" text-white md:text-xl text-lg"
+                    className=" text-[#000] md:text-lg text-md font-semibold"
                   >
                     {service.name}
                   </Link>
@@ -87,7 +87,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
                 <BreadcrumbItem>
                   <Link
                     to={`/services/${service.id}`}
-                    className=" text-white md:text-xl text-lg"
+                    className=" text-[#000] md:text-xl text-lg font-bold"
                   >
                     Requests
                   </Link>
@@ -96,7 +96,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
                 <BreadcrumbItem>
                   <Link
                     to={user.role === 'Applicant' ? `/applicant/requestinformation/${request.id}` : `/provider/requestinformation/${request.id}`}
-                    className="text-white md:text-xl text-lg"
+                    className="text-[#000] md:text-xl text-lg font-extrabold"
                   >
                     {applicant.username}
                   </Link>
@@ -119,27 +119,27 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
           </div>
         </div>
       </div>
-      <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative rounded-lg overflow-hidden">
-        <section className="max-w-container flex items-center justify-center mx-auto py-[24px] lg:py-[40px] px-4 lg:px-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[30px] lg:gap-[40px]">
-            <div className="flex items-center mr-30 gap-3 flex-col lg:flex-row">
-              <FaFlag className="text-indigo-600 text-3xl" />
-              <div>
+      <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative ">
+        <section className="w-full max-w-none flex justify-between items-center mx-auto py-6 lg:py-10 px-4 lg:px-0">
+          <div className="flex w-full justify-around gap-12">
+            <div className="flex items-center gap-3">
+              <FaFlag className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
                 <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Nationality</p>
                 <p className="text-heading-6 text-gray-800">{applicantProfile ? applicantProfile.nationality : "N/A"}</p>
               </div>
             </div>
 
-            <div className="flex items-center ml-30 gap-3 flex-col lg:flex-row">
-              <FaUsers className="text-green-600 text-3xl" />
+            <div className="flex items-center gap-3 flex-col lg:flex-row">
+              <FaUsers className="text-[#1eb2a6] text-3xl" />
               <div>
                 <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Ethnicity</p>
                 <p className="text-heading-6 text-gray-800">{applicantProfile ? applicantProfile.ethnicity : "N/A"}</p>
               </div>
             </div>
 
-            <div className="flex items-center mr-30 gap-3 flex-col lg:flex-row">
-              <FaTransgender className="text-purple-600 text-3xl" />
+            <div className="flex items-center gap-3 flex-col lg:flex-row">
+              <FaTransgender className="text-[#1eb2a6] text-3xl" />
               <div>
                 <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Gender</p>
                 <p className="text-heading-6 text-gray-800">{applicantProfile ? applicantProfile.gender : "N/A"}</p>
@@ -147,7 +147,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
             </div>
 
             <div className="flex items-center ml-30 gap-3 flex-col lg:flex-row">
-              <FaBirthdayCake className="text-orange-600 text-3xl" />
+              <FaBirthdayCake className="text-[#1eb2a6] text-3xl" />
               <div>
                 <p className="block mb-[4px] lg:mb-[8px] font-semibold text-lg text-gray-600">Birth Date</p>
                 <p className="text-heading-6 text-gray-800">{applicantProfile ? formatOnlyDate(applicantProfile.birthDate) : "N/A"}</p>
