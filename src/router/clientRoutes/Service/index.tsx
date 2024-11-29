@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ServiceSkeleton from "./ServiceSkeleton";
@@ -9,15 +14,32 @@ import ServiceCard from "@/components/Services/ServiceCard";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { IoIosAddCircleOutline, IoIosApps, IoIosArrowBack, IoIosArrowForward, IoIosInformationCircle, IoMdCheckmarkCircleOutline, IoMdTime } from "react-icons/io";
+import {
+  IoIosAddCircleOutline,
+  IoIosApps,
+  IoIosArrowBack,
+  IoIosArrowForward,
+  IoIosInformationCircle,
+  IoMdCheckmarkCircleOutline,
+  IoMdTime,
+} from "react-icons/io";
 import { IoIosSearch, IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
 import { Input } from "@/components/ui/input";
-import { getAccountById, getAccountWallet } from "@/services/ApiServices/accountService";
+import {
+  getAccountById,
+  getAccountWallet,
+} from "@/services/ApiServices/accountService";
 import { Dialog } from "@mui/material";
 import { IoPerson, IoWallet } from "react-icons/io5";
-import { FaClock, FaCreditCard, FaDollarSign, FaInfoCircle, FaSadTear } from "react-icons/fa";
+import {
+  FaClock,
+  FaCreditCard,
+  FaDollarSign,
+  FaInfoCircle,
+  FaSadTear,
+} from "react-icons/fa";
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
@@ -49,17 +71,19 @@ const Service = () => {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [numberOfServicesLeft, setNumberOfServicesLeft] = useState<number>(0);
   const [allServices, setAllServices] = useState<number>(0);
-  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
-  const [isSubscriptionDetailModalOpen, setIsSubscriptionDetailModalOpen] = useState(false);
+  const [subscriptionDetails, setSubscriptionDetails] =
+    useState<SubscriptionDetails | null>(null);
+  const [isSubscriptionDetailModalOpen, setIsSubscriptionDetailModalOpen] =
+    useState(false);
 
   const formatDate = (dateString: string | null): string => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
 
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'N/A';
+    if (isNaN(date.getTime())) return "N/A";
 
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -68,24 +92,27 @@ const Service = () => {
   const fetchSubscriptionDetails = async () => {
     try {
       if (user?.role === "Provider") {
-        const subscriptionResponse = await getSubscriptionByProviderId(Number(user?.id));
+        const subscriptionResponse = await getSubscriptionByProviderId(
+          Number(user?.id),
+        );
         const accountResponse = await getAccountById(Number(user?.id));
 
         const subscriptionData = subscriptionResponse?.data || {};
 
-
         setSubscriptionDetails({
-          name: subscriptionData.name || 'N/A',
-          description: subscriptionData.description || 'No description available.',
+          name: subscriptionData.name || "N/A",
+          description:
+            subscriptionData.description || "No description available.",
           amount: subscriptionData.amount || 0,
           numberOfServices: subscriptionData.numberOfServices || 0,
           validMonths: subscriptionData.validMonths || 0,
-          subscriptionEndDate: formatDate(accountResponse.subscriptionEndDate) || 'N/A',
+          subscriptionEndDate:
+            formatDate(accountResponse.subscriptionEndDate) || "N/A",
         });
       }
     } catch (error) {
-      console.error('Error fetching subscription details:', error);
-      setError('Failed to fetch subscription details');
+      console.error("Error fetching subscription details:", error);
+      setError("Failed to fetch subscription details");
     }
   };
 
@@ -101,7 +128,9 @@ const Service = () => {
   const fetchSubscriptionForProvider = async () => {
     try {
       if (user?.role === "Provider") {
-        const subscription = await getSubscriptionByProviderId(Number(user?.id));
+        const subscription = await getSubscriptionByProviderId(
+          Number(user?.id),
+        );
 
         if (subscription && subscription.data) {
           const numberOfServices = subscription.data.numberOfServices ?? 0;
@@ -135,16 +164,17 @@ const Service = () => {
       if (user?.role === "Provider") {
         const allServicesData = await getServicesByProvider(Number(user.id));
 
-        response = await axios.get(`${BASE_URL}/api/services/by-provider-paginated/${user.id}`, {
-          params: {
-            pageIndex: currentPage,
-            pageSize: pageSize,
+        response = await axios.get(
+          `${BASE_URL}/api/services/by-provider-paginated/${user.id}`,
+          {
+            params: {
+              pageIndex: currentPage,
+              pageSize: pageSize,
+            },
           },
-        });
+        );
         console.log(response);
-
-      }
-      else {
+      } else {
         response = await axios.get(`${BASE_URL}/api/services/paginated`, {
           params: {
             pageIndex: currentPage,
@@ -155,14 +185,17 @@ const Service = () => {
       if (response.data.statusCode === 200) {
         if (!user) return null;
         const allServicesData = await getServicesByProvider(Number(user.id));
-        const activeServices = response.data.data.items.filter((service: any) => service.status === "Active");
+        const activeServices = response.data.data.items.filter(
+          (service: any) => service.status === "Active",
+        );
         if (user?.role === "Provider") {
-          const filteredServices = activeServices.filter((service: any) => service.providerId == user.id);
-          console.log(filteredServices)
+          const filteredServices = activeServices.filter(
+            (service: any) => service.providerId == user.id,
+          );
+          console.log(filteredServices);
           setData(filteredServices);
-          setAllServices(allServicesData.data.length)
+          setAllServices(allServicesData.data.length);
           setTotalPages(response.data.data.totalPages);
-
         } else {
           setData(activeServices);
           setFilteredData(activeServices);
@@ -190,7 +223,7 @@ const Service = () => {
       if (error.response.data.statusCode === 400) {
         setIsWalletDialogOpen(true);
       }
-      console.error('Error checking wallet:', error);
+      console.error("Error checking wallet:", error);
     }
   };
 
@@ -200,7 +233,9 @@ const Service = () => {
 
   useEffect(() => {
     setFilteredData(
-      data.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      data.filter((service) =>
+        service.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
     );
   }, [searchTerm, data]);
 
@@ -260,7 +295,6 @@ const Service = () => {
       ? `You have ${numberOfServicesLeft} service creation attempts left. You cannot buy a subscription at this time.`
       : "Buy a subscription to enable more service creation.";
 
-
   return (
     <div>
       <div className="relative">
@@ -269,13 +303,18 @@ const Service = () => {
           <Breadcrumb>
             <BreadcrumbList className="text-white">
               <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg font-semibold hover:text-blue-400 transition-colors duration-300">
+                <Link
+                  to="/"
+                  className="md:text-xl text-lg font-semibold hover:text-blue-400 transition-colors duration-300"
+                >
                   Home
                 </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <p className="text-white md:text-xl text-lg font-semibold">Services</p>
+                <p className="text-white md:text-xl text-lg font-semibold">
+                  Services
+                </p>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -312,35 +351,40 @@ const Service = () => {
                 />
               )}
             </div>
-            
+
             <button
               onClick={handleAddServiceClick}
-              className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95 ${numberOfServicesLeft === 0 ? 'bg-gray-400 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+              className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95 ${numberOfServicesLeft === 0 ? "bg-gray-400 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white"}`}
               disabled={numberOfServicesLeft === 0}
-              title={numberOfServicesLeft === 0 ? "You need to buy a subscription to add service" : ""}
+              title={
+                numberOfServicesLeft === 0
+                  ? "You need to buy a subscription to add service"
+                  : ""
+              }
             >
               <IoIosAddCircleOutline
-                className={`text-3xl ${numberOfServicesLeft === 0 ? 'text-gray-500' : 'text-blue-500'} transition-all duration-300 ease-in-out transform hover:scale-110`}
+                className={`text-3xl ${numberOfServicesLeft === 0 ? "text-gray-500" : "text-blue-500"} transition-all duration-300 ease-in-out transform hover:scale-110`}
               />
-              <p className={`text-xl ${numberOfServicesLeft === 0 ? 'text-gray-500' : 'text-blue-600'} font-semibold`}>
+              <p
+                className={`text-xl ${numberOfServicesLeft === 0 ? "text-gray-500" : "text-blue-600"} font-semibold`}
+              >
                 Add Service
               </p>
             </button>
-
 
             <button
               onClick={handleBuySubscriptionClick}
               disabled={isBuySubscriptionDisabled}
               title={buySubscriptionTitle}
-              className={`flex justify-center items-center gap-4 px-6 py-3 rounded-xl shadow-lg active:scale-95 transition-all duration-300 ${isBuySubscriptionDisabled
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
-                : "bg-white hover:bg-green-600 hover:text-white"
-                }`}
+              className={`flex justify-center items-center gap-4 px-6 py-3 rounded-xl shadow-lg active:scale-95 transition-all duration-300 ${
+                isBuySubscriptionDisabled
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                  : "bg-white hover:bg-green-600 hover:text-white"
+              }`}
             >
               <FaCreditCard className="text-3xl transition-all duration-300 ease-in-out transform hover:scale-110" />
               <p className="text-xl font-semibold">Buy Subscription</p>
             </button>
-
           </div>
         )}
 
@@ -351,14 +395,18 @@ const Service = () => {
               className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
             >
               <IoMdTime className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
-              <p className="text-xl text-blue-600 font-semibold">View History</p>
+              <p className="text-xl text-blue-600 font-semibold">
+                View History
+              </p>
             </button>
             <button
               onClick={handleNavigateProviderList}
               className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white rounded-xl shadow-lg active:scale-95"
             >
               <IoPerson className="text-3xl text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-110" />
-              <p className="text-xl text-blue-600 font-semibold">Provider List</p>
+              <p className="text-xl text-blue-600 font-semibold">
+                Provider List
+              </p>
             </button>
           </div>
         )}
@@ -410,7 +458,10 @@ const Service = () => {
       <AddServiceModal
         isOpen={isServiceModalOpen}
         setIsOpen={setIsServiceModalOpen}
-        fetchServices={() => { setCurrentPage(1); fetchData(); }}
+        fetchServices={() => {
+          setCurrentPage(1);
+          fetchData();
+        }}
       />
 
       <MultiStepSubscriptionModal
@@ -440,16 +491,18 @@ const Service = () => {
         width={600}
         className="subscription-modal"
         style={{
-          borderRadius: '10px',
-          background: '#f0f8ff',
-          padding: '20px',
+          borderRadius: "10px",
+          background: "#f0f8ff",
+          padding: "20px",
         }}
       >
         {subscriptionDetails ? (
           <div className="text-gray-800">
             <br></br>
             <div className="flex items-center mb-3">
-              <h3 className="text-2xl font-semibold text-blue-400">{subscriptionDetails.name}</h3>
+              <h3 className="text-2xl font-semibold text-blue-400">
+                {subscriptionDetails.name}
+              </h3>
             </div>
             <div className="flex items-center mb-3">
               <IoMdCheckmarkCircleOutline className="text-blue-400 text-2xl mr-2" />
@@ -466,7 +519,8 @@ const Service = () => {
             <div className="flex items-center mb-3">
               <IoIosApps className="text-blue-400 text-2xl mr-2" />
               <p className="text-lg">
-                <strong>Number of Services:</strong> {subscriptionDetails.numberOfServices}
+                <strong>Number of Services:</strong>{" "}
+                {subscriptionDetails.numberOfServices}
               </p>
             </div>
             <div className="flex items-center mb-3">
@@ -478,7 +532,8 @@ const Service = () => {
             <div className="flex items-center mb-3">
               <MdDateRange className="text-blue-400 text-2xl mr-2" />
               <p className="text-lg">
-                <strong>Subscription End Date:</strong> {subscriptionDetails.subscriptionEndDate}
+                <strong>Subscription End Date:</strong>{" "}
+                {subscriptionDetails.subscriptionEndDate}
               </p>
             </div>
           </div>
@@ -498,7 +553,8 @@ const Service = () => {
             You don't have a wallet yet!
           </h3>
           <p className="my-4 text-lg text-gray-600">
-            You need to create a wallet to add services. Do you want to go to the Wallet page?
+            You need to create a wallet to add services. Do you want to go to
+            the Wallet page?
           </p>
           <div className="flex justify-end gap-4">
             <button
@@ -517,9 +573,7 @@ const Service = () => {
           </div>
         </div>
       </Dialog>
-
     </div>
-
   );
 };
 
