@@ -7,7 +7,7 @@ const typeOptions = [
     { value: 'Financial Report', label: 'Financial Report' },
 ];
 
-const ExtendApplicationRows = ({ row, setRows, handleDeleteRow, handleInputChange }: any) => {
+const ExtendApplicationRows = ({ row, setRows, documentType, handleDeleteRow, handleInputChange }: any) => {
     return (
         <TableRow
             key={row.id}
@@ -34,9 +34,9 @@ const ExtendApplicationRows = ({ row, setRows, handleDeleteRow, handleInputChang
                     <MenuItem value="" disabled>
                         Select Type
                     </MenuItem>
-                    {typeOptions.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
+                    {documentType.map((option:any) => (
+                        <MenuItem key={option} value={option}>
+                            {option}
                         </MenuItem>
                     ))}
                 </Select>
