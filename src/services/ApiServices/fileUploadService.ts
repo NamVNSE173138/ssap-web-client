@@ -10,11 +10,16 @@ export async function uploadFile(files: File[]) {
     formData.append("files", file);
   });
 
-  const response = await axios.post(`${BASE_URL}/api/file-upload`, files, {
+  for (let [key, value] of formData.entries()) {
+    console.log("Key:", key, "Value:", value);
+  }
+
+  const response = await axios.post(`${BASE_URL}/api/file-upload`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
       ...ngrokSkipWarning.headers,
     },
   });
+
   return response.data;
 }
