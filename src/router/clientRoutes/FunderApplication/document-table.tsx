@@ -4,7 +4,7 @@ import ExtendApplicationRows from "./extend-application-rows"
 import {InsertDriveFile as FileIcon, AccessTime as TimeIcon } from "@mui/icons-material";
 
 
-const DocumentTable = ({ documents, awardMilestones, rows, setRows, handleDeleteRow, handleInputChange }: any) => {
+const DocumentTable = ({ documents, documentType, awardMilestones, rows, setRows, handleDeleteRow, handleInputChange }: any) => {
 
   return (
     <>
@@ -74,6 +74,7 @@ const DocumentTable = ({ documents, awardMilestones, rows, setRows, handleDelete
                 awardMilestones={awardMilestones}
                 row={row}
                 setRows={setRows}
+                documentType={documentType}
                 handleDeleteRow={handleDeleteRow}
                 handleInputChange={handleInputChange}
               />

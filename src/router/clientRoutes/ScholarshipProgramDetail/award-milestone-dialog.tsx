@@ -23,13 +23,15 @@ const AwardMilestoneDialog = ({ open, onClose, awardMilestones, reviewMilestones
         Award Milestones
       </DialogTitle>
 
-      <div className="w-full flex justify-end p-4">
+      <div className="w-full flex justify-between items-center p-4">
+        <p className="text-xl text-sky-400">Num. of Award Milestones: {scholarship?.numberOfAwardMilestones}</p>
         <button
           onClick={() => handleOpenAdd(true)}
-          className="w-auto flex items-center hover:bg-blue-500 hover:text-white transition-all duration-200 gap-3 px-6 py-3 bg-blue-100 rounded-lg shadow-md hover:shadow-xl"
+          disabled={awardMilestones.length >= scholarship?.numberOfAwardMilestones}
+          className="w-auto flex text-blue-600 items-center disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:text-gray-500 hover:bg-blue-500 hover:text-white transition-all duration-200 gap-3 px-6 py-3 bg-blue-100 rounded-lg shadow-md hover:shadow-xl"
         >
-          <IoIosAddCircleOutline className="text-3xl text-blue-500" />
-          <p className="text-xl text-blue-600">Add Award Milestone</p>
+          <IoIosAddCircleOutline className="text-3xl" />
+          <p className="text-xl">Add Award Milestone</p>
         </button>
       </div>
 

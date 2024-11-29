@@ -27,7 +27,6 @@ interface AddAwardDialogProps {
 const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awardMilestones, scholarship }: AddAwardDialogProps) => {
     const { id } = useParams<{ id: string }>();
 
-    const [quillValue, setQuillValue] = useState('');
     const [fileType, setFileType] = useState<any>([]);
 
     const typeOptions = [
@@ -65,6 +64,16 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
         message: `The 'Amount' must be less than or equal to the remaining amount. which is ${scholarship.scholarshipAmount -
             awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0)}`,
         path: ["amount"], // This will add the error message to `toDate`
+    }).refine(data => awardMilestones.length == scholarship.numberOfAwardMilestones - 1 || Number(data.amount) < scholarship.scholarshipAmount -
+            awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0), {
+        message: `The 'Amount' of the not last award milestone must be less than the remaining amount. which is ${scholarship.scholarshipAmount -
+            awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0)}`,
+        path: ["amount"], // This will add the error message to `toDate`
+    }).refine(data => awardMilestones.length != scholarship.numberOfAwardMilestones - 1 || Number(data.amount) == scholarship.scholarshipAmount -
+            awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0), {
+        message: `The 'Amount' of the last award milestone must be equal to the remaining amount. which is ${scholarship.scholarshipAmount -
+            awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0)}`,
+        path: ["amount"], // This will add the error message to `toDate`
     });
 
     const form = useForm<z.infer<typeof awardFormSchema>>({
@@ -72,8 +81,10 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
     });
 
     useEffect(() => {
+            
         if (isOpen) {
             form.setValue("scholarshipProgramId", Number(id));
+            
         }
     }, [isOpen, id, form]);
 
@@ -84,10 +95,18 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
         );
     }, [fileType, form]);
 
+    useEffect(() => {
+            if(scholarship.numberOfAwardMilestones - 1 == awardMilestones.length){
+                form.setValue("amount", scholarship.scholarshipAmount - 
+                awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0));
+            }
+    }, [scholarship.numberOfAwardMilestones, awardMilestones.length, form]);
+
 
     const handleSubmit = async (values: z.infer<typeof awardFormSchema>) => {
         try {
             const response = await createAwardMilestone(values);
+            //console.log(values);
             setFileType([]);
             form.reset();
             //console.log("Service created successfully:", response.data);
@@ -129,7 +148,8 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                 <div className="flex items-center">
                                     <IoCalendar className="text-blue-500 mr-2" />
                                     <Input {...form.register("toDate")} type="datetime-local" placeholder="To Date" />
-                                </div>                                {form.formState.errors.toDate && <p className="text-red-500 text-sm">{form.formState.errors.toDate.message}</p>}
+                                </div>                                
+                                {form.formState.errors.toDate && <p className="text-red-500 text-sm">{form.formState.errors.toDate.message}</p>}
                             </div>
                             <div>
                                 <Label>Required File Types</Label>
@@ -149,7 +169,9 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                     <span className="text-md text-green-500 bg-gray-100 border border-gray-200 p-2 rounded-sm">$</span>
                                     <Input
                                         type="number"
+                                        disabled={scholarship.numberOfAwardMilestones - 1 == awardMilestones.length}
                                         onChange={(e) => form.setValue("amount", Number(e.target.value))}
+                                        value={form.getValues("amount")}
                                         placeholder="Amount"
                                         className="ml-2 flex-1"
                                     />
