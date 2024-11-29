@@ -106,7 +106,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.5 }}
                         transition={{ duration: 0.2 }}
-                        className="bg-white max-h-[500px] overflow-y-scroll p-6 rounded-lg shadow-lg w-1/2"
+                        className="bg-white  p-6 rounded-lg shadow-lg w-1/2"
                     >
                         <div className="flex justify-between items-center">
                             <h3 className="text-2xl mb-10">Add New Award Milestone</h3>
@@ -114,7 +114,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                 &times;
                             </button>
                         </div>
-                        <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
+                        <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col max-h-[500px] overflow-y-scroll gap-4">
                             <div>
                                 <Label>From Date</Label>
                                 <Input {...form.register("fromDate")} placeholder="From Date" type="datetime-local" />

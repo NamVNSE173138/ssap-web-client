@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
 import { Tag } from "antd";
+import React from "react";
 
 const AwardProgressTable = ({ awardMilestone, application }: any) => {
     const transformToMarkdown = (text: string) => {
@@ -49,7 +50,7 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
         {/* Table Body */}
         <TableBody>
           {awardMilestone.map((award: any, index: any) => (
-          <>
+          <React.Fragment key={award.id}>
             <TableRow
               key={award.id}
               sx={{
@@ -214,7 +215,7 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
               </Accordion>
             </TableCell>
             </TableRow>
-        </>
+        </React.Fragment>
           ))}
         </TableBody>
       </Table>
