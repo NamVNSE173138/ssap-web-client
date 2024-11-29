@@ -7,13 +7,11 @@ import {
   AiOutlineAudit,
   AiOutlineClockCircle,
 } from "react-icons/ai";
-import { BiLogOutCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProfileSection from "./components/ProfileSection";
 import AccountSection from "./components/AccountSection";
 import AuthSection from "./components/AuthSection";
-import LogoutSection from "./components/LogoutSection";
 import ApplicationHistorySection from "./components/ApplicationHistorySection";
 import RequestHistorySection from "./components/RequestHistorySection";
 import {
@@ -23,12 +21,11 @@ import {
 } from "@/services/ApiServices/applicantProfileService";
 import { RootState } from "@/store/store";
 import Spinner from "@/components/Spinner";
-import { ToastMessage } from "@/components/ToastMessage";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
+import { setUser } from "@/reducers/tokenSlice";
 
 const ApplicantProfile = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.token.user);
 
   const [avatar, setAvatar] = useState<File[]>([]);
@@ -90,9 +87,8 @@ const ApplicantProfile = () => {
       const uploadFileResponse = await uploadFile(avatar);
       const fileUrls = uploadFileResponse.data;
 
-      setProfile((prevData) => ({ ...prevData, avatar: fileUrls[0] || "" }));
       const postData = {
-        avatarUrl: profile.avatar,
+        avatarUrl: fileUrls[0],
         firstName: profile.firstName,
         lastName: profile.lastName,
         username: profile.username,
@@ -114,6 +110,7 @@ const ApplicantProfile = () => {
       console.log("Post data", postData);
 
       await updateApplicantProfileDetails(Number(user?.id), postData);
+      dispatch(setUser({ ...user, avatar: profile.avatar }));
       setIsProfileUpdated(true);
     } catch (error) {
       setError("Update profile failed");
@@ -195,12 +192,13 @@ const ApplicantProfile = () => {
         defaultValue={activeTab}
         value={activeTab}
         onValueChange={setActiveTab}
-        className="flex flex-col"
+        className="flex flex-row w-full"
+        orientation="vertical"
       >
         {/* Tab List */}
         <Tabs.List
           aria-label="Applicant Profile Tabs"
-          className="flex space-x-4 border-b border-gray-200 pb-2"
+          className="flex flex-col w-1/4 border-r border-gray-200 space-y-2 pr-4"
         >
           {/* Account Info Tab */}
           <Tabs.Trigger
@@ -246,44 +244,36 @@ const ApplicantProfile = () => {
             <AiOutlineLock className="text-lg" />
             Authentication
           </Tabs.Trigger>
-
-          {/* Logout Tab */}
-          <Tabs.Trigger
-            value="logout"
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
-          >
-            <BiLogOutCircle className="text-lg" />
-            Log Out
-          </Tabs.Trigger>
         </Tabs.List>
 
         {/* Tab Panels */}
-        <AccountSection
-          profile={profile}
-          setActiveTab={setActiveTab}
-          setIsEditing={setIsEditing}
-        />
 
-        <ProfileSection
-          profile={profile}
-          handleAvatarChange={handleAvatarChange}
-          handleInputChange={handleInputChange}
-          handleListChange={handleListChange}
-          handleAddField={handleAddField}
-          handleRemoveField={handleRemoveField}
-          isEditing={isEditing}
-          handleSaveClick={handleSaveClick}
-          handleEditClick={handleEditClick}
-          handleExportPDF={handleExportPDF}
-        />
+        <div className="w-3/4 pl-6">
+          <AccountSection
+            profile={profile}
+            setActiveTab={setActiveTab}
+            setIsEditing={setIsEditing}
+          />
 
-        <ApplicationHistorySection />
+          <ProfileSection
+            profile={profile}
+            handleAvatarChange={handleAvatarChange}
+            handleInputChange={handleInputChange}
+            handleListChange={handleListChange}
+            handleAddField={handleAddField}
+            handleRemoveField={handleRemoveField}
+            isEditing={isEditing}
+            handleSaveClick={handleSaveClick}
+            handleEditClick={handleEditClick}
+            handleExportPDF={handleExportPDF}
+          />
 
-        <RequestHistorySection />
+          <ApplicationHistorySection />
 
-        <AuthSection />
+          <RequestHistorySection />
 
-        <LogoutSection dispatch={dispatch} navigate={navigate} />
+          <AuthSection />
+        </div>
       </Tabs.Root>
     </div>
   );
