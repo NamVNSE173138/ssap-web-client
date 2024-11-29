@@ -47,10 +47,11 @@ import { LoginUser } from "@/services/ApiServices/authenticationService";
 import { SendNotification } from "@/services/ApiServices/notification";
 import { argv0 } from "process";
 import { getScholarshipProgram, updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
-import { FaCalendarAlt, FaCheckCircle, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaSearch, FaTimes, FaTrophy } from "react-icons/fa";
+import { FaAward, FaCalendarAlt, FaCheckCircle, FaCreditCard, FaExternalLinkAlt, FaGraduationCap, FaMapMarkerAlt, FaMoneyBillWave, FaSearch, FaTimes, FaTrophy } from "react-icons/fa";
 import { notification } from "antd";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { log } from "console";
+import { format } from "date-fns";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -274,10 +275,10 @@ const statusColor = {
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px]   z-10">
           <div>
             <Breadcrumb className="">
-              <BreadcrumbList className="text-white">
+              <BreadcrumbList className="text-[#000]">
                 <BreadcrumbItem>
                   <Link to="/" className="md:text-xl text-lg">
                     Home
@@ -287,14 +288,14 @@ const statusColor = {
                 <BreadcrumbItem>
                   <Link
                     to="/scholarship-program"
-                    className=" text-white md:text-xl text-lg"
+                    className=" text-[#000] md:text-xl font-medium text-lg"
                   >
                     Scholarship Program
                   </Link>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <p className="text-white md:text-xl text-lg">{data?.name}</p>
+                  <p className="text-[#000] md:text-xl text-lg font-semibold">{data?.name}</p>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -314,10 +315,10 @@ const statusColor = {
           </div>
         </div>
       </div>
-      <div className="bg-white lg:bg-white drop-shadow-lg lg:drop-shadow-xl relative rounded-lg">
+      {/* <div className="bg-white lg:bg-white drop-shadow-lg lg:drop-shadow-xl relative rounded-lg">
         <section className="max-w-container mx-auto py-[24px] bg-gray-100 lg:py-[40px]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px] lg:gap-[40px] px-[24px] lg:px-0">
-            {/* Location */}
+            
             <div className="flex flex-col items-start bg-blue-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
                 <FaMapMarkerAlt className="text-blue-500 text-3xl" />
@@ -326,16 +327,16 @@ const statusColor = {
               <p className="text-heading-6 text-gray-700 mt-2">VietNam</p>
             </div>
 
-            {/* Qualification */}
+            
             <div className="flex flex-col items-start bg-green-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
                 <FaGraduationCap className="text-green-500 text-3xl" />
                 <p className="block text-xl font-semibold text-green-600">Qualification</p>
               </div>
-              <p className="text-heading-6 text-gray-700 mt-2">Bachelor's Degree</p>
+              <p className="text-heading-6 text-gray-700 mt-2">{data.category.description}</p>
             </div>
 
-            {/* Funding Type */}
+            
             <div className="flex flex-col items-start bg-yellow-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
                 <FaMoneyBillWave className="text-yellow-500 text-3xl" />
@@ -344,7 +345,7 @@ const statusColor = {
               <p className="text-heading-6 text-gray-700 mt-2">Full Scholarship</p>
             </div>
 
-            {/* Deadline */}
+            
             <div className="flex flex-col items-start bg-orange-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
                 <FaCalendarAlt className="text-orange-500 text-3xl" />
@@ -353,7 +354,7 @@ const statusColor = {
               <p className="text-heading-6 text-gray-700 mt-2">December 31, 2024</p>
             </div>
 
-            {/* Value of Award */}
+            
             <div className="flex flex-col items-start bg-teal-50 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105">
               <div className="flex items-center gap-2">
                 <FaTrophy className="text-teal-500 text-3xl" />
@@ -363,8 +364,70 @@ const statusColor = {
             </div>
           </div>
         </section>
-      </div>
+      </div> */}
+<div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
+        <section className="w-full max-w-none flex justify-between items-center mx-auto py-6 lg:py-10 px-4 lg:px-0">
+          <div className="flex w-full justify-around gap-12">
+            <div className="flex items-center gap-3">
+              <FaMapMarkerAlt className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Location</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {"VietNam"}
+                </p>
+              </div>
+            </div>
 
+            <div className="flex items-center gap-3">
+              <FaGraduationCap className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">
+                  Qualification
+                </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.category.description || "Not specified"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <FaCreditCard className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">
+                  Funding Type
+                </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {"Not specified"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Deadline</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.deadline
+                    ? format(new Date(data.deadline), "dd/MM/yyyy")
+                    : "Not specified"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <FaAward className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">
+                  Value of Award
+                </p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.scholarshipAmount || "Not specified"}$
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
       <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
