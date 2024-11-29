@@ -1035,8 +1035,8 @@ const ScholarshipProgramDetail = () => {
         <AssignExpertDialog
           open={assignExpertDialogOpen}
           onClose={() => setAssignExpertDialogOpen(false)}
-          resetMajor={null}
-          experts={experts ?? []}
+          // resetMajor={null}
+          // experts={experts ?? []}
           scholarshipId={id}
         />
       )}
