@@ -128,7 +128,7 @@ const AccountSection = (props: any) => {
               <div>Actions</div>
             </div>
             <ul className="space-y-4">
-              {providerData.providerDocuments.map((doc, index) => (
+              {providerData.providerDocuments.map((doc:any, index:any) => (
                 <li
                   key={index}
                   className="grid grid-cols-[2fr_2fr_1fr_auto] gap-4 items-center"

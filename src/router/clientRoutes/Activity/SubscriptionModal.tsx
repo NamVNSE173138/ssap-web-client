@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import SubscriptionContractDialog from "../ServiceDetail/SubscriptionContractDialog";
 import { getAllSubscriptions } from "@/services/ApiServices/subscriptionService";
+import { NotifySubscriptionPurchase } from "@/services/ApiServices/notification";
 
 type Subscription = {
     name: string;
@@ -125,6 +126,8 @@ const MultiStepSubscriptionModal = ({
 
                 const updateResponse = await updateAccount(updatedAccountData);
                 notification.success({ message: "Buy subscription successfully!" });
+                if(!selectedSubscrip) return null;
+                await NotifySubscriptionPurchase(selectedSubscrip?.id, Number(user.id))
 
                 if (updateResponse) {
                     fetchSubscriptions();

@@ -1,19 +1,22 @@
 import RouteNames from "@/constants/routeNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
-import {GoogleAuth, RegisterUser, RegisterFunder, RegisterProvider } from "@/services/ApiServices/authenticationService";
+import { GoogleAuth, RegisterUser } from "@/services/ApiServices/authenticationService";
 import parseJwt from "@/services/parseJwt";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaEyeSlash, FaIdBadge, FaImage, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUserAlt, FaUsers } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ValidationErrorMessage from "../Login/components/ValidationErrorMessage";
 import { useToast } from "@/components/ui/use-toast";
 import { NotifyNewUser } from "@/services/ApiServices/notification";
+import { notification } from "antd";
+import { IoIosArrowForward } from "react-icons/io";
+import { MdPersonPin } from "react-icons/md";
+import { uploadFile } from "@/services/ApiServices/fileUploadService";
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -34,10 +37,24 @@ const formSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters long" })
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      { message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character." }
+      {
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      }
     ),
-  role: z.string(),
+  address: z.string().min(1, { message: "Address is required" }),
+  roleId: z.number().refine(
+    (value) => [2, 4, 5].includes(value),
+    "RoleId must be 2 (Funder), 4 (Provider), or 5 (Applicant)"
+  ),
+  status: z
+    .string()
+    .refine(
+      (value) => ["NeedToSubmitFile", "Active"].includes(value),
+      "Status must be 'NeedToSubmitFile' or 'Active'"
+    ),
 });
+
 
 const Register = () => {
   const navigate = useNavigate();
@@ -45,77 +62,100 @@ const Register = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [securePassword, setSecurePassword] = useState(true);
-  const [selectedRole, setSelectedRole] = useState("applicant");
   const [error, setError] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedRole, setSelectedRole] = useState(5);
+  const [isOpen, setIsOpen] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
-      email: '',
-      phoneNumber: '',
-      fullName: '',
-      password: '',
-      role: selectedRole,
+      username: "",
+      email: "",
+      phoneNumber: "",
+      fullName: "",
+      password: "",
+      address: "",
+      roleId: selectedRole,
+      status: selectedRole === 5 ? "Active" : "NeedToSubmitFile",
     },
   });
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(prevState => !prevState);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
   const handleRegisterSubmit = async (data: any) => {
     setIsLoading(true);
-    let user = null;
     try {
-      switch (selectedRole) {
-        case "applicant":
-          user = await RegisterUser(data);
-          break;
-        case "funder":
-          user = await RegisterFunder(data);
-          break;
-        case "provider":
-          user = await RegisterProvider(data);
-          break;
-        default:
-          throw new Error("Invalid role");
+      console.log("Selected Role: ", selectedRole);
+      
+      const status = selectedRole === 5 ? "Active" : "NeedToSubmitFile";
+  
+      let uploadUrls = [];
+      if (selectedFile) {
+        const uploadResponse = await uploadFile([selectedFile]);
+        uploadUrls = uploadResponse.data;
       }
-
+  
+      const userData = {
+        ...data,
+        status,
+        roleId: selectedRole,
+        avatarUrl: uploadUrls.length > 0 ? uploadUrls[0] : "",
+      };
+  
+      const user = await RegisterUser(userData);
+  
       setIsLoading(false);
       dispatch(setToken(user.token));
       const userInfo = parseJwt(user.token);
       dispatch(setUser(userInfo));
       navigate(RouteNames.LOGIN);
-      toast({
-        title: "Registration Successful.",
-        description: "You can now log in with your credentials.",
-        duration: 5000,
-        variant: 'default',
+  
+      notification.success({
+        message: "Registration Successful",
+        description: "You can now log in.",
+        duration: 5,
       });
+  
       await NotifyNewUser(userInfo.id);
     } catch (error: any) {
       setIsLoading(false);
-      const errorMessage = error?.response?.data?.message || "An error occurred. Please try again later.";
-      toast({
-        title: "Registration Failed.",
+      console.log(error);
+      const errorMessage =
+        error?.response?.data?.message || "An error occurred. Please try again later.";
+      notification.error({
+        message: "Registration Failed",
         description: errorMessage,
-        duration: 5000,
-        variant: 'destructive',
+        duration: 5,
       });
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      let data = await GoogleAuth();
-      window.location = data.url;
-    } catch (error: any) {
-      setError(
-        error.response?.data?.message ||
-          "An error occurred. Please try again later."
-      );
-    }
+  const handleRoleSelection = (roleId: number) => {
+    setSelectedRole(roleId);
+  };
+
+  const handleNextStep = () => {
+    setCurrentStep(currentStep + 1);
+  };
+
+  const handleBackStep = () => {
+    setCurrentStep(currentStep - 1);
   };
 
   return (
@@ -128,130 +168,290 @@ const Register = () => {
             className="w-full h-full object-cover "
           />
         </div>
-        <div className="absolute top-0 left-0 w-full h-full bg-black z-10 opacity-5 "></div>
-        <div className="absolute md:w-[50%] w-[80%] h-[80%] md:h-[90%] md:p-[30px] p-2 top-1/2 left-1/2 bg-[rgba(255,255,255,0.75)] z-20 -translate-x-1/2 -translate-y-1/2 rounded-md">
-          <button
-            onClick={() => navigate("/login")}
-            className="absolute top-4 left-4 z-30 text-white text-xl bg-blue-500 p-2 rounded-full hover:bg-blue-600 transition-colors"
-          >
-            <FaArrowLeft />
-          </button>
-          <div className="w-full h-full bg-transparent md:px-10 px-5 flex flex-col justify-center">
+        <div className="absolute top-0 left-0 w-full h-full bg-black z-10 opacity-5 "></div>{" "}
+        <div className="absolute md:w-[50%] w-[80%] h-[60%] md:h-[80%] md:p-[30px] p-2 top-1/2 left-1/2 bg-[rgba(255,255,255,0.75)] z-20 -translate-x-1/2 -translate-y-1/2 rounded-md">
+          <div className="w-full h-full bg-transparent md:px-10 px-5 flex flex-col justify-top">
             <div className="w-full">
-              <h3 className="text-3xl mb-4 md:mb-0 md:text-4xl text-black font-bold text-center">
+              <h3 className="text-3xl mb-7 md:mb-7 md:text-4xl text-black font-bold text-center">
                 BECOME A MEMBER
               </h3>
             </div>
-
-            <div className="mb-4 mt-4 flex justify-center font-semibold text-xl">
-              <label className="mr-4">
-                <input
-                  type="radio"
-                  value={selectedRole}
-                  checked={selectedRole === "applicant"}
-                  onChange={() => setSelectedRole("applicant")}
-                />
-                Sign up as Applicant
-              </label>
-              <label className="mr-4">
-                <input
-                  type="radio"
-                  value= {selectedRole}
-                  checked={selectedRole === "funder"}
-                  onChange={() => setSelectedRole("funder")}
-                />
-                Sign up as Funder
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value={selectedRole}
-                  checked={selectedRole === "provider"}
-                  onChange={() => setSelectedRole("provider")}
-                />
-                Sign up as Provider
-              </label>
+            <div className="flex items-center justify-center mb-6">
+              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 1 ? "bg-blue-600" : "bg-gray-300"}`}>
+                1
+              </div>
+              <div className="h-1 w-20 bg-gray-300 mx-2"></div>
+              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 2 ? "bg-blue-600" : "bg-gray-300"}`}>
+                2
+              </div>
+              <div className="h-1 w-20 bg-gray-300 mx-2"></div>
+              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 3 ? "bg-blue-600" : "bg-gray-300"}`}>
+                3
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit(handleRegisterSubmit)} className="w-full md:mt-4 mt-0">
-              <div className="w-full flex flex-col mb-4 items-center">
-                <input
-                  {...register("username")}
-                  placeholder="Username"
-                  className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
-                />
-                {errors.username && <ValidationErrorMessage error={errors.username.message} />}
-                
-                <input
-                  {...register("email")}
-                  placeholder="Email"
-                  className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
-                />
-                {errors.email && <ValidationErrorMessage error={errors.email.message} />}
-                
-                <input
-                  {...register("phoneNumber")}
-                  placeholder="Phone number"
-                  className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
-                />
-                {errors.phoneNumber && <ValidationErrorMessage error={errors.phoneNumber.message} />}
-                
-                <input
-                  {...register("fullName")}
-                  placeholder="Full name"
-                  className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none"
-                />
-                {errors.fullName && <ValidationErrorMessage error={errors.fullName.message} />}
-                
-                <div className="w-[65%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none flex justify-between gap-2 items-center">
-                  <input
-                    type={securePassword ? "password" : "text"}
-                    placeholder="Password"
-                    {...register("password")}
-                    className="w-full bg-transparent focus:outline-none"
-                  />
-                  {securePassword ? (
-                    <FaEyeSlash
-                      className="right-0 top-0 mt-2 mr-2 cursor-pointer"
-                      onClick={() => setSecurePassword(false)}
-                    />
-                  ) : (
-                    <FaEye
-                      className="right-0 top-0 mt-2 mr-2 cursor-pointer"
-                      onClick={() => setSecurePassword(true)}
-                    />
-                  )}
+            {currentStep === 1 && (
+              <div>
+                <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Choose Your Role</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {["Funder", "Provider", "Applicant"].map((role, index) => {
+                    let roleId: any;
+                    let roleDescription = "";
+
+                    if (role === "Funder") {
+                      roleId = 2;
+                      roleDescription =
+                        "You will provide scholarships. Submit relevant certifications to register.";
+                    } else if (role === "Provider") {
+                      roleId = 4;
+                      roleDescription =
+                        "Focusing on offering services. Submit appropriate certifications to register.";
+                    } else if (role === "Applicant") {
+                      roleId = 5;
+                      roleDescription =
+                        "You can purchase services and apply for scholarships provided by Providers/Funders.";
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => handleRoleSelection(roleId)}
+                        className={`p-6 cursor-pointer border rounded-lg shadow-md transition-transform duration-300 hover:scale-105 ${selectedRole === roleId ? "bg-blue-100 border-blue-500" : "border-gray-300"
+                          }`}
+                      >
+                        <h3 className="font-semibold text-lg text-gray-800 mb-2">{role}</h3>
+                        {selectedRole === roleId && (
+                          <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md border border-gray-200 mt-2">
+                            {roleDescription}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                {errors.password && <ValidationErrorMessage error={errors.password.message} />}
+
+                <button
+                  onClick={handleNextStep}
+                  disabled={!selectedRole}
+                  className={`mt-6 py-3 px-5 rounded-xl w-full transition-all duration-300 ${selectedRole
+                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                >
+                  Next Step
+                </button>
+
+                <div className="w-full flex justify-center mt-3">
+                  <p className="text-base text-black">
+                    You already have an account?{" "}
+                    <Link to="/login">
+                      <span className="font-semibold underline cursor-pointer">
+                        Login
+                      </span>
+                    </Link>
+                  </p>
+                </div>
               </div>
 
-              <div className="w-full flex flex-col md:space-y-2 space-y-1 items-center">
-                <button
-                  type="submit"
-                  className="w-[55%] text-lg text-white bg-blue-500 rounded-3xl py-3"
-                >
-                  Sign up
-                </button>
-                <button
-                  onClick={handleGoogleLogin}
-                  type="button"
-                  className="w-[55%] text-blue-500 bg-white border border-blue-500 rounded-3xl py-3"
-                >
-                  Sign up with Google
-                </button>
+            )}
+
+            {currentStep === 2 && (
+              <form onSubmit={handleSubmit(handleRegisterSubmit)}>
+                <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Fill in Your Information</h2>
+                <div className="space-y-6 overflow-y-auto max-h-[270px]">
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <FaUser className="inline text-blue-600 mr-2" /> Username
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        {...register("username")}
+                        placeholder="Enter your username"
+                        className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                      />
+                    </div>
+                    {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <FaEnvelope className="inline text-blue-600 mr-2" /> Email
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        {...register("email")}
+                        placeholder="Enter your email"
+                        className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                      />
+                    </div>
+                    {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <FaPhoneAlt className="inline text-blue-600 mr-2" /> Phone Number
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        {...register("phoneNumber")}
+                        placeholder="Enter your phone number"
+                        className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                      />
+                    </div>
+                    {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <MdPersonPin className="inline text-blue-600 mr-2" /> Full Name
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        {...register("fullName")}
+                        placeholder="Enter your full name"
+                        className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                      />
+                    </div>
+                    {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <FaKey className="inline text-blue-600 mr-2" /> Password
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        {...register("password")}
+                        placeholder="Enter your password"
+                        type={showPassword ? "text" : "password"}
+                        className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                      />
+                      <div className="ml-3 cursor-pointer" onClick={togglePasswordVisibility}>
+                        {showPassword ? (
+                          <FaEyeSlash className="text-gray-500" />
+                        ) : (
+                          <FaEye className="text-gray-500" />
+                        )}
+                      </div>
+                    </div>
+                    {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <FaMapMarkedAlt className="inline text-blue-600 mr-2" /> Address
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        {...register("address")}
+                        placeholder="Enter your address"
+                        className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                      />
+                    </div>
+                    {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-700 font-medium">
+                      <FaImage className="inline text-blue-600 mr-2" /> Upload Avatar
+                    </label>
+                    <div className="flex items-center border p-3 rounded-md border-gray-400">
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        className="w-full text-gray-800 p-3 focus:outline-none"
+                        accept="image/*"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-between">
+                  <button
+                    onClick={handleBackStep}
+                    className="bg-gray-200 text-gray-700 p-3 rounded-md w-1/4 hover:bg-gray-300 transition-colors duration-300"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={handleNextStep}
+                    disabled={!selectedRole}
+                    className="bg-blue-600 text-white p-3 rounded-md w-1/4 hover:bg-blue-700 transition-colors duration-300"
+                  >
+                    Next Step
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {currentStep === 3 && (
+              <div>
+                <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Preview Your Details</h2>
+                <div className="flex space-x-6 overflow-y-auto max-h-[270px]">
+                  <div className="flex-1">
+                    {selectedFile && (
+                      <div className="mt-4 flex justify-center">
+                        <div>
+                          <p className="font-semibold text-lg text-gray-800 text-center">Avatar:</p>
+                          <img
+                            src={URL.createObjectURL(selectedFile)}
+                            alt="Avatar Preview"
+                            className="mt-2 w-32 h-32 object-cover rounded-full mx-auto"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Vertical divider (thin vertical line) */}
+                  <div className="border-l border-gray-400 h-full"></div>
+
+                  {/* Right section for User Details */}
+                  <div className="flex-1 space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <FaUsers className="text-blue-600 text-2xl" />
+                      <p className="text-lg text-gray-800 font-medium">
+                        <strong>Role:</strong> {selectedRole === 2 ? "Funder" : selectedRole === 4 ? "Provider" : "Applicant"}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <FaUser className="text-blue-600 text-2xl" />
+                      <p className="text-lg text-gray-800 font-medium">
+                        <strong>Username:</strong> {watch("username")}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <FaEnvelope className="text-blue-600 text-2xl" />
+                      <p className="text-lg text-gray-800 font-medium">
+                        <strong>Email:</strong> {watch("email")}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <FaPhoneAlt className="text-blue-600 text-2xl" />
+                      <p className="text-lg text-gray-800 font-medium">
+                        <strong>Phone Number:</strong> {watch("phoneNumber")}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <FaIdBadge className="text-blue-600 text-2xl" />
+                      <p className="text-lg text-gray-800 font-medium">
+                        <strong>Full Name:</strong> {watch("fullName")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex justify-between">
+                  <button onClick={handleBackStep} className="bg-gray-200 text-gray-700 p-3 rounded-md w-1/4 hover:bg-gray-300 transition-colors duration-300">Back</button>
+                  <button onClick={handleSubmit(handleRegisterSubmit)} className="bg-blue-600 text-white p-3 rounded">Confirm & Register</button>
+                </div>
               </div>
-            </form>
-            <div className="w-full flex justify-center md:mt-5 mt-10">
-              <p className="text-black">
-                <span className="text-lg">You already have an account?</span>
-                <Link to={RouteNames.LOGIN}>
-                  <span className="text-base font-semibold underline cursor-pointer">
-                    Sign in
-                  </span>
-                </Link>
-                .
-              </p>
-            </div>
+            )}
+
           </div>
         </div>
       </div>
