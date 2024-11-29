@@ -14,6 +14,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback';
 import ChatIcon from '@mui/icons-material/Chat';
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { toast } from "react-toastify";
+import { notification } from "antd";
 
 const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails, description }: { showButtons: boolean, request: any, fetchRequest: () => void, requestDetails: any; description: string }) => {
     const user = useSelector((state: any) => state.token.user);
@@ -26,8 +27,9 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
     const [userFeedback, setUserFeedback] = useState<any>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [scholarships, setScholarships] = useState<{ id: number; name: string }[]>([]);
-
     const [hasFeedback, setHasFeedback] = useState(false);
+    const [finishDate, setFinishDate] = useState<Date | null>(null);
+    const [canProvideFeedback, setCanProvideFeedback] = useState(true);
 
     if (!requestDetails || requestDetails.length === 0) {
         return (
@@ -67,8 +69,9 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 return;
             }
 
-            toast.success("Request status updated to 'Finished' successfully!");
+            notification.success({ message: "Finished successfully!" });
             const response = await updateFinishRequest(request.id);
+            setFinishDate(new Date());
             await fetchRequest();
 
         } catch (error) {
@@ -102,9 +105,24 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
         fetchServiceData();
     }, [request, user.id]);
 
+    useEffect(() => {
+        if (finishDate) {
+            const diffInTime = new Date().getTime() - finishDate.getTime();
+            const diffInDays = diffInTime / (1000 * 3600 * 24);
+            if (diffInDays > 3) {
+                setCanProvideFeedback(false);
+            }
+        }
+    }, [finishDate]);
+
     const handleFeedbackSubmit = async () => {
         if (hasFeedback) {
-            toast.error("You have already feedback this service!");
+            notification.error({ message: "You have already feedback this service!" });
+            return;
+        }
+
+        if (rating === null || !comment.trim()) {
+            notification.error({ message: "Please provide a rating and a comment!" });
             return;
         }
 
@@ -121,6 +139,7 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                 await addFeedback(feedbackData);
                 setOpenFeedbackDialog(false);
                 setHasFeedback(true);
+                notification.success({ message: "Feedback successfully!" });
                 navigate("/services");
             } catch (error) {
                 console.error("Failed to submit feedback", error);
@@ -283,12 +302,12 @@ const RequestDetailTable = ({ showButtons, request, fetchRequest, requestDetails
                                     color="secondary"
                                     onClick={() => {
                                         if (hasFeedback) {
-                                            toast.error("You have already given feedback!");
+                                            notification.error({ message: "You have already given feedback!" });
                                         } else {
                                             setOpenFeedbackDialog(true);
                                         }
                                     }}
-                                    disabled={hasFeedback}
+                                    disabled={hasFeedback || !canProvideFeedback}
                                     sx={{
                                         borderRadius: '25px',
                                         padding: '12px 24px',

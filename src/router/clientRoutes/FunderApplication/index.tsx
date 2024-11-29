@@ -23,9 +23,10 @@ import { transferMoney } from "@/services/ApiServices/paymentService"
 import PayAwardDialog from "./PayAwardDialog"
 import { FaBirthdayCake, FaCheckCircle, FaClock, FaCross, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaQuestionCircle, FaStopCircle, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
 import { HiOutlinePlusCircle } from 'react-icons/hi';
-import { SendNotificationAndEmail } from "@/services/ApiServices/notification"
+import { SendNeedExtendReason, SendNotificationAndEmail } from "@/services/ApiServices/notification"
 import { getMessaging, onMessage } from "firebase/messaging"
 import scholarshipProgram from "../ScholarshipProgram/data"
+import SendReasonDialog from "./send-email-more-doc"
 
 const FunderApplication = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,6 +42,9 @@ const FunderApplication = () => {
   const [applyLoading, setApplyLoading] = useState<boolean>(false);
 
   const [openPayDialog, setOpenPayDialog] = useState<boolean>(false);
+
+  const [openSendReasonDialog, setOpenSendReasonDialog] = useState<boolean>(false);
+  const [reasonStatus, setReasonStatus] = useState<string>("");
 
   const [isPayAll, setIsPayAll] = useState<boolean>(false);
 
@@ -84,6 +88,7 @@ const FunderApplication = () => {
     if (!id) return;
     try {
       const applicationDocuments = [];
+      setApplyLoading(true);
       if (rows.length !== 0) {
           setRows(
             rows.map((row) => ({
@@ -95,7 +100,6 @@ const FunderApplication = () => {
               },
             }))
           );
-          setApplyLoading(true);
 
           for (const row of rows) {
             if (!row.name || !row.type || !row.file) return;
@@ -117,6 +121,15 @@ const FunderApplication = () => {
               fileUrl: name.urls[0],
             };
             applicationDocuments.push(documentData);
+          }
+      }
+      else{
+         const currentAward = awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+                new Date(application.updatedAt) < new Date(milestone.toDate)
+          )
+          if(currentAward.awardMilestoneDocuments.length != 0) {
+            setExtendError("Please upload required documents of types " + currentAward.awardMilestoneDocuments.map((doc: any) => doc.type).join(", "));
+            return;
           }
       }
 
@@ -166,6 +179,24 @@ const FunderApplication = () => {
       setApplyLoading(false);
     }
   };
+
+  const handleNeedExtend = async (status: string,data: any) => {
+     try {
+      if (!id) return;
+      setApplyLoading(true);
+      const response = await updateApplication(parseInt(id), {
+        status: status,
+        updatedAt: new Date(),
+      });
+      notification.success({message: "Change successfully!"})
+      await SendNeedExtendReason(data)
+      await fetchApplication();
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setApplyLoading(false);
+    } 
+  }
 
 
   const handlePayAwardProgress = async (data: any) => {
@@ -309,7 +340,7 @@ const FunderApplication = () => {
           </div>
           <div className="w-full">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={applicant.avatarUrl} />
+              <SchoolLogo imageUrl={applicant.avatarUrl || "https://github.com/shadcn.png"} />
               <div>
                 <p className="text-white text-4xl font-semibold hover:text-indigo-300 transition-colors duration-300">
                   <FaUserCircle className="inline-block mr-2 text-indigo-200" />
@@ -447,7 +478,9 @@ const FunderApplication = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>No</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleApproveExtend(ApplicationStatus.Rejected)}>Yes</AlertDialogAction>
+                      <AlertDialogAction onClick={() => {
+                          setReasonStatus("Rejected")
+                          setOpenSendReasonDialog(true)}}>Yes</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -465,7 +498,10 @@ const FunderApplication = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>No</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleApproveExtend(ApplicationStatus.NeedExtend)}>Yes</AlertDialogAction>
+                      <AlertDialogAction onClick={() => {/*handleApproveExtend(ApplicationStatus.NeedExtend)*/
+                            setReasonStatus("NeedExtend")
+                            setOpenSendReasonDialog(true)
+                        }}>Yes</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -568,6 +604,15 @@ const FunderApplication = () => {
             .reduce((sum:any,milestone: any) => sum + milestone.amount, 0) : 
             awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) 
             && new Date(application.updatedAt) < new Date(milestone.toDate))?.amount}
+        />}
+
+        {/* Send Reason Dialog */}
+        {openSendReasonDialog && <SendReasonDialog
+          status={reasonStatus}
+          isOpen={openSendReasonDialog}
+          setIsOpen={setOpenSendReasonDialog}
+          application={application}
+          handleNeedExtend={handleNeedExtend}
         />}
       </section>
 

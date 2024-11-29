@@ -38,6 +38,14 @@ export async function SendNotification(data: any) {
   return response.data;
 }
 
+export async function SendNeedExtendReason(data: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/send-extend-reason`,
+    data
+  );
+  return response.data;
+}
+
 export async function SendNotificationAndEmail(data: any) {
   const response = await axios.post(
     `${BASE_URL}/api/notifications/send-notification-and-email`,

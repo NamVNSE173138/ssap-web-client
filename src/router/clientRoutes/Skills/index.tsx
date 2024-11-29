@@ -125,10 +125,10 @@ const SkillInformation = () => {
     }
 
     return (
-        <div className="grid grid-cols-12 h-full">
-            <Sidebar className="col-start-1 col-end-3" />
+        <div className="grid grid-cols-12 ">
+            <Sidebar className="col-start-2 col-end-4 h-auto self-start" />
 
-            <div className="mt-15 mb-2 col-start-3 col-end-13 flex flex-col justify-start gap-1 p-5">
+            <div className="mt-15 mb-2 col-span-8 flex flex-col justify-start gap-1 p-5">
                 <div className="lg:px-28 flex flex-col gap-9">
 
                     {/* Skill Name */}
