@@ -1,5 +1,4 @@
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { FaFilePdf } from "react-icons/fa";
 import * as Tabs from "@radix-ui/react-tabs";
 
 const AccountSection = (props: any) => {
@@ -8,6 +7,13 @@ const AccountSection = (props: any) => {
     getStatusBadge,
     isEditing,
     setIsEditing,
+    handleSaveClick,
+    handleAvatarChange,
+    handleDocumentChange,
+    handleInputChange,
+    handleAddField,
+    handleRemoveField,
+    handleListChange,
     previewUrl,
     setPreviewUrl,
   } = props;
@@ -17,13 +23,17 @@ const AccountSection = (props: any) => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Funder Profile</h1>
         <button
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={(e) => {
+            if (isEditing) {
+              handleSaveClick(e);
+            }
+            setIsEditing(!isEditing);
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition"
         >
           {isEditing ? "Save Changes" : "Edit Profile"}
         </button>
       </div>
-
       <div className="flex items-center space-x-6 mb-8">
         <div className="relative">
           <img
@@ -33,52 +43,49 @@ const AccountSection = (props: any) => {
           />
           {isEditing && (
             <label className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full cursor-pointer hover:bg-blue-600">
-              <input type="file" className="hidden" />✎
+              <input
+                type="file"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+              ✎
             </label>
           )}
         </div>
       </div>
-
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-700 mb-6">
           Basic Information
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {[
-            {
-              label: "Username",
-              value: funderData.username,
-              editable: true,
-            },
-            { label: "Email", value: funderData.email, editable: true },
-            {
-              label: "Phone Number",
-              value: funderData.phoneNumber,
-              editable: true,
-            },
-            { label: "Address", value: funderData.address, editable: true },
+            { label: "Username", name: "username", editable: true },
+            { label: "Email", name: "email", editable: false },
+            { label: "Phone Number", name: "phone", editable: true },
+            { label: "Address", name: "address", editable: true },
             {
               label: "Organization Name",
-              value: funderData.organizationName,
+              name: "organizationName",
               editable: true,
             },
             {
               label: "Contact Person Name",
-              value: funderData.contactPersonName,
+              name: "contactPersonName",
               editable: true,
             },
             {
               label: "Account Status",
+              name: "status",
+              editable: false,
               value: (
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(
-                    funderData.accountStatus,
+                    funderData.status,
                   )}`}
                 >
-                  {funderData.accountStatus}
+                  {funderData.status}
                 </span>
               ),
-              editable: false,
             },
           ].map((field, idx) => (
             <div key={idx}>
@@ -87,11 +94,15 @@ const AccountSection = (props: any) => {
                 {isEditing && field.editable ? (
                   <input
                     type="text"
-                    defaultValue={field.value}
+                    name={field.name}
+                    defaultValue={funderData[field.name]}
+                    onChange={handleInputChange}
                     className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 ) : (
-                  <span className="text-gray-800">{field.value}</span>
+                  <span className="text-gray-800">
+                    {field.value || funderData[field.name]}
+                  </span>
                 )}
               </p>
             </div>
@@ -99,49 +110,102 @@ const AccountSection = (props: any) => {
         </div>
       </div>
 
-      <div>
-        <Collapsible.Root>
-          <Collapsible.Trigger className="text-xl font-semibold text-blue-600 hover:underline cursor-pointer flex items-center">
-            <FaFilePdf className="mr-2" />
-            Your Documents
-            {funderData.documents.length > 0 && (
-              <span className="ml-2 bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-full">
-                {funderData.documents.length}
-              </span>
-            )}{" "}
-          </Collapsible.Trigger>
-          <Collapsible.Content>
-            <div className="mt-6 p-6 bg-gray-100 rounded-lg border border-gray-200">
-              {funderData.documents.length > 0 ? (
-                <ul className="space-y-4">
-                  {funderData.documents.map((doc, index) => (
-                    <li key={index}>
-                      <div className="flex items-center justify-between">
-                        <a
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline hover:text-blue-800"
-                        >
-                          {doc.name}
-                        </a>
+      <Collapsible.Root>
+        <Collapsible.Trigger className="text-xl font-semibold text-blue-600 hover:underline cursor-pointer">
+          Your Documents
+        </Collapsible.Trigger>
+        <Collapsible.Content>
+          <div className="mt-6 p-6 bg-gray-100 rounded-lg border border-gray-200">
+            <div className="grid grid-cols-[2fr_2fr_1fr_auto] gap-4 font-semibold text-gray-600 border-b pb-2 mb-4">
+              <div>Document Name</div>
+              <div>Type</div>
+              <div>File</div>
+              <div>Actions</div>
+            </div>
+            <ul className="space-y-4">
+              {funderData.funderDocuments.map((doc, index) => (
+                <li
+                  key={index}
+                  className="grid grid-cols-[2fr_2fr_1fr_auto] gap-4 items-center"
+                >
+                  {isEditing ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="File Name"
+                        value={doc.name}
+                        onChange={(e) =>
+                          handleListChange(index, "name", e.target.value)
+                        }
+                        className="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                      />
+                      <select
+                        value={doc.type}
+                        onChange={(e) =>
+                          handleListChange(index, "type", e.target.value)
+                        }
+                        className="p-2 border rounded-md"
+                      >
+                        <option value="">Select Type</option>
+                        <option value="Organizational Document">
+                          Organizational Document
+                        </option>
+                        <option value="Proof of Funds">Proof of Funds</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <input
+                        type="file"
+                        onChange={(e) =>
+                          e.target.files &&
+                          handleDocumentChange(index, e.target.files?.[0])
+                        }
+                        className="w-full"
+                      />
+                      <button
+                        onClick={() => handleRemoveField(index)}
+                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="font-medium">{doc.name}</div>
+                      <div>{doc.type}</div>
+                      <div>
                         <button
-                          onClick={() => setPreviewUrl(doc.url)}
-                          className="ml-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+                          onClick={() => setPreviewUrl(doc.fileUrl)}
+                          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
                         >
                           Preview
                         </button>
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No documents available.</p>
-              )}
-            </div>
-          </Collapsible.Content>
-        </Collapsible.Root>
-      </div>
+                      <div>
+                        <a
+                          href={doc.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline hover:text-blue-800"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {isEditing && (
+              <button
+                onClick={handleAddField}
+                className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md"
+              >
+                Add Document
+              </button>
+            )}
+          </div>
+        </Collapsible.Content>
+      </Collapsible.Root>
 
       {previewUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out">
