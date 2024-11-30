@@ -41,7 +41,7 @@ const ServiceCard = (service: ServiceType) => {
 
   return (
     <Link to={`/services/${service.id}`}>
-      <div className="flex flex-col justify-between gap-6 p-4 rounded-xl shadow-md bg-gradient-to-r from-blue-50 to-indigo-100 cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:translate-y-1">
+      <div className="flex flex-col justify-between gap-6 p-4 rounded-3xl shadow shadow-gray-400  cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:translate-y-1">
         <div>
           <h2
             className="text-lg md:text-xl mt-5 font-medium text-gray-800 hover:text-indigo-600 transition-colors truncate"
@@ -64,14 +64,14 @@ const ServiceCard = (service: ServiceType) => {
           </div>
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaAddressBook
-              color="#2D3748"
+              color="#1eb2a6"
               className="transition-all transform hover:scale-125 hover:animate-bounce ease-in-out duration-300"
             />
             <p className="text-gray-800">{service.type || "No Type Specified"}</p>
           </div>
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaClipboardList
-              color="#2D3748"
+              color="#1eb2a6"
               className="transition-all transform hover:scale-125 hover:animate-ping ease-in-out duration-300"
             />
             <p className="text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap max-w-full" style={{ maxWidth: '50ch' }}>
@@ -81,7 +81,7 @@ const ServiceCard = (service: ServiceType) => {
 
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaDollarSign
-              color="#2D3748"
+              color="#1eb2a6"
               className="transition-all transform hover:scale-125 hover:animate-wiggle ease-in-out duration-300"
             />
             <p className="text-gray-800">{service.price ? `$${service.price.toFixed(2)}` : "Price not available"}</p>
