@@ -369,24 +369,28 @@ const Service = () => {
 
   return (
     <div>
-      <div className="relative">
+      {/* <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[70px] z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
           <Breadcrumb>
-            <BreadcrumbList className="text-white">
+            <BreadcrumbList className="text-[#000]">
               <BreadcrumbItem>
+
                 <Link
                   to="/"
                   className="md:text-xl text-lg font-semibold hover:text-blue-400 transition-colors duration-300"
                 >
+
                   Home
                 </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
+
                 <p className="text-white md:text-xl text-lg font-semibold">
                   Services
                 </p>
+
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -394,6 +398,7 @@ const Service = () => {
       </div>
 
       <div className="flex bg-gradient-to-r from-blue-300 to-blue-500 justify-between p-4 items-center shadow-lg">
+      
         <div className="relative w-full max-w-md">
           <Input
             className="w-full pl-12 pr-12 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
@@ -502,9 +507,156 @@ const Service = () => {
             </button>
           </div>
         )}
+      </div> */}
+      {/* ================================ */}
+      <div className="relative">
+        <ScholarshipProgramBackground />
+
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
+          
+          <Breadcrumb>
+            <BreadcrumbList className="text-[#000]">
+              <BreadcrumbItem>
+                <Link to="/" className="md:text-xl text-lg">
+                  Home
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <p className="text-[#000] font-medium md:text-xl text-lg">
+                  Services
+                </p>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          
+          <div className="w-full mt-6">
+            <div className="relative w-full">
+              <Input
+                className="w-full h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
+                placeholder="Search for services..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
+              {searchTerm && (
+                <IoMdClose
+                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
+                  onClick={clearSearch}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <ul className="grid grid-cols-1 bg-blue-100 md:grid-cols-2 lg:grid-cols-3 gap-10 p-10">
+      
+      <div className="flex bg-white justify-between p-4 items-center z-20">
+        {user?.role === "Provider" && (
+          <div className="flex gap-4">
+            <div className=" text-black text-lg flex items-center flex-wrap">
+              <span>Number of services created left: </span>
+              <span className="font-semibold">{numberOfServicesLeft}</span>
+
+              {numberOfServicesLeft > 0 && (
+                <IoIosInformationCircle
+                  onClick={handleInfoIconClick}
+                  className="text-white text-xl cursor-pointer hover:text-blue-500 transition-all duration-300 ml-2"
+                />
+              )}
+
+              {isSubscriptionExpiringSoon() && (
+                <p className="text-red-500 font-bold mt-2">
+                  Your subscription will expire in less than 7 days!
+                </p>
+              )}
+            </div>
+
+            <Button
+              onClick={handleAddServiceClick}
+              className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white h-full shadow-lg active:scale-95 ${
+                numberOfServicesLeft === 0
+                  ? "bg-gray-400 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-500 text-white"
+              }`}
+              disabled={numberOfServicesLeft === 0}
+              title={
+                numberOfServicesLeft === 0
+                  ? "You need to buy a subscription to add service"
+                  : ""
+              }
+            >
+              <IoIosAddCircleOutline
+                className={`text-2xl ${
+                  numberOfServicesLeft === 0 ? "text-gray-500" : "text-blue-500"
+                } transition-all duration-300 ease-in-out transform hover:scale-110`}
+              />
+              <p
+                className={`text-xl ${
+                  numberOfServicesLeft === 0 ? "text-gray-500" : "text-blue-600"
+                } font-semibold`}
+              >
+                Add Service
+              </p>
+            </Button>
+
+            <Button
+              onClick={handleBuySubscriptionClick}
+              disabled={isBuySubscriptionDisabled}
+              title={buySubscriptionTitle}
+              className={`flex justify-center items-center gap-1 px-4 py-3 h-full shadow-lg active:scale-95 transition-all duration-300 ${
+                isBuySubscriptionDisabled
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                  : "bg-white hover:bg-green-600 hover:text-white"
+              }`}
+            >
+              <FaCreditCard className="text-2xl transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl font-semibold">Buy Subscription</p>
+            </Button>
+
+            <Button
+              onClick={handleUpgradeSubscriptionClick}
+              disabled={isUpgradeSubscriptionDisabled}
+              title={upgradeSubscriptionTitle}
+              className={`flex justify-center items-center gap-1 px-4 py-3 h-full shadow-lg active:scale-95 transition-all duration-300 ${
+                isUpgradeSubscriptionDisabled
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                  : "bg-white hover:bg-yellow-600 hover:text-white"
+              }`}
+            >
+              <FaArrowUp className="text-2xl transition-all duration-300 ease-in-out transform hover:scale-110" />
+              <p className="text-xl font-semibold">Upgrade Subscription</p>
+            </Button>
+          </div>
+        )}
+
+        {user?.role === "Applicant" && (
+          <div className="flex gap-4">
+            <Button
+              onClick={handleViewHistory}
+              className="flex justify-center items-center bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full shadow-lg "
+            >
+              <IoMdTime className="text-2xl text-white" />
+              <p className="text-xl text-white font-semibold">
+                View History
+              </p>
+            </Button>
+            <Button
+              onClick={handleNavigateProviderList}
+              className="flex justify-center items-center bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full shadow-lg "
+            >
+              <IoPerson className="text-2xl text-white" />
+              <p className="text-xl text-white font-semibold">
+                Provider List
+              </p>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* =============================== */}
+      <ul className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-10 p-10">
         {loading ? (
           <ServiceSkeleton />
         ) : error ? (
@@ -527,20 +679,20 @@ const Service = () => {
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-300 flex items-center gap-2"
+          className="bg-[#1eb2a6] text-white px-5 py-2 rounded-full hover:bg-[#0d978b] disabled:bg-gray-400 transition-all duration-300 flex items-center gap-2"
         >
           <IoIosArrowBack className="text-xl" />
           <span>Previous</span>
         </button>
 
-        <span className="text-lg font-semibold text-blue-700">
+        <span className="text-lg font-semibold text-[#1eb2a6]">
           Page {currentPage} of {totalPages}
         </span>
 
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-300 flex items-center gap-2"
+          className="bg-[#1eb2a6] text-white px-5 py-2 rounded-full hover:bg-[#0d978b] disabled:bg-gray-400 transition-all duration-300 flex items-center gap-2"
         >
           <span>Next</span>
           <IoIosArrowForward className="text-xl" />

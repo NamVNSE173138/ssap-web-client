@@ -21,6 +21,8 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Container, Slider }
 import { getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendarAlt, FaCircle, FaDollarSign } from "react-icons/fa";
 import { HiOutlineChevronDown } from "react-icons/hi";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 const ScholarshipProgram = () => {
   const [data, setData] =
     useState<ScholarshipProgramType[]>(scholarshipProgram);
@@ -132,10 +134,10 @@ const ScholarshipProgram = () => {
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[70px] z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
           <div>
-            <Breadcrumb className=" ">
-              <BreadcrumbList className="text-white">
+            <Breadcrumb className="">
+              <BreadcrumbList className="text-[#000]">
                 <BreadcrumbItem>
                   <Link to="/" className="md:text-xl text-lg">
                     Home
@@ -143,7 +145,7 @@ const ScholarshipProgram = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <p className="text-white md:text-xl text-lg">
+                  <p className="text-[#000] font-medium md:text-xl text-lg">
                     Scholarship Program
                   </p>
                 </BreadcrumbItem>
@@ -152,14 +154,14 @@ const ScholarshipProgram = () => {
           </div>
 
           <form action="" className="w-full">
-            <div className="flex items-center mb-5 border border-zinc-950 rounded-sm relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
+            <div className="flex items-center mb-5  rounded-sm relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
               <SearchIcon className="w-[20px] h-[20px] ml-3 rounded-full" />
               <input value={scholarshipKeyword} onChange={(e) => setScholarshipKeyword(e.target.value)}
                 placeholder="Search scholarships by keyword" className="w-full outline-none py-[13px] pl-[16px] pr-[32px]" type="text" />
             </div>
             <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-[1fr_120px]">
               <div className="flex gap-[16px] flex-col lg:flex-row flex-wrap">
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full sm:1/2 lg:w-1/5 cursor-pointer ">
+                <div className=" rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full sm:1/2 lg:w-1/5 cursor-pointer ">
                   <label hidden>Study Major</label>
                   <select className="w-full">
                     <option value="">Select study major</option>
@@ -170,7 +172,7 @@ const ScholarshipProgram = () => {
                     ))}
                   </select>
                 </div>
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
+                <div className="rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
                   <label hidden>Study destination</label>
                   <select className="w-full">
                     <option value="">Select a study destination</option>
@@ -181,7 +183,7 @@ const ScholarshipProgram = () => {
                     ))}
                   </select>
                 </div>
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
+                <div className=" rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
                   <label hidden>Scholarship Categories</label>
                   <select value={scholarshipCategory} onChange={(e) => setScholarshipCategory(e.target.value)} className="w-full">
                     <option value="">Select a scholarship categories</option>
@@ -192,7 +194,7 @@ const ScholarshipProgram = () => {
                     ))}
                   </select>
                 </div>
-                <div className="border border-zinc-950 rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
+                <div className="rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
                   <label hidden>Scholarship Certificates</label>
                   <select className="w-full">
                     <option value="">Select a scholarship certificates</option>
@@ -204,8 +206,8 @@ const ScholarshipProgram = () => {
                   </select>
                 </div>
               </div>
-              <div className=" flex w-full text-white bg-[#1eb2a6] justify-center rounded-full">
-                <button type="button" onClick={handleSearch}>Search</button>
+              <div className=" flex w-full text-white  justify-center rounded-full">
+                <Button className="bg-[#1eb2a6] w-full h-full" type="button" onClick={handleSearch}>Search</Button>
               </div>
             </div>
           </form>
@@ -215,17 +217,17 @@ const ScholarshipProgram = () => {
       <div className="flex px-10 gap-5">
 
         <div className="w-[250px] mt-10">
-          <span className="bg-sky-500 w-[98%] mx-auto mb-3 rounded-full h-[3px] block"></span>
+          <span className="bg-[#1eb2a6] w-[98%] mx-auto mb-3 rounded-full h-[3px] block"></span>
 
           {/* Amount Accordion */}
           <Accordion defaultExpanded>
             <AccordionSummary
-              expandIcon={<HiOutlineChevronDown className="text-sky-500 text-2xl" />}
+              expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
               aria-controls="panel1-content"
               id="panel1-header"
             >
               <div className="flex items-center gap-3">
-                <FaDollarSign className="text-sky-500 text-xl" />
+                <FaDollarSign className="text-[#1eb2a6] text-xl" />
                 <p className="font-semibold text-lg text-gray-800">Amount</p>
               </div>
             </AccordionSummary>
@@ -255,18 +257,18 @@ const ScholarshipProgram = () => {
           {/* Deadline Accordion */}
           <Accordion defaultExpanded>
             <AccordionSummary
-              expandIcon={<HiOutlineChevronDown className="text-sky-500 text-2xl" />}
+              expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
               aria-controls="panel2-content"
               id="panel2-header"
             >
               <div className="flex items-center gap-3">
-                <FaCalendarAlt className="text-sky-500 text-xl" />
+                <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
                 <p className="font-semibold text-lg text-gray-800">Deadline After</p>
               </div>
             </AccordionSummary>
             <AccordionDetails>
               <div className="flex items-center mb-5 border border-zinc-950 rounded-sm relative bg-white">
-                <FaCalendarAlt className="w-[20px] h-[20px] ml-3 text-sky-500" />
+                <FaCalendarAlt className="w-[20px] h-[20px] ml-3 text-[#1eb2a6]" />
                 <input
                   value={scholarshipDeadline}
                   onChange={(e) => setScholarshipDeadline(e.target.value)}
@@ -280,12 +282,12 @@ const ScholarshipProgram = () => {
           {/* Status Accordion */}
           <Accordion defaultExpanded>
             <AccordionSummary
-              expandIcon={<HiOutlineChevronDown className="text-sky-500 text-2xl" />}
+              expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
               aria-controls="panel3-content"
               id="panel3-header"
             >
               <div className="flex items-center gap-3">
-                <FaCircle className="text-sky-500 text-xl" />
+                <FaCircle className="text-[#1eb2a6] text-xl" />
                 <p className="font-semibold text-lg text-gray-800">Status</p>
               </div>
             </AccordionSummary>
