@@ -13,7 +13,6 @@ import ProfileSection from "./components/ProfileSection";
 import AccountSection from "./components/AccountSection";
 import AuthSection from "./components/AuthSection";
 import ApplicationHistorySection from "./components/ApplicationHistorySection";
-import RequestHistorySection from "./components/RequestHistorySection";
 import {
   exportApplicantProfileToPdf,
   getApplicantProfileDetails,
@@ -187,7 +186,7 @@ const ApplicantProfile = () => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="w-full max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <Tabs.Root
         defaultValue={activeTab}
         value={activeTab}
@@ -223,17 +222,8 @@ const ApplicantProfile = () => {
             value="application-history"
             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
           >
-            <AiOutlineAudit className="text-lg" />
-            Application History
-          </Tabs.Trigger>
-
-          {/* Request History Tab */}
-          <Tabs.Trigger
-            value="request-history"
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
-          >
             <AiOutlineClockCircle className="text-lg" />
-            Request History
+            Application History
           </Tabs.Trigger>
 
           {/* Authentication Tab */}
@@ -269,8 +259,6 @@ const ApplicantProfile = () => {
           />
 
           <ApplicationHistorySection />
-
-          <RequestHistorySection />
 
           <AuthSection />
         </div>
