@@ -266,7 +266,7 @@ const ExpertForm: React.FC<ExpertFormProps> = ({ onSubmit, initialData, handelUp
       </div>
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
       >
         Submit
       </button>

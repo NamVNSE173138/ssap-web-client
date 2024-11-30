@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
 
 const AuthSection = (props: any) => {
@@ -51,9 +52,9 @@ const AuthSection = (props: any) => {
 
         {/* Save Button */}
         <div>
-          <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none">
+          <Button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none">
             Save Changes
-          </button>
+          </Button>
         </div>
       </form>
     </Tabs.Content>

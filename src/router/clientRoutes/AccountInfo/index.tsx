@@ -10,6 +10,7 @@ import { GoPencil } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setUser } from "@/reducers/tokenSlice";
+import { Button } from "@/components/ui/button";
 
 
 const AccountInfo = () => {
@@ -345,13 +346,13 @@ const AccountInfo = () => {
             </div>
 
             <div className="flex justify-center">
-              <button
+              <Button
                 type="button"
                 onClick={handleEdit}
                 className="lg:mb-7 mb-5 bg-[#1eb2a6] text-primary-foreground lg:h-16 h-12 lg:w-64 w-48 rounded-[2rem] lg:text-xl text-base"
               >
                 Edit Profile
-              </button>
+              </Button>
             </div>
           </form>
         </div>
