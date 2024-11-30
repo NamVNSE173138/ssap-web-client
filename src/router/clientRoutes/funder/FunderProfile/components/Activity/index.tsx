@@ -82,10 +82,10 @@ const Activity = () => {
               <Link
                 to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
                 // onClick={() => setIsScholarshipModalOpen(true)}
-                className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
+                className="flex justify-start items-center hover:bg-[#419f97] text-[#1eb2a6] hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95 border border-[#1eb2a6]"
               >
-                <IoIosAddCircleOutline className="text-3xl text-blue-500" />
-                <p className="text-xl text-blue-600">Add Scholarship Program</p>
+                <IoIosAddCircleOutline className="text-3xl  hover:text-white" />
+                <p className="text-xl  ">Add Scholarship Program</p>
               </Link>
             )}
           </div>

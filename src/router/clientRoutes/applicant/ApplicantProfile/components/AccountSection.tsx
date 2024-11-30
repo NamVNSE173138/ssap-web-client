@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import * as Tabs from "@radix-ui/react-tabs";
 
 const AccountSection = (props: any) => {
@@ -50,24 +52,24 @@ const AccountSection = (props: any) => {
 
             {/* Phone Number */}
             <div>
-              <label
+              <Label
                 htmlFor="phone"
                 className="block text-gray-700 font-medium"
               >
                 Phone Number
-              </label>
+              </Label>
               <div className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed">
                 {profile.phone || "N/A"}
               </div>
             </div>
             {/* Address */}
             <div>
-              <label
+              <Label
                 htmlFor="address"
                 className="block text-gray-700 font-medium"
               >
                 Address
-              </label>
+              </Label>
               <div className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed">
                 {profile.address || "N/A"}
               </div>
@@ -75,7 +77,7 @@ const AccountSection = (props: any) => {
           </div>
           <div className="mt-8 flex space-x-4">
             {/* Edit Profile Button */}
-            <button
+            <Button
               onClick={() => {
                 setActiveTab("profile");
                 setIsEditing(true);
@@ -83,15 +85,15 @@ const AccountSection = (props: any) => {
               className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none"
             >
               Edit Profile
-            </button>
+            </Button>
 
             {/* Change Password Button */}
-            <button
+            <Button
               onClick={() => setActiveTab("password")}
               className="px-6 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none"
             >
               Change Password
-            </button>
+            </Button>
           </div>
         </div>
       </div>
