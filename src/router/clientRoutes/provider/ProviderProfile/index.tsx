@@ -194,7 +194,7 @@ const ProviderProfile = () => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="w-full max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <Tabs.Root
         defaultValue={activeTab}
         value={activeTab}
