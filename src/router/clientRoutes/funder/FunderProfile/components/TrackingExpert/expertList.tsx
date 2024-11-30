@@ -65,7 +65,7 @@ const ExpertList = ({ experts, loading, error }: ExpertListProps) => {
                       }-500 opacity-75`}
                     ></span>
                     <span
-                      className={`relative inline-flex rounded-full h-3 w-3 bg-${
+                      className={`relative overflow-hidden inline-flex rounded-full h-3 w-3 bg-${
                         statusColor[expert.status]
                       }-500`}
                     ></span>

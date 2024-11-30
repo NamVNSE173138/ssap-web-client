@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import * as Tabs from "@radix-ui/react-tabs";
 
@@ -22,7 +25,7 @@ const AccountSection = (props: any) => {
     <Tabs.Content value="account" className="pt-4">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Funder Profile</h1>
-        <button
+        <Button
           onClick={(e) => {
             if (isEditing) {
               handleSaveClick(e);
@@ -32,7 +35,7 @@ const AccountSection = (props: any) => {
           className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition"
         >
           {isEditing ? "Save Changes" : "Edit Profile"}
-        </button>
+        </Button>
       </div>
       <div className="flex items-center space-x-6 mb-8">
         <div className="relative">
@@ -42,14 +45,14 @@ const AccountSection = (props: any) => {
             className="w-24 h-24 rounded-full border-2 border-gray-300 object-cover"
           />
           {isEditing && (
-            <label className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full cursor-pointer hover:bg-blue-600">
-              <input
+            <Label className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full cursor-pointer hover:bg-blue-600">
+              <Input
                 type="file"
                 className="hidden"
                 onChange={handleAvatarChange}
               />
               ✎
-            </label>
+            </Label>
           )}
         </div>
       </div>
@@ -123,7 +126,7 @@ const AccountSection = (props: any) => {
               <div>Actions</div>
             </div>
             <ul className="space-y-4">
-              {funderData.funderDocuments.map((doc, index) => (
+              {funderData.funderDocuments.map((doc: any, index: any) => (
                 <li
                   key={index}
                   className="grid grid-cols-[2fr_2fr_1fr_auto] gap-4 items-center"

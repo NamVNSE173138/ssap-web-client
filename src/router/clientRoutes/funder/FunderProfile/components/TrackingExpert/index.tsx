@@ -105,19 +105,19 @@ const TrackingExpert = () => {
             <Tabs.List className="flex space-x-4 border-b-2 my-5 bg-white shadow-2 rounded-lg">
               <Tabs.Trigger
                 value="create"
-                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-blue-600"
+                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]"
               >
                 Add Expert
               </Tabs.Trigger>
               <Tabs.Trigger
                 value="list"
-                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-blue-600"
+                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]"
               >
                 Expert List
               </Tabs.Trigger>
               <Tabs.Trigger
                 value="assign"
-                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-blue-600"
+                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]"
               >
                 Expert Assigning
               </Tabs.Trigger>
