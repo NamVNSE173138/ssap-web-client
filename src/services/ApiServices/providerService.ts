@@ -11,6 +11,15 @@ export async function getProviderProfile(id: number) {
   return response.data;
 }
 
+export async function addProviderDetails(id: number, request: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/providers/${id}`,
+    request,
+    ngrokSkipWarning,
+  );
+  return response.data;
+}
+
 export async function updateProviderProfile(id: number, request: any) {
   const response = await axios.put(
     `${BASE_URL}/api/providers/${id}`,
