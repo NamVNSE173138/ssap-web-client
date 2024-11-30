@@ -9,6 +9,30 @@ export async function getAllMajors() {
   return response.data;
 }
 
+export async function getMajors() {
+  const response = await axios.get(
+    `${BASE_URL}/api/majors`,
+  );
+  return response.data;
+}
+
+export async function addMajor(data: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/majors`,
+    data
+  );
+  return response.data;
+}
+
+export async function editMajors(id: number, data: any) {
+  const response = await axios.put(
+    `${BASE_URL}/api/majors/${id}`,
+    data
+  );
+  return response.data;
+}
+
+
 export async function getMajor(id: string) {
   const response = await axios.get(
     `${BASE_URL}/api/majors/${id}`,

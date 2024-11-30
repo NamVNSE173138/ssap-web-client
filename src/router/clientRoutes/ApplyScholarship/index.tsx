@@ -237,11 +237,6 @@ const ApplyScholarship = () => {
 
             <div className="flex gap-[20px] lg:col-span-2">
               <div className="flex justify-between w-full">
-                {/* <h2>
-                  Documents
-                  <span className="block bg-blue-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
-                </h2> */}
-
                 <button
                   type="button"
                   onClick={handleAddRow}

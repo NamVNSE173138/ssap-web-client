@@ -10,3 +10,20 @@ export async function getAllCategories() {
   return response.data;
 }
 
+export async function addCategory(data: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/categories`,
+    data,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function editCategory(id: number, data: any) {
+  const response = await axios.put(
+    `${BASE_URL}/api/categories/${id}`,
+    data,
+    ngrokSkipWarning
+  );
+  return response.data;
+}

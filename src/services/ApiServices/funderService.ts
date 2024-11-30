@@ -27,3 +27,13 @@ export async function updateFunderProfile(id: number, request: any) {
   );
   return response.data;
 }
+
+export async function addFunderDetails(id: number, request: any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/funders/${id}`,
+    request,
+    ngrokSkipWarning,
+  );
+  return response.data;
+}
+
