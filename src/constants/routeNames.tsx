@@ -42,7 +42,10 @@ const RouteNames = {
   TRACKING_EXPERT: "/funder/tracking-expert",
   FUNDER_PROFILE: "/funder/profile",
   PROVIDER_PROFILE: "/provider/profile",
-  APPLICATION_REVIEW: "/experts/application-review"
+  APPLICATION_REVIEW: "/experts/application-review",
+  MAJOR_MANAGEMENT: "/admin/major-management",
+  UNIVERSITY_MANAGEMENT: "/admin/university-management",
+  CATEGORY_MANAGEMENT: "/admin/category-management",
 };
 
 export default RouteNames;

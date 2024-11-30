@@ -442,7 +442,7 @@ const FunderApplication = () => {
               awardMilestones={awardMilestones}
               documentType={awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
                 new Date(application.updatedAt) < new Date(milestone.toDate)
-              ).awardMilestoneDocuments.map((doc: any) => doc.type)}
+              )?.awardMilestoneDocuments.map((doc: any) => doc.type)}
               rows={rows}
               setRows={setRows}
               handleDeleteRow={handleDeleteRow}

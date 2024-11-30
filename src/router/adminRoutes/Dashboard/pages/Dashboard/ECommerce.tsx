@@ -35,7 +35,7 @@ const ECommerce: React.FC = () => {
       {error && <p className="text-red-500">{error}</p>}
       {loading && <ScreenSpinner/>}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        {accounts && <CardDataStats title="Total Users" total={accounts.length} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Users" total={accounts.length - 1} rate="" levelDown={false} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"

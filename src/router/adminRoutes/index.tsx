@@ -7,6 +7,8 @@ import { Calendar } from "antd";
 import AccountsManagement from "./Dashboard/pages/AccountsManagement";
 import RoleNames from "@/constants/roleNames";
 import TransactionsManagement from "./Dashboard/pages/TransactionsManagement";
+import MajorManagement from "./Dashboard/pages/MajorManagement";
+import CategoryManagement from "./Dashboard/pages/CategoryManagement";
 
 const privateRoutes: RouteObject[] = [
   {
@@ -24,6 +26,14 @@ const privateRoutes: RouteObject[] = [
   {
     path: "/admin/transactionsmanagement",
     element: <TransactionsManagement />,
+  },
+  {
+    path: RouteNames.MAJOR_MANAGEMENT,
+    element: <MajorManagement />,
+  },
+  {
+    path: RouteNames.CATEGORY_MANAGEMENT,
+    element: <CategoryManagement />,
   },
 ];
 const publicRoutes: RouteObject[] = [
