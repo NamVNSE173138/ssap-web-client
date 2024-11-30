@@ -37,7 +37,7 @@ const AccountSection = (props: any) => {
       <div className="flex items-center space-x-6 mb-8">
         <div className="relative">
           <img
-            src={providerData.avatar}
+            src={providerData.avatar || "https://github.com/shadcn.png"}
             alt="User Avatar"
             className="w-24 h-24 rounded-full border-2 border-gray-300 object-cover"
           />
