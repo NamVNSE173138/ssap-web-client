@@ -73,9 +73,8 @@ interface ServiceType {
 const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
   return (
     <div
-      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${
-        isOpen ? "block" : "hidden"
-      }`}
+      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${isOpen ? "block" : "hidden"
+        }`}
       onClick={onClose}
     >
       <div
@@ -488,11 +487,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 <div className="flex gap-6">
                   <div
                     onClick={() => setPaymentMethod("Wallet")}
-                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${
-                      paymentMethod === "Wallet"
+                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet"
                         ? "border-blue-500 bg-blue-100"
                         : "border-gray-300 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
                       <IoWalletOutline className="text-2xl" />
@@ -503,11 +501,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </div>
                   <div
                     onClick={() => setPaymentMethod("Cash")}
-                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${
-                      paymentMethod === "Cash"
+                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash"
                         ? "border-green-500 bg-green-100"
                         : "border-gray-300 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
                       <IoCashOutline className="text-2xl" />
@@ -633,7 +630,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                 <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-blue-600">
+                    <h2 className="text-xl font-semibold text-[#1eb2a6] ">
                       Feedback Details
                     </h2>
                     <span
@@ -734,14 +731,14 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                       requestStatus === "Finished" ? (
                         <button
                           onClick={handleRequestNow}
-                          className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                          className="flex items-center justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
                         >
                           <FaRedo className="mr-2" /> Request Again
                         </button>
                       ) : (
                         <button
                           onClick={handleRequestNow}
-                          className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                          className="flex items-center mb-3 justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
                         >
                           <FaPlus className="mr-2" /> Request Now
                         </button>
@@ -750,11 +747,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                       <>
                         <button
                           onClick={() => openEditDialog()}
-                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
-                            !canEdit
+                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
                               ? "bg-gray-500 text-gray-300 cursor-not-allowed"
                               : "bg-yellow-500 hover:bg-yellow-400 text-white"
-                          }`}
+                            }`}
                           disabled={!canEdit}
                           title={
                             !canEdit
@@ -772,11 +768,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         </button>
                         <button
                           onClick={() => setConfirmationDialogOpen(true)}
-                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
-                            !canEdit
+                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
                               ? "bg-gray-500 text-gray-300 cursor-not-allowed"
                               : "bg-red-600 hover:bg-red-500 text-white"
-                          }`}
+                            }`}
                           disabled={!canEdit}
                           title={
                             !canEdit
@@ -830,7 +825,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                       ":id",
                       serviceData.providerId
                     )}
-                    className="text-blue-600 hover:underline text-lg font-semibold"
+                    className="text-[#1eb2a6] hover:underline text-lg font-semibold"
                   >
                     Provider Information
                   </Link>
