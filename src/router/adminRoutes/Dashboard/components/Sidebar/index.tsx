@@ -10,6 +10,8 @@ import { messaging } from '@/services/firebase';
 import { removeToken, removeUser } from '@/reducers/tokenSlice';
 import RouteNames from '@/constants/routeNames';
 import ScreenSpinner from '@/components/ScreenSpinner';
+import { BsSuitcase, BsSuitcase2 } from 'react-icons/bs';
+import { TableIcon } from 'lucide-react';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -220,6 +222,32 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   Accounts Management
                 </NavLink>
               </li>
+              {/* <!-- Menu Item Profile --> */}
+              <li>
+                <NavLink
+                  to="/admin/major-management"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('profile') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                >
+                  <BsSuitcase2 size={18}/>
+                  Major Management
+                </NavLink>
+              </li>
+              {/* <!-- Menu Item Profile --> */}
+
+                {/* <!-- Menu Item Profile --> */}
+              <li>
+                <NavLink
+                  to="/admin/category-management"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('profile') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                >
+                  <TableIcon size={18}/>
+                  Category Management
+                </NavLink>
+              </li>
+              {/* <!-- Menu Item Profile --> */}
+
               {/* <!-- Menu Item Profile --> */}
               <li>
                 <NavLink

@@ -210,6 +210,8 @@ const AccountsManagement = () => {
           {renderTable("Funder", accounts.filter(account => account.roleName === "Funder"))}
           <br />
           {renderTable("Provider", accounts.filter(account => account.roleName === "Provider"))}
+          <br />
+          {renderTable("Expert", accounts.filter(account => account.roleName === "Expert"))}
         </>
       )}
 
