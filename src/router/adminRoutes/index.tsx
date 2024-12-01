@@ -9,6 +9,7 @@ import RoleNames from "@/constants/roleNames";
 import TransactionsManagement from "./Dashboard/pages/TransactionsManagement";
 import MajorManagement from "./Dashboard/pages/MajorManagement";
 import CategoryManagement from "./Dashboard/pages/CategoryManagement";
+import UniversityManagement from "./Dashboard/pages/UniversityManagement";
 
 const privateRoutes: RouteObject[] = [
   {
@@ -34,6 +35,10 @@ const privateRoutes: RouteObject[] = [
   {
     path: RouteNames.CATEGORY_MANAGEMENT,
     element: <CategoryManagement />,
+  },
+  {
+    path: RouteNames.UNIVERSITY_MANAGEMENT,
+    element: <UniversityManagement/>,
   },
 ];
 const publicRoutes: RouteObject[] = [
