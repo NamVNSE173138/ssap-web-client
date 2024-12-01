@@ -36,6 +36,7 @@ import TrackingExpert from "./TrackingExpert";
 import FunderProfile from "./funder/FunderProfile";
 import ProviderProfile from "./provider/ProviderProfile";
 import ApplicationReview from "./Expert";
+import ExpertProfile from "./Expert/ExpertProfile";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -194,6 +195,17 @@ const funderRoutes: RouteObject[] = [
   },
 ];
 
+const expertRoutes: RouteObject[] = [
+  {
+    path: RouteNames.EXPERT_PROFILE,
+    element: <ExpertProfile />,
+  },
+  {
+    path: RouteNames.TRACKING_EXPERT,
+    element: <TrackingExpert />,
+  },
+];
+
 const providerRoutes: RouteObject[] = [
   {
     path: RouteNames.PROVIDER_PROFILE,
@@ -219,10 +231,13 @@ const clientRoutes: RouteObject[] = [
     children: [...funderRoutes],
   },
   {
+    element: <ProtectedRoute allowedRoles={[RoleNames.EXPERT]} />,
+    children: [...expertRoutes],
+  },
+  {
     element: <ProtectedRoute allowedRoles={[RoleNames.PROVIDER]} />,
     children: [...providerRoutes],
   },
-
   ...publicRoutes,
 ];
 
