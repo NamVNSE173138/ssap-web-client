@@ -32,6 +32,13 @@ export async function editMajors(id: number, data: any) {
   return response.data;
 }
 
+export async function editMajorSkills(id: number, data: any) {
+  const response = await axios.put(
+    `${BASE_URL}/api/majors/update-skills/${id}`,
+    data
+  );
+  return response.data;
+}
 
 export async function getMajor(id: string) {
   const response = await axios.get(
