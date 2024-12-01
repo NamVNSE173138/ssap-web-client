@@ -72,6 +72,10 @@ const HeaderAvatar = () => {
         navigate(`${RouteNames.FUNDER_PROFILE}`);
       }
 
+      if (user.role.toLowerCase() === RoleNames.EXPERT.toLowerCase()) {
+        navigate(`${RouteNames.EXPERT_PROFILE}`);
+      }
+
       if (user.role.toLowerCase() === RoleNames.PROVIDER.toLowerCase()) {
         navigate(`${RouteNames.PROVIDER_PROFILE}`);
       }
