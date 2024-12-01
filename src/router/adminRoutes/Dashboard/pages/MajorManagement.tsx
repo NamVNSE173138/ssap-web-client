@@ -25,9 +25,6 @@ import {
   Box,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
-import { TrashIcon } from "@heroicons/react/24/solid";
-import { FaCheckCircle, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle, FaUserCircle } from "react-icons/fa";
 import { getAllMajors, getMajors } from "@/services/ApiServices/majorService";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
 import React from "react";
@@ -37,6 +34,8 @@ import { IoAddCircle } from "react-icons/io5";
 import { IoMdAddCircle } from "react-icons/io";
 import AddMajorModal from "./MajorManagement/AddMajorForm";
 import EditMajorModal from "./MajorManagement/EditMajorForm";
+import EditMajorSkillModal from "./MajorManagement/EditMajorSkillForm";
+import { getAllSkills } from "@/services/ApiServices/skillService";
 
 const MajorManagement = () => {
   const [majors, setMajors] = useState<Major[]>([]);
@@ -51,6 +50,10 @@ const MajorManagement = () => {
 
   const [openEditMajor, setOpenEditMajor] = useState<boolean>(false);
   const [currentMajor, setCurrentMajor] = useState<Major | null>(null);
+
+
+  const [openEditMajorSkill, setOpenEditMajorSkill] = useState<boolean>(false);
+  const [skills, setSkills] = useState<any>([]);
 
   const [parentMajorId, setParentMajorId] = useState<any>(null);
 
@@ -67,12 +70,16 @@ const MajorManagement = () => {
   ];
 
   const SKILL_TABLE_HEAD = [
-    "ID", "Name", "Description", "Type", "Actions"
+    "ID", "Name", "Description", "Type"
   ];
 
-  const fetchMajors = () => {
+  const fetchMajors = async () => {
     setLoading(true);
-    getMajors()
+    await getAllSkills()
+      .then((data) => {
+          setSkills(data.data);
+      })
+    await getMajors()
       .then((data) => {
         setMajors(data.data);
       })
@@ -87,56 +94,6 @@ const MajorManagement = () => {
   useEffect(() => {
     fetchMajors();
   }, []);
-
-  /*const handleEditAccount = (account: AccountWithRole) => {
-    setCurrentAccount(account);
-    setStatus(account.status || "");
-    setOpenEditDialog(true);
-  };*/
-
-  /*const handleDeleteAccount = async (id: string) => {
-    setLoading(true);
-    try {
-      const account = accounts.find((acc) => acc.id === id);
-      if (account) {
-        await updateAccount({
-          id: account.id,
-          username: account.username,
-          phoneNumber: account.phoneNumber,
-          email: account.email,
-          hashedPassword: account.hashedPassword,
-          roleId: account.roleId,
-          address: account.address,
-          avatarUrl: account.avatarUrl || "https://github.com/shadcn.png",
-          status: "Inactive", 
-          roleName: account.roleName,
-        });
-        fetchAccounts(); 
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      setLoading(false);
-    }
-  };*/
-
-  /*const handleUpdateStatus = async () => {
-    if (currentAccount) {
-      setLoading(true);
-      try {
-        await updateAccount({
-          ...currentAccount,await 
-          status, 
-        });
-        fetchAccounts(); 
-        setOpenEditDialog(false); 
-      } catch (error) {
-        console.error("Error updating account status:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };*/
 
   const renderTable = () => (
     <Card className="h-full w-full shadow-lg rounded-lg">
@@ -211,7 +168,8 @@ const MajorManagement = () => {
                               e.stopPropagation(); // Prevents the TableRow's onClick event from firing
                               setParentMajorId(account.id);
                               setOpenAddMajor(true)
-                              }} className="gap-2">
+                              }}
+                              className="bg-sky-500 hover:bg-sky-600 gap-2">
                             <IoMdAddCircle />
                             Add Submajor
                           </Button>
@@ -269,7 +227,20 @@ const MajorManagement = () => {
                           aria-controls="panel1-content"
                           id="panel1-header"
                         >
+
+                        <div className="flex w-full items-center justify-between">
                           <Typography className="font-semibold text-sky-500 ">Skills</Typography>
+
+                          <Button onClick={(e) => {
+                                e.stopPropagation(); // Prevents the TableRow's onClick event from firing
+                                setCurrentMajor(account);
+                                setOpenEditMajorSkill(true);
+                            }}
+                              className="bg-sky-500 hover:bg-sky-600 gap-2">
+                            <IoMdAddCircle />
+                            Edit Skills
+                          </Button>
+                        </div>
                         </AccordionSummary>
                         <AccordionDetails>
                           <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -292,19 +263,6 @@ const MajorManagement = () => {
                                     <TableCell>{skills.name}</TableCell>
                                     <TableCell>{skills.description}</TableCell>
                                     <TableCell>{skills.type}</TableCell>
-                                    <TableCell>
-                                      <div className="flex items-center gap-2">
-                                        <Tooltip title="Edit Skill">
-                                          <IconButton
-                                            onClick={() => { }}
-                                            sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                                          >
-                                            <EditIcon />
-                                          </IconButton>
-                                        </Tooltip>
-                                      </div>
-                                    </TableCell>
-
 
                                   </TableRow>
                                 ))}
@@ -332,7 +290,7 @@ const MajorManagement = () => {
             Major Management
         </Typography>
 
-        <Button onClick={() => setOpenAddMajor(true)} className="gap-2">
+        <Button onClick={() => setOpenAddMajor(true)} className="bg-sky-500 hover:bg-sky-600 gap-2">
           <IoMdAddCircle />
           Add Major
         </Button>
@@ -368,21 +326,20 @@ const MajorManagement = () => {
         />
       )}
 
-      {/* Edit Account Status Dialog */}
-      {/*<Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} fullWidth>
-        <DialogTitle>Edit Account Status</DialogTitle>
-        <DialogContent>
-          <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)} fullWidth>
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Inactive">Inactive</MenuItem>
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} color="secondary">Cancel</Button>
-          <Button onClick={handleUpdateStatus} color="primary">Update</Button>
-        </DialogActions>
-      </Dialog>*/}
-    </>
+      {majors && (
+        <EditMajorSkillModal
+          isOpen={openEditMajorSkill}
+          setIsOpen={(open: boolean) => setOpenEditMajorSkill(open)}
+          major={currentMajor}
+          skillOptions={skills.map((skill: any) => ({label: skill.name, value: skill.id}))}
+          fetchMajor={async () => {
+            fetchMajors();
+          }}
+        />
+      )}
+
+
+      </>
   );
 };
 
