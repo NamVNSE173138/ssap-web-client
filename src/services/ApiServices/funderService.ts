@@ -3,6 +3,14 @@ import { BASE_URL } from "@/constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
+export async function getAllFunderProfiles() {
+  const response = await axios.get(
+    `${BASE_URL}/api/funders`,
+    ngrokSkipWarning,
+  );
+  return response.data;
+}
+
 export async function getFunderProfile(id: number) {
   const response = await axios.get(
     `${BASE_URL}/api/funders/${id}`,
