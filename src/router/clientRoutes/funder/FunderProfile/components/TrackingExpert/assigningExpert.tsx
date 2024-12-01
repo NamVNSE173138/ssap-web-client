@@ -21,6 +21,7 @@ const AssigningExpert = () => {
       }
 
       try {
+        // Step 1: Fetch Experts Created by Funder
         const expertsResponse = await axios.get(
           `${BASE_URL}/api/funders/${funderId}/experts`
         );
@@ -83,7 +84,7 @@ const AssigningExpert = () => {
                       <p><strong>Application ID:</strong> {app.id}</p>
                       <p><strong>Status:</strong> {app.status}</p>
                       <p><strong>Applied Date:</strong> {new Date(app.appliedDate).toLocaleDateString()}</p>
-                      <p><strong>Score:</strong> {app.applicationReviews.map((review: any) => (review.score))}</p>
+
                       {/* Show Application Documents */}
                       <div>
                         <strong>Documents:</strong>

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { formatOnlyDate } from "@/lib/date-formatter";
 import * as Avatar from "@radix-ui/react-avatar";
 import * as Separator from "@radix-ui/react-separator";
@@ -244,7 +245,7 @@ const ProfileSection = (props: any) => {
             <Tabs.Content value="skill" className="py-4">
               <h3 className="text-lg font-medium text-gray-900">Skills</h3>
               <ul className="mt-2 list-disc list-inside text-sm text-gray-500">
-                {profile.skills.map((skill, index) => (
+                {profile.skills.map((skill: any, index: any) => (
                   <li key={index} className="flex items-center gap-2">
                     {isEditing ? (
                       <input
@@ -282,7 +283,7 @@ const ProfileSection = (props: any) => {
             <Tabs.Content value="experience" className="py-4">
               <h3 className="text-lg font-medium text-gray-900">Experience</h3>
               <ul className="mt-2 list-disc list-inside text-sm text-gray-500">
-                {profile.experience.map((exp, index) => (
+                {profile.experience.map((exp: any, index: any) => (
                   <li key={index} className="flex items-center gap-2">
                     {isEditing ? (
                       <input
@@ -322,7 +323,7 @@ const ProfileSection = (props: any) => {
                 Achievements
               </h3>
               <ul className="mt-2 list-disc list-inside text-sm text-gray-500">
-                {profile.achievements.map((achievement, index) => (
+                {profile.achievements.map((achievement: any, index: any) => (
                   <li key={index} className="flex items-center gap-2">
                     {isEditing ? (
                       <input
@@ -366,7 +367,7 @@ const ProfileSection = (props: any) => {
                 Certificates
               </h3>
               <ul className="mt-2 list-disc list-inside text-sm text-gray-500">
-                {profile.certificates.map((certificate, index) => (
+                {profile.certificates.map((certificate: any, index: any) => (
                   <li key={index} className="flex items-center gap-2">
                     {isEditing ? (
                       <input
@@ -410,28 +411,28 @@ const ProfileSection = (props: any) => {
         <div className="flex justify-end gap-4">
           {isEditing ? (
             <>
-              <button
+              <Button
                 onClick={handleSaveClick}
                 className="bg-blue-500 text-white p-2 rounded"
               >
                 Save Changes
-              </button>
+              </Button>
             </>
           ) : (
             <div className="flex gap-4 mt-4">
-              <button
+              <Button
                 onClick={handleEditClick}
-                className="bg-blue-500 text-white p-2 rounded"
+                className="bg-blue-500 text-white p-2 rounded w-full h-full"
               >
                 Edit Profile
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={handleExportPDF}
-                className="bg-green-500 text-white p-2 rounded"
+                className="bg-green-500 text-white p-2 rounded w-full h-full"
               >
                 Export PDF
-              </button>
+              </Button>
             </div>
           )}
         </div>

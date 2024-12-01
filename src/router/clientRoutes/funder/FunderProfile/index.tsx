@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { AiOutlineLock, AiOutlineUser } from "react-icons/ai";
+import {
+  AiOutlineContacts,
+  AiOutlineLock,
+  AiOutlineUser,
+} from "react-icons/ai";
 import AccountSection from "./components/AccountSection";
 import AuthSection from "./components/AuthSection";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { FaClipboardList } from "react-icons/fa";
 import {
   getFunderProfile,
@@ -14,6 +17,8 @@ import { RootState } from "@/store/store";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import Spinner from "@/components/Spinner";
 import { setUser } from "@/reducers/tokenSlice";
+import TrackingExpert from "./components/TrackingExpert";
+import Activity from "./components/Activity";
 
 const FunderProfile = () => {
   const dispatch = useDispatch();
@@ -187,7 +192,7 @@ const FunderProfile = () => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="w-full max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <Tabs.Root
         defaultValue={activeTab}
         value={activeTab}
@@ -208,7 +213,7 @@ const FunderProfile = () => {
           </Tabs.Trigger>
 
           <Tabs.Trigger
-            value="scholarship"
+            value="activity"
             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
           >
             <FaClipboardList className="text-lg" />
@@ -221,6 +226,14 @@ const FunderProfile = () => {
           >
             <AiOutlineLock className="text-lg" />
             Authentication
+          </Tabs.Trigger>
+
+          <Tabs.Trigger
+            value="expert"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+          >
+            <AiOutlineContacts className="text-lg" />
+            Expert
           </Tabs.Trigger>
         </Tabs.List>
 
@@ -241,7 +254,11 @@ const FunderProfile = () => {
             setPreviewUrl={setPreviewUrl}
           />
 
+          <Activity />
+
           <AuthSection />
+
+          <TrackingExpert />
         </div>
       </Tabs.Root>
     </div>
