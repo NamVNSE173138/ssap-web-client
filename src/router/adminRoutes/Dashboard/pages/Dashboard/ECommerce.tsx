@@ -7,6 +7,10 @@ import ChatCard from '../../components/Chat/ChatCard';
 import TableOne from '../../components/Tables/TableOne';
 import { getAllAccounts } from '@/services/ApiServices/accountService';
 import ScreenSpinner from '@/components/ScreenSpinner';
+import Chart from '../Chart';
+import { SchoolIcon } from 'lucide-react';
+import { CurrencyDollarIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/solid';
+import formatCurrency from '@/lib/currency-formatter';
 
 const ECommerce: React.FC = () => {
     
@@ -34,7 +38,7 @@ const ECommerce: React.FC = () => {
     <>
       {error && <p className="text-red-500">{error}</p>}
       {loading && <ScreenSpinner/>}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+      <div className="grid mb-5 grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         {accounts && <CardDataStats title="Total Users" total={accounts.length - 1} rate="" levelDown={false} >
           <svg
             className="fill-primary dark:fill-white"
@@ -58,7 +62,21 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>}
+        {accounts && <CardDataStats title="Total Scholarships" total={10} rate="" levelDown={false} >
+          <SchoolIcon />
+        </CardDataStats>}
+        {accounts && <CardDataStats title="Total Services" total={10} rate="" levelDown={false} >
+          <GlobeEuropeAfricaIcon />
+        </CardDataStats>}
+        {accounts && <CardDataStats title="Total Revenues" total={formatCurrency(1000, "USD", true)} rate="" levelDown={false} >
+          <CurrencyDollarIcon />
+        </CardDataStats>}
       </div>
+      
+
+
+
+      <ChartOne/>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <div className="col-span-12 xl:col-span-8">

@@ -19,11 +19,21 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Tabs,
+  Tab,
+  Collapse,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
 import { TrashIcon } from "@heroicons/react/24/solid";
-import { FaCheckCircle, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle, FaUserCircle } from "react-icons/fa";
+import { FaCheckCircle, FaEnvelope, FaExclamationCircle, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle, FaUserCircle } from "react-icons/fa";
+import React from "react";
+import { GridArrowDownwardIcon } from "@mui/x-data-grid";
+import { IoMdAddCircle } from "react-icons/io";
+import { ArrowDown } from "lucide-react";
 
 const AccountsManagement = () => {
   const [accounts, setAccounts] = useState<AccountWithRole[]>([]);
@@ -32,6 +42,19 @@ const AccountsManagement = () => {
   const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(null);
   const [status, setStatus] = useState("");
 
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+  };
+
+  const [openRows, setOpenRows] = useState<any>({});
+  const handleToggle = (rowId: any) => {
+    setOpenRows((prevState: any) => ({
+      ...prevState,
+      [rowId]: !prevState[rowId],
+    }));
+  };
   const TABLE_HEAD = [
     "No.", "ID", "Username", "Phone Number", "Email", "Address", "Avatar", "Status", "Actions"
   ];
@@ -40,7 +63,12 @@ const AccountsManagement = () => {
     setLoading(true);
     getAllAccounts()
       .then((data) => {
-        setAccounts(data);
+          if(selectedTab == 0)
+            setAccounts(data.filter((account:any) => account.status == "Pending"));
+          else if(selectedTab == 1)
+            setAccounts(data.filter((account:any) => account.status == "Active"));
+          else
+            setAccounts(data.filter((account:any) => account.status == "Inactive"));
       })
       .catch((error) => {
         console.error("Error fetching accounts:", error);
@@ -52,7 +80,7 @@ const AccountsManagement = () => {
 
   useEffect(() => {
     fetchAccounts();
-  }, []);
+  }, [selectedTab]);
 
   const handleEditAccount = (account: AccountWithRole) => {
     setCurrentAccount(account);
@@ -124,7 +152,8 @@ const AccountsManagement = () => {
 
           <TableBody>
             {filteredAccounts.map((account, index) => (
-              <TableRow key={account.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
+              <React.Fragment key={account.id}>
+              <TableRow className="cursor-pointer" onClick={() => handleToggle(account.id)} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{account.id}</TableCell>
                 <TableCell>{account.username}</TableCell>
@@ -162,8 +191,10 @@ const AccountsManagement = () => {
                   <div className="flex items-center gap-2">
                     {account.status === "Active" ? (
                       <FaCheckCircle className="text-green-500" />
-                    ) : (
+                    ) : account.status === "Inactive" ? (
                       <FaTimesCircle className="text-red-500" />
+                    ): (
+                      <FaExclamationCircle className="text-yellow-500" />  
                     )}
                     {account.status || "N/A"}
                   </div>
@@ -172,12 +203,22 @@ const AccountsManagement = () => {
                   <div className="flex items-center gap-2">
                     <Tooltip title="Edit Account">
                       <IconButton 
-                        onClick={() => handleEditAccount(account)} 
+                        onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditAccount(account)
+                        }}
                         sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
                       >
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
+                    <Tooltip title="Expand">
+                        <IconButton
+                          sx={{ color: 'gray', '&:hover': { color: 'gray' } }}
+                        >
+                          <ArrowDown />
+                        </IconButton>
+                      </Tooltip>
                     <Tooltip title="Delete Account">
                       <IconButton 
                         onClick={() => handleDeleteAccount(account.id)} 
@@ -189,6 +230,32 @@ const AccountsManagement = () => {
                   </div>
                 </TableCell>
               </TableRow>
+              {/* Collapsible content */}
+
+                {(account.roleName == "Provider" || account.roleName == "Funder") && <TableRow>
+                  <TableCell colSpan={10} style={{ paddingBottom: 0, paddingTop: 0 }}>
+                    <Collapse in={openRows[account.id]} timeout={300} 
+                        unmountOnExit 
+                        className="py-3"
+                        sx={{ transition: "all 0.3s ease-in-out" }}>
+                      <Accordion >
+                        <AccordionSummary
+                          expandIcon={<GridArrowDownwardIcon />}
+                          aria-controls="panel1-content"
+                          id="panel1-header"
+                        >
+                        <div className="flex w-full items-center justify-between">
+                          <Typography className="font-semibold text-sky-500 ">{account.roleName+ " Profile"}</Typography>
+                        </div>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                        </AccordionDetails>
+                      </Accordion>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>}
+
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
@@ -201,6 +268,29 @@ const AccountsManagement = () => {
       <Typography variant="h4" component="div" color="primary" sx={{ ml: 2, mb: 3 }}>
         Accounts Management
       </Typography>
+      <Tabs
+          value={selectedTab}
+          onChange={handleTabChange}
+          aria-label="Applications Tabs"
+          className="bg-white shadow-sm"
+          indicatorColor="primary"
+          textColor="inherit"
+          centered
+        >
+          <Tab
+            label="Pending Accounts"
+            sx={{ textTransform: "none", color: "gold", fontWeight: "bold" }}
+          />
+          <Tab
+            label="Active Accounts"
+            sx={{ textTransform: "none", color: "green", fontWeight: "bold" }}
+          />
+          <Tab
+            label="Inactive Accounts"
+            sx={{ textTransform: "none", color: "red", fontWeight: "bold" }}
+          />
+        </Tabs>
+
       {loading ? (
         <CircularProgress />
       ) : (
