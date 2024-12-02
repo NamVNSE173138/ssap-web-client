@@ -11,6 +11,16 @@ export async function getAllServices() {
   return response.data;
 }
 
+export async function countServices() {
+    try {
+        const response = await axios.get(`${BASE_URL}/api/services/count`);
+        return response.data;
+    } catch (error: any) {
+        console.error('API error:', error?.response?.data || error.message);
+        throw error;
+    }
+}
+
 export async function getServiceById(id: number) {
   const response = await axios.get(
     `${BASE_URL}/api/services/${id}`,

@@ -22,6 +22,7 @@ type AccountWithRole = {
     avatarUrl?: string;
     status?: string;
     roleName: string;
+    accountId: string;
 };
 
 interface AccountWithDetails extends AccountWithRole {
@@ -60,7 +61,7 @@ const AccountAwaitingApproval = () => {
                     filteredProviders.map(async (provider: AccountWithRole) => {
                         const providerDetails = await getProviderProfile(Number(provider.id));
                         console.log(providerDetails);
-                        return { ...provider, ...providerDetails.data };
+                        return { ...provider, ...providerDetails.data, accountId: provider.id };
                     })
                 );
 
@@ -68,7 +69,7 @@ const AccountAwaitingApproval = () => {
                     filteredFunders.map(async (funder: AccountWithRole) => {
                         const funderDetails = await getFunderProfile(Number(funder.id));
                         console.log(funderDetails);
-                        return { ...funder, ...funderDetails.data };
+                        return { ...funder, ...funderDetails.data, accountId: funder.id };
                     })
                 );
 
@@ -88,7 +89,7 @@ const AccountAwaitingApproval = () => {
         setLoading(true);
         try {
             await updateAccount({
-                id: user.id,
+                id: user.accountId,
                 username: user.username,
                 phoneNumber: user.phoneNumber,
                 email: user.email,
@@ -123,7 +124,7 @@ const AccountAwaitingApproval = () => {
             await SendNotificationAndEmailReject(rejectedUser?.id + "", emailContent);
 
             await updateAccount({
-                id: rejectedUser?.id,
+                id: rejectedUser?.accountId,
                 username: rejectedUser?.username,
                 phoneNumber: rejectedUser?.phoneNumber,
                 email: rejectedUser?.email,
@@ -164,7 +165,7 @@ const AccountAwaitingApproval = () => {
                     {data.map((user, index) => (
                         <tr key={user.id} className="hover:bg-gray-50 transition-all duration-200">
                             <td className="px-6 py-4 border-b text-sm">{index + 1}</td>
-                            <td className="px-6 py-4 border-b text-sm">{user.id}</td>
+                            <td className="px-6 py-4 border-b text-sm">{user.accountId}</td>
                             <td className="px-6 py-4 border-b text-sm">
                                 <img src={user.avatarUrl || "https://github.com/shadcn.png"} alt="avatar" className="w-12 h-12 rounded-full" />
                             </td>

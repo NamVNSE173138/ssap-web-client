@@ -13,6 +13,7 @@ type User = {
     iss: string,
     jti: string,
     nbf: number,
+    status?: string,
     role: string,
     sub: string
 }

@@ -238,6 +238,10 @@ const clientRoutes: RouteObject[] = [
     element: <ProtectedRoute allowedRoles={[RoleNames.PROVIDER]} />,
     children: [...providerRoutes],
   },
+  /*{
+    element: <PrivateRoute />,
+    children: [...publicRoutes],
+  },*/
   ...publicRoutes,
 ];
 

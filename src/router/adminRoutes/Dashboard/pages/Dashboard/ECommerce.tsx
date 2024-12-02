@@ -5,24 +5,37 @@ import ChartThree from '../../components/Charts/ChartThree';
 import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import TableOne from '../../components/Tables/TableOne';
-import { getAllAccounts } from '@/services/ApiServices/accountService';
+import { getAccountWallet, getAllAccounts } from '@/services/ApiServices/accountService';
 import ScreenSpinner from '@/components/ScreenSpinner';
 import Chart from '../Chart';
 import { SchoolIcon } from 'lucide-react';
 import { CurrencyDollarIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/solid';
 import formatCurrency from '@/lib/currency-formatter';
+import { countScholarshipProgram } from '@/services/ApiServices/scholarshipProgramService';
+import { countServices } from '@/services/ApiServices/serviceService';
 
 const ECommerce: React.FC = () => {
     
     const [accounts, setAccounts] = useState<any>(null);
+    const [scholarshipCount, setScholarshipCount] = useState<number>(0);
+    const [serviceCount, setServiceCount] = useState<number>(0);
+    const [revenue, setRevenue] = useState<number>(0);
+
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
    const fetchAccounts = async () => {
         try {
             const response = await getAllAccounts();
+            const scholarship = await countScholarshipProgram();
+            const services = await countServices();
+            const wallet = await getAccountWallet(1)
+
             //console.log(response);
+            setScholarshipCount(scholarship.data);
+            setServiceCount(services.data);
             setAccounts(response);
+            setRevenue(wallet.data.balance);
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -62,13 +75,13 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>}
-        {accounts && <CardDataStats title="Total Scholarships" total={10} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Scholarships" total={scholarshipCount} rate="" levelDown={false} >
           <SchoolIcon />
         </CardDataStats>}
-        {accounts && <CardDataStats title="Total Services" total={10} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Services" total={serviceCount} rate="" levelDown={false} >
           <GlobeEuropeAfricaIcon />
         </CardDataStats>}
-        {accounts && <CardDataStats title="Total Revenues" total={formatCurrency(1000, "USD", true)} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Revenues" total={formatCurrency(revenue, "USD", true)} rate="" levelDown={false} >
           <CurrencyDollarIcon />
         </CardDataStats>}
       </div>
