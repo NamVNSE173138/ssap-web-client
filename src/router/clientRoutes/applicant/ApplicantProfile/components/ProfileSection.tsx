@@ -27,7 +27,7 @@ const ProfileSection = (props: any) => {
               <div className="relative">
                 <Avatar.Root className="inline-flex h-24 w-24 select-none items-center justify-center overflow-hidden rounded-full bg-gray-100 ">
                   <img
-                    src={profile.avatar}
+                    src={profile.avatarUrl}
                     alt="User Avatar"
                     className="w-40 h-40 rounded-full border-2 border-gray-300 object-cover"
                   />
