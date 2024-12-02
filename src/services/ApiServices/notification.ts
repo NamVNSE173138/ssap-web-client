@@ -81,3 +81,16 @@ export async function NotifySubscriptionPurchase(subscriptionId: number, userId:
   );
   return response.data;
 }
+
+export async function SendNotificationAndEmailReject(email: string, content: string) {
+  const data = {
+    topic: email,
+    link: "",
+    title: "Rejection Notification",
+    body: content,
+  };
+
+  const response = await axios.post(`${BASE_URL}/api/notifications/send-notification-and-email-reject`, data);
+  return response.data;
+}
+
