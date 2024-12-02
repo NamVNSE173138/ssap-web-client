@@ -5,20 +5,37 @@ import ChartThree from '../../components/Charts/ChartThree';
 import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import TableOne from '../../components/Tables/TableOne';
-import { getAllAccounts } from '@/services/ApiServices/accountService';
+import { getAccountWallet, getAllAccounts } from '@/services/ApiServices/accountService';
 import ScreenSpinner from '@/components/ScreenSpinner';
+import Chart from '../Chart';
+import { SchoolIcon } from 'lucide-react';
+import { CurrencyDollarIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/solid';
+import formatCurrency from '@/lib/currency-formatter';
+import { countScholarshipProgram } from '@/services/ApiServices/scholarshipProgramService';
+import { countServices } from '@/services/ApiServices/serviceService';
 
 const ECommerce: React.FC = () => {
     
     const [accounts, setAccounts] = useState<any>(null);
+    const [scholarshipCount, setScholarshipCount] = useState<number>(0);
+    const [serviceCount, setServiceCount] = useState<number>(0);
+    const [revenue, setRevenue] = useState<number>(0);
+
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
    const fetchAccounts = async () => {
         try {
             const response = await getAllAccounts();
+            const scholarship = await countScholarshipProgram();
+            const services = await countServices();
+            const wallet = await getAccountWallet(1)
+
             //console.log(response);
+            setScholarshipCount(scholarship.data);
+            setServiceCount(services.data);
             setAccounts(response);
+            setRevenue(wallet.data.balance);
         } catch (error) {
             setError((error as Error).message);
         } finally {
@@ -34,7 +51,7 @@ const ECommerce: React.FC = () => {
     <>
       {error && <p className="text-red-500">{error}</p>}
       {loading && <ScreenSpinner/>}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+      <div className="grid mb-5 grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         {accounts && <CardDataStats title="Total Users" total={accounts.length - 1} rate="" levelDown={false} >
           <svg
             className="fill-primary dark:fill-white"
@@ -58,7 +75,21 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>}
+        {accounts && <CardDataStats title="Total Scholarships" total={scholarshipCount} rate="" levelDown={false} >
+          <SchoolIcon />
+        </CardDataStats>}
+        {accounts && <CardDataStats title="Total Services" total={serviceCount} rate="" levelDown={false} >
+          <GlobeEuropeAfricaIcon />
+        </CardDataStats>}
+        {accounts && <CardDataStats title="Total Revenues" total={formatCurrency(revenue, "USD", true)} rate="" levelDown={false} >
+          <CurrencyDollarIcon />
+        </CardDataStats>}
       </div>
+      
+
+
+
+      <ChartOne/>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <div className="col-span-12 xl:col-span-8">
