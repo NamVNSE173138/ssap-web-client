@@ -10,6 +10,7 @@ import TransactionsManagement from "./Dashboard/pages/TransactionsManagement";
 import MajorManagement from "./Dashboard/pages/MajorManagement";
 import CategoryManagement from "./Dashboard/pages/CategoryManagement";
 import UniversityManagement from "./Dashboard/pages/UniversityManagement";
+import AccountAwaitingApproval from "./Dashboard/pages/AccountAwaitingApproval";
 
 const privateRoutes: RouteObject[] = [
   {
@@ -40,6 +41,10 @@ const privateRoutes: RouteObject[] = [
     path: RouteNames.UNIVERSITY_MANAGEMENT,
     element: <UniversityManagement/>,
   },
+  {
+    path: RouteNames.ACCOUNT_AWAITING_APPROVAL,
+    element: <AccountAwaitingApproval/>,
+  }
 ];
 const publicRoutes: RouteObject[] = [
   //   {
