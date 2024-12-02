@@ -46,6 +46,7 @@ const RouteNames = {
   MAJOR_MANAGEMENT: "/admin/major-management",
   UNIVERSITY_MANAGEMENT: "/admin/university-management",
   CATEGORY_MANAGEMENT: "/admin/category-management",
+  EXPERT_PROFILE: "/expert/profile",
 };
 
 export default RouteNames;
