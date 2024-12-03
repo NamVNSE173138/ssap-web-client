@@ -9,6 +9,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import AssigningExpert from "./assigningExpert";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import { notification } from "antd";
+import ScoredList from "./scoredApplicationList";
 
 const TrackingExpert = () => {
   const user = useSelector((state: any) => state.token.user);
@@ -121,6 +122,12 @@ const TrackingExpert = () => {
               >
                 Expert Assigning
               </Tabs.Trigger>
+              <Tabs.Trigger
+                value="scored"
+                className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]"
+              >
+                Scored Application
+              </Tabs.Trigger>
             </Tabs.List>
 
             <div className="pt-3">
@@ -146,6 +153,9 @@ const TrackingExpert = () => {
 
               <Tabs.Content value="assign">
                 <AssigningExpert />
+              </Tabs.Content>
+              <Tabs.Content value="scored">
+                <ScoredList/>
               </Tabs.Content>
             </div>
           </Tabs.Root>
