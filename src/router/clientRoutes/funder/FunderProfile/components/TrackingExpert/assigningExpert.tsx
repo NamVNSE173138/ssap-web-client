@@ -84,6 +84,7 @@ const AssigningExpert = () => {
                       <p><strong>Application ID:</strong> {app.id}</p>
                       <p><strong>Status:</strong> {app.status}</p>
                       <p><strong>Applied Date:</strong> {new Date(app.appliedDate).toLocaleDateString()}</p>
+                      <p><strong>Score:</strong> {app.applicationReviews[0]?.score}</p>
 
                       {/* Show Application Documents */}
                       <div>

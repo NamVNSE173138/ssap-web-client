@@ -60,8 +60,8 @@ const formSchema = z.object({
       (value) => ["Pending", "Active"].includes(value),
       "Status must be 'Pending' or 'Active'"
     ),
-  organizationName: z.string().min(1, "Organization name is required").optional(),
-  contactPersonName: z.string().min(1, "Contact person name is required").optional(),
+  organizationName: z.string().optional(),
+  contactPersonName: z.string().optional(),
   providerDocuments: z
     .array(
       z.object({
@@ -126,11 +126,11 @@ const Register = () => {
       address: "",
       roleId: selectedRole,
       status: selectedRole === 5 ? "Active" : "Pending",
-      organizationName: "",
-      contactPersonName: "",
-      documents: [],
+      organizationName: selectedRole === 5 ? null : "",
+      contactPersonName: selectedRole === 5 ? null : "",
+      documents: selectedRole === 5 ? null : [],
     },
-  });
+  });  
 
   const formRef = useRef<HTMLFormElement | null>(null);
 
@@ -157,6 +157,7 @@ const Register = () => {
   }, [selectedRole, setValue]);
 
   const handleRegisterSubmit = async (data: any) => {
+    console.log(error)
     setIsLoading(true);
     try {
       const status = selectedRole === 5 ? "Active" : "Pending";
@@ -414,6 +415,7 @@ const Register = () => {
       notification.error({ message: "Please select a role first." });
       return;
     }
+    console.log(selectedRole)
     if (selectedRole === 4) {
       // console.log(data);
 
@@ -534,7 +536,7 @@ const Register = () => {
 
             )}
 
-            <form ref={formRef} onSubmit={handleSubmit(handleFormSubmit)}>
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
               {currentStep === 2 && (
                 <div>
                   <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Fill in Your Information</h2>
@@ -714,8 +716,8 @@ const Register = () => {
                                         "Quality Assurance Certificate",
                                         "Curriculum Vitae (CV) of Lead Instructor",
                                         "Proof of Financial Capacity",
-                                        "Endowment Fund Certification",
                                         "Funder’s Organizational Profile",
+                                        "Others"
                                       ]}
                                       handleDeleteRow={handleDeleteRow}
                                       handleInputChange={handleDocumentInputChange}
@@ -859,12 +861,12 @@ const Register = () => {
                                     </div>
 
                                     <div className="text-sm text-gray-700">
-                                      <strong>URL:</strong> {row.fileURL ? (
-                                        <a href={row.fileURL} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                          {row.fileURL.length > 20 ? `${row.fileURL.substring(0, 20)}...` : row.fileURL}
+                                      <strong>URL:</strong> {row.fileName ? (
+                                        <a target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                                          {row.fileName.length > 20 ? `${row.fileName.substring(0, 20)}...` : row.fileName}
                                         </a>
                                       ) : (
-                                        <span className="text-gray-500">No URL provided</span>
+                                        <span className="text-gray-500">No File provided</span>
                                       )}
                                     </div>
                                   </div>
