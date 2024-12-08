@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllTransactions } from "@/services/ApiServices/paymentService";
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert, Chip, TablePagination, IconButton, Typography } from "@mui/material";
-import { FaSortUp, FaSortDown, FaTimesCircle, FaCheckCircle, FaPiggyBank, FaWallet, FaExchangeAlt } from "react-icons/fa";
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert,TablePagination, Typography } from "@mui/material";
+import { FaTimesCircle, FaCheckCircle, FaPiggyBank} from "react-icons/fa";
 import { getAllWallets } from "@/services/ApiServices/accountService";
 
 const WalletAndTransactionManagement = () => {
@@ -11,8 +11,11 @@ const WalletAndTransactionManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<string>("transactionId");
+  // const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  // const [orderBy, setOrderBy] = useState<string>("transactionId");
+
+  const sortDirection: "asc" | "desc" = "asc"
+  const orderBy = "transactionId"
 
   useEffect(() => {
     const fetchWalletsAndTransactions = async () => {
@@ -37,13 +40,13 @@ const WalletAndTransactionManagement = () => {
     fetchWalletsAndTransactions();
   }, []);
 
-  const handleRequestSort = (property: string) => {
-    const isAsc = orderBy === property && sortDirection === "asc";
-    setSortDirection(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (property: string) => {
+  //   const isAsc = orderBy === property && sortDirection === "asc";
+  //   setSortDirection(isAsc ? "desc" : "asc");
+  //   setOrderBy(property);
+  // };
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 

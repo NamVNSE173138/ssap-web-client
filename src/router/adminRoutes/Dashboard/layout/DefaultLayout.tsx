@@ -1,8 +1,8 @@
-import React, { useState, ReactNode, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../components/Header/index';
 import Sidebar from '../components/Sidebar/index';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useToast } from '@/components/ui/use-toast';
 import { requestNotify } from '@/services/requestNotify';

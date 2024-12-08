@@ -49,7 +49,7 @@ import {
 import AwardDialog from "./award-dialog";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
-import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
+import { formatDate } from "@/lib/date-formatter";
 import AwardMilestoneDialog from "./award-milestone-dialog";
 
 import {
@@ -61,12 +61,10 @@ import {
   FaCode,
   FaCreditCard,
   FaDollarSign,
-  FaEdit,
   FaEye,
   FaGraduationCap,
   FaInfoCircle,
   FaMapMarkerAlt,
-  FaMoneyBillWave,
   FaRegListAlt,
   FaTag,
   FaTrash,
@@ -81,8 +79,8 @@ const ScholarshipProgramDetail = () => {
   const token = useSelector((state: RootState) => state.token.token);
   const [data, setData] = useState<ScholarshipProgramType | null>(null);
   const [authorized, setAuthorized] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_loading, setLoading] = useState<boolean>(true);
+  const [_error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   const isApplicant = user?.role;
@@ -91,13 +89,14 @@ const ScholarshipProgramDetail = () => {
   const [applicantDialogOpen, setApplicantDialogOpen] =
     useState<boolean>(false);
 
-  const [experts, setExperts] = useState<any>(null);
+  const [_experts, setExperts] = useState<any>(null);
   const [assignExpertDialogOpen, setAssignExpertDialogOpen] =
     useState<boolean>(false);
 
   const [reviewingDialogOpen, setReviewingDialogOpen] =
     useState<boolean>(false);
-  const [selectedExpert, setSelectedExpert] = useState<any>(null);
+  // const [selectedExpert, setSelectedExpert] = useState<any>(null);
+  const selectedExpert: any = null
 
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] =
@@ -258,7 +257,7 @@ const ScholarshipProgramDetail = () => {
               application.status === ApplicationStatus.Approved ||
               application.status === ApplicationStatus.Awarded ||
               application.status === ApplicationStatus.NeedExtend ||
-              new Date(application.updatedAt) > new Date(data?.deadline)
+              new Date(application.updatedAt) > new Date(data!.deadline)
           )
         );
       } else {
@@ -312,10 +311,10 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
-  const handleOpenReviewingDialog = async () => {
-    setSelectedExpert(experts);
-    setReviewingDialogOpen(true);
-  };
+  // const handleOpenReviewingDialog = async () => {
+  //   setSelectedExpert(experts);
+  //   setReviewingDialogOpen(true);
+  // };
 
   const cancelApplication = async () => {
     try {

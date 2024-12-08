@@ -2,21 +2,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
-import { Card } from "@/components/ScholarshipProgram";
-import { CardContent } from "@/components/ui/card";
-import { Select } from "@/components/ui/select";
-import { IoCard, IoCashOutline, IoWalletOutline } from "react-icons/io5";
-import TextArea from "antd/es/input/TextArea";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { transferMoney } from "@/services/ApiServices/paymentService";
-import { log } from "console";
+
 import QuillEditor from "@/components/Quill/QuillEditor";
 
 interface SendReasonDialogProps {
@@ -38,10 +29,10 @@ const formSchema = z.object({
 
 const SendReasonDialog = ({ isOpen, setIsOpen, application, handleNeedExtend, status }: SendReasonDialogProps) => {
     const { id } = useParams<{ id: string }>();
-    const user = useSelector((state: RootState) => state.token.user);
+    // const user = useSelector((state: RootState) => state.token.user);
 
     const [applyLoading, setApplyLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
+    const [_error, setError] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

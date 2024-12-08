@@ -1,21 +1,16 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import axios from "axios";
-import { BASE_URL } from "@/constants/api";
+
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { createReviewMilestone } from "@/services/ApiServices/reviewMilestoneService";
+
 import { useParams } from "react-router-dom";
-import { FaTimes, FaCalendarAlt, FaPen, FaCheckCircle } from 'react-icons/fa';
-import Select from "react-select";
-import { formatDate } from "@/lib/date-formatter";
-import { addMajor } from "@/services/ApiServices/majorService";
+import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
+
 import { addCategory } from "@/services/ApiServices/categoryService";
 
 interface AddMilestoneModalProps {
@@ -46,7 +41,7 @@ const milestoneFormSchema = z.object({
     const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
         try {
             //console.log(values);
-            const response = await addCategory(values);
+            await addCategory(values);
             form.reset();
             //console.log("Service created successfully:", response.data);
             setIsOpen(false);

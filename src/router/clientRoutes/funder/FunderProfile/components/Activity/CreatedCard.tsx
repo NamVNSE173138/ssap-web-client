@@ -1,8 +1,6 @@
-import FptLogo from "../../assets/FPT_logo.jpg";
 import { ScholarshipProgramType } from "@/router/clientRoutes/ScholarshipProgram/data";
 import { FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import scholarshipProgram from "./data";
 
 const CreatedCard = (sholarshipProgram: ScholarshipProgramType) => {
   return (

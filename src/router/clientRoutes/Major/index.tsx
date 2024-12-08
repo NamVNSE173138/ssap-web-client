@@ -25,7 +25,7 @@ const Major = () => {
   const { id } = useParams<{ id: string}>();
   const [major, setMajor] = useState<any>(null);
   const [scholarships, setScholarships] = useState<any>(null);
-  const [errorMessage, setErrorMessage] = useState<any>(null);
+  const [_errorMessage, setErrorMessage] = useState<any>(null);
   const [scholarshipError, setScholarshipError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

@@ -38,7 +38,6 @@ const ForgetPassword = () => {
     register,
     handleSubmit,
     formState: { errors },
-    setValue
   } = useForm({
     resolver: zodResolver(formSchema),
   });

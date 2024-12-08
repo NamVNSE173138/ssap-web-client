@@ -21,14 +21,14 @@ const truncateString = (str: string, num: number) => {
   return str.slice(0, num) + "...";
 };
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+// const formatDate = (dateString: string) => {
+//   const date = new Date(dateString);
+//   return date.toLocaleDateString("en-US", {
+//     year: "numeric",
+//     month: "short",
+//     day: "numeric",
+//   });
+// };
 const Card = (scholarshipProgram: ScholarshipProgramType) => {
   const truncatedDescription = truncateString(
     scholarshipProgram.description,

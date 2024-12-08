@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { IoCalendarOutline, IoClose, IoCloseCircleOutline, IoDocumentText, IoInformationCircleOutline, IoListCircle, IoLockClosedOutline, IoPersonOutline, IoShieldCheckmarkOutline, IoWarningOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
+import { IoCalendarOutline, IoClose, IoCloseCircleOutline, IoDocumentText, IoListCircle, IoLockClosedOutline, IoPersonOutline, IoShieldCheckmarkOutline, IoWarningOutline } from "react-icons/io5";
 
 const ServiceContractDialog = ({
     isOpen,

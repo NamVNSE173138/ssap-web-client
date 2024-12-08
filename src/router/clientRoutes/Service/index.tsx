@@ -81,7 +81,7 @@ const Service = () => {
     useState(false);
   const [isSubscriptionUpgradeModalOpen, setIsSubscriptionUpgradeModalOpen] =
     useState(false);
-  const [hasSubcription, setHasSubcription] = useState(false);
+  const [_hasSubcription, setHasSubcription] = useState(false);
 
   const fetchSubscriptionDetails = async () => {
     try {

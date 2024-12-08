@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -34,10 +34,10 @@ const formSchema = z.object({
 
 
 const PayAwardDialog = ({ isOpen, setIsOpen, application, amount, handlePayAwardProgress, awardName, scholarship }: AwardDialogProps) => {
-  const { id } = useParams<{ id: string }>();
+  // const { id } = useParams<{ id: string }>();
   const user = useSelector((state: RootState) => state.token.user);
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  // const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const paymentMethod = "";
 
   const [applyLoading, setApplyLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -135,7 +135,7 @@ const PayAwardDialog = ({ isOpen, setIsOpen, application, amount, handlePayAward
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                   <IoCard className="text-blue-500" />
                   Choose Payment Method
                 </label>

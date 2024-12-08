@@ -1,10 +1,10 @@
 import RouteNames from "@/constants/routeNames";
-import { getAccountById, getAccountWallet, updateAccount } from "@/services/ApiServices/accountService";
+import { getAccountById, updateAccount } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
 import { RootState } from "@/store/store";
 import { Dialog } from "@mui/material";
 import { notification } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaClock, FaCreditCard, FaDollarSign, FaExclamationTriangle, FaInfoCircle, FaRocket, FaTag, FaTimes, FaWallet } from "react-icons/fa";
 import { IoIosApps, IoIosArrowDown, IoIosArrowUp, IoMdClose } from "react-icons/io";
 import { IoCashOutline, IoInformationCircle, IoWalletOutline } from "react-icons/io5";
@@ -277,7 +277,7 @@ const MultiStepSubscriptionModal = ({
                         </div>
 
                         <div className="mt-6">
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 Choose Payment Method
                             </label>
                             <div className="flex gap-4">

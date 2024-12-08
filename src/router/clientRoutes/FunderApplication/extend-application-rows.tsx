@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { Button, IconButton, MenuItem, Select, TableCell, TableRow, TextField, Tooltip } from "@mui/material";
+import { Button, IconButton, MenuItem, Select, TableCell, TableRow, Tooltip } from "@mui/material";
 import { CloudUploadIcon, TrashIcon } from "lucide-react";
 
-const typeOptions = [
-    { value: 'Academic Transcript', label: 'Academic Transcript' },
-    { value: 'Financial Report', label: 'Financial Report' },
-];
+// const typeOptions = [
+//     { value: 'Academic Transcript', label: 'Academic Transcript' },
+//     { value: 'Financial Report', label: 'Financial Report' },
+// ];
 
 const ExtendApplicationRows = ({ row, setRows, documentType, handleDeleteRow, handleInputChange }: any) => {
     return (
