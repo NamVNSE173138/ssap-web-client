@@ -1,6 +1,5 @@
 import RoleNames from "@/constants/roleNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
-import { NotifyNewUser } from "@/services/ApiServices/notification";
 import parseJwt from "@/services/parseJwt";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";

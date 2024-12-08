@@ -18,7 +18,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
   const [applicantProfile, setApplicantProfile] = useState<any>(null);
   const [service, setService] = useState<any>(null);
   const [requestDetails, setRequestDetails] = useState<any>(null);
-  const [error, setError] = useState<string>("");
+  const [_error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const user = useSelector((state: any) => state.token.user);
 

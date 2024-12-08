@@ -37,10 +37,10 @@ const AccountAwaitingApproval = () => {
     const [activeTab, setActiveTab] = useState("providers");
     const [providers, setProviders] = useState<AccountWithRole[]>([]);
     const [funders, setFunders] = useState<AccountWithRole[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [_isLoading, setIsLoading] = useState<boolean>(false);
     const [emailContent, setEmailContent] = useState<string>("");
     const [rejectedUser, setRejectedUser] = useState<AccountWithRole | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [_loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchProfiles = async () => {
@@ -145,7 +145,7 @@ const AccountAwaitingApproval = () => {
         }
     };
 
-    const renderTable = (data: AccountWithDetails[], isProvider: boolean) => (
+    const renderTable = (data: AccountWithDetails[], _isProvider: boolean) => (
         <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-4 ml-0">
             <table className="min-w-full text-left border-collapse">
                 <thead>

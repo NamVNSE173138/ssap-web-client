@@ -621,7 +621,7 @@ import { BASE_URL } from "@/constants/api";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import scholarshipProgram, {ScholarshipProgramType,} from "../ScholarshipProgram/data";
+import {ScholarshipProgramType,} from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
 import {Avatar,Button,Divider,FormControl,InputAdornment,InputLabel,List,ListItem,ListItemAvatar,ListItemText,OutlinedInput,Paper,Typography,} from "@mui/material";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
@@ -629,7 +629,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { SendNotification } from "@/services/ApiServices/notification";
 import {getScholarshipProgram,updateScholarshipStatus,
 } from "@/services/ApiServices/scholarshipProgramService";
-import {FaAward,FaCalendarAlt,FaCheckCircle,FaCreditCard,FaExternalLinkAlt,FaGraduationCap,FaMapMarkerAlt,FaSearch,FaTimes,FaTrophy,
+import {FaCheckCircle,FaExternalLinkAlt,FaSearch,FaTimes,FaTrophy,
 } from "react-icons/fa";
 import { notification } from "antd";
 import ApplicationStatus from "@/constants/applicationStatus";
@@ -642,7 +642,7 @@ const ChooseWinner = () => {
   const [data, setData] = useState<ScholarshipProgramType | null>(null);
   const [applicants, setApplicants] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");

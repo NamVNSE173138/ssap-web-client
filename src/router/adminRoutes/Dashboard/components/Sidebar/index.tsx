@@ -1,16 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import  { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo.svg';
 import { AiFillWallet } from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
+import { useDispatch } from 'react-redux';
 import { deleteToken } from 'firebase/messaging';
 import { messaging } from '@/services/firebase';
 import { removeToken, removeUser } from '@/reducers/tokenSlice';
 import RouteNames from '@/constants/routeNames';
 import ScreenSpinner from '@/components/ScreenSpinner';
-import { BsSuitcase, BsSuitcase2 } from 'react-icons/bs';
+import { BsSuitcase2 } from 'react-icons/bs';
 import { SchoolIcon, TableIcon } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,7 +17,7 @@ interface SidebarProps {
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const location = useLocation();
-  const avatar = useSelector((state: RootState) => state.token.avatar);
+  // const avatar = useSelector((state: RootState) => state.token.avatar);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,9 +29,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const sidebar = useRef<any>(null);
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
-  const [sidebarExpanded, setSidebarExpanded] = useState(
-    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
-  );
+  // const [sidebarExpanded, setSidebarExpanded] = useState(
+  //   storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
+  // );
+
+  const sidebarExpanded = storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
 
   const handleLogout = () => {
     setIsLoading(true);
@@ -718,7 +717,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${(pathname === '/auth' || pathname.includes('auth')) &&
                                   'bg-graydark dark:bg-meta-4'
                                   }`}
-                                onClick={(e) => {
+                                onClick={() => {
                                     handleLogout()
                                 }}
                               >

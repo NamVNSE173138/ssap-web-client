@@ -1,7 +1,7 @@
 import ApplicationStatus from "@/constants/applicationStatus";
-import { Avatar, Button, Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import { Avatar,  Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
 import { FaRegEye, FaTrophy, FaUserCircle } from "react-icons/fa";
-import { IoIosAddCircleOutline, IoMdClose } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 interface AwardDialogProps {

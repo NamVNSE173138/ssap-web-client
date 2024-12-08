@@ -1,7 +1,7 @@
 import { formatDate } from "@/lib/date-formatter";
-import { NotifyApplicantServiceComment, NotifyProviderNewRequest } from "@/services/ApiServices/notification";
+import { NotifyApplicantServiceComment } from "@/services/ApiServices/notification";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
-import { deleteFile, uploadFile } from "@/services/ApiServices/testService";
+import {uploadFile } from "@/services/ApiServices/testService";
 import { RootState } from "@/store/store";
 import { AddComment } from "@mui/icons-material";
 import {
@@ -14,18 +14,14 @@ import {
     ListItemText,
     Tabs,
     Tab,
-    Tooltip,
     Typography,
     Box,
-    Snackbar,
-    Alert,
     CircularProgress,
 } from "@mui/material";
 import { notification } from "antd";
 import { useState, useEffect } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
-import { HiOutlineUpload } from "react-icons/hi";
 import { IoCloudUpload } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -47,7 +43,7 @@ interface AccountApplicantDialogProps {
     fetchApplications: () => void;
 }
 
-const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, onClose, applications, fetchApplications }) => {
+const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, onClose, applications }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [applicants, setApplicants] = useState({
         pending: [] as Applicant[],
@@ -60,8 +56,8 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
     const [commentText, setCommentText] = useState("");
     const navigate = useNavigate();
     const [commentFile, setCommentFile] = useState<File[]>([]);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
+    // const [snackbarOpen, setSnackbarOpen] = useState(false);
+    // const [snackbarMessage, setSnackbarMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -290,7 +286,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 <Tabs
                     value={activeTab}
-                    onChange={(e, newValue) => setActiveTab(newValue)}
+                    onChange={(_e, newValue) => setActiveTab(newValue)}
                     centered
                     indicatorColor="primary"
                     textColor="primary"
@@ -356,7 +352,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 <Box sx={{ p: 3, backgroundColor: "#fff" }}>
                     <div className="mb-5">
-                        <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                        <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                             <IoCloudUpload className="text-blue-500" />
                             Add updated file:
                         </label>
@@ -393,7 +389,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     </div>
 
                     <div className="mb-5">
-                        <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                        <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                             <AddComment className="text-blue-500" />
                             Add your comment:
                         </label>

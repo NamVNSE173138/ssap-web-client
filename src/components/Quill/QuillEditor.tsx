@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css'; // Quill default theme
-import MarkdownShortcuts from 'quilljs-markdown';
+// import MarkdownShortcuts from 'quilljs-markdown';
 import TurndownService from 'turndown';
 
 interface QuillEditorProps {
@@ -10,7 +10,7 @@ interface QuillEditorProps {
   isHTML?: boolean;
 }
 
-const QuillEditor: React.FC<QuillEditorProps> = ({ value, onChange, isHTML = false }) => {
+const QuillEditor: React.FC<QuillEditorProps> = ({  onChange, isHTML = false }) => {
   const quillRef = useRef<HTMLDivElement | null>(null);
 
   const turndownService = new TurndownService();
@@ -31,7 +31,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({ value, onChange, isHTML = fal
       });
 
       // Add markdown shortcuts
-      new MarkdownShortcuts(quill); // Initialize the markdown shortcuts module
+      // new MarkdownShortcuts(quill); 
 
       // Capture content change
       quill.on('text-change', () => {

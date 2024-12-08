@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import useMediaQuery from "@/hooks/useMediaQuery";
+
 
 export type AttributeProps = {
   icon: IconDefinition;
@@ -12,14 +12,11 @@ export type AttributeProps = {
 };
 
 const Attribute = ({ icon, title, description, index = 0 }: AttributeProps) => {
-  const isAboveMediumScreens = useMediaQuery("(min-width: 1060px)");
+ 
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [shouldTriggerNextAnimation, setShouldTriggerNextAnimation] = useState(false);
+  
   const initialLiPosition = { translateX: -100, opacity: 0 }; 
-  const [divPosition, setDivPosition] = useState({
-    translateY: "-100%",
-    opacity: 0,
-  });
+  
   return (
     <motion.li
       className="max-w-full flex flex-col items-center gap-4"

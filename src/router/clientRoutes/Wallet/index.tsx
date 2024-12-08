@@ -3,10 +3,10 @@ import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import { Spin, Modal, Input, Button, notification, Table } from "antd";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { createWallet, getAccountWallet, updateWalletBalance, updateWalletBankInformation } from "@/services/ApiServices/accountService";
+import { createWallet, getAccountWallet, updateWalletBankInformation } from "@/services/ApiServices/accountService";
 import { createCheckoutSession, getTransactionsByWalletSenderId } from "@/services/ApiServices/paymentService";
 import { toast } from "react-toastify";
-import { loadStripe } from '@stripe/stripe-js';
+// import { loadStripe } from '@stripe/stripe-js';
 
 const Wallet = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -21,7 +21,7 @@ const Wallet = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isUpdateBankModalOpen, setIsUpdateBankModalOpen] = useState(false);
   const [isModalWithdrawOpen, setIsModalWithdrawOpen] = useState(false);
-  const stripePromise = loadStripe('pk_test_51QCMb308u8J7LaJOAREpbPlmyfVpd22yS6ltclWgXSrdsB5OxGxSdo6zlhm54FdxUaRoX0zsKvlVdVSrjVessc0I00xFufsjzu');
+  // const stripePromise = loadStripe('pk_test_51QCMb308u8J7LaJOAREpbPlmyfVpd22yS6ltclWgXSrdsB5OxGxSdo6zlhm54FdxUaRoX0zsKvlVdVSrjVessc0I00xFufsjzu');
 
   useEffect(() => {
     const fetchWalletData = async () => {

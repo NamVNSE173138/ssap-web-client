@@ -1,7 +1,7 @@
 import { getAllAccounts } from "@/services/ApiServices/accountService";
 import { getAllMessages, getChatHistory, sendMessage } from "@/services/ApiServices/chatService";
 import { RootState } from "@/store/store";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getMessaging, onMessage } from "firebase/messaging";
 import { useLocation, useNavigate } from "react-router-dom";

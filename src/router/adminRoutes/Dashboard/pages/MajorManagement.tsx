@@ -4,9 +4,7 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  Dialog,
-  Select,
-  MenuItem,
+  
   Table,
   TableBody,
   TableCell,
@@ -15,22 +13,19 @@ import {
   TableRow,
   TableSortLabel,
   CircularProgress,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Collapse,
-  Box,
+  
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import { getAllMajors, getMajors } from "@/services/ApiServices/majorService";
+import {  getMajors } from "@/services/ApiServices/majorService";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
 import React from "react";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { IoAddCircle } from "react-icons/io5";
 import { IoMdAddCircle } from "react-icons/io";
 import AddMajorModal from "./MajorManagement/AddMajorForm";
 import EditMajorModal from "./MajorManagement/EditMajorForm";
@@ -40,9 +35,6 @@ import { getAllSkills } from "@/services/ApiServices/skillService";
 const MajorManagement = () => {
   const [majors, setMajors] = useState<Major[]>([]);
   const [loading, setLoading] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  //const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(null);
-  const [status, setStatus] = useState("");
 
   const [openRows, setOpenRows] = useState<any>({});
 
@@ -115,7 +107,7 @@ const MajorManagement = () => {
 
           <TableBody>
             {/*JSON.stringify(majors)*/}
-            {majors.map((account, index) => (
+            {majors.map((account) => (
               <React.Fragment key={account.id}>
                 <TableRow key={account.id} onClick={() => handleToggle(account.id)} className="cursor-pointer" sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
                   {/*<TableCell>{index + 1}</TableCell>*/}
@@ -190,7 +182,7 @@ const MajorManagement = () => {
 
                               <TableBody>
                                 {/*JSON.stringify(majors)*/}
-                                {account.subMajors.map((submajor: any, subIndex: number) => (
+                                {account.subMajors.map((submajor: any, _subIndex: number) => (
                                   <TableRow key={submajor.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
                                     <TableCell>{submajor.id}</TableCell>
                                     <TableCell>{submajor.name}</TableCell>
@@ -257,7 +249,7 @@ const MajorManagement = () => {
 
                               <TableBody>
                                 {/*JSON.stringify(majors)*/}
-                                {account.skills.map((skills: any, subIndex: number) => (
+                                {account.skills.map((skills: any, _subIndex: number) => (
                                   <TableRow key={skills.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
                                     <TableCell>{skills.id}</TableCell>
                                     <TableCell>{skills.name}</TableCell>

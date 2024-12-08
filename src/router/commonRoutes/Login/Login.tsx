@@ -12,9 +12,7 @@ import { z } from "zod";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ValidationErrorMessage from "./components/ValidationErrorMessage";
-import { log } from "console";
 import { useToast } from "@/components/ui/use-toast";
-import { Google } from "@mui/icons-material";
 import RoleNames from "@/constants/roleNames";
 
 
@@ -31,9 +29,9 @@ const Login = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  const [_error, setError] = useState("");
   const [securePassword, setSecurePassword] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 

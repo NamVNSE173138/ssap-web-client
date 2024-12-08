@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
-import ChartThree from '../../components/Charts/ChartThree';
-import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import TableOne from '../../components/Tables/TableOne';
 import { getAccountWallet, getAllAccounts } from '@/services/ApiServices/accountService';
 import ScreenSpinner from '@/components/ScreenSpinner';
-import Chart from '../Chart';
 import { SchoolIcon } from 'lucide-react';
 import { CurrencyDollarIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/solid';
 import formatCurrency from '@/lib/currency-formatter';
@@ -52,7 +49,7 @@ const ECommerce: React.FC = () => {
       {error && <p className="text-red-500">{error}</p>}
       {loading && <ScreenSpinner/>}
       <div className="grid mb-5 grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        {accounts && <CardDataStats title="Total Users" total={accounts.length - 1} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Users" total={(accounts.length - 1).toString()} rate="" levelDown={false} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -75,10 +72,10 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>}
-        {accounts && <CardDataStats title="Total Scholarships" total={scholarshipCount} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Scholarships" total={scholarshipCount.toString()} rate="" levelDown={false} >
           <SchoolIcon />
         </CardDataStats>}
-        {accounts && <CardDataStats title="Total Services" total={serviceCount} rate="" levelDown={false} >
+        {accounts && <CardDataStats title="Total Services" total={serviceCount.toString()} rate="" levelDown={false} >
           <GlobeEuropeAfricaIcon />
         </CardDataStats>}
         {accounts && <CardDataStats title="Total Revenues" total={formatCurrency(revenue, "USD", true)} rate="" levelDown={false} >

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
 
-const AuthSection = (props: any) => {
+const AuthSection = (_props: any) => {
   return (
     <Tabs.Content value="password" className="pt-4">
       <h2 className="text-xl font-bold mb-6">Password & Authentication</h2>

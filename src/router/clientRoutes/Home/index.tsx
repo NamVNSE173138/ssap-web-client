@@ -12,7 +12,6 @@ import {
   FaUser,
 } from "react-icons/fa";
 import {
-  BsFillSuitcaseFill,
   BsFillSuitcaseLgFill,
   BsRulers,
   BsTerminal,
@@ -21,21 +20,18 @@ import { GoLaw } from "react-icons/go";
 import { getAllMajors } from "@/services/ApiServices/majorService";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import ScreenSpinner from "@/components/ScreenSpinner";
-import { Spin } from "antd";
 import { motion } from "framer-motion";
 
-const container = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.2 },
-  },
-};
+// const container = {
+//   hidden: {},
+//   visible: {
+//     transition: { staggerChildren: 0.2 },
+//   },
+// };
 
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);
-  const [errorMessage, setErrorMessage] = useState<any>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [_errorMessage, setErrorMessage] = useState<any>(null);
 
   const fetchMajors = async () => {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { Search } from "lucide-react";
@@ -46,7 +46,7 @@ export default function SearchBox() {
         freeSolo
         options={suggestions}
         loading={loading}
-        onInputChange={(event, newInputValue) => {
+        onInputChange={(_event, newInputValue) => {
           setInput(newInputValue);
         }}
         renderInput={(params) => (

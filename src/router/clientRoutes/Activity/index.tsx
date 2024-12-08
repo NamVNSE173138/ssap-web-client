@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/AccountInfo";
-import CreateScholarshipModal from "./CreateScholarshipModal";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -20,7 +19,7 @@ const Activity = () => {
   const role = user?.role; // Check the user role
   const funderId = user?.id;
 
-  const [isScholarshipModalOpen, setIsScholarshipModalOpen] = useState(false);
+ 
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [data, setData] = useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [services, setServices] = useState<any[]>([]); 

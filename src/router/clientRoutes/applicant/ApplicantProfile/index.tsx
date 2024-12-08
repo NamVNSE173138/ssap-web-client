@@ -4,11 +4,9 @@ import {
   AiOutlineUser,
   AiOutlineLock,
   AiOutlineProfile,
-  AiOutlineAudit,
   AiOutlineClockCircle,
 } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import ProfileSection from "./components/ProfileSection";
 import AccountSection from "./components/AccountSection";
 import AuthSection from "./components/AuthSection";
@@ -30,7 +28,7 @@ const ApplicantProfile = () => {
   const [avatar, setAvatar] = useState<File[]>([]);
   const [activeTab, setActiveTab] = useState<string>("account");
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isProfileUpdated, setIsProfileUpdated] = useState<boolean>(false);
   const [profile, setProfile] = useState({
@@ -153,8 +151,8 @@ const ApplicantProfile = () => {
     index: number,
     value: string,
   ) => {
-    const updatedList = [...profile[type]];
-    updatedList[index] = value;
+    const updatedList = [...profile[type]] as any;
+    updatedList[index] = value ;
     setProfile({ ...profile, [type]: updatedList });
   };
 

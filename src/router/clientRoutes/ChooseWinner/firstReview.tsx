@@ -52,7 +52,7 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
     {
       field: "actions",
       headerName: "Actions",
-      renderCell: (params) => (
+      renderCell: (_params) => (
         <button className="text-sky-500 underline">View Details</button>
       ),
       flex: 1,

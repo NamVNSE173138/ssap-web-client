@@ -1,13 +1,13 @@
 import RouteNames from "@/constants/routeNames";
-import { getAccountById, getAccountWallet, updateAccount } from "@/services/ApiServices/accountService";
+import { getAccountById, updateAccount } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
 import { RootState } from "@/store/store";
 import { Dialog } from "@mui/material";
 import { notification } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaCheckCircle, FaClock, FaCreditCard, FaDollarSign, FaExclamationTriangle, FaInfoCircle, FaRocket, FaTag, FaTimes, FaWallet } from "react-icons/fa";
 import { IoIosApps, IoIosArrowDown, IoIosArrowUp, IoMdClose } from "react-icons/io";
-import { IoCashOutline, IoInformationCircle, IoPricetag, IoPricetagOutline, IoWalletOutline } from "react-icons/io5";
+import { IoCashOutline, IoInformationCircle, IoPricetagOutline, IoWalletOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import SubscriptionContractDialog from "../ServiceDetail/SubscriptionContractDialog";
@@ -334,7 +334,7 @@ const MultiStepUpgradeSubscriptionModal = ({
                                     </p>
 
                                     <div className="mt-4">
-                                        <label className="block text-gray-700 font-semibold mb-2 flex items-center gap-2">
+                                        <label className=" text-gray-700 font-semibold mb-2 flex items-center gap-2">
                                             <IoPricetagOutline className="text-blue-500" size={20} />
                                             Total Price
                                         </label>
@@ -350,7 +350,7 @@ const MultiStepUpgradeSubscriptionModal = ({
 
                             {/* Phần tiếp theo của modal */}
                             <div className="mt-6">
-                                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                     Choose Payment Method
                                 </label>
                                 <div className="flex gap-4">

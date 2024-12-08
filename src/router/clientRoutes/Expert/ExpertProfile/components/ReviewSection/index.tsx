@@ -539,7 +539,8 @@ const ApprovalList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [score, setScore] = useState<number | string>("");
   const [comment, setComment] = useState("");
-  const [isFirstReview, setIsFirstReview] = useState(true);
+  // const [isFirstReview, setIsFirstReview] = useState(true);
+  const isFirstReview = true;
 
   const fetchApplicationReview = async () => {
     setLoading(true);

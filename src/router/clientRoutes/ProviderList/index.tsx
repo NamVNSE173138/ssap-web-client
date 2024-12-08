@@ -5,7 +5,7 @@ import { getAllAccounts } from "@/services/ApiServices/accountService";
 import { List } from "@mui/material";
 import { Breadcrumb } from "antd";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaUsers, FaEye, FaPhoneAlt, FaEnvelope, FaSpinner } from "react-icons/fa"; // Added icons for better UX
 import { Link } from "react-router-dom";
 

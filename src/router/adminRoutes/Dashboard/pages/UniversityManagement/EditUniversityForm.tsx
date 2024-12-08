@@ -2,22 +2,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import axios from "axios";
-import { BASE_URL } from "@/constants/api";
+
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { createReviewMilestone } from "@/services/ApiServices/reviewMilestoneService";
+
 import { useParams } from "react-router-dom";
-import { FaTimes, FaCalendarAlt, FaPen, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
 import Select from "react-select";
-import { formatDate } from "@/lib/date-formatter";
-import { addMajor } from "@/services/ApiServices/majorService";
-import { addCategory } from "@/services/ApiServices/categoryService";
-import { updateUniversities } from "@/services/ApiServices/universityService";
+
 
 interface AddMilestoneModalProps {
     isOpen: boolean;
@@ -64,9 +58,9 @@ const milestoneFormSchema = z.object({
         );
     }, [countryId, form]);
 
-    const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
+    const handleSubmit = async () => {
         try {
-            const response = await updateUniversities(values.id, values);
+            // const response = await updateUniversities(values.id, values);
             form.reset();
             setCountryId({});
             //console.log("Service created successfully:", response.data);

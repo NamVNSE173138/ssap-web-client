@@ -5,13 +5,12 @@ import { ServiceType } from "@/router/clientRoutes/Service/data";
 import { useEffect, useState } from "react";
 import { getServiceById } from "@/services/ApiServices/serviceService";
 
-const truncateString = (str: string, num: number) => {
-  return str.length <= num ? str : str.slice(0, num) + "...";
-};
+// const truncateString = (str: string, num: number) => {
+//   return str.length <= num ? str : str.slice(0, num) + "...";
+// };
 
 const ServiceCard = (service: ServiceType) => {
-  const truncatedDescription = truncateString(service.description, 40);
-  const [services, setServices] = useState<ServiceType | null>(null);
+  const [_services, setServices] = useState<ServiceType | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
 
