@@ -29,10 +29,9 @@ import {
 import { Edit as EditIcon } from "@mui/icons-material";
 import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
 import { TrashIcon } from "@heroicons/react/24/solid";
-import { FaCheckCircle, FaEnvelope, FaExclamationCircle, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle, FaUserCircle } from "react-icons/fa";
+import { FaCheckCircle, FaEnvelope, FaExclamationCircle, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle} from "react-icons/fa";
 import React from "react";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
-import { IoMdAddCircle } from "react-icons/io";
 import { ArrowDown } from "lucide-react";
 
 const AccountsManagement = () => {

@@ -1,11 +1,9 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
 import PrivateRoute from "../PrivateRoute";
-import AdminDashboard from "./Dashboard";
 import ECommerce from "./Dashboard/pages/Dashboard/ECommerce";
 import { Calendar } from "antd";
 import AccountsManagement from "./Dashboard/pages/AccountsManagement";
-import RoleNames from "@/constants/roleNames";
 import TransactionsManagement from "./Dashboard/pages/TransactionsManagement";
 import MajorManagement from "./Dashboard/pages/MajorManagement";
 import CategoryManagement from "./Dashboard/pages/CategoryManagement";

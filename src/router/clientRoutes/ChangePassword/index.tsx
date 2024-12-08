@@ -19,7 +19,7 @@ const ChangePassword: React.FC = () => {
     const [otp, setOtp] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [oldPassword, setOldPassword] = useState<string>("");
-    const [otpSent, setOtpSent] = useState<boolean>(false);
+    const [_otpSent, setOtpSent] = useState<boolean>(false);
     const [isOtpVerified, setIsOtpVerified] = useState<boolean>(false);
     const [isResetPassword, setIsResetPassword] = useState<boolean>(false);
     const [emailError, setEmailError] = useState<string>("");

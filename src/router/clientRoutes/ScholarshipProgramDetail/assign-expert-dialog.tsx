@@ -420,7 +420,6 @@
 import axios from "axios";
 import {
   Autocomplete,
-  Box,
   Button,
   Checkbox,
   Dialog,
@@ -560,7 +559,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
               <StyledAutocomplete
                 options={experts} 
                 getOptionLabel={(option: any) => option.username}
-                onChange={(event, newValue) => handleExpertSelection(newValue)}
+                onChange={(_event, newValue) => handleExpertSelection(newValue)}
                 renderInput={(params) => (
                   <TextField
                     {...params}

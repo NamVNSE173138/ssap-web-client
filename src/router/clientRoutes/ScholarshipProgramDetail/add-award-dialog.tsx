@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createAwardMilestone } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate } from "@/lib/date-formatter";
-import Select, { MultiValue } from "react-select";
+import Select from "react-select";
 import QuillEditor from "@/components/Quill/QuillEditor";
 import { IoCalendar } from "react-icons/io5";
 
@@ -105,7 +105,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
 
     const handleSubmit = async (values: z.infer<typeof awardFormSchema>) => {
         try {
-            const response = await createAwardMilestone(values);
+             await createAwardMilestone(values);
             //console.log(values);
             setFileType([]);
             form.reset();

@@ -27,7 +27,7 @@ const ExpertProfile = () => {
   const [avatar, setAvatar] = useState<File[]>([]);
   const [activeTab, setActiveTab] = useState("account");
   const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isProfileUpdated, setIsProfileUpdated] = useState<boolean>(false);
   const [expertData, setExpertData] = useState({

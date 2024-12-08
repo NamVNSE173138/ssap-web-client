@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 
 const AccountInfo = () => {
   const user = useSelector((state: RootState) => state.token.user);
-  const avatar = useSelector((state: RootState) => state.token.avatar);
+  // const avatar = useSelector((state: RootState) => state.token.avatar);
   const dispatch = useDispatch();
   const [profileData, setProfileData] = useState<any>(null);
   const [avatarFile, setAvatarFile] = useState<any>(null);

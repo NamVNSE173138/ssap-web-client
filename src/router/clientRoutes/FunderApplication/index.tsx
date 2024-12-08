@@ -5,7 +5,7 @@ import SchoolLogo from "../ScholarshipProgramDetail/logo"
 import { useEffect, useState } from "react"
 import { extendApplication, getApplicationWithDocumentsAndAccount, updateApplication } from "@/services/ApiServices/applicationService"
 import NotFound from "@/router/commonRoutes/404"
-import { getAllScholarshipProgram, getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService"
+import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService"
 import { notification, Spin, Tag } from "antd"
 import { formatOnlyDate } from "@/lib/date-formatter"
 import DocumentTable from "./document-table"
@@ -14,18 +14,17 @@ import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMile
 import { Button } from "@/components/ui/button"
 import ApplicationStatus from "@/constants/applicationStatus"
 import { uploadFile } from "@/services/ApiServices/testService"
-import Application from "../Application"
+
 import { useSelector } from "react-redux"
 import { RootState } from "@/store/store"
 import RoleNames from "@/constants/roleNames"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { transferMoney } from "@/services/ApiServices/paymentService"
 import PayAwardDialog from "./PayAwardDialog"
-import { FaBirthdayCake, FaCheckCircle, FaClock, FaCross, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaQuestionCircle, FaStopCircle, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
+import { FaBirthdayCake, FaCheckCircle, FaClock, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaQuestionCircle, FaStopCircle, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
 import { HiOutlinePlusCircle } from 'react-icons/hi';
 import { SendNeedExtendReason, SendNotificationAndEmail } from "@/services/ApiServices/notification"
 import { getMessaging, onMessage } from "firebase/messaging"
-import scholarshipProgram from "../ScholarshipProgram/data"
 import SendReasonDialog from "./send-email-more-doc"
 
 const FunderApplication = () => {
@@ -36,7 +35,7 @@ const FunderApplication = () => {
   const [applicantProfile, setApplicantProfile] = useState<any>(null);
   const [scholarship, setScholarship] = useState<any>(null);
   const [documents, setDocuments] = useState<any>(null);
-  const [error, setError] = useState<string>("");
+  const [_error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   const [applyLoading, setApplyLoading] = useState<boolean>(false);
@@ -137,7 +136,7 @@ const FunderApplication = () => {
           }
       }
 
-      const response = await extendApplication({
+       await extendApplication({
         applicationId: parseInt(id),
         documents: applicationDocuments
       })
@@ -165,7 +164,7 @@ const FunderApplication = () => {
       
       if (!id) return;
       setApplyLoading(true);
-      const response = await updateApplication(parseInt(id), {
+       await updateApplication(parseInt(id), {
         status: status,
         updatedAt: new Date(),
       });
@@ -188,7 +187,7 @@ const FunderApplication = () => {
      try {
       if (!id) return;
       setApplyLoading(true);
-      const response = await updateApplication(parseInt(id), {
+       await updateApplication(parseInt(id), {
         status: status,
         updatedAt: new Date(),
       });
@@ -206,8 +205,8 @@ const FunderApplication = () => {
   const handlePayAwardProgress = async (data: any) => {
     if (!id) return;
     setApplyLoading(true);
-    const response = await transferMoney(data);
-    const res = await updateApplication(parseInt(id), {
+    await transferMoney(data);
+    await updateApplication(parseInt(id), {
       status: ApplicationStatus.Awarded
     });
     notification.success({message: "Pay successfully!"})
@@ -226,8 +225,8 @@ const FunderApplication = () => {
   const handlePayAllAwardProgress = async (data: any) => {
     if (!id) return;
     setApplyLoading(true);
-    const response = await transferMoney(data);
-    const res = await updateApplication(parseInt(id), {
+    await transferMoney(data);
+    await updateApplication(parseInt(id), {
       status: ApplicationStatus.Awarded,
       updatedAt: new Date(new Date(awardMilestones[awardMilestones.length - 1].toDate).setDate(
         new Date(awardMilestones[awardMilestones.length - 1].toDate).getDate() + 1

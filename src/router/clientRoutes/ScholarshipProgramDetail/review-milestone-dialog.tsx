@@ -1,13 +1,12 @@
 import { formatDate } from "@/lib/date-formatter";
-import { Box, Button, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper } from "@mui/material";
+import {  Dialog, DialogTitle, List, Paper } from "@mui/material";
 import { IoIosAddCircleOutline } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
 import AddMilestoneModal from "./add-milestone-dialog";
 import { useState } from "react";
-import { FaCalendarAlt, FaEye } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestones, scholarship, fetchReviewMilestones }: any) => {
-  const navigate = useNavigate();
+  
   const [openAdd, setOpenAdd] = useState<boolean>(false);
 
   const handleOpenAdd = (openAdd: boolean) => {
@@ -17,7 +16,7 @@ const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestone
 
   return (<>
     <Dialog onClose={() => onClose(false)} open={open} fullWidth style={{ zIndex: 40 }}>
-      <DialogTitle className="text-2xl font-semibold text-gray-800 flex items-center gap-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+      <DialogTitle className="text-2xl font-semibold  flex items-center gap-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white">
         <FaCalendarAlt className="text-sky-500 text-3xl" />
         Review Milestones
       </DialogTitle>

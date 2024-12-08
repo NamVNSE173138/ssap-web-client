@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Alert, DatePicker, Spin, message } from "antd";
+import { Alert, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
-import { getAllApplicantProfilesByApplicant, getApplicantProfileById, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
+import { getAllApplicantProfilesByApplicant, updateApplicantProfile, exportApplicantProfileToPdf, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Sidebar } from "@/components/AccountInfo";
@@ -13,7 +13,8 @@ const Information = () => {
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [hasProfile, setHasProfile] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
+  const error: string | null = null;
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isAdd, setIsAdd] = useState<boolean>(false);
   const [formValues, setFormValues] = useState({

@@ -8,7 +8,6 @@ import { deleteToken } from 'firebase/messaging';
 import { messaging } from '@/services/firebase';
 import { removeToken, removeUser } from '@/reducers/tokenSlice';
 import RouteNames from '@/constants/routeNames';
-import ScreenSpinner from '@/components/ScreenSpinner';
 
 const DropdownUser = ({ setIsLoading }: any) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);

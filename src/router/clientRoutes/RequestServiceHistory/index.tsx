@@ -467,7 +467,7 @@ const RequestHistory = () => {
       <div className="mt-6">
         <Tabs
           value={activeTab}
-          onChange={(e, newValue) => setActiveTab(newValue)}
+          onChange={(_e, newValue) => setActiveTab(newValue)}
           centered
           textColor="primary"
           indicatorColor="primary"

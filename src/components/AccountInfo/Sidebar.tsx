@@ -73,7 +73,7 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
 
   const fetchSkills = async () => {
     try {
-      const data = await getApplicantProfileById(Number(id || user?.id));
+      await getApplicantProfileById(Number(id || user?.id));
       setHasProfile(true);
     } catch (error: any) {
       if (error.response.data.detail.includes("applicantId")) {

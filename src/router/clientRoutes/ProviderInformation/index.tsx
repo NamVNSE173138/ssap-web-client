@@ -20,7 +20,7 @@ const ProviderInformation = () => {
   const [loading, setLoading] = useState(true);
   const [averageRatings, setAverageRatings] = useState<number>(0);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState<boolean>(false);
-  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [_isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);

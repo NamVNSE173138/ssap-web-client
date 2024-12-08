@@ -7,9 +7,9 @@ import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormControl, MenuItem, Select } from "@mui/material";
 import { FaClipboardList, FaCog, FaDollarSign, FaPen, FaTimes } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface EditServiceModalProps {
   isOpen: boolean;

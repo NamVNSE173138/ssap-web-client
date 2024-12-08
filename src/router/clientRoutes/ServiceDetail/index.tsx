@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Breadcrumb,
@@ -114,20 +114,20 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [scholarshipType, setScholarshipType] = useState<string>("");
-  const [scholarships, setScholarships] = useState<
+  const [_scholarshipType, setScholarshipType] = useState<string>("");
+  const [_scholarships, setScholarships] = useState<
     { id: number; name: string }[]
   >([]);
   const [description, setDescription] = useState<string>("");
   const [applicationFileUrls, setApplicationFileUrls] = useState<File[]>([]);
-  const [editData, setEditData] = useState<ServiceType | null>(null);
+  const [_editData, setEditData] = useState<ServiceType | null>(null);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   const isProvider = user?.role === "Provider";
   const isFunder = user?.role === "Funder";
   const [canEdit, setCanEdit] = useState<boolean>(true);
-  const [existingRequestId, setExistingRequestId] = useState<number | null>(
+  const [_existingRequestId, setExistingRequestId] = useState<number | null>(
     null
   );
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
@@ -137,11 +137,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setConfirmationDialogOpen] =
     useState<boolean>(false);
-  const [requestData, setRequestData] = useState<any>(null);
+  // const [requestData, setRequestData] = useState<any>(null);
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [isContractOpen, setContractOpen] = useState(false);
-  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [_isServiceModalOpen, setIsServiceModalOpen] = useState(false);
 
   const fetchService = async () => {
     try {
@@ -428,7 +428,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-5">
-                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                   <IoText className="text-blue-500" />
                   Description
                 </label>
@@ -441,7 +441,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               </div>
 
               <div className="mb-5">
-                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                   <IoCloudUpload className="text-blue-500" />
                   Submit File(s)
                 </label>
@@ -480,7 +480,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               </div>
 
               <div className="mb-5">
-                <label className="block text-gray-700 font-medium mb-3 flex items-center gap-2">
+                <label className=" text-gray-700 font-medium mb-3 flex items-center gap-2">
                   <IoCard className="text-blue-500" />
                   Choose Payment Method
                 </label>
@@ -520,7 +520,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               </div>
 
               <div className="mb-5">
-                <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                   <IoText className="text-blue-500" />
                   Payment Description
                 </label>
@@ -831,7 +831,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </Link>
                 </div>
               </div>
-              <div className="hidden flex items-center space-x-4">
+              <div className=" flex items-center space-x-4">
                 <FaCheckCircle className="text-teal-500 text-xl" />
                 <div>
                   <p className="text-lg font-semibold text-gray-700">Status:</p>

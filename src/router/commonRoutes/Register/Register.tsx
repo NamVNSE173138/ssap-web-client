@@ -1,20 +1,18 @@
 import RouteNames from "@/constants/routeNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
-import { GoogleAuth, RegisterUser } from "@/services/ApiServices/authenticationService";
+import { RegisterUser } from "@/services/ApiServices/authenticationService";
 import parseJwt from "@/services/parseJwt";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaEnvelope, FaEye, FaEyeSlash, FaIdBadge, FaImage, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUserAlt, FaUsers } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaEyeSlash, FaIdBadge, FaImage, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUsers } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/components/ui/use-toast";
 import { NotifyNewUser } from "@/services/ApiServices/notification";
 import { notification } from "antd";
-import { IoIosArrowForward } from "react-icons/io";
 import { MdPersonPin } from "react-icons/md";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import { addProviderDetails } from "@/services/ApiServices/providerService";
@@ -23,7 +21,6 @@ import { Table, TableBody, TableContainer } from "@mui/material";
 import DocumentRows from "./DocumentRows";
 import { Button } from "@/components/ui/button";
 import { HiOutlinePlusCircle } from "react-icons/hi";
-import { dataListLabelPropDefs } from "@radix-ui/themes/dist/esm/components/data-list.props.js";
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -77,13 +74,11 @@ const formSchema = z.object({
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [securePassword, setSecurePassword] = useState(true);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
+  const error = null
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState(5);
-  const [isOpen, setIsOpen] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -132,7 +127,7 @@ const Register = () => {
     },
   });  
 
-  const formRef = useRef<HTMLFormElement | null>(null);
+  // const formRef = useRef<HTMLFormElement | null>(null);
 
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState);

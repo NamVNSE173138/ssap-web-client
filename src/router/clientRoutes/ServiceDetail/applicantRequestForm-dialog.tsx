@@ -33,15 +33,15 @@ type RequestFormModalProps = {
   ) => void;
 };
 
-const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: RequestFormModalProps) => {
+const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalProps) => {
   const user = useSelector((state: RootState) => state.token.user);
   const [selectedService, setSelectedService] = useState<number[]>([]);
   const [description, setDescription] = useState<string>("");
   const [applicationFiles, setApplicationFiles] = useState<File[]>([]);
-  const [scholarships, setScholarships] = useState<{ id: number; name: string }[]>([]);
+  const [_scholarships, setScholarships] = useState<{ id: number; name: string }[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -210,7 +210,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                 </FormControl>
 
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                  <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                     <IoText className="text-blue-500" />
                     Description
                   </label>
@@ -224,7 +224,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                 </div>
 
                 <div className="mb-5">
-                  <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                  <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                     <IoCloudUpload className="text-blue-500" />
                     Submit File(s)
                   </label>
@@ -263,7 +263,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                  <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                     <IoPricetag className="text-blue-500" />
                     Total Price
                   </label>
@@ -276,7 +276,7 @@ const RequestFormModal = ({ isOpen, handleClose, services, handleSubmit }: Reque
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                  <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                     <IoCard className="text-blue-500" />
                     Choose Payment Method
                   </label>

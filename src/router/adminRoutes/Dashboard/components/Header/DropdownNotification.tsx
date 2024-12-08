@@ -10,15 +10,16 @@ import { IoIosNotifications, IoIosNotificationsOutline } from 'react-icons/io';
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [notifying, setNotifying] = useState(true);
+  const [_notifying, setNotifying] = useState(true);
 
   const user = useSelector((state: RootState) => state.token.user);
 
   const [notis, setNotis] = useState<any>(null);
   const [unreadNotis, setUnreadNotis] = useState<number>(0);
-  const [errorMessage, setErrorMessage] = useState<any>(null);
+  const [_errorMessage, setErrorMessage] = useState<any>(null);
 
-  const [title, setTitle] = useState("Scholarship Portal");
+  // const [title, setTitle] = useState("Scholarship Portal");
+  const title = "Scholarship Portal";
 
   const fetchNotis = async () => {
     try {
@@ -77,7 +78,7 @@ const DropdownNotification = () => {
       setUnreadNotis(unread);
       if (unread > 0) document.title = `(${unread}) ${title}`
       else document.title = title
-      let res = await ReadNotisWithId(noti.id);
+       await ReadNotisWithId(noti.id);
       //await fetchNotis();
     } catch (error: any) {
       setErrorMessage(
@@ -89,7 +90,7 @@ const DropdownNotification = () => {
 
   useEffect(() => {
     fetchNotis();
-    navigator.serviceWorker.addEventListener('message', (event) => {
+    navigator.serviceWorker.addEventListener('message', (_event) => {
       fetchNotis();
     });
   }, [])

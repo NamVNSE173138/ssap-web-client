@@ -4,9 +4,7 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  Dialog,
-  Select,
-  MenuItem,
+  
   Table,
   TableBody,
   TableCell,
@@ -15,28 +13,14 @@ import {
   TableRow,
   TableSortLabel,
   CircularProgress,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Collapse,
-  Box,
+ 
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
-import { TrashIcon } from "@heroicons/react/24/solid";
-import { FaCheckCircle, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle, FaUserCircle } from "react-icons/fa";
-import { getAllMajors, getMajors } from "@/services/ApiServices/majorService";
-import { GridArrowDownwardIcon } from "@mui/x-data-grid";
+
 import React from "react";
-import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { IoAddCircle } from "react-icons/io5";
 import { IoMdAddCircle } from "react-icons/io";
-import AddMajorModal from "./MajorManagement/AddMajorForm";
-import EditMajorModal from "./MajorManagement/EditMajorForm";
+
 import { getAllCategories } from "@/services/ApiServices/categoryService";
 import AddCategoryModal from "./CategoryManagement/AddCategoryForm";
 import EditCategoryModal from "./CategoryManagement/EditCategoryForm";
@@ -44,10 +28,7 @@ import EditCategoryModal from "./CategoryManagement/EditCategoryForm";
 const CategoryManagement = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [status, setStatus] = useState("");
-
-  const [openRows, setOpenRows] = useState<any>({});
+  
 
   const [openAddCategory, setOpenAddCategory] = useState<boolean>(false);
 
@@ -55,12 +36,12 @@ const CategoryManagement = () => {
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
 
 
-  const handleToggle = (rowId: any) => {
-    setOpenRows((prevState: any) => ({
-      ...prevState,
-      [rowId]: !prevState[rowId],
-    }));
-  };
+  // const handleToggle = (rowId: any) => {
+  //   setOpenRows((prevState: any) => ({
+  //     ...prevState,
+  //     [rowId]: !prevState[rowId],
+  //   }));
+  // };
 
   const TABLE_HEAD = [
     "ID", "Name", "Description", "Actions"
@@ -154,7 +135,7 @@ const CategoryManagement = () => {
 
           <TableBody>
             {/*JSON.stringify(majors)*/}
-            {categories.map((account, index) => (
+            {categories.map((account) => (
               <React.Fragment key={account.id}>
                 <TableRow key={account.id} className="cursor-pointer" sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
                   {/*<TableCell>{index + 1}</TableCell>*/}

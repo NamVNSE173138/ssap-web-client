@@ -15,13 +15,12 @@ import { BASE_URL } from "@/constants/api";
 import { getAllCountries } from "@/services/ApiServices/countryService";
 import { getAllMajors } from "@/services/ApiServices/majorService";
 import { getAllCategories } from "@/services/ApiServices/categoryService";
-import { ArrowDownIcon, CalendarIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { getAllCertificates } from "@/services/ApiServices/certificateService";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Container, Slider } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Slider } from "@mui/material";
 import { getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendarAlt, FaCircle, FaDollarSign } from "react-icons/fa";
 import { HiOutlineChevronDown } from "react-icons/hi";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 const ScholarshipProgram = () => {
   const [data, setData] =

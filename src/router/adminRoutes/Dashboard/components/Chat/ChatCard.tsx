@@ -1,10 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Chat } from '../../types/chat';
-import UserOne from '../../images/user/user-01.png';
 import UserTwo from '../../images/user/user-02.png';
-import UserThree from '../../images/user/user-03.png';
-import UserFour from '../../images/user/user-04.png';
-import UserFive from '../../images/user/user-05.png';
 import { useEffect, useState } from 'react';
 import { getAllAccounts } from '@/services/ApiServices/accountService';
 
@@ -61,8 +56,8 @@ import { getAllAccounts } from '@/services/ApiServices/accountService';
 
 const ChatCard = () => {
     const [providers, setProviders] = useState<any>(null);
-    const [error, setError] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
+    const [_error, setError] = useState<string>("");
+    const [_loading, setLoading] = useState<boolean>(false);
 
   const fetchProviders = async () => {
     try {
