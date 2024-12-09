@@ -139,11 +139,6 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
     <>
       <div className={`${className} flex flex-col my-10 shadow-2 bg-white rounded-lg`}>
         <div className="flex flex-col items-center gap-8">
-          {/* <div className='flex justify-center items-center gap-4'>
-                        <img src='https://via.placeholder.com/150' alt='profile' className='rounded-full w-24' />
-                        
-                    </div> */}
-          {/* <div className="h-[1px] bg-gray-100 w-2/3"></div> */}
         </div>
         {isAboveMediumScreens ? (
           <menu className="w-full flex flex-col ">
@@ -155,8 +150,6 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
                 link={item.link}
               />
             ))}
-            {/* <li className='lg:px-12 px-5 gap-4 transition-colors w-full py-2 cursor-pointer duration-200 hover:bg-blue-400 group rounded-lg'>
-                        </li> */}
           </menu>
         ) : (
           <motion.div

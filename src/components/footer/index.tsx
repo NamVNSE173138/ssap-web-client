@@ -16,24 +16,6 @@ const Footer = () => {
                         <p></p>
                         <p></p>
                     </div>
-                    {/* <menu className="grid grid-cols-2 grid-rows-2 gap-y-2 md:w-1/2 w-full mt-2 md:mt-0">
-                        <li className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faFlag} />
-                            <p className='opacity-70'>{t(footer.actions.COUNTRY)}</p>
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faHeadphones} />
-                            <p className='opacity-70'>{t(footer.actions.SUPPORT)}</p>
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faEnvelope} />
-                            <p className='opacity-70'>{t(footer.actions.CONTACT)}</p>
-                        </li>
-                        <li className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faMessage} />
-                            <p className='opacity-70'>{t(footer.actions.COMPLAIN)}</p>
-                        </li>
-                    </menu> */}
                 </div>
                 <div className="mt-16 basis-1/2 md:mt-0 text-black">
                     <p className="mt-9 mb-4 font-semibold text-[30px]">ORGANIZATION</p>

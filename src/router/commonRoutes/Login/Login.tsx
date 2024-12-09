@@ -25,12 +25,8 @@ const formSchema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
-  //const token = useSelector((state: RootState) => state.token.token);
   const dispatch = useDispatch();
   const { toast } = useToast();
-
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
   const [_error, setError] = useState("");
   const [securePassword, setSecurePassword] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +62,7 @@ const Login = () => {
       }
       toast({
         title: "Login Successful.",
-        description: "Now you can....",
+        description: "Ready to find your perfect scholarship?",
         duration: 5000,
         variant: 'default',
       });
