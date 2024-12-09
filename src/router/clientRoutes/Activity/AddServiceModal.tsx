@@ -14,6 +14,7 @@ import { FormControl, MenuItem, Select, CircularProgress } from "@mui/material";
 import { FaClipboardList, FaDollarSign, FaFileAlt, FaPen, FaPlus, FaTimes, FaCheckCircle } from "react-icons/fa";
 import { IoDocumentText, IoListCircle, IoWarningOutline, IoPersonOutline, IoLockClosedOutline, IoShieldCheckmarkOutline, IoCalendarOutline, IoCloseCircleOutline } from "react-icons/io5";
 import { notification } from "antd";
+import { addService } from "@/services/ApiServices/serviceService";
 
 const serviceTypes = [
   { value: "CV_REVIEW", label: "CV Review" },
@@ -135,7 +136,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
   const handleSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${BASE_URL}/api/services`, values);
+      const response = await addService(values);
       console.log("Service created successfully:", response.data);
       setIsOpen(false);
       setSuccess(true);
@@ -250,18 +251,21 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                   </p>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="bg-blue-600 text-white hover:bg-blue-700 mt-6"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <CircularProgress size={24} className="text-white" />
-                  ) : (
-                    <FaPlus className="mr-2" />
-                  )}
-                  Add Service
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 text-white hover:bg-blue-700 mt-6 w-1/3 py-2 px-6 rounded-lg shadow-md transition-all"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <CircularProgress size={24} className="text-white" />
+                    ) : (
+                      <FaPlus className="mr-2" />
+                    )}
+                    {isSubmitting ? "Adding..." : "Add Service"}
+                  </Button>
+                </div>
+
               </form>
 
               {success && (
