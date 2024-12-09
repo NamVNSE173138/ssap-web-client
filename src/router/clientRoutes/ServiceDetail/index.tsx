@@ -161,12 +161,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
       }
       const response = await fetchApplicants(data.data.id);
       console.log(response);
-      setExistingRequestId(
-        response.find((r: any) => r.applicantId == user?.id)?.id || null
-      );
+      setExistingRequestId(response);
       if (response.length == 0) {
         setCanEdit(true);
       } else {
+        console.log("Hrllo");
+        
         setCanEdit(false);
       }
 
@@ -210,9 +210,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
       const response = await getRequestsByService(serviceId);
       if (response.statusCode == 200) {
         setApplicants(response.data);
-        const existingRequest = response.data.find(
-          (r: any) => r.applicantId == user?.id
-        );
+        const existingRequest = response.data
         console.log(existingRequest);
         if (existingRequest) {
           setExistingRequestId(existingRequest.id);
@@ -221,7 +219,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
           setExistingRequestId(null);
           setRequestStatus(null);
         }
-        setCanEdit(existingRequest ? false : true);
+        setCanEdit(existingRequest.length !=0 ? false : true);
         return response.data;
       } else {
         setError("Failed to get applicants");
@@ -831,7 +829,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </Link>
                 </div>
               </div>
-              <div className=" flex items-center space-x-4">
+              <div className="hidden items-center space-x-4">
                 <FaCheckCircle className="text-teal-500 text-xl" />
                 <div>
                   <p className="text-lg font-semibold text-gray-700">Status:</p>
