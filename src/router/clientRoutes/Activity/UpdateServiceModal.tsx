@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormControl, MenuItem, Select } from "@mui/material";
-import { FaClipboardList, FaCog, FaDollarSign, FaPen, FaTimes } from "react-icons/fa";
+import { FaAddressCard, FaClipboardList, FaDollarSign, FaPen, FaTimes } from "react-icons/fa";
 import { useEffect } from "react";
+import { updateService } from "@/services/ApiServices/serviceService";
+import { notification } from "antd";
 
 interface EditServiceModalProps {
   isOpen: boolean;
@@ -40,7 +42,7 @@ const serviceFormSchema = z.object({
   price: z.string().refine((value) => !isNaN(parseFloat(value)), {
     message: "Price must be a number",
   }),
-  status: z.string().default("Active"),
+  status: z.string(),
   providerId: z.number()
 });
 
@@ -51,20 +53,22 @@ const EditServiceModal = ({ isOpen, setIsOpen, fetchServices, serviceData }: Edi
       name: serviceData?.name || "",
       description: serviceData?.description || "",
       type: serviceData?.type || "",
-      price: serviceData?.price || "",
-      status: serviceData?.status || "Active",
+      price: serviceData?.price + "" || "",
+      status: serviceData?.status || "",
       providerId: serviceData?.providerId || "",
     }
   });
 
   const handleSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
     try {
-      const response = await axios.put(`${BASE_URL}/api/services/${serviceData.id}`, values);
+      const response = await updateService(serviceData.id, values);
       console.log("Service updated successfully:", response.data);
+      notification.success({message:"Service updated successfully"})
       setIsOpen(false);
       await fetchServices();
     } catch (error) {
       console.error("Error updating service:", error);
+      notification.error({message:"Failed to update service"});
     }
   };
 
@@ -74,8 +78,8 @@ const EditServiceModal = ({ isOpen, setIsOpen, fetchServices, serviceData }: Edi
         name: serviceData?.name || "",
         description: serviceData?.description || "",
         type: serviceData?.type || "",
-        price: serviceData?.price || "",
-        status: serviceData?.status || "Active",
+        price: serviceData?.price + "" || "",
+        status: serviceData?.status || "",
         providerId: serviceData?.providerId || "",
       });
     }
@@ -147,13 +151,34 @@ const EditServiceModal = ({ isOpen, setIsOpen, fetchServices, serviceData }: Edi
                     </MenuItem>
                     {serviceTypes.map((service) => (
                       <MenuItem key={service.value} value={service.value}>
-                        <FaCog className="mr-2" />
                         {service.label}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
                 {form.formState.errors.type && <p className="text-red-500 text-sm">{form.formState.errors.type.message}</p>}
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaAddressCard className="text-blue-600" />
+                  <Label>Status</Label>
+                </div>
+                <FormControl fullWidth variant="outlined" className="mb-4">
+                  <Select
+                    labelId="status-label"
+                    {...form.register("status")}
+                    defaultValue={serviceData?.status || "Active"}
+                    error={!!form.formState.errors.status}
+                    className="select-custom hover:border-blue-400 focus:border-blue-500"
+                  >
+                    <MenuItem value="Active">Active</MenuItem>
+                    <MenuItem value="Inactive">Inactive</MenuItem>
+                  </Select>
+                </FormControl>
+                {form.formState.errors.status && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.status.message}</p>
+                )}
               </div>
 
               <div className="flex flex-col">
@@ -170,11 +195,6 @@ const EditServiceModal = ({ isOpen, setIsOpen, fetchServices, serviceData }: Edi
                 {form.formState.errors.price && <p className="text-red-500">{form.formState.errors.price.message}</p>}
               </div>
 
-              <div className="hidden">
-                <Label>Status</Label>
-                <Input hidden {...form.register("status")} value="Active" disabled />
-                {form.formState.errors.status && <p>{form.formState.errors.status.message}</p>}
-              </div>
               <div className="hidden">
                 <Label>Provider ID</Label>
                 <Input {...form.register("providerId")} placeholder="Provider ID" disabled />

@@ -1,7 +1,7 @@
 import { formatDate } from "@/lib/date-formatter";
 import { NotifyApplicantServiceComment } from "@/services/ApiServices/notification";
 import { getRequestById, updateRequest } from "@/services/ApiServices/requestService";
-import {uploadFile } from "@/services/ApiServices/testService";
+import { uploadFile } from "@/services/ApiServices/testService";
 import { RootState } from "@/store/store";
 import { AddComment } from "@mui/icons-material";
 import {
@@ -23,6 +23,7 @@ import { useState, useEffect } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
 import { IoCloudUpload } from "react-icons/io5";
+import { MdPending } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -80,7 +81,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     const handleSubmitComment = async () => {
         if (selectedApplicantId === null) return;
-        if(!user) return null;
+        if (!user) return null;
         setIsSubmitting(true);
         try {
             const existingApplicantResponse = await getRequestById(selectedApplicantId);
@@ -116,7 +117,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
                 setApplicants(updatedApplicants);
 
-                notification.success({message:"Comment successfully!"})
+                notification.success({ message: "Comment successfully!" })
                 setCommentDialogOpen(false);
                 await NotifyApplicantServiceComment(Number(requestDetail.serviceId), Number(existingApplicantResponse.data.applicantId));
                 setCommentText("");
@@ -133,125 +134,166 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
 
     const renderApplicants = (applicantsList: Applicant[]) => (
         <Box>
-            {applicantsList.length > 0 ? (
-                applicantsList.map((app) => (
-                    <ListItem
-                        key={app.id}
-                        disableGutters
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            mb: 3,
-                            p: 3,
-                            borderRadius: "12px",
-                            bgcolor: "background.paper",
-                            boxShadow: 2,
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                                boxShadow: 6,
-                                transform: "scale(1.02)",
-                            },
-                        }}
-                    >
-                        <ListItemAvatar>
-                            <img
-                                src={app.applicant?.avatarUrl ?? "https://github.com/shadcn.png"}
-                                alt={`${app.applicant?.username}'s avatar`}
-                                className="rounded-full"
-                                style={{ width: "48px", height: "48px" }}
-                            />
-                        </ListItemAvatar>
+    {applicantsList.length > 0 ? (
+      applicantsList.map((app) => (
+        <ListItem
+          key={app.id}
+          disableGutters
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 3,
+            p: 3,
+            borderRadius: "12px",
+            bgcolor: "background.paper",
+            boxShadow: 3,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: 6,
+              transform: "scale(1.02)",
+              bgcolor: "action.hover",
+            },
+          }}
+        >
+          {/* Request ID */}
+          <Box
+            sx={{
+              mr: 2,
+              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              color: "text.primary",
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: "bold",
+                color: app.status === "Pending" ? "#FFA726" : "#66BB6A",
+              }}
+            >
+              {`#${app.id}`}
+            </Typography>
+          </Box>
 
-                        <ListItemText
-                            primary={
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{
-                                        fontWeight: 600,
-                                        fontFamily: "Poppins, sans-serif",
-                                    }}
-                                >
-                                    {app.applicant.username}
-                                </Typography>
-                            }
-                            secondary={
-                                <Typography
-                                    variant="body2"
-                                    sx={{ color: "text.secondary" }}
-                                >
-                                    {formatDate(app.requestDate)}
-                                </Typography>
-                            }
-                            sx={{ flex: 1, ml: 2 }}
-                        />
+          {/* Avatar */}
+          <ListItemAvatar>
+            <img
+              src={app.applicant?.avatarUrl ?? "https://github.com/shadcn.png"}
+              alt={`${app.applicant?.username}'s avatar`}
+              className="rounded-full"
+              style={{
+                width: "48px",
+                height: "48px",
+                border: "2px solid #4A90E2",
+              }}
+            />
+          </ListItemAvatar>
 
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Button
-                                onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
-                                variant="contained"
-                                size="small"
-                                sx={{
-                                    bgcolor: "primary.main",
-                                    color: "white",
-                                    borderRadius: "20px",
-                                    textTransform: "capitalize",
-                                    fontFamily: "Roboto, sans-serif",
-                                    fontSize: "0.875rem",
-                                    "&:hover": {
-                                        bgcolor: "primary.dark",
-                                    },
-                                }}
-                            >
-                                <FaEye style={{ marginRight: "8px" }} />
-                                View Request
-                            </Button>
+          {/* Username and Date */}
+          <ListItemText
+            primary={
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 600,
+                  fontFamily: "Poppins, sans-serif",
+                  color: "text.primary",
+                }}
+              >
+                {app.applicant.username}
+              </Typography>
+            }
+            secondary={
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
+              >
+                <FaEye style={{ marginRight: "4px" }} />
+                {formatDate(app.requestDate)}
+              </Typography>
+            }
+            sx={{ flex: 1, ml: 2 }}
+          />
 
-                            {app.status === "Pending" && (
-                                <Button
-                                    onClick={() => handleOpenCommentDialog(app.id)}
-                                    variant="outlined"
-                                    size="small"
-                                    sx={{
-                                        borderRadius: "20px",
-                                        textTransform: "capitalize",
-                                        fontFamily: "Roboto, sans-serif",
-                                        fontSize: "0.875rem",
-                                        borderColor: "primary.main",
-                                        color: "primary.main",
-                                        "&:hover": {
-                                            borderColor: "primary.dark",
-                                            bgcolor: "action.hover",
-                                        },
-                                    }}
-                                >
-                                    <FaCommentDots style={{ marginRight: "8px" }} />
-                                    Add Comment
-                                </Button>
-                            )}
-                        </Box>
-                    </ListItem>
-                ))
-            ) : (
-                <ListItem>
-                    <ListItemText
-                        primary={
-                            <Typography
-                                variant="body1"
-                                align="center"
-                                sx={{
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 500,
-                                    color: "text.secondary",
-                                }}
-                            >
-                                No requests available
-                            </Typography>
-                        }
-                    />
-                </ListItem>
+          {/* Action Buttons */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <Button
+              onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
+              variant="contained"
+              size="small"
+              sx={{
+                bgcolor: "primary.main",
+                color: "white",
+                borderRadius: "20px",
+                textTransform: "capitalize",
+                fontFamily: "Roboto, sans-serif",
+                fontSize: "0.875rem",
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                },
+              }}
+            >
+              <FaEye style={{ marginRight: "8px" }} />
+              View Request
+            </Button>
+
+            {app.status === "Pending" && (
+              <Button
+                onClick={() => handleOpenCommentDialog(app.id)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: "20px",
+                  textTransform: "capitalize",
+                  fontFamily: "Roboto, sans-serif",
+                  fontSize: "0.875rem",
+                  borderColor: "primary.main",
+                  color: "primary.main",
+                  "&:hover": {
+                    borderColor: "primary.dark",
+                    bgcolor: "action.hover",
+                  },
+                }}
+              >
+                <FaCommentDots style={{ marginRight: "8px" }} />
+                Add Comment
+              </Button>
             )}
-        </Box>
-
+          </Box>
+        </ListItem>
+      ))
+    ) : (
+      <ListItem>
+        <ListItemText
+          primary={
+            <Typography
+              variant="body1"
+              align="center"
+              sx={{
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: 500,
+                color: "text.secondary",
+              }}
+            >
+              No requests available
+            </Typography>
+          }
+        />
+      </ListItem>
+    )}
+  </Box>
     );
 
     return (
@@ -260,7 +302,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                 onClose={onClose}
                 open={open}
                 fullWidth
-                maxWidth="sm"
+                maxWidth="md"
             >
                 <DialogTitle
                     sx={{

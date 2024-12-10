@@ -1,18 +1,17 @@
 import { Separator } from "../ui/separator";
 import { Link } from "react-router-dom";
-import { FaDollarSign, FaStar, FaAddressBook, FaClipboardList } from "react-icons/fa";
+import { FaDollarSign, FaStar, FaAddressBook, FaClipboardList, FaCheckCircle } from "react-icons/fa";
 import { ServiceType } from "@/router/clientRoutes/Service/data";
 import { useEffect, useState } from "react";
 import { getServiceById } from "@/services/ApiServices/serviceService";
-
-// const truncateString = (str: string, num: number) => {
-//   return str.length <= num ? str : str.slice(0, num) + "...";
-// };
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const ServiceCard = (service: ServiceType) => {
   const [_services, setServices] = useState<ServiceType | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
+  const user = useSelector((state: RootState) => state.token.user);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -68,6 +67,7 @@ const ServiceCard = (service: ServiceType) => {
             />
             <p className="text-gray-800">{service.type || "No Type Specified"}</p>
           </div>
+
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaClipboardList
               color="#1eb2a6"
@@ -78,6 +78,19 @@ const ServiceCard = (service: ServiceType) => {
             </p>
           </div>
 
+          {user?.role === 'Provider' && (
+            <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
+              <FaCheckCircle
+                className={`text-2xl ${service.status === "Active" ? "text-teal-500" : "text-red-500"}`}
+              />
+              <div>
+                <p className={`text-ellipsis ${service.status === "Active" ? "text-teal-600" : "text-red-600"}`}>
+                  {service.status}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
             <FaDollarSign
               color="#1eb2a6"
@@ -85,6 +98,7 @@ const ServiceCard = (service: ServiceType) => {
             />
             <p className="text-gray-800">{service.price ? `$${service.price.toFixed(2)}` : "Price not available"}</p>
           </div>
+
         </div>
       </div>
     </Link>
