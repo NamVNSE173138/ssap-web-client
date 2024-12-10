@@ -32,15 +32,25 @@ const serviceTypes = [
 ];
 
 const serviceFormSchema = z.object({
-  name: z.string().min(1, "Please enter the service name"),
+  name: z
+    .string()
+    .min(1, "Please enter the service name")
+    .max(40, "Service name must not exceed 40 characters"),
   description: z.string().min(1, "Please enter a description"),
-  type: z.string().min(1, "Please select a service type"),
-  price: z.string().refine((value) => !isNaN(parseFloat(value)), {
-    message: "Price must be a number",
-  }),
+  type: z
+    .string()
+    .min(1, "Please select a service type")
+    .refine((value) => value !== "", { message: "Service type is required" }),
+  price: z
+    .string()
+    .refine((value) => {
+      const parsedValue = parseFloat(value);
+      return !isNaN(parsedValue) && parsedValue >= 0;
+    }, { message: "Price must be a positive number" }),
   status: z.string().default("Active"),
   providerId: z.number(),
 });
+
 
 interface AddServiceModalProps {
   isOpen: boolean;
