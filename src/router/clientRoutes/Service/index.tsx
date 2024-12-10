@@ -45,7 +45,7 @@ import {
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
-import { getServicesByProvider } from "@/services/ApiServices/serviceService";
+import { getPaginatedServices, getServicesByProvider, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
 import { MdDateRange } from "react-icons/md";
 import MultiStepUpgradeSubscriptionModal from "../Activity/SubscriptionUpgradeModal";
 
@@ -260,25 +260,25 @@ const Service = () => {
     try {
       let response: any = {};
       if (user?.role === "Provider") {
-        //response = await getServicesByProviderPaginated(Number(user.id),currentPage,pageSize);
-        response = await axios.get(
-          `${BASE_URL}/api/services/by-provider-paginated/${user.id}`,
-          {
-            params: {
-              pageIndex: currentPage,
-              pageSize: pageSize,
-            },
-          },
-        );
+        response = await getServicesByProviderPaginated(Number(user.id),currentPage,pageSize);
+        // response = await axios.get(
+        //   `${BASE_URL}/api/services/by-provider-paginated/${user.id}`,
+        //   {
+        //     params: {
+        //       pageIndex: currentPage,
+        //       pageSize: pageSize,
+        //     },
+        //   },
+        // );
         console.log(response);
       } else {
-        //response = await getPaginatedServices(currentPage, pageSize)
-        response = await axios.get(`${BASE_URL}/api/services/paginated`, {
-          params: {
-            pageIndex: currentPage,
-            pageSize: pageSize,
-          },
-        });
+        response = await getPaginatedServices(currentPage, pageSize)
+        // response = await axios.get(`${BASE_URL}/api/services/paginated`, {
+        //   params: {
+        //     pageIndex: currentPage,
+        //     pageSize: pageSize,
+        //   },
+        // });
       }
 
       if (response.data.statusCode === 200) {

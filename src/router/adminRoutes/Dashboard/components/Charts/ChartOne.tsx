@@ -1,10 +1,34 @@
+import { getChartData } from '@/services/ApiServices/subscriptionService';
+import { notification } from 'antd';
 import { ApexOptions } from 'apexcharts';
 import React, { useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const options: ApexOptions = {
+interface ChartOneState {
+  series: {
+    name: string;
+    data: number[];
+  }[];
+}
+
+const ChartOne: React.FC = () => {
+  const state: ChartOneState = ({
+  // const [state, setState] = useState<ChartOneState>({
+    series: [
+      {
+        name: 'Subscription 1',
+        data: [50, 40, 60, 80, 70, 100, 90, 120, 130, 140, 110, 150],
+      },
+      {
+        name: 'Subscription 2',
+        data: [40, 50, 70, 60, 80, 110, 100, 130, 120, 150, 140, 160],
+      },
+    ],
+  });
+
+  const options: ApexOptions = {
   legend: {
     show: false,
     position: 'top',
@@ -101,33 +125,28 @@ const options: ApexOptions = {
   },
 };
 
-interface ChartOneState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
-}
-
-const ChartOne: React.FC = () => {
-  const state: ChartOneState = ({
-  // const [state, setState] = useState<ChartOneState>({
-    series: [
-      {
-        name: 'Subscription 1',
-        data: [50, 40, 60, 80, 70, 100, 90, 120, 130, 140, 110, 150],
-      },
-      {
-        name: 'Subscription 2',
-        data: [40, 50, 70, 60, 80, 110, 100, 130, 120, 150, 140, 160],
-      },
-    ],
-  });
-
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
 
-  const handleDateChange = () => {
+  const handleDateChange = async () => {
     // Apply logic to filter data by date range
+    if (!fromDate || !toDate) {
+      notification.error({
+        message: 
+        'Please select both start and end dates.',
+      })
+      return;
+    }
+    if(fromDate > toDate) {
+        notification.error({
+            message: 
+            'Please select a valid date range.',
+        })
+        return;
+    }
+    const chartData = await getChartData(fromDate.toLocaleString(), toDate.toLocaleString());
+    console.log('Chart data:', chartData);
+
     console.log('Filtering data from:', fromDate, 'to:', toDate);
   };
 
