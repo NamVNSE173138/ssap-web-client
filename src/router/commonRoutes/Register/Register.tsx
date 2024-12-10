@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaEnvelope, FaEye, FaEyeSlash, FaIdBadge, FaImage, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUsers } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaEyeSlash, FaIdBadge, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUsers } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NotifyNewUser } from "@/services/ApiServices/notification";
-import { notification } from "antd";
+import { Modal, notification } from "antd";
 import { MdPersonPin } from "react-icons/md";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import { addProviderDetails } from "@/services/ApiServices/providerService";
@@ -21,6 +21,7 @@ import { Table, TableBody, TableContainer } from "@mui/material";
 import DocumentRows from "./DocumentRows";
 import { Button } from "@/components/ui/button";
 import { HiOutlinePlusCircle } from "react-icons/hi";
+import { forgotPassword, sendOtp, verifyOtp } from "@/services/ApiServices/accountService";
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -35,7 +36,6 @@ const formSchema = z.object({
       (value) => /^\d+$/.test(value) && value.length === 10,
       "Phone number must be exactly 10 digits"
     ),
-  fullName: z.string().min(1, "Full name is required"),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" })
@@ -75,7 +75,6 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState(null);
   const error = null
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState(5);
@@ -83,14 +82,17 @@ const Register = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [rowId, setRowId] = useState<number>(0);
-  const [rows, setRows] = useState<any[]>([
-    //{ id: 1, name: 'CV', type: "PDF", file: null, isNew: false },
-    //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
-  ]);
+  const [rows, setRows] = useState<any[]>([]);
+  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
-    const newRow = { id: rowId + 1, name: "", type: "" }; // Blank row for user input
+    const newRow = { id: rowId + 1, name: "", type: "" };
     setRows([...rows, newRow]);
   };
 
@@ -116,7 +118,6 @@ const Register = () => {
       username: "",
       email: "",
       phoneNumber: "",
-      fullName: "",
       password: "",
       address: "",
       roleId: selectedRole,
@@ -125,9 +126,7 @@ const Register = () => {
       contactPersonName: selectedRole === 5 ? null : "",
       documents: selectedRole === 5 ? null : [],
     },
-  });  
-
-  // const formRef = useRef<HTMLFormElement | null>(null);
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState);
@@ -150,6 +149,12 @@ const Register = () => {
       setValue("documents", []);
     }
   }, [selectedRole, setValue]);
+
+  useEffect(() => {
+    if (currentStep === 3) {
+      setValue("email", email);
+    }
+  }, [currentStep, email, setValue]);
 
   const handleRegisterSubmit = async (data: any) => {
     console.log(error)
@@ -271,9 +276,6 @@ const Register = () => {
 
       for (const row of rows) {
         if (!row.name || !row.type || !row.file) return;
-
-        // const formData = new FormData();
-        // formData.append("File", row.file);
         const name = await uploadFile([row.file]);
 
         const documentData = {
@@ -370,9 +372,6 @@ const Register = () => {
 
       for (const row of rows) {
         if (!row.name || !row.type || !row.file) return;
-
-        // const formData = new FormData();
-        // formData.append("File", row.file);
         const name = await uploadFile([row.file]);
 
         const documentData = {
@@ -412,8 +411,6 @@ const Register = () => {
     }
     console.log(selectedRole)
     if (selectedRole === 4) {
-      // console.log(data);
-
       handleRegisterSubmitProvider(data);
     } else if (selectedRole === 2) {
       handleRegisterSubmitFunder(data);
@@ -427,12 +424,54 @@ const Register = () => {
   };
 
   const handleNextStep = () => {
+    if (currentStep === 2) {
+      setOtp("");
+    }
+
     setCurrentStep(currentStep + 1);
   };
+
 
   const handleBackStep = () => {
     setCurrentStep(currentStep - 1);
   };
+
+  const handleSendOtp = () => {
+    setIsDialogVisible(true);
+  };
+
+  const confirmSendOtp = async () => {
+    try {
+      setIsDialogVisible(false);
+      await sendOtp(email);
+      notification.success({
+        message: "We have sent an email to verify",
+      });
+      setIsOtpSent(true);
+    } catch (error: any) {
+      notification.error({
+        message: "Failed to send OTP",
+        description: error.response?.data?.message || "Please try again later.",
+      });
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      setIsVerifyingOtp(true);
+      await verifyOtp(email, otp);
+      notification.success({ message: "OTP verified successfully! Now you can next step" });
+      setIsOtpVerified(true);
+    } catch (error: any) {
+      notification.error({
+        message: "Invalid OTP",
+        description: "The OTP you entered is incorrect. Please try again.",
+      });
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
 
   return (
     <div className="h-full">
@@ -463,6 +502,10 @@ const Register = () => {
               <div className="h-1 w-20 bg-gray-300 mx-2"></div>
               <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 3 ? "bg-blue-600" : "bg-gray-300"}`}>
                 3
+              </div>
+              <div className="h-1 w-20 bg-gray-300 mx-2"></div>
+              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 4 ? "bg-blue-600" : "bg-gray-300"}`}>
+                4
               </div>
             </div>
 
@@ -528,11 +571,100 @@ const Register = () => {
                   </p>
                 </div>
               </div>
+            )}
+            {currentStep === 2 && (
+              <div>
+                <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                  Verify Step
+                </h2>
+                <div className="space-y-6 overflow-y-auto max-h-[270px]">
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <span className="text-black-600 text-2xl">Enter your email</span>
+                  </h3>
 
+                  <div className="flex justify-center">
+                    <div className="space-y-1 w-3/4">
+                      <div className="flex items-center border p-3 rounded-md border-gray-400">
+                        <input
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="Enter your email"
+                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="bg-blue-600 text-white p-2 rounded ml-5"
+                      onClick={handleSendOtp}
+                    >
+                      Send OTP
+                    </button>
+                  </div>
+
+                  <Modal
+                    title="Confirm Email"
+                    open={isDialogVisible}
+                    onOk={confirmSendOtp}
+                    onCancel={() => setIsDialogVisible(false)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <p>Are you sure you want to use this email: <strong>{email}</strong> for our website?</p>
+                  </Modal>
+
+                  {isOtpSent && (
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <span className="text-black-600 text-2xl">Enter OTP</span>
+                      </h3>
+                      <div className="flex justify-center">
+                        <div className="space-y-1 w-3/4">
+                          <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            <input
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              placeholder="Enter your OTP"
+                              className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="bg-blue-600 text-white p-2 rounded ml-5"
+                          onClick={handleVerifyOtp}
+                          disabled={isVerifyingOtp}
+                        >
+                          {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 flex justify-between">
+                  <button
+                    onClick={handleBackStep}
+                    className="bg-gray-200 text-gray-700 p-3 rounded-md w-1/4 hover:bg-gray-300 transition-colors duration-300"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={handleNextStep}
+                    disabled={!isOtpVerified || !selectedRole}
+                    className={`bg-blue-600 text-white p-3 rounded-md w-1/4 hover:bg-blue-700 transition-colors duration-300 ${!isOtpVerified || !selectedRole ? 'bg-gray-400 cursor-not-allowed' : ''
+                      }`}
+                  >
+                    Next Step
+                  </button>
+
+                </div>
+              </div>
             )}
 
+
             <form onSubmit={handleSubmit(handleFormSubmit)}>
-              {currentStep === 2 && (
+              {currentStep === 3 && (
                 <div>
                   <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Fill in Your Information</h2>
                   <div className="space-y-6 overflow-y-auto max-h-[270px]">
@@ -540,198 +672,212 @@ const Register = () => {
                       <span className="text-black-600">📋</span>
                       <span className="text-black-600 text-2xl">Basic Information</span>
                     </h3>
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <FaUser className="inline text-blue-600 mr-2" /> Username
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          {...register("username")}
-                          placeholder="Enter your username"
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                        />
+                    <div className="flex justify-center">
+                      <div className="space-y-1 w-3/4">
+                        <label className="block text-gray-700 font-medium">
+                          <FaUser className="inline text-blue-600 mr-2" /> Username
+                        </label>
+                        <div className="flex items-center border p-3 rounded-md border-gray-400">
+                          <input
+                            {...register("username")}
+                            placeholder="Enter your username"
+                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                          />
+                        </div>
+                        {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                       </div>
-                      {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <FaEnvelope className="inline text-blue-600 mr-2" /> Email
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          {...register("email")}
-                          placeholder="Enter your email"
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                        />
+                    <div className="flex justify-center">
+                      <div className="space-y-1 w-3/4">
+                        <label className="block text-gray-700 font-medium">
+                          <FaEnvelope className="inline text-blue-600 mr-2" /> Email
+                        </label>
+                        <div className="flex items-center border p-3 rounded-md border-gray-400">
+                          <input
+                            {...register("email")}
+                            value={email}
+                            disabled
+                            placeholder="Enter your email"
+                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                          />
+                        </div>
+                        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                       </div>
-                      {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <FaPhoneAlt className="inline text-blue-600 mr-2" /> Phone Number
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          {...register("phoneNumber")}
-                          placeholder="Enter your phone number"
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                        />
+                    <div className="flex justify-center">
+                      <div className="space-y-1 w-3/4">
+                        <label className="block text-gray-700 font-medium">
+                          <FaPhoneAlt className="inline text-blue-600 mr-2" /> Phone Number
+                        </label>
+                        <div className="flex items-center border p-3 rounded-md border-gray-400">
+                          <input
+                            {...register("phoneNumber")}
+                            placeholder="Enter your phone number"
+                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                          />
+                        </div>
+                        {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
                       </div>
-                      {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <MdPersonPin className="inline text-blue-600 mr-2" /> Full Name
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          {...register("fullName")}
-                          placeholder="Enter your full name"
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                        />
+                    <div className="flex justify-center">
+                      <div className="space-y-1 w-3/4">
+                        <label className="block text-gray-700 font-medium">
+                          <FaKey className="inline text-blue-600 mr-2" /> Password
+                        </label>
+                        <div className="flex items-center border p-3 rounded-md border-gray-400">
+                          <input
+                            {...register("password")}
+                            placeholder="Enter your password"
+                            type={showPassword ? "text" : "password"}
+                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                          />
+                          <div className="ml-3 cursor-pointer" onClick={togglePasswordVisibility}>
+                            {showPassword ? (
+                              <FaEyeSlash className="text-gray-500" />
+                            ) : (
+                              <FaEye className="text-gray-500" />
+                            )}
+                          </div>
+                        </div>
+                        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                       </div>
-                      {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <FaKey className="inline text-blue-600 mr-2" /> Password
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          {...register("password")}
-                          placeholder="Enter your password"
-                          type={showPassword ? "text" : "password"}
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                        />
-                        <div className="ml-3 cursor-pointer" onClick={togglePasswordVisibility}>
-                          {showPassword ? (
-                            <FaEyeSlash className="text-gray-500" />
-                          ) : (
-                            <FaEye className="text-gray-500" />
-                          )}
+                    <div className="flex justify-center">
+                      <div className="space-y-1 w-3/4">
+                        <label className="block text-gray-700 font-medium">
+                          <FaMapMarkedAlt className="inline text-blue-600 mr-2" /> Address
+                        </label>
+                        <div className="flex items-center border p-3 rounded-md border-gray-400">
+                          <input
+                            {...register("address")}
+                            placeholder="Enter your address"
+                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                          />
+                        </div>
+                        {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center">
+                      <div className="space-y-1 w-3/4">
+                        <label className="block text-gray-700 font-medium">
+                          <FaImage className="inline text-blue-600 mr-2" /> Upload Avatar
+                        </label>
+                        <div className="flex items-center border p-3 rounded-md border-gray-400">
+                          <input
+                            type="file"
+                            onChange={handleFileChange}
+                            className="w-full text-gray-800 p-3 focus:outline-none"
+                            accept="image/*"
+                          />
                         </div>
                       </div>
-                      {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <FaMapMarkedAlt className="inline text-blue-600 mr-2" /> Address
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          {...register("address")}
-                          placeholder="Enter your address"
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                        />
-                      </div>
-                      {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="block text-gray-700 font-medium">
-                        <FaImage className="inline text-blue-600 mr-2" /> Upload Avatar
-                      </label>
-                      <div className="flex items-center border p-3 rounded-md border-gray-400">
-                        <input
-                          type="file"
-                          onChange={handleFileChange}
-                          className="w-full text-gray-800 p-3 focus:outline-none"
-                          accept="image/*"
-                        />
-                      </div>
-                    </div>
                     {(selectedRole === 4 || selectedRole === 2) && (
                       <>
                         <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
                           <span className="text-black-600">📋</span>
-                          <span className="text-black-600 text-2xl">Necessary information</span>
+                          <span className="text-black-600 text-2xl flex items-center gap-2">
+                            Necessary Information
+                            <FaInfoCircle
+                              className="text-gray-600 cursor-pointer"
+                              title="You must provide more information for us to check your business"
+                            />
+                          </span>
                         </h3>
-                        <div className="space-y-1">
-                          <label className="block text-gray-700 font-medium">
-                            Organization Name
-                          </label>
-                          <div className="flex items-center border p-3 rounded-md border-gray-400">
-                            <input
-                              {...register("organizationName")}
-                              placeholder="Enter your organization name"
-                              className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                            />
+                        <div className="flex justify-center">
+                          <div className="space-y-1 w-3/4">
+                            <label className="block text-gray-700 font-medium">
+                              Organization Name
+                            </label>
+                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                              <input
+                                {...register("organizationName")}
+                                placeholder="Enter your organization name"
+                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                              />
+                            </div>
+                            {errors.organizationName && (
+                              <p className="text-red-500 text-sm">{errors.organizationName.message}</p>
+                            )}
                           </div>
-                          {errors.organizationName && (
-                            <p className="text-red-500 text-sm">{errors.organizationName.message}</p>
-                          )}
                         </div>
 
-                        <div className="space-y-1">
-                          <label className="block text-gray-700 font-medium">
-                            Contact Person Name
-                          </label>
-                          <div className="flex items-center border p-3 rounded-md border-gray-400">
-                            <input
-                              {...register("contactPersonName")}
-                              placeholder="Enter contact person name"
-                              className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                            />
+                        <div className="flex justify-center">
+                          <div className="space-y-1 w-3/4">
+                            <label className="block text-gray-700 font-medium">
+                              Contact Person Name
+                            </label>
+                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                              <input
+                                {...register("contactPersonName")}
+                                placeholder="Enter contact person name"
+                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                              />
+                            </div>
+                            {errors.contactPersonName && (
+                              <p className="text-red-500 text-sm">{errors.contactPersonName.message}</p>
+                            )}
                           </div>
-                          {errors.contactPersonName && (
-                            <p className="text-red-500 text-sm">{errors.contactPersonName.message}</p>
-                          )}
                         </div>
 
-                        <div className="space-y-4">
-                          <label className="block text-gray-700 font-medium">
-                            Documents
-                          </label>
+                        <div className="space-y-4 flex justify-center w-full">
+                          <div className="w-3/4">
+                            <label className="block text-gray-700 font-medium">
+                              Documents
+                            </label>
+                            <div className="">
+                              <Button
+                                type="button"
+                                onClick={handleAddRow}
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                              >
+                                <HiOutlinePlusCircle className="text-2xl" />
+                                <span className="font-medium">Add Extend Document</span>
+                              </Button>
+                            </div>
 
-                          <Button
-                            type="button"
-                            onClick={handleAddRow}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
-                          >
-                            <HiOutlinePlusCircle className="text-2xl" />
-                            <span className="font-medium">Add Extend Document</span>
-                          </Button>
+                            <div className="mt-4 p-4 rounded-lg border border-gray-300 bg-white shadow-md">
+                              <div className="overflow-x-auto">
+                                <TableContainer>
+                                  <Table className="min-w-full">
+                                    <TableBody>
+                                      {rows && rows.length > 0 && rows.map((row: any) => (
+                                        <DocumentRows
+                                          key={row.id}
+                                          row={row}
+                                          setRows={setRows}
+                                          documentType={[
+                                            "Provider’s Organizational Profile",
+                                            "Quality Assurance Certificate",
+                                            "Curriculum Vitae (CV) of Lead Instructor",
+                                            "Proof of Financial Capacity",
+                                            "Funder’s Organizational Profile",
+                                            "Others"
+                                          ]}
+                                          handleDeleteRow={handleDeleteRow}
+                                          handleInputChange={handleDocumentInputChange}
+                                        />
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </TableContainer>
+                              </div>
+                            </div>
 
-                          <div className="mt-4 p-4 rounded-lg border border-gray-300 bg-white shadow-md">
-                            <TableContainer>
-                              <Table>
-                                <TableBody>
-                                  {rows && rows.length > 0 && rows.map((row: any) => (
-                                    <DocumentRows
-                                      key={row.id}
-                                      row={row}
-                                      setRows={setRows}
-                                      documentType={[
-                                        "Provider’s Organizational Profile",
-                                        "Quality Assurance Certificate",
-                                        "Curriculum Vitae (CV) of Lead Instructor",
-                                        "Proof of Financial Capacity",
-                                        "Funder’s Organizational Profile",
-                                        "Others"
-                                      ]}
-                                      handleDeleteRow={handleDeleteRow}
-                                      handleInputChange={handleDocumentInputChange}
-                                    />
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
+
+                            {errors.documents && (
+                              <p className="text-red-500 text-sm mt-2">{errors.documents.message}</p>
+                            )}
                           </div>
-
-                          {/* Error Message */}
-                          {errors.documents && (
-                            <p className="text-red-500 text-sm mt-2">{errors.documents.message}</p>
-                          )}
                         </div>
-
                       </>
                     )}
-
                   </div>
 
                   <div className="mt-6 flex justify-between">
@@ -750,9 +896,10 @@ const Register = () => {
                     </button>
                   </div>
                 </div>
+
               )}
 
-              {currentStep === 3 && (
+              {currentStep === 4 && (
                 <div>
                   <div className="overflow-y-auto max-h-[300px]">
                     <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center ">Preview Your Details</h2>
@@ -806,12 +953,7 @@ const Register = () => {
                           </p>
                         </div>
 
-                        <div className="flex items-center space-x-3">
-                          <FaIdBadge className="text-blue-600 text-2xl" />
-                          <p className="text-lg text-gray-800 font-medium">
-                            <strong>Full Name:</strong> {watch("fullName")}
-                          </p>
-                        </div>
+
                       </div>
                     </div>
                     <br></br>
@@ -819,24 +961,24 @@ const Register = () => {
                       <>
                         <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
                           <span className="text-black-600">📋</span>
-                          <span className="text-black-600 text-2xl">Necessary Information</span>
+                          <span className="text-black-600 text-2xl flex items-center gap-2">
+                            Necessary Information
+
+                          </span>
                         </h3>
                         <div className="space-y-4">
-                          {/* Organization Name */}
                           <div className="flex items-center space-x-3">
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Organization Name:</strong> {watch("organizationName") || "Not provided"}
                             </p>
                           </div>
 
-                          {/* Contact Person Name */}
                           <div className="flex items-center space-x-3">
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Contact Person Name:</strong> {watch("contactPersonName") || "Not provided"}
                             </p>
                           </div>
 
-                          {/* Documents */}
                           <div className="flex items-center space-x-3">
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Documents:</strong>
@@ -844,30 +986,20 @@ const Register = () => {
                                 rows.map((row: any, index: number) => (
                                   <div key={index} className="flex space-x-4">
                                     <div className="text-sm text-gray-700">
-                                      <strong># {index + 1}</strong>
+                                      <strong>#{index + 1}</strong>
                                     </div>
 
                                     <div className="text-sm text-gray-700">
-                                      <strong>Name:</strong> {row.name?.length > 10 ? `${row.name.substring(0, 10)}...` : row.name}
+                                      <strong>Name:</strong> {row.name?.length > 10 ? `${row.name.substring(0, 15)}...` : row.name}
                                     </div>
 
                                     <div className="text-sm text-gray-700">
                                       <strong>Type:</strong> {row.type}
                                     </div>
-
-                                    <div className="text-sm text-gray-700">
-                                      <strong>URL:</strong> {row.fileName ? (
-                                        <a target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                          {row.fileName.length > 20 ? `${row.fileName.substring(0, 20)}...` : row.fileName}
-                                        </a>
-                                      ) : (
-                                        <span className="text-gray-500">No File provided</span>
-                                      )}
-                                    </div>
                                   </div>
                                 ))
                               ) : (
-                                <span className="text-sm text-gray-700">No documents uploaded</span>
+                                <span className="text-lg text-gray-800 font-medium">No documents uploaded</span>
                               )}
                             </p>
                           </div>

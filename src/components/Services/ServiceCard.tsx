@@ -96,8 +96,15 @@ const ServiceCard = (service: ServiceType) => {
               color="#1eb2a6"
               className="transition-all transform hover:scale-125 hover:animate-wiggle ease-in-out duration-300"
             />
-            <p className="text-gray-800">{service.price ? `$${service.price.toFixed(2)}` : "Price not available"}</p>
+            <p className="text-gray-800">
+              {service.price === 0
+                ? "Free"
+                : service.price
+                  ? `$${service.price.toFixed(2)}`
+                  : "Price not available"}
+            </p>
           </div>
+
 
         </div>
       </div>
