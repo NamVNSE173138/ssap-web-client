@@ -80,7 +80,7 @@ export async function getPaginatedServices(
         }
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching paginated services:", error);
     throw error;
@@ -119,7 +119,7 @@ export async function getServicesByProviderPaginated(
         }
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching paginated services by provider ID:", error);
     throw error;

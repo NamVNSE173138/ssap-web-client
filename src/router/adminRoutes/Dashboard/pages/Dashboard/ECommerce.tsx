@@ -10,6 +10,7 @@ import { CurrencyDollarIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/s
 import formatCurrency from '@/lib/currency-formatter';
 import { countScholarshipProgram } from '@/services/ApiServices/scholarshipProgramService';
 import { countServices } from '@/services/ApiServices/serviceService';
+import { getRevenue } from '@/services/ApiServices/subscriptionService';
 
 const ECommerce: React.FC = () => {
     
@@ -26,13 +27,14 @@ const ECommerce: React.FC = () => {
             const response = await getAllAccounts();
             const scholarship = await countScholarshipProgram();
             const services = await countServices();
-            const wallet = await getAccountWallet(1)
+            //const wallet = await getAccountWallet(1)
+            const wallet = await getRevenue()
 
             //console.log(response);
             setScholarshipCount(scholarship.data);
             setServiceCount(services.data);
             setAccounts(response);
-            setRevenue(wallet.data.balance);
+            setRevenue(wallet.data);
         } catch (error) {
             setError((error as Error).message);
         } finally {
