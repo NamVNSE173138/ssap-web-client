@@ -392,14 +392,14 @@ const RequestHistory = () => {
   };
 
   const renderProviders = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 w-3/4">
       {providers.map((provider) => (
         <div
           key={provider.id}
-          className="bg-white border rounded-lg shadow-md overflow-hidden"
+          className="bg-white border rounded-lg shadow-md overflow-hidden "
         >
           <div
-            className="flex justify-between items-center p-4 bg-gradient-to-r from-cyan-400 to-cyan-600 text-white font-semibold cursor-pointer"
+            className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-400 to-blue-400 text-white font-semibold cursor-pointer"
             onClick={() => toggleProvider(provider.id)}
           >
             <div className="flex items-center space-x-3">
@@ -413,7 +413,7 @@ const RequestHistory = () => {
             )}
           </div>
           {expandedProvider === provider.id && (
-            <div className="p-4">{renderProviderServices(provider.id)}</div>
+            <div className="p-4 ">{renderProviderServices(provider.id)}</div>
           )}
         </div>
       ))}
@@ -477,7 +477,7 @@ const RequestHistory = () => {
         </Tabs>
       </div>
 
-      <div className="mt-6 p-6 bg-white rounded-lg shadow-md">
+      <div className="mt-6 p-6 bg-white rounded-lg shadow-md flex justify-center">
         {renderProviders()}
       </div>
     </div>

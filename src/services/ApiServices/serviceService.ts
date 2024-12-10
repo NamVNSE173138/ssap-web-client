@@ -41,7 +41,6 @@ export async function addService(serviceData: any) {
   const response = await axios.post(
     `${BASE_URL}/api/services`,
     serviceData,
-    ngrokSkipWarning
   );
   return response.data;
 }
@@ -61,4 +60,68 @@ export async function deleteService(id: number) {
     ngrokSkipWarning
   );
   return response.data;
+}
+
+export async function getPaginatedServices(
+  pageIndex: number = 1,
+  pageSize: number = 10,
+  sortBy: string = "name",
+  sortOrder: string = "asc"
+) {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/services/paginated`,
+      {
+        params: {
+          pageIndex,
+          pageSize,
+          sortBy,
+          sortOrder
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching paginated services:", error);
+    throw error;
+  }
+}
+
+export async function getServicesByProviderId(providerId: number) {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/services/by-provider-id/${providerId}`,
+      ngrokSkipWarning
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching services by provider ID:", error);
+    throw error;
+  }
+}
+
+export async function getServicesByProviderPaginated(
+  providerId: number,
+  pageIndex: number = 1,
+  pageSize: number = 10,
+  sortBy: string = "name",
+  sortOrder: string = "asc"
+) {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/services/by-provider-paginated/${providerId}`,
+      {
+        params: {
+          pageIndex,
+          pageSize,
+          sortBy,
+          sortOrder
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching paginated services by provider ID:", error);
+    throw error;
+  }
 }
