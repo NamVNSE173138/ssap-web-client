@@ -94,3 +94,9 @@ export async function SendNotificationAndEmailReject(email: string, content: str
   return response.data;
 }
 
+export async function AccountActiveEmail(userId: number) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/account-active/${userId}`
+  );
+  return response.data;
+}
