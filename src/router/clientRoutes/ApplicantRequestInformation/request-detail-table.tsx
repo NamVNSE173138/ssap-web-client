@@ -199,7 +199,7 @@ const RequestDetailTable = ({
         content: comment,
         rating,
       });
-      toast.success("Feedback updated successfully.");
+      notification.success({ message: "Feedback updated successfully." });
       setIsEditing(false);
       setOpenUserFeedbackDialog(false);
     } catch (error) {

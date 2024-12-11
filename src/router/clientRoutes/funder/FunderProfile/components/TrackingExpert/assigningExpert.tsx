@@ -21,14 +21,13 @@ const AssigningExpert = () => {
       }
 
       try {
-        // Step 1: Fetch Experts Created by Funder
+        
         const expertsResponse = await axios.get(
           `${BASE_URL}/api/funders/${funderId}/experts`
         );
         const fetchedExperts = expertsResponse.data.data || [];
         setExperts(fetchedExperts);
 
-        // Step 2: Fetch Assigned Applications for Each Expert
         const applicationsPromises = fetchedExperts.map((expert: any) =>
           axios
             .get(

@@ -12,7 +12,7 @@ import CreatedCard from "./CreatedCard";
 
 const Activity = () => {
   const user = useSelector((state: any) => state.token.user);
-  const role = user?.role; // Check the user role
+  const role = user?.role; 
   const funderId = user?.id;
 
   const [data, setData] =
@@ -20,35 +20,7 @@ const Activity = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // const fetchData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     if (role === "FUNDER") {
-  //       const response = await axios.get(
-  //         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
-  //       );
-  //       if (response.data.statusCode === 200) {
-  //         setData(response.data.data);
-  //       } else {
-  //         setError("Failed to fetch scholarship programs");
-  //       }
-  //     } else if (role === "PROVIDER") {
-  //       const response = await axios.get(
-  //         `${BASE_URL}/api/services/by-provider-id/${funderId}`
-  //       );
-  //       if (response.data.statusCode === 200) {
-  //         const activeServices = response.data.data.filter((service: any) => service.status === 'Active');
-  //         setServices(activeServices);
-  //       } else {
-  //         setError("Failed to fetch services");
-  //       }
-  //     }
-  //   } catch (err) {
-  //     setError((err as Error).message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -56,6 +28,8 @@ const Activity = () => {
       const response = await axios.get(
         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`,
       );
+      console.log("SCP", response.data.data);
+      
       if (response.data.statusCode === 200) {
         setData(response.data.data);
       } else {
@@ -81,7 +55,6 @@ const Activity = () => {
             {(role == "FUNDER" || role == "Funder") && (
               <Link
                 to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
-                // onClick={() => setIsScholarshipModalOpen(true)}
                 className="flex justify-start items-center hover:bg-[#419f97] text-[#1eb2a6] hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95 border border-[#1eb2a6]"
               >
                 <IoIosAddCircleOutline className="text-3xl  hover:text-white" />

@@ -44,12 +44,13 @@ const ApplicationHistorySection = (_props: any) => {
         const response = await fetch(
           `${BASE_URL}/api/applicants/${applicantId}/applications`,
         );
-
+          
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const data = await response.json();
+        console.log("APPLICANT HISTORY", data);
 
         if (data && Array.isArray(data.data)) {
           setApplications(data.data);
@@ -94,15 +95,13 @@ const ApplicationHistorySection = (_props: any) => {
                   key={application.id}
                   className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn"
                 >
-                  {/* Image at the top of the card */}
-                  <img
-                    src={FptLogo} // Replace with a dynamic image URL if available
+                  {/* <img
+                    src={FptLogo} 
                     alt={`Application ${application.id}`}
                     className="w-full h-32 object-cover rounded-lg mb-4"
-                  />
+                  /> */}
 
                   <p className="text-lg font-semibold text-gray-800 mb-1">
-                    {/* <span className="text-blue-600">ID:</span> {application.id} */}
                   </p>
                   <p className="text-sm text-gray-500 mb-2">
                     <strong className="text-indigo-500">Applied Date:</strong>{" "}
@@ -110,7 +109,7 @@ const ApplicationHistorySection = (_props: any) => {
                   </p>
                   <p
                     className={`text-sm font-semibold mb-4 ${
-                      application.status === "APPROVED"
+                      application.status === "APPROVED" || "Approved"
                         ? "text-green-600"
                         : application.status === "PENDING"
                           ? "text-yellow-500"
