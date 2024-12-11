@@ -396,7 +396,7 @@ const AccountApplicantDialog: React.FC<AccountApplicantDialogProps> = ({ open, o
                     <div className="mb-5">
                         <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                             <IoCloudUpload className="text-blue-500" />
-                            Add updated file:
+                            Add updated file (Optional):
                         </label>
 
                         <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
