@@ -45,12 +45,13 @@ const ApplicationHistorySection = (_props: any) => {
         const response = await fetch(
           `${BASE_URL}/api/applicants/${applicantId}/applications`
         );
-
+          
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const data = await response.json();
+        console.log("APPLICANT HISTORY", data);
 
         if (data && Array.isArray(data.data)) {
           setApplications(data.data);
@@ -96,24 +97,19 @@ const ApplicationHistorySection = (_props: any) => {
                   key={application.id}
                   className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn"
                 >
-                  {/* Image at the top */}
-                  <img
-                    src={FptLogo} // Replace with a dynamic image URL if available
-                    alt={`Application ${application.id}`}
-                    className="w-full h-32 object-cover rounded-lg mb-4"
-                  />
 
-                  {/* Applied Date */}
-                  <p className="text-sm text-gray-500 mb-2 flex items-center gap-2">
-                    <FaClock className="text-indigo-500" />
-                    <strong>Applied Date:</strong>{" "}
+
+                  <p className="text-lg font-semibold text-gray-800 mb-1">
+                  </p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    <strong className="text-indigo-500">Applied Date:</strong>{" "}
                     {new Date(application.appliedDate).toLocaleDateString()}
                   </p>
 
-                  {/* Status */}
+                 
                   <p
-                    className={`text-sm font-semibold mb-4 flex items-center gap-2 ${
-                      application.status === "APPROVED"
+                    className={`text-sm font-semibold mb-4 ${
+                      application.status === "APPROVED" || "Approved"
                         ? "text-green-600"
                         : application.status === "PENDING"
                         ? "text-yellow-500"

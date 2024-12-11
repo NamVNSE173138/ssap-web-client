@@ -1,27 +1,32 @@
 import RouteNames from "@/constants/routeNames";
 import { setToken, setUser } from "@/reducers/tokenSlice";
-import { GoogleAuth, LoginUser } from "@/services/ApiServices/authenticationService";
+import {
+  GoogleAuth,
+  LoginUser,
+} from "@/services/ApiServices/authenticationService";
 import parseJwt from "@/services/parseJwt";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import LoginImage from "../../../assets/login-image.jpg";
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import ValidationErrorMessage from "./components/ValidationErrorMessage";
 import { useToast } from "@/components/ui/use-toast";
 import RoleNames from "@/constants/roleNames";
-
+import { notification } from "antd";
 
 const formSchema = z.object({
-  email: z.string().min(1, { message: "Email is required." }).email("This is not a valid email."),
-  password: z.string().min(1, 'Password cannot be  empty'),
+  email: z
+    .string()
+    .min(1, { message: "Email is required." })
+    .email("This is not a valid email."),
+  password: z.string().min(1, "Password cannot be  empty"),
   role: z.string(),
 });
-
 
 const Login = () => {
   const navigate = useNavigate();
@@ -34,9 +39,9 @@ const Login = () => {
   const { register, handleSubmit, formState } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      role: '0',
+      email: "",
+      password: "",
+      role: "0",
     },
   });
 
@@ -56,22 +61,16 @@ const Login = () => {
       dispatch(setUser(userInfo));
       if (userInfo.role === RoleNames.ADMIN) {
         navigate("/admin");
-      }
-      else {
+      } else {
         navigate("/");
       }
-      toast({
-        title: "Login Successful.",
-        description: "Ready to find your perfect scholarship?",
-        duration: 5000,
-        variant: 'default',
-      });
+
+      notification.success({ message: "Login Successful" });
     } catch (error: any) {
       setIsLoading(false);
 
-
       if (error.response?.data?.message) {
-        console.log()
+        console.log();
         if (error.response.data.message === "Email not found") {
           setError("Email not found");
         } else if (error.response.data.message === "Wrong password") {
@@ -81,12 +80,7 @@ const Login = () => {
         }
       } else {
         setError("An error occurred. Please try again later.");
-        toast({
-          title: "Login Failed.",
-          description: "Now you can ....",
-          duration: 5000,
-          variant: 'destructive',
-        });
+        notification.error({ message: "Login Failed" });
       }
     }
   };
@@ -98,7 +92,7 @@ const Login = () => {
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
-        "An error occurred. Please try again later."
+          "An error occurred. Please try again later."
       );
     }
   };
@@ -125,7 +119,7 @@ const Login = () => {
             <form onSubmit={handleSubmit(handleLoginSubmit)} className="w-full">
               <div className="w-full flex flex-col mb-4 items-center">
                 <input
-                  {...register('email')}
+                  {...register("email")}
                   id="email"
                   type="email"
                   placeholder="Email"
@@ -133,13 +127,15 @@ const Login = () => {
                   aria-label="Username"
                 />
 
-                {errors.email && <ValidationErrorMessage error={errors.email.message} />}
+                {errors.email && (
+                  <ValidationErrorMessage error={errors.email.message} />
+                )}
                 <div className="w-[75%] text-black py-2 text-lg md:text-xl mb-3 bg-transparent border-b border-black focus:outline-none flex justify-between gap-2 items-center">
                   <input
-                    type={securePassword ? 'password' : 'text'}
+                    type={securePassword ? "password" : "text"}
                     id="password"
                     autoComplete="current-password"
-                    {...register('password')}
+                    {...register("password")}
                     placeholder="Password"
                     className="w-full bg-transparent focus:outline-none"
                     aria-label="Password"
@@ -156,7 +152,9 @@ const Login = () => {
                     />
                   )}
                 </div>
-                {errors.password && <ValidationErrorMessage error={errors.password.message} />}
+                {errors.password && (
+                  <ValidationErrorMessage error={errors.password.message} />
+                )}
               </div>
               <div className="w-full flex justify-center mb-10">
                 <Link

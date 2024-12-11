@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { createWallet, getAccountWallet, updateWalletBankInformation } from "@/services/ApiServices/accountService";
 import { createCheckoutSession, getTransactionsByWalletSenderId } from "@/services/ApiServices/paymentService";
-import { toast } from "react-toastify";
 // import { loadStripe } from '@stripe/stripe-js';
 
 const Wallet = () => {
@@ -128,7 +127,7 @@ const Wallet = () => {
       setWalletData(newWallet);
       setError(null);
       setIsOpenDialog(false);
-      toast.success("Create wallet successful!");
+      notification.success({ message: "Create wallet successfully!" });
     } catch (err) {
       notification.error({
         message: "Failed to create wallet.",
