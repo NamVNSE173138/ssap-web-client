@@ -18,8 +18,8 @@ import { getAllCategories } from "@/services/ApiServices/categoryService";
 import { SearchIcon } from "lucide-react";
 import { getAllCertificates } from "@/services/ApiServices/certificateService";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Slider } from "@mui/material";
-import { getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
-import { FaCalendarAlt, FaCircle, FaDollarSign } from "react-icons/fa";
+import { getAllScholarshipProgram, getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { FaCalendar, FaCalendarAlt, FaCircle, FaDollarSign, FaInfoCircle } from "react-icons/fa";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 const ScholarshipProgram = () => {
@@ -33,11 +33,12 @@ const ScholarshipProgram = () => {
   const [categories, setCategories] = useState<{ name: string }[]>([]);
   const [certificates, setCertificates] = useState<{ name: string }[]>([]);
 
-  const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 1400000]);
+  const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 50000]);
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
   const [scholarshipStatus, setScholarshipStatus] = useState<string>("");
   const [scholarshipCategory, setScholarshipCategory] = useState<string>("");
   const [scholarshipKeyword, setScholarshipKeyword] = useState<string>("");
+  const [fullData, setFullData] = useState<ScholarshipProgramType[]>(scholarshipProgram);
 
   const handleSearch = async () => {
     if (!scholarshipKeyword || scholarshipAmount[0] == null || scholarshipAmount[1] == null || !scholarshipCategory || !scholarshipStatus || !scholarshipDeadline) {
@@ -54,31 +55,25 @@ const ScholarshipProgram = () => {
         scholarshipCategory,
         scholarshipStatus,
         scholarshipDeadline && new Date(scholarshipDeadline).toISOString());
-      const scholarships = []
+
+      const scholarships = [];
       for (let res of response.data) {
         const scholarshipProgram = await getScholarshipProgram(res.id);
         scholarships.push(scholarshipProgram.data);
       }
-      setData(scholarships);
 
-      if (response.statusCode === 200) {
-      } else {
-        //setError("Failed to fetch data");
-      }
+      setData(scholarships);
+      filterScholarships();
     } catch (err) {
-      //setError((err as Error).message);
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
-
-
-    //console.log(scholarshipAmount, scholarshipDeadline, scholarshipStatus, scholarshipCategory);
   };
+
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/api/scholarship-programs`
-      );
+      const response = await getAllScholarshipProgram();
       const countryDatas = await getAllCountries();
       const majorDatas = await getAllMajors();
       const categoriesDatas = await getAllCategories();
@@ -86,6 +81,7 @@ const ScholarshipProgram = () => {
 
       if (response.data.statusCode === 200) {
         setData(response.data.data.items);
+        setFullData(response.data.data.items);
         setCountries(countryDatas.data);
         setMajors(majorDatas.data.items);
         setCategories(categoriesDatas.data);
@@ -100,34 +96,28 @@ const ScholarshipProgram = () => {
     }
   };
 
+  const filterScholarships = () => {
+    const dataFull = fullData;
+    const filteredScholarships = dataFull.filter((scholarship) => {
+      const scholarshipValue = scholarship.scholarshipAmount;
+      const scholarshipDeadlineDate = new Date(scholarship.deadline);
+
+      const isWithinAmountRange = scholarshipValue >= scholarshipAmount[0] && scholarshipValue <= scholarshipAmount[1];
+      const isAfterDeadline = scholarshipDeadline ? scholarshipDeadlineDate >= new Date(scholarshipDeadline) : true;
+
+      return isWithinAmountRange && isAfterDeadline;
+    });
+
+    setData(filteredScholarships);
+  };
+
   useEffect(() => {
-
-
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchCountriesData = async () => {
-  //     try {
-  //       const response = await axios.get(`${BASE_URL}/api/countries`);
-  //       console.log("Countries API Response:", response.data);
-  //       if (response.data.statusCode === 200) {
-  //         const countryNames = response.data.data.map(
-  //           (country: { name: string }) => ({
-  //             name: country.name,
-  //           })
-  //         );
-  //         setCountries(countryNames);
-  //       } else {
-  //         setError("Failed to fetch countries data");
-  //       }
-  //     } catch (err) {
-  //       setError((err as Error).message);
-  //     }
-  //   };
-
-  //   fetchCountriesData();
-  // }, []);
+  useEffect(() => {
+    filterScholarships();
+  }, [scholarshipAmount, data]);
 
   return (
     <div>
@@ -217,8 +207,6 @@ const ScholarshipProgram = () => {
 
         <div className="w-[250px] mt-10">
           <span className="bg-[#1eb2a6] w-[98%] mx-auto mb-3 rounded-full h-[3px] block"></span>
-
-          {/* Amount Accordion */}
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
@@ -235,7 +223,7 @@ const ScholarshipProgram = () => {
                 <Slider
                   aria-label="Scholarship Amount"
                   value={scholarshipAmount}
-                  max={1400000}
+                  max={50000}
                   onChange={(_: Event, value: number | number[]) =>
                     setScholarshipAmount(value as number[])
                   }
@@ -245,15 +233,13 @@ const ScholarshipProgram = () => {
                   }
                   marks={[
                     { value: 0, label: '$0' },
-                    { value: 1400000, label: 'Max' },
+                    { value: 50000, label: 'Max' },
                   ]}
                   disableSwap
                 />
               </Box>
             </AccordionDetails>
           </Accordion>
-
-          {/* Deadline Accordion */}
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
@@ -261,47 +247,24 @@ const ScholarshipProgram = () => {
               id="panel2-header"
             >
               <div className="flex items-center gap-3">
-                <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
-                <p className="font-semibold text-lg text-gray-800">Deadline After</p>
+                <FaCalendar className="text-[#1eb2a6] text-xl" />
+                <p className="font-semibold text-lg text-gray-800">Deadline</p>
+                <FaInfoCircle
+                  className="text-gray-600 cursor-pointer"
+                  title="The date you filter must be less than the deadline date of that scholarship."
+                />
               </div>
+
             </AccordionSummary>
             <AccordionDetails>
               <div className="flex items-center mb-5 border border-zinc-950 rounded-sm relative bg-white">
-                <FaCalendarAlt className="w-[20px] h-[20px] ml-3 text-[#1eb2a6]" />
+                <FaCalendar className="w-[20px] h-[20px] ml-3 text-[#1eb2a6]" />
                 <input
                   value={scholarshipDeadline}
                   onChange={(e) => setScholarshipDeadline(e.target.value)}
                   className="w-full outline-none py-[13px] pl-[16px] pr-[32px]"
                   type="date"
                 />
-              </div>
-            </AccordionDetails>
-          </Accordion>
-
-          {/* Status Accordion */}
-          <Accordion defaultExpanded>
-            <AccordionSummary
-              expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
-              aria-controls="panel3-content"
-              id="panel3-header"
-            >
-              <div className="flex items-center gap-3">
-                <FaCircle className="text-[#1eb2a6] text-xl" />
-                <p className="font-semibold text-lg text-gray-800">Status</p>
-              </div>
-            </AccordionSummary>
-            <AccordionDetails>
-              <div className="flex py-[13px] pl-[16px] pr-[32px] items-center mb-5 border border-zinc-950 rounded-sm relative bg-white">
-                <select
-                  value={scholarshipStatus}
-                  onChange={(e) => setScholarshipStatus(e.target.value)}
-                  className="w-full h-full outline-none bg-white focus:ring-2 focus:ring-sky-500"
-                >
-                  <option>Select scholarship status</option>
-                  <option value="ACTIVE">ACTIVE</option>
-                  <option value="FINISHED">FINISHED</option>
-                  <option value="INACTIVE">INACTIVE</option>
-                </select>
               </div>
             </AccordionDetails>
           </Accordion>
@@ -315,14 +278,14 @@ const ScholarshipProgram = () => {
             <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
               Error loading scholarship programs.
             </p>
-          ) : data.length == 0 ? (
+          ) : data.length === 0 ? (
             <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
               No scholarship programs found.
             </p>
           ) : (
-            data.map((service: any) => (
-              <li key={service.id}>
-                <Card {...service} />
+            data.map((scholarship: any) => (
+              <li key={scholarship.id}>
+                <Card {...scholarship} />
               </li>
             ))
           )}
