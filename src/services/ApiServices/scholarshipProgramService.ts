@@ -6,7 +6,7 @@ export async function getAllScholarshipProgram() {
     try {
         const response = await axios.get(`${BASE_URL}/api/scholarship-programs`);
         console.log('API response:', response.data);
-        return response.data;
+        return response;
     } catch (error: any) {
         console.error('API error:', error?.response?.data || error.message);
         throw error;
