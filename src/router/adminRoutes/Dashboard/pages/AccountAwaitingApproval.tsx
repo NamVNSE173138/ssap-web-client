@@ -6,7 +6,7 @@ import { FaTimesCircle } from "react-icons/fa";
 import { AiOutlineUser, AiOutlineCheckCircle } from "react-icons/ai";
 import { getProviderProfile } from "@/services/ApiServices/providerService";
 import { getFunderProfile } from "@/services/ApiServices/funderService";
-import { SendNotificationAndEmailReject } from "@/services/ApiServices/notification";
+import { AccountActiveEmail, SendNotificationAndEmailReject } from "@/services/ApiServices/notification";
 import { notification } from "antd";
 import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
 
@@ -100,6 +100,7 @@ const AccountAwaitingApproval = () => {
                 status: "Active",
                 roleName: user.roleName,
             });
+            await AccountActiveEmail(Number(user.accountId));
             notification.success({ message: "Account approved successfully." });
         } catch (error) {
             console.error("Error approving account:", error);

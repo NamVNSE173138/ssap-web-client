@@ -97,6 +97,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
 
     useEffect(() => {
             if(scholarship.numberOfAwardMilestones - 1 == awardMilestones.length){
+                
                 form.setValue("amount", scholarship.scholarshipAmount - 
                 awardMilestones.reduce((sum: number, award: any) => sum + award.amount, 0));
             }
@@ -170,8 +171,15 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                     <Input
                                         type="number"
                                         disabled={scholarship.numberOfAwardMilestones - 1 == awardMilestones.length}
-                                        onChange={(e) => form.setValue("amount", Number(e.target.value))}
-                                        value={form.getValues("amount")}
+                                        {...form.register("amount", {
+        setValueAs: (value) => (value === "" ? undefined : Number(value)), // Convert string to number
+        onChange: (e) => {
+            // Handle validation-friendly updates here if needed
+            form.setValue("amount", Number(e.target.value), {
+                shouldValidate: true,
+            });
+        },
+    })}                                        value={form.getValues("amount")}
                                         placeholder="Amount"
                                         className="ml-2 flex-1"
                                     />

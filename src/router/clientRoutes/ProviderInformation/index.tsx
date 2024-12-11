@@ -122,7 +122,7 @@ const ProviderInformation = () => {
         </div>
       </div>
 
-      <section className="bg-gray-200 py-12 shadow-xl rounded-lg">
+      <section className="bg-gray-100 py-12 shadow-xl rounded-lg">
         <div className="container mx-auto px-6">
           <div className="flex items-center gap-8 mb-10 bg-gradient-to-r from-cyan-500 to-blue-300 p-8 rounded-lg shadow-lg">
             <img

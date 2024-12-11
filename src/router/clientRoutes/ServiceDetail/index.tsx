@@ -676,7 +676,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                             <td className="p-4">
                               {new Date(
                                 feedback.feedbackDate
-                              ).toLocaleDateString()}
+                              ).toLocaleDateString('en-US')}
                             </td>
                           </tr>
                         ))}

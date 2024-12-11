@@ -670,7 +670,8 @@ const ChooseWinner = () => {
         setApplicants(
           response.data.filter(
             (row: any) =>
-              row.status == "Submitted" &&
+              (row.status == "Submitted" ||
+              row.status == "Reviewing") &&
               new Date(row.updatedAt) < new Date(scholarship.data.deadline)
           )
         );
