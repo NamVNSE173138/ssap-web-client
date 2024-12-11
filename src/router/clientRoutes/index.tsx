@@ -7,7 +7,6 @@ import Events from "./Events";
 import BlogDetail from "./BlogDetail";
 import BlogList from "./BlogList";
 import ScholarshipProgram from "./ScholarshipProgram";
-import Activity from "./Activity";
 import ChangePassword from "./ChangePassword";
 import Major from "./Major";
 import Chat from "./Chat";
@@ -107,10 +106,10 @@ const privateRoutes: RouteObject[] = [
     path: RouteNames.INFORMATION,
     element: <Information />,
   },
-  {
-    path: RouteNames.ACTIVITY,
-    element: <Activity />,
-  },
+  // {
+  //   path: RouteNames.ACTIVITY,
+  //   element: <Activity />,
+  // },
   {
     path: RouteNames.APPLICATION,
     element: <ApplyScholarship />,

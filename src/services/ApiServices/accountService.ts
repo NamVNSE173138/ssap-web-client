@@ -107,3 +107,29 @@ export async function updateWalletBankInformation(id: number, updateWalletBankIn
   return response.data;
 }
 
+export async function forgotPassword(email: string) {
+  const response = await axios.post(
+    `${BASE_URL}/api/accounts/forgot-password`,
+    { Email: email },
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function verifyOtp(email: string, otp: string) {
+  const response = await axios.post(
+    `${BASE_URL}/api/accounts/verify-otp`,
+    { Email: email, Otp: otp },
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
+export async function sendOtp(email:any) {
+  const response = await axios.post(
+    `${BASE_URL}/api/accounts/send-otp`,
+    { Email: email },
+    ngrokSkipWarning
+  );
+  return response.data;
+}

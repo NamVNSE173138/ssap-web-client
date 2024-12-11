@@ -3,7 +3,6 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ScholarshipProgramSkeleton from "../ScholarshipProgram/ScholarshipProgramSkeleton";
-import { CreatedCard } from "@/components/CreatedScholarshipProgram";
 import axios from "axios";
 import scholarshipProgram, {
   ScholarshipProgramType,
@@ -13,10 +12,11 @@ import AddServiceModal from "./AddServiceModal";
 import ServiceCard from "@/components/Services/ServiceCard";
 import { Link } from "react-router-dom";
 import RouteNames from "@/constants/routeNames";
+import CreatedCard from "../funder/FunderProfile/components/Activity/CreatedCard";
 
 const Activity = () => {
   const user = useSelector((state: any) => state.token.user);
-  const role = user?.role; // Check the user role
+  const role = user?.role; 
   const funderId = user?.id;
 
  
@@ -26,35 +26,6 @@ const Activity = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // const fetchData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     if (role === "FUNDER") {
-  //       const response = await axios.get(
-  //         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
-  //       );
-  //       if (response.data.statusCode === 200) {
-  //         setData(response.data.data);
-  //       } else {
-  //         setError("Failed to fetch scholarship programs");
-  //       }
-  //     } else if (role === "PROVIDER") {
-  //       const response = await axios.get(
-  //         `${BASE_URL}/api/services/by-provider-id/${funderId}`
-  //       );
-  //       if (response.data.statusCode === 200) {
-  //         const activeServices = response.data.data.filter((service: any) => service.status === 'Active');
-  //         setServices(activeServices);
-  //       } else {
-  //         setError("Failed to fetch services");
-  //       }
-  //     }
-  //   } catch (err) {
-  //     setError((err as Error).message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const fetchData = async () => {
     setLoading(true);
@@ -112,7 +83,6 @@ const Activity = () => {
           <div className="flex items-center"></div>
           {(role == "FUNDER" || role=="Funder") && (
             <Link to={RouteNames.FORM_CREATE_SCHOLARSHIP_PROGRAM}
-              // onClick={() => setIsScholarshipModalOpen(true)}
               className="flex justify-start items-center hover:bg-blue-400 hover:text-white transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95"
             >
               <IoIosAddCircleOutline className="text-3xl text-blue-500" />
@@ -152,11 +122,6 @@ const Activity = () => {
             )
           )}
         </menu>
-
-        {/* <CreateScholarshipModal
-          isOpen={isScholarshipModalOpen}
-          setIsOpen={setIsScholarshipModalOpen}
-        /> */}
         <AddServiceModal
           isOpen={isServiceModalOpen}
           setIsOpen={setIsServiceModalOpen}

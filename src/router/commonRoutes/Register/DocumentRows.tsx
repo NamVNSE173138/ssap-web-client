@@ -12,7 +12,7 @@ const DocumentRows = ({ row, setRows, documentType, handleDeleteRow, handleInput
         <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
   <TableCell component="th" scope="row">
     <Input
-      className={`w-full ${row.errors?.name ? 'border-red-500' : ''}`}
+      className={`w-[200px] ${row.errors?.name ? 'border-red-500' : ''}`}
       value={row.name}
       onChange={(e) => handleInputChange(row.id, 'name', e.target.value)}
       placeholder="Enter name"

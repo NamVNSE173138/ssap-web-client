@@ -227,12 +227,7 @@ const Service = () => {
       let hasMorePages = true;
 
       while (hasMorePages) {
-        const response = await axios.get(
-          `${BASE_URL}/api/services/by-provider-paginated/${user.id}`,
-          {
-            params: { pageIndex, pageSize },
-          }
-        );
+        const response = await getServicesByProviderPaginated(Number(user.id),currentPage,pageSize);
 
         if (response.data.statusCode === 200) {
           const services = response.data.data.items || [];

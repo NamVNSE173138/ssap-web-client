@@ -892,8 +892,8 @@ const ChooseWinner = () => {
             <p className="text-4xl font-semibold text-sky-600 flex items-center gap-2">
               <FaTrophy className="text-4xl text-sky-500" />
               Choose Scholarship Winner
-              <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
+            <div className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px] ml-12"></div>
             <p className="text-lg font-semibold my-5 text-gray-700">
               <span>The winners of this scholarship: </span>
               <span className="text-sky-500">{scholarshipWinners.length}</span>
