@@ -13,6 +13,7 @@ import {
   updateProviderProfile,
 } from "@/services/ApiServices/providerService";
 import { setUser } from "@/reducers/tokenSlice";
+import ServicesSection from "./components/ServicesSection";
 
 const ProviderProfile = () => {
   const dispatch = useDispatch();
@@ -247,8 +248,8 @@ const ProviderProfile = () => {
             previewUrl={previewUrl}
             setPreviewUrl={setPreviewUrl}
           />
-
-          <AuthSection />
+        <AuthSection />
+        <ServicesSection></ServicesSection>
         </div>
       </Tabs.Root>
     </div>

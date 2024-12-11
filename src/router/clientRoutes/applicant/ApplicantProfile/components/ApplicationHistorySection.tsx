@@ -5,6 +5,7 @@ import { BASE_URL } from "@/constants/api";
 import FptLogo from "@/assets/FPT_logo.jpg";
 import { Link } from "react-router-dom";
 import * as Tabs from "@radix-ui/react-tabs";
+import { FaCheckCircle, FaClock, FaTimesCircle, FaFileAlt } from "react-icons/fa";
 
 interface ApplicationDocument {
   id: number;
@@ -42,7 +43,7 @@ const ApplicationHistorySection = (_props: any) => {
 
       try {
         const response = await fetch(
-          `${BASE_URL}/api/applicants/${applicantId}/applications`,
+          `${BASE_URL}/api/applicants/${applicantId}/applications`
         );
           
         if (!response.ok) {
@@ -69,7 +70,9 @@ const ApplicationHistorySection = (_props: any) => {
 
   if (loading)
     return (
-      <div className="text-center text-blue-600 animate-pulse">Loading...</div>
+      <div className="text-center text-blue-600 animate-pulse">
+        Loading...
+      </div>
     );
   if (error)
     return (
@@ -85,21 +88,16 @@ const ApplicationHistorySection = (_props: any) => {
           <h2 className="text-3xl font-bold text-blue-700 mb-6 animate-slideIn">
             Application History
           </h2>
-          <Link to=""></Link>
           {applications.length === 0 ? (
             <p className="text-gray-600">No applications found.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {applications.map((application) => (
                 <div
                   key={application.id}
                   className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn"
                 >
-                  {/* <img
-                    src={FptLogo} 
-                    alt={`Application ${application.id}`}
-                    className="w-full h-32 object-cover rounded-lg mb-4"
-                  /> */}
+
 
                   <p className="text-lg font-semibold text-gray-800 mb-1">
                   </p>
@@ -107,18 +105,32 @@ const ApplicationHistorySection = (_props: any) => {
                     <strong className="text-indigo-500">Applied Date:</strong>{" "}
                     {new Date(application.appliedDate).toLocaleDateString()}
                   </p>
+
+                 
                   <p
                     className={`text-sm font-semibold mb-4 ${
                       application.status === "APPROVED" || "Approved"
                         ? "text-green-600"
                         : application.status === "PENDING"
-                          ? "text-yellow-500"
-                          : "text-red-600"
+                        ? "text-yellow-500"
+                        : "text-red-600"
                     }`}
                   >
+                    {application.status === "APPROVED" && (
+                      <FaCheckCircle className="text-green-600" />
+                    )}
+                    {application.status === "PENDING" && (
+                      <FaClock className="text-yellow-500" />
+                    )}
+                    {application.status === "REJECTED" && (
+                      <FaTimesCircle className="text-red-600" />
+                    )}
                     <strong>Status:</strong> {application.status}
                   </p>
-                  <h4 className="text-sm font-semibold text-blue-600 mb-2">
+
+                  {/* Documents */}
+                  <h4 className="text-sm font-semibold text-blue-600 mb-2 flex items-center gap-2">
+                    <FaFileAlt className="text-blue-600" />
                     Documents:
                   </h4>
                   <ul className="space-y-1">

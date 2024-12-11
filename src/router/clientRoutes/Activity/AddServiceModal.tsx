@@ -14,6 +14,7 @@ import { FormControl, MenuItem, Select, CircularProgress } from "@mui/material";
 import { FaClipboardList, FaDollarSign, FaFileAlt, FaPen, FaPlus, FaTimes, FaCheckCircle } from "react-icons/fa";
 import { IoDocumentText, IoListCircle, IoWarningOutline, IoPersonOutline, IoLockClosedOutline, IoShieldCheckmarkOutline, IoCalendarOutline, IoCloseCircleOutline } from "react-icons/io5";
 import { notification } from "antd";
+import { addService } from "@/services/ApiServices/serviceService";
 
 const serviceTypes = [
   { value: "CV_REVIEW", label: "CV Review" },
@@ -31,15 +32,25 @@ const serviceTypes = [
 ];
 
 const serviceFormSchema = z.object({
-  name: z.string().min(1, "Please enter the service name"),
+  name: z
+    .string()
+    .min(1, "Please enter the service name")
+    .max(40, "Service name must not exceed 40 characters"),
   description: z.string().min(1, "Please enter a description"),
-  type: z.string().min(1, "Please select a service type"),
-  price: z.string().refine((value) => !isNaN(parseFloat(value)), {
-    message: "Price must be a number",
-  }),
+  type: z
+    .string()
+    .min(1, "Please select a service type")
+    .refine((value) => value !== "", { message: "Service type is required" }),
+  price: z
+    .string()
+    .refine((value) => {
+      const parsedValue = parseFloat(value);
+      return !isNaN(parsedValue) && parsedValue >= 0;
+    }, { message: "Price must be a positive number" }),
   status: z.string().default("Active"),
   providerId: z.number(),
 });
+
 
 interface AddServiceModalProps {
   isOpen: boolean;
@@ -135,7 +146,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
   const handleSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${BASE_URL}/api/services`, values);
+      const response = await addService(values);
       console.log("Service created successfully:", response.data);
       setIsOpen(false);
       setSuccess(true);
@@ -250,18 +261,21 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                   </p>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="bg-blue-600 text-white hover:bg-blue-700 mt-6"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <CircularProgress size={24} className="text-white" />
-                  ) : (
-                    <FaPlus className="mr-2" />
-                  )}
-                  Add Service
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 text-white hover:bg-blue-700 mt-6 w-1/3 py-2 px-6 rounded-lg shadow-md transition-all"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <CircularProgress size={24} className="text-white" />
+                    ) : (
+                      <FaPlus className="mr-2" />
+                    )}
+                    {isSubmitting ? "Adding..." : "Add Service"}
+                  </Button>
+                </div>
+
               </form>
 
               {success && (

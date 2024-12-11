@@ -527,3 +527,4 @@ const CreateScholarshipModal = ({
 
 export default CreateScholarshipModal;
 
+

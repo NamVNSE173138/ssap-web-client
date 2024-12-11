@@ -47,3 +47,19 @@ export async function getSubscriptionByProviderId(providerId: number) {
     );
     return response.data;
 }
+
+export async function getRevenue() {
+    const response = await axios.get(
+        `${BASE_URL}/api/subscriptions/revenue`,
+        ngrokSkipWarning
+    );
+    return response.data;
+}
+
+export async function getChartData(from: string, to: string) {
+    const response = await axios.get(
+        `${BASE_URL}/api/subscriptions/subscription-sold?fromDate=${from}&toDate=${to}`,
+        ngrokSkipWarning
+    );
+    return response.data;
+}
