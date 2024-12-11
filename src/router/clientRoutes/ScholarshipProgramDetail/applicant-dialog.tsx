@@ -35,7 +35,8 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
 
   const submittingApplications = applications.filter(
     (application: any) =>
-      application.status == "Submitted" &&
+      (application.status == "Submitted" ||
+      application.status == "Reviewing") &&
       new Date(application.updatedAt) < new Date(scholarship.deadline)
   );
 

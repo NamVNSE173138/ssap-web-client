@@ -90,7 +90,7 @@ const ChatCard = () => {
             key={key}
           >
             <div className="relative h-14 w-14 rounded-full">
-              <img src={UserTwo} alt="User" />
+              <img className="relative h-14 w-14 rounded-full" src={chat.avatarUrl} alt="User" />
               <span
                 className="absolute right-0 bottom-0 h-3.5 w-3.5 rounded-full border-2 border-white"
                 style={{backgroundColor: "green"}}
@@ -106,7 +106,7 @@ const ChatCard = () => {
                   <span className="text-sm text-black dark:text-white">
                     {chat.email}
                   </span>
-                  <span className="text-xs"> . {chat.time} min</span>
+                  {/*<span className="text-xs"> . {chat.time} min</span>*/}
                 </p>
               </div>
               {/*chat.textCount !== 0 && (
