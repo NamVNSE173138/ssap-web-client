@@ -49,9 +49,9 @@ export async function getAllApplicantProfilesByApplicant(id: number) {
   return response.data;
 }
 
-export async function addApplicantProfile(profileData: any) {
+export async function addApplicantProfile(id:number, profileData: any) {
   const response = await axios.post(
-    `${BASE_URL}/api/applicants`,
+    `${BASE_URL}/api/applicants/${id}`,
     profileData,
     ngrokSkipWarning,
   );
