@@ -179,8 +179,8 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-blue-50 p-8">
-      <div className="w-1/3 bg-blue-200 border-r border-gray-200 p-5 overflow-y-auto rounded-lg shadow-lg">
+    <div className="flex h-screen bg-gray-100 p-8 gap-5">
+      <div className="w-1/3 bg-white border-r border-gray-200 p-5 overflow-y-auto rounded-lg shadow-xl ">
         <ul className="space-y-4">
           {accounts.map((account) => (
             <li
@@ -208,7 +208,7 @@ const Chat: React.FC = () => {
         </ul>
       </div>
 
-      <div className="flex-1 flex flex-col bg-blue-200 p-6 rounded-lg shadow-lg">
+      <div className="flex-1 flex flex-col bg-white p-6 rounded-lg shadow-lg">
         <div className="mb-4 flex items-center justify-between">
           {selectedUser ? (
             <h2 className="text-xl md:text-2xl font-semibold text-gray-800 flex items-center gap-2">

@@ -245,27 +245,6 @@ const Home = () => {
           <Background2 />
         </section>
       </div>
-
-      {/** DREAM DESTINATIONS */}
-      <div className="py-[40px] lg:py-[60px] bg-white">
-        <section className="px-[24px] 2xl:px-0 max-w-[1216px] mx-auto">
-          <div>
-              <p>DREAM DESTINATION</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-[20px] lg:gap-[32px]">
-              <div className="grid-cols-1">
-                <div className="relative group cursor-pointer rounded-[16px] bg-transparent w-[auto] h-[165px] xl:h-[340px] shadow-lg overflow-hidden">
-                  <div className="block relative w-full h-full">
-                    <div className="absolute w-full h-full">
-                      <img className="w-96 h-96" alt="" src="../../../assets/Australia.webp"/>
-                    </div>
-                    <div></div>
-                  </div>
-                </div>
-              </div>
-          </div>
-        </section>
-      </div>
     </>
   );
 };

@@ -5,7 +5,12 @@ import { BASE_URL } from "@/constants/api";
 import FptLogo from "@/assets/FPT_logo.jpg";
 import { Link } from "react-router-dom";
 import * as Tabs from "@radix-ui/react-tabs";
-import { FaCheckCircle, FaClock, FaTimesCircle, FaFileAlt } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaClock,
+  FaTimesCircle,
+  FaFileAlt,
+} from "react-icons/fa";
 
 interface ApplicationDocument {
   id: number;
@@ -45,13 +50,13 @@ const ApplicationHistorySection = (_props: any) => {
         const response = await fetch(
           `${BASE_URL}/api/applicants/${applicantId}/applications`
         );
-          
+        
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const data = await response.json();
-        console.log("APPLICANT HISTORY", data);
+        console.log("APPLICANT HISTORY", data.data);
 
         if (data && Array.isArray(data.data)) {
           setApplications(data.data);
@@ -70,9 +75,7 @@ const ApplicationHistorySection = (_props: any) => {
 
   if (loading)
     return (
-      <div className="text-center text-blue-600 animate-pulse">
-        Loading...
-      </div>
+      <div className="text-center text-blue-600 animate-pulse">Loading...</div>
     );
   if (error)
     return (
@@ -85,7 +88,7 @@ const ApplicationHistorySection = (_props: any) => {
     <Tabs.Content value="application-history">
       <div className="grid grid-cols-12">
         <div className="col-span-12 p-10">
-          <h2 className="text-3xl font-bold text-blue-700 mb-6 animate-slideIn">
+          <h2 className="text-3xl font-bold text-black mb-6 animate-slideIn">
             Application History
           </h2>
           {applications.length === 0 ? (
@@ -93,20 +96,16 @@ const ApplicationHistorySection = (_props: any) => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {applications.map((application) => (
-                <div
+                <Link
+                  to={`/scholarship-program/${application.scholarshipProgramId}`}
                   key={application.id}
                   className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn"
                 >
-
-
-                  <p className="text-lg font-semibold text-gray-800 mb-1">
-                  </p>
+                  <p className="text-lg font-semibold text-gray-800 mb-1"></p>
                   <p className="text-sm text-gray-500 mb-2">
-                    <strong className="text-indigo-500">Applied Date:</strong>{" "}
+                    <strong className="text-black">Applied Date:</strong>{" "}
                     {new Date(application.appliedDate).toLocaleDateString()}
                   </p>
-
-                 
                   <p
                     className={`text-sm font-semibold mb-4 ${
                       application.status === "APPROVED" || "Approved"
@@ -125,13 +124,13 @@ const ApplicationHistorySection = (_props: any) => {
                     {application.status === "REJECTED" && (
                       <FaTimesCircle className="text-red-600" />
                     )}
-                    <strong>Status:</strong> {application.status}
+                    <strong className="text-black">Status:</strong>{" "}
+                    {application.status}
                   </p>
 
-                  {/* Documents */}
-                  <h4 className="text-sm font-semibold text-blue-600 mb-2 flex items-center gap-2">
-                    <FaFileAlt className="text-blue-600" />
-                    Documents:
+                  <h4 className="text-sm font-semibold  mb-2 flex items-center gap-2">
+                    <FaFileAlt className="text-[#1eb2a6]" />
+                    <p className="text-black">Documents:</p>
                   </h4>
                   <ul className="space-y-1">
                     {application.applicationDocuments.map((doc) => (
@@ -148,7 +147,7 @@ const ApplicationHistorySection = (_props: any) => {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </Link>
               ))}
             </div>
           )}
