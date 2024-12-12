@@ -53,16 +53,6 @@ const HeaderAvatar = () => {
   };
 
   const handleProfileClick = () => {
-    // const token = localStorage.getItem("token");
-    // const decodedToken = parseJwt(token);
-    // const userId = decodedToken ? decodedToken.id : null;
-    //
-    // if (userId) {
-    //   navigate(`${RouteNames.ACCOUNT_INFO}`);
-    // } else {
-    //   console.error("User ID not found in token");
-    // }
-
     if (user) {
       if (user.role.toLowerCase() === RoleNames.APPLICANT.toLowerCase()) {
         navigate(`${RouteNames.APPLICANT_PROFILE}`);

@@ -7,7 +7,7 @@ const AccountSection = (props: any) => {
 
   return (
     <Tabs.Content value="account" className="pt-4">
-      <h2 className="text-xl font-bold mb-6">My Account</h2>
+      <h2 className="text-3xl text-black font-bold mb-6">My Account</h2>
       <div className="flex items-start gap-6">
         {/* Avatar */}
         <div className="flex-shrink-0">
