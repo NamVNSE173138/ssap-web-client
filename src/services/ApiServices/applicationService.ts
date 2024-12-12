@@ -56,3 +56,20 @@ export async function getApplicationByApplicantIdAndScholarshipId(applicantId: n
   );
   return response.data;
 }
+
+
+export async function fetchFirstReviewData(scholarshipId: string, token: string) {
+  const response = await axios.get(`${BASE_URL}/api/applications/reviews/result`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { isFirstReview: true, scholarshipProgramId: scholarshipId },
+  });
+  return response.data.data;
+}
+
+export async function fetchSecondReviewData(scholarshipId: string, token: string) {
+  const response = await axios.get(`${BASE_URL}/api/applications/reviews/result`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { isFirstReview: false, scholarshipProgramId: scholarshipId },
+  });
+  return response.data.data;
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
-import { BASE_URL } from "@/constants/api";
+
+import { fetchFirstReviewData } from "@/services/ApiServices/applicationService";
 
 interface FirstReviewProps {
   scholarshipId: string;
@@ -13,37 +13,21 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+ 
   useEffect(() => {
-    const fetchFirstReviewData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${BASE_URL}/api/applications/reviews/result`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            params: {
-              isFirstReview: true,
-              scholarshipProgramId: scholarshipId, 
-            },
-          }
-        );
-        console.log("REVIEW RESULT", response.data.data);
-        
-        if (response.data.statusCode === 200) {
-          setData(response.data.data); // Store the retrieved data
-        } else {
-          setError("Failed to fetch first review data"); // Set error if status code is not 200
-        }
+        const fetchedData = await fetchFirstReviewData(scholarshipId, token);
+        setData(fetchedData);   
       } catch (err) {
-        setError((err as Error).message); // Catch and display error message
+        setError((err as Error).message); 
       } finally {
-        setLoading(false); // Stop loading spinner once the request completes
+        setLoading(false); 
       }
     };
 
-    fetchFirstReviewData();
-  }, [scholarshipId, token]); // Re-run when scholarshipId or token changes
+    fetchData(); 
+  }, [scholarshipId, token]);
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
