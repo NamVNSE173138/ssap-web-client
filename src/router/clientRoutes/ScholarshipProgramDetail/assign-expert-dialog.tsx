@@ -436,13 +436,14 @@ import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { BASE_URL } from "@/constants/api";
 import { formatDate } from "@/lib/date-formatter";
+import { notification } from "antd";
 
 // Styled Autocomplete component to hide popup indicator
-const StyledAutocomplete = styled(Autocomplete)(() => ({
-  "& .MuiAutocomplete-popupIndicator": {
-    display: "none",
-  },
-}));
+// const StyledAutocomplete = styled(Autocomplete)(() => ({
+//   "& .MuiAutocomplete-popupIndicator": {
+//     display: "none",
+//   },
+// }));
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const [experts, setExperts] = useState<any[]>([]);
@@ -510,71 +511,185 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   };
 
   // Handle assigning expert to applications
+  // const assignExpert = async () => {
+  //   if (!selectedApplications.length || !selectedExpert) {
+  //     alert("Please select an expert and applications before assigning.");
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     // description: "Review assignment",
+  //     isFirstReview: true,
+  //     reviewDate: new Date().toISOString(),
+  //     expertId: selectedExpert.id,
+  //     applicationIds: selectedApplications,
+  //   };
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${BASE_URL}/api/applications/reviews/assign-expert`,
+  //       payload
+  //     );
+  //     if (response.status === 200) {
+  //       notification.success({ message: "Expert successfully assigned!" });
+  //       onClose();
+  //     } else {
+  //       notification.error({
+  //         message: "Failed to assign expert. Please try again.",
+  //       });
+  //     }
+  //   } catch (error: any) {
+  //     // alert(
+  //     //   `Failed to assign expert: ${
+  //     //     error.response?.data?.message || "Unknown error"
+  //     //   }`
+  //     // );
+  //     notification.error({
+  //       message: `Failed to assign expert: ${
+  //         error.response?.data?.message || "Unknown error"
+  //       }`,
+  //     });
+  //   }
+  // };
   const assignExpert = async () => {
     if (!selectedApplications.length || !selectedExpert) {
       alert("Please select an expert and applications before assigning.");
       return;
     }
-
-    const payload = {
-      description: "Review assignment",
-      reviewDate: new Date().toISOString(),
-      expertId: selectedExpert.id,
-      applicationIds: selectedApplications,
-    };
-
+  
     try {
+      // Fetch scholarship program details
+      const scholarshipResponse = await axios.get(
+        `${BASE_URL}/api/scholarship-programs/${scholarshipId}`
+      );
+  
+      const scholarshipData = scholarshipResponse.data.data;
+      const reviewMilestones = scholarshipData.reviewMilestones;
+  
+      // Get current date and time
+      const currentDate = new Date();
+  
+      let isFirstReview = true; // Default value for the first review
+  
+      if (reviewMilestones && reviewMilestones.length > 0) {
+        // Find the second review milestone by its description
+        const secondReviewMilestone = reviewMilestones.find(
+          (milestone: any) =>
+            milestone.description.toLowerCase() === "interview"
+        );
+  
+        if (secondReviewMilestone) {
+          const secondReviewStart = new Date(secondReviewMilestone.fromDate);
+          const secondReviewEnd = new Date(secondReviewMilestone.toDate);
+  
+          // If current date falls within the second review period
+          if (
+            currentDate >= secondReviewStart &&
+            currentDate <= secondReviewEnd
+          ) {
+            isFirstReview = false; // Second review assignment
+          }
+        }
+      }
+  
+      const payload = {
+        isFirstReview,
+        reviewDate: currentDate.toISOString(),
+        expertId: selectedExpert.id,
+        applicationIds: selectedApplications, // Assign selected applications
+      };
+  
+      // Post the new assignment
       const response = await axios.post(
         `${BASE_URL}/api/applications/reviews/assign-expert`,
         payload
       );
+  
       if (response.status === 200) {
-        alert("Expert successfully assigned!");
-        onClose(); // Close dialog after assignment
+        notification.success({ message: "Expert successfully assigned!" });
+        onClose();
       } else {
-        alert("Failed to assign expert. Please try again.");
+        notification.error({
+          message: "Failed to assign expert. Please try again.",
+        });
       }
     } catch (error: any) {
-      alert(
-        `Failed to assign expert: ${
+      notification.error({
+        message: `Failed to assign expert: ${
           error.response?.data?.message || "Unknown error"
-        }`
-      );
+        }`,
+      });
     }
   };
+  
+  
+  
+  
+
 
   console.log("EXPERT", experts);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-      <DialogTitle>Assign Expert</DialogTitle>
+      
       <div className="p-5">
         {/* Step 1: Select Expert */}
         {step === 1 && (
           <>
-            <h3>Select Expert:</h3>
+            {/* <h3>Select Expert:</h3> */}
+            <DialogTitle>Select Expert</DialogTitle>
             {loading ? (
               <CircularProgress />
             ) : (
-              <StyledAutocomplete
-                options={experts} 
-                getOptionLabel={(option: any) => option.username}
-                onChange={(_event, newValue) => handleExpertSelection(newValue)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search Experts"
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                )}
-              />
+              <>
+                {/* Search Bar */}
+                <TextField
+                  fullWidth
+                  placeholder="Search Experts"
+                  onChange={(e) => {
+                    const searchValue = e.target.value.toLowerCase();
+                    setExperts((prevExperts) =>
+                      prevExperts.map((expert) => ({
+                        ...expert,
+                        isVisible: expert.username
+                          .toLowerCase()
+                          .includes(searchValue),
+                      }))
+                    );
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+
+                {/* Experts List */}
+                <List>
+                  {experts
+                    .filter((expert) => expert.isVisible !== false) // Show only visible experts
+                    .map((expert: any) => (
+                      <ListItem
+                        key={expert.id}
+                        component="div"
+                        onClick={() => handleExpertSelection(expert)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <ListItemText
+                          primary={expert.username}
+                          secondary={`Major: ${expert.major || "N/A"}`}
+                        />
+                      </ListItem>
+                    ))}
+
+                  {/* Fallback if no experts match the search */}
+                  {experts.every((expert) => expert.isVisible === false) && (
+                    <p>No experts match your search.</p>
+                  )}
+                </List>
+              </>
             )}
           </>
         )}
@@ -582,7 +697,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         {/* Step 2: Select Applications */}
         {step === 2 && (
           <>
-            <h3>Select Applications:</h3>
+            <DialogTitle>Select Applications</DialogTitle>
             <List>
               {applications.map((application: any) => (
                 <ListItem key={application.id}>
@@ -599,20 +714,38 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 </ListItem>
               ))}
             </List>
-            <Button
+            {/* <Button
               variant="contained"
               onClick={() => setStep(3)}
               disabled={!selectedApplications.length}
             >
               Next
-            </Button>
+            </Button> */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "1rem",
+              }}
+            >
+              <Button variant="outlined" onClick={() => setStep(1)}>
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => setStep(3)}
+                disabled={!selectedApplications.length}
+              >
+                Next
+              </Button>
+            </div>
           </>
         )}
 
         {/* Step 3: Confirm Assignment */}
         {step === 3 && (
           <>
-            <h3>Assign Expert:</h3>
+            <DialogTitle>Assign Expert</DialogTitle>
             <p>
               <strong>Expert:</strong> {selectedExpert.username}
             </p>
@@ -620,9 +753,24 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
               <strong>Applications:</strong> {selectedApplications.length}{" "}
               selected
             </p>
-            <Button variant="contained" color="primary" onClick={assignExpert}>
-              Assign
-            </Button>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "1rem",
+              }}
+            >
+              <Button variant="outlined" onClick={() => setStep(2)}>
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={assignExpert}
+              >
+                Assign
+              </Button>
+            </div>
           </>
         )}
       </div>

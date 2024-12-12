@@ -14,14 +14,6 @@ const navItems: NavItem[] = [
     to: RouteNames.ABOUT_US,
   },
   {
-    text: navigation.EVENTS,
-    to: RouteNames.EVENTS,
-  },
-  {
-    text: navigation.BLOGS,
-    to: RouteNames.BLOGS_LIST,
-  },
-  {
     text: navigation.SCHOLARSHIP_PROGRAM,
     to: RouteNames.SCHOLARSHIP_PROGRAM,
   },

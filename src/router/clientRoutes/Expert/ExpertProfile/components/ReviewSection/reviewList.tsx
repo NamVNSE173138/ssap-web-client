@@ -176,9 +176,9 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
             <th className="p-4 text-left text-sm font-semibold text-gray-600">
               Status
             </th>
-            <th className="p-4 text-left text-sm font-semibold text-gray-600">
+            {/* <th className="p-4 text-left text-sm font-semibold text-gray-600">
               Actions
-            </th>
+            </th> */}
           </tr>
         </thead>
         <tbody>
@@ -209,7 +209,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               >
                 {item.status}
               </td>
-              <td className="p-4 text-sm">
+              {/* <td className="p-4 text-sm">
                 <div className="flex items-center space-x-2">
                   <Button
                     className="w-full h-full bg-green-500 text-white"
@@ -230,7 +230,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
                     Reject
                   </Button>
                 </div>
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>

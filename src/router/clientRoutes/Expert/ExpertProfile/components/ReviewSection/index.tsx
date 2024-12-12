@@ -636,7 +636,7 @@ const ApprovalList: React.FC = () => {
       const payload = {
         applicationReviewId: reviewId,
         comment,
-        isPassed: numericScore >= 3, // Assuming passing score is 3 or above
+        isPassed: numericScore >= 50, // Assuming passing score is 3 or above
         score: Number(score),
         isFirstReview,
       };
