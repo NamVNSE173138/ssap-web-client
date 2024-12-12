@@ -34,7 +34,7 @@ import ApplicantProfile from "./applicant/ApplicantProfile";
 import TrackingExpert from "./TrackingExpert";
 import FunderProfile from "./funder/FunderProfile";
 import ProviderProfile from "./provider/ProviderProfile";
-import ApplicationReview from "./Expert";
+import ApplicationReview from "./Expert/ExpertProfile";
 import ExpertProfile from "./Expert/ExpertProfile";
 
 const publicRoutes: RouteObject[] = [

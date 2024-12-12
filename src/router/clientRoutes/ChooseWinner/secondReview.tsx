@@ -8,7 +8,7 @@ interface FirstReviewProps {
   token: string;
 }
 
-const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
+const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
               Authorization: `Bearer ${token}`,
             },
             params: {
-              isFirstReview: true,
+              isFirstReview: false,
               scholarshipProgramId: scholarshipId, 
             },
           }
@@ -31,24 +31,24 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
         console.log("REVIEW RESULT", response.data.data);
         
         if (response.data.statusCode === 200) {
-          setData(response.data.data); // Store the retrieved data
+          setData(response.data.data);
         } else {
-          setError("Failed to fetch first review data"); // Set error if status code is not 200
+          setError("Failed to fetch first review data"); 
         }
       } catch (err) {
-        setError((err as Error).message); // Catch and display error message
+        setError((err as Error).message); 
       } finally {
-        setLoading(false); // Stop loading spinner once the request completes
+        setLoading(false); 
       }
     };
 
     fetchFirstReviewData();
-  }, [scholarshipId, token]); // Re-run when scholarshipId or token changes
+  }, [scholarshipId, token]); 
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "applicantName", headerName: "Applicant Name", width: 200 },
-    { field: "score", headerName: "Score", width: 150 },
+    { field: "score", headerName: "Score", width: 100 },
     { field: "reviewDate", headerName: "Review Date", width: 200 },
     { field: "status", headerName: "Review Status", width: 150 },
     {
@@ -64,7 +64,6 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   console.log("scholarship ID", scholarshipId);
   
 
-  // Loading or error states before rendering the DataGrid
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -75,4 +74,4 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   );
 };
 
-export default FirstReview;
+export default SecondReview;

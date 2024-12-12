@@ -611,7 +611,7 @@
 
 
 
-
+// 
 
 
 
@@ -635,6 +635,7 @@ import { notification } from "antd";
 import ApplicationStatus from "@/constants/applicationStatus";
 import * as Tabs from "@radix-ui/react-tabs";
 import FirstReview from "./firstReview";
+import SecondReview from "./secondReview";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -883,8 +884,6 @@ const ChooseWinner = () => {
 
   return (
     <div>
-      
-      
       <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
@@ -1002,7 +1001,7 @@ const ChooseWinner = () => {
               <FirstReview scholarshipId={id ?? ""} token={token ?? ""} />
               </Tabs.Content>
               <Tabs.Content value="secondReview">
-                <p>Second Review Content Goes Here</p>
+              <SecondReview scholarshipId={id ?? ""} token={token ?? ""} />
               </Tabs.Content>
               <Tabs.Content value="finalReview">
               <Paper
@@ -1022,7 +1021,7 @@ const ChooseWinner = () => {
                           "https://github.com/shadcn.png",
                         username: app.applicant.username,
                         status: app.status,
-                        expertReview: app.expertReview ?? "Not reviewed", // Adjust based on API response
+                        expertReview: app.expertReview ?? "Not reviewed", 
   score: app.score ?? "N/A",
                         choosable:
                           availableScholarships > 0 ||
@@ -1044,19 +1043,7 @@ const ChooseWinner = () => {
                     </p>
                   )}
                 </Paper>
-              </Tabs.Content>
-            </Tabs.Root>
-
-            <div className="my-4 text-lg text-gray-700">
-              Selected Winners:{" "}
-              {selectedRows.map((row: any, index: number) =>
-                index > 0
-                  ? `, ${row.applicant.username}`
-                  : row.applicant.username
-              )}
-            </div>
-
-            <div className="flex justify-end mt-4 gap-5">
+                <div className="flex justify-end mt-4 gap-5">
               <Button
                 variant="contained"
                 color="warning"
@@ -1085,6 +1072,48 @@ const ChooseWinner = () => {
                 <span className="text-lg font-semibold">Apply</span>
               </Button>
             </div>
+              </Tabs.Content>
+              
+            </Tabs.Root>
+
+            <div className="my-4 text-lg text-gray-700">
+              Selected Winners:{" "}
+              {selectedRows.map((row: any, index: number) =>
+                index > 0
+                  ? `, ${row.applicant.username}`
+                  : row.applicant.username
+              )}
+            </div>
+
+            {/* <div className="flex justify-end mt-4 gap-5">
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={handleClearSelection}
+                className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500"
+              >
+                <FaSearch className="text-white text-2xl" />
+                <span className="text-lg font-semibold">Clear Selection</span>
+              </Button>
+
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                onClick={applyForSelectedWinners}
+                className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500"
+              >
+                {loading ? (
+                  <div
+                    className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                    aria-hidden="true"
+                  ></div>
+                ) : (
+                  <FaCheckCircle className="text-white text-2xl" />
+                )}
+                <span className="text-lg font-semibold">Apply</span>
+              </Button>
+            </div> */}
           </div>
         </div>
       </section>
