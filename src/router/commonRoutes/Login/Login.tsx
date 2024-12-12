@@ -15,7 +15,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ValidationErrorMessage from "./components/ValidationErrorMessage";
-import { useToast } from "@/components/ui/use-toast";
 import RoleNames from "@/constants/roleNames";
 import { notification } from "antd";
 
@@ -31,7 +30,6 @@ const formSchema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { toast } = useToast();
   const [_error, setError] = useState("");
   const [securePassword, setSecurePassword] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
