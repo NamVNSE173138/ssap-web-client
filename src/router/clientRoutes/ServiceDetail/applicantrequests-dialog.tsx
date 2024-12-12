@@ -23,7 +23,6 @@ import { useState, useEffect } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots, FaEye, FaInfoCircle } from "react-icons/fa";
 import { IoCloudUpload } from "react-icons/io5";
-import { MdPending } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 

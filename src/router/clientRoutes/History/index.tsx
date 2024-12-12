@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "@/constants/api";
 import { Sidebar } from "@/components/AccountInfo";
-import FptLogo from "../../../assets/FPT_logo.jpg";
 import { Link } from "react-router-dom";
 
 interface ApplicationDocument {

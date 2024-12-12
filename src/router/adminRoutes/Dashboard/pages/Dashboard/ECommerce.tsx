@@ -3,7 +3,7 @@ import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChatCard from '../../components/Chat/ChatCard';
 import TableOne from '../../components/Tables/TableOne';
-import { getAccountWallet, getAllAccounts } from '@/services/ApiServices/accountService';
+import { getAllAccounts } from '@/services/ApiServices/accountService';
 import ScreenSpinner from '@/components/ScreenSpinner';
 import { SchoolIcon } from 'lucide-react';
 import { CurrencyDollarIcon, GlobeEuropeAfricaIcon } from '@heroicons/react/24/solid';
