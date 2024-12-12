@@ -12,6 +12,8 @@ import EditableTable from "./application-document-table";
 import { uploadFile } from "@/services/ApiServices/testService";
 import Background from "../../../assets/back.webp";
 import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { notification } from "antd";
+import { addApplication } from "@/services/ApiServices/applicationService";
 
 
 
@@ -118,16 +120,11 @@ const ApplyScholarship = () => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/api/applications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(applicationData),
-      });
+      const response = await addApplication(applicationData);
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response.statusCode === 200) {
+        const result = await response.data;
+        notification.success({message:"Application submitted successfully"});
         console.log("Application submitted:", result);
       } else {
         console.error("Failed to submit application");
