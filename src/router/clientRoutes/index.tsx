@@ -31,11 +31,11 @@ import PaymentResult from "./Payment";
 import ProtectedRoute from "../ProtectedRoute";
 import RoleNames from "@/constants/roleNames";
 import ApplicantProfile from "./applicant/ApplicantProfile";
-import TrackingExpert from "./TrackingExpert";
 import FunderProfile from "./funder/FunderProfile";
 import ProviderProfile from "./provider/ProviderProfile";
 import ApplicationReview from "./Expert/ExpertProfile";
 import ExpertProfile from "./Expert/ExpertProfile";
+import TrackingExpert from "./funder/FunderProfile/components/TrackingExpert";
 
 const publicRoutes: RouteObject[] = [
   {
