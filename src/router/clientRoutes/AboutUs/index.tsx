@@ -1,6 +1,5 @@
-import React from 'react';
 import AboutUsImage from '../../../assets/AboutUs.png';
-import { FaGraduationCap, FaHandsHelping } from 'react-icons/fa'; // Importing icons
+import { FaGraduationCap, FaHandsHelping } from 'react-icons/fa'; 
 
 const AboutUs = () => {
   return (

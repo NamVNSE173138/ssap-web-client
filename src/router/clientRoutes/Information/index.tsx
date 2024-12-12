@@ -98,7 +98,7 @@ const Information = () => {
     e.preventDefault();
     try {
       if (isAdd) {
-        await addApplicantProfile({ ...formValues, id: profileData.id });
+        await addApplicantProfile(profileData.id, { ...formValues, id: profileData.id });
         setHasProfile(true);
       }
       else {

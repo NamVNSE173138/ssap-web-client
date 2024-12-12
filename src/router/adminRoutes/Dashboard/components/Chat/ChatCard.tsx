@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import UserTwo from '../../images/user/user-02.png';
 import { useEffect, useState } from 'react';
 import { getAllAccounts } from '@/services/ApiServices/accountService';
 
