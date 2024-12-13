@@ -19,8 +19,9 @@ import {
 import { GoLaw } from "react-icons/go";
 import { getAllMajors } from "@/services/ApiServices/majorService";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import RouteNames from "@/constants/routeNames";
 
 // const container = {
 //   hidden: {},
@@ -32,6 +33,10 @@ import { motion } from "framer-motion";
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);
   const [_errorMessage, setErrorMessage] = useState<any>(null);
+  const navigate = useNavigate();
+  const handleApplyNowClick = () => {
+    navigate(RouteNames.SCHOLARSHIP_PROGRAM);
+  };
 
   const fetchMajors = async () => {
     try {
@@ -40,7 +45,7 @@ const Home = () => {
     } catch (error: any) {
       setErrorMessage(
         error.response?.data?.message ||
-          "An error occurred. Please try again later."
+        "An error occurred. Please try again later."
       );
     }
   };
@@ -68,43 +73,6 @@ const Home = () => {
 
   return (
     <>
-      {/* <div
-        className="max-h-full max-w-full mt-[2px]"
-        style={{ backgroundColor: "#BBD4EA" }}
-      >
-        
-        <section className="flex justify-around flex-row mx-32">
-          <section className="p-14">
-            <p className="w-[65%] text-3xl text-center text-white font-semibold drop-shadow-lg my-10">
-              THE FUTURE BELONGS TO THOSE WHO BELIEVE IN THE BEAUTY OF THEIR
-              DREAMS
-            </p>
-            <p className="w-[65%] text-2xl text-center font-semibold drop-shadow-lg">
-              Create Your Own Tomorrow
-            </p>
-            <p className="w-[65%] text-lg text-center font-semibold drop-shadow-lg">
-              Discover thousands of Master's degrees worldwide!
-            </p>
-            <div className="flex items-center pt-10">
-              <input className="h-14" type="text" placeholder="What to study" />
-              <input
-                className="h-14"
-                type="text"
-                placeholder="Where to study"
-              />
-              <button
-                className="h-14 w-[20%] text-white"
-                style={{ backgroundColor: "#5559C7" }}
-              >
-                Find scholarship
-              </button>
-            </div>
-          </section>
-          <section className="w-[30%] h-[30%] mt-1">
-            <ImageCarousel />
-          </section>
-        </section>
-      </div> */}
       <div className="relative">
         <BackgroundImage />
         <div className="absolute inset-0 flex flex-col justify-center text-white max-w-[85%] m-auto">
@@ -120,30 +88,33 @@ const Home = () => {
               Discover thousands of Master's degrees worldwide!
             </p>
           </div>
-          <div className="flex items-center pt-10">
-            <input
-              className="h-14 px-4"
-              type="text"
-              placeholder="What to study"
-            />
-            <input
-              className="h-14 px-4"
-              type="text"
-              placeholder="Where to study"
-            />
+          <div className="flex items-center pt-10 ml-70">
             <button
-              className="h-14 w-[20%] text-white"
-              style={{ backgroundColor: "#1eb2a6" }}
+              className="h-14 w-[20%] text-white font-semibold text-lg py-3 px-6 rounded-full"
+              style={{
+                background: 'linear-gradient(45deg, #1eb2a6, #12d7b5)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onMouseOver={(e: any) => {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.2)';
+              }}
+              onMouseOut={(e: any) => {
+                e.target.style.transform = 'scale(1)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+              }}
+              onClick={handleApplyNowClick}
             >
-              Find scholarship
+              Find Scholarship
             </button>
           </div>
         </div>
       </div>
 
-      {/** HOW TO APPLY */}
       <div className="">
         <section className="relative ">
+          <br></br>
           <div className="absolute">
             <motion.div
               className="md:my-5 md:w-[70%]"
@@ -181,8 +152,6 @@ const Home = () => {
         </section>
       </div>
 
-      {/** BROWSER BY DISCIPLINES */}
-      {/* {!majors && <Spin size="large" />} */}
       <div className="my-10">
         <section className="relative ">
           <motion.div

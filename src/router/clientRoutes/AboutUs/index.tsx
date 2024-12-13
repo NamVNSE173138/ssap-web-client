@@ -1,10 +1,16 @@
+import { useNavigate } from 'react-router-dom';
 import AboutUsImage from '../../../assets/AboutUs.png';
-import { FaGraduationCap, FaHandsHelping } from 'react-icons/fa'; 
+import { FaGraduationCap, FaHandsHelping } from 'react-icons/fa';
+import RouteNames from '@/constants/routeNames';
+
 
 const AboutUs = () => {
+  const navigate = useNavigate();
+  const handleApplyNowClick = () => {
+    navigate(RouteNames.SCHOLARSHIP_PROGRAM);
+  };
   return (
     <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial, sans-serif', backgroundColor: '#e5f6f6' }}>
-      {/* Image */}
       <img
         src={AboutUsImage}
         alt="About Us"
@@ -21,24 +27,22 @@ const AboutUs = () => {
         onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
       />
 
-      {/* Heading */}
-      <h1 style={{ fontSize: '38px', color: '#2C3E50', fontWeight: '700', marginBottom: '20px', marginTop:'50px' }}>
+      <h1 style={{ fontSize: '38px', color: '#2C3E50', fontWeight: '700', marginBottom: '20px', marginTop: '50px' }}>
         Welcome to SSAP!
       </h1>
+      <br></br>
 
-      {/* Icons Section */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', gap: '50px' }}>
         <div style={{ textAlign: 'center' }}>
           <FaGraduationCap size={60} color="#FF6F20" />
           <h3 style={{ color: '#FF6F20', fontSize: '22px', fontWeight: '600' }}>Empowering Students</h3>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <FaHandsHelping size={60} color="#007BFF" />
+          <FaHandsHelping size={60} color="#007BFF" className='ml-35' />
           <h3 style={{ color: '#007BFF', fontSize: '22px', fontWeight: '600' }}>Supporting Dreams</h3>
         </div>
       </div>
 
-      {/* Full-Width Text Block */}
       <div
         style={{
           fontSize: '20px',
@@ -98,30 +102,7 @@ const AboutUs = () => {
         ></div>
       </div>
 
-      {/* Call to Action */}
       <div style={{ marginTop: '40px' }}>
-        <button
-          style={{
-            backgroundColor: '#FF6F20',
-            color: '#fff',
-            padding: '18px 35px',
-            border: 'none',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            fontSize: '20px',
-            boxShadow: '0 6px 12px rgba(255, 111, 32, 0.3)',
-            transition: 'all 0.3s ease',
-            marginRight: '25px',
-            fontWeight: '600',
-            letterSpacing: '1px',
-            outline: 'none',
-          }}
-          onMouseOver={(e: any) => (e.target.style.backgroundColor = '#E65F1B')}
-          onMouseOut={(e: any) => (e.target.style.backgroundColor = '#FF6F20')}
-        >
-          Contact Us
-        </button>
-
         <button
           style={{
             backgroundColor: '#007BFF',
@@ -139,6 +120,7 @@ const AboutUs = () => {
           }}
           onMouseOver={(e: any) => (e.target.style.backgroundColor = '#0056b3')}
           onMouseOut={(e: any) => (e.target.style.backgroundColor = '#007BFF')}
+          onClick={handleApplyNowClick}
         >
           Apply Now
         </button>
