@@ -45,22 +45,20 @@ const Home = () => {
     }
   };
 
-  const majorIcons: any = {
-    Agriculture: <MdAgriculture size={45} className="ml-3 mt-3" />,
-    Sciences: <FaMicroscope size={45} className="ml-3 mt-3" />,
-    Architecture: <MdArchitecture size={45} className="ml-3 mt-3" />,
-    "Business & Management": (
-      <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />
-    ),
-    "Computer Science": <BsTerminal size={45} className="ml-3 mt-3" />,
-    "Creative Art & Design": <MdFormatPaint size={45} className="ml-3 mt-3" />,
-    "Mechanism & Technology": <BsRulers size={45} className="ml-3 mt-3" />,
-    "Public Health": <FaMedkit size={45} className="ml-3 mt-3" />,
-    Humanities: <FaUser size={45} className="ml-3 mt-3" />,
-    Law: <GoLaw size={45} className="ml-3 mt-3" />,
-    "Social Science & Media": <FaCamera size={45} className="ml-3 mt-3" />,
-    "Tourism & Hotel": <FaHotel size={45} className="ml-3 mt-3" />,
-  };
+  const majorIcons: any = [
+    <MdAgriculture size={45} className="ml-3 mt-3" />,
+    <FaMicroscope size={45} className="ml-3 mt-3" />,
+    <MdArchitecture size={45} className="ml-3 mt-3" />,
+    <BsFillSuitcaseLgFill size={45} className="ml-3 mt-3" />,
+    <BsTerminal size={45} className="ml-3 mt-3" />,
+    <MdFormatPaint size={45} className="ml-3 mt-3" />,
+    <BsRulers size={45} className="ml-3 mt-3" />,
+    <FaMedkit size={45} className="ml-3 mt-3" />,
+    <FaUser size={45} className="ml-3 mt-3" />,
+    <GoLaw size={45} className="ml-3 mt-3" />,
+    <FaCamera size={45} className="ml-3 mt-3" />,
+    <FaHotel size={45} className="ml-3 mt-3" />,
+  ];
 
   useEffect(() => {
     fetchMajors();
@@ -68,43 +66,6 @@ const Home = () => {
 
   return (
     <>
-      {/* <div
-        className="max-h-full max-w-full mt-[2px]"
-        style={{ backgroundColor: "#BBD4EA" }}
-      >
-        
-        <section className="flex justify-around flex-row mx-32">
-          <section className="p-14">
-            <p className="w-[65%] text-3xl text-center text-white font-semibold drop-shadow-lg my-10">
-              THE FUTURE BELONGS TO THOSE WHO BELIEVE IN THE BEAUTY OF THEIR
-              DREAMS
-            </p>
-            <p className="w-[65%] text-2xl text-center font-semibold drop-shadow-lg">
-              Create Your Own Tomorrow
-            </p>
-            <p className="w-[65%] text-lg text-center font-semibold drop-shadow-lg">
-              Discover thousands of Master's degrees worldwide!
-            </p>
-            <div className="flex items-center pt-10">
-              <input className="h-14" type="text" placeholder="What to study" />
-              <input
-                className="h-14"
-                type="text"
-                placeholder="Where to study"
-              />
-              <button
-                className="h-14 w-[20%] text-white"
-                style={{ backgroundColor: "#5559C7" }}
-              >
-                Find scholarship
-              </button>
-            </div>
-          </section>
-          <section className="w-[30%] h-[30%] mt-1">
-            <ImageCarousel />
-          </section>
-        </section>
-      </div> */}
       <div className="relative">
         <BackgroundImage />
         <div className="absolute inset-0 flex flex-col justify-center text-white max-w-[85%] m-auto">
@@ -226,7 +187,7 @@ const Home = () => {
             viewport={{ once: true }}
           >
             {majors &&
-              majors.map((major: any) => (
+              majors.map((major: any, index: any) => (
                 <Link
                   key={major.id}
                   to={`/major/${major.id}`}
@@ -236,7 +197,7 @@ const Home = () => {
                     {major.name}
                   </p>
                   <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-[70px] h-[70px] bg-white drop-shadow-lg rounded-full">
-                    {majorIcons[major.name]}
+                    {majorIcons[index]}
                   </div>
                 </Link>
               ))}

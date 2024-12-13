@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect} from "react";
+import { useEffect, useState} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
@@ -27,6 +27,7 @@ interface AddMilestoneModalProps {
 
 const AddMilestoneModal = ({ isOpen, setIsOpen, scholarship,awardMilestones, reviewMilestones, fetchMilestones }: AddMilestoneModalProps) => {
     const { id } = useParams<{ id: string }>();
+    const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 
 const milestoneFormSchema = z.object({
     description: z.string().min(1, "Please enter a description"),
@@ -60,9 +61,11 @@ const milestoneFormSchema = z.object({
 
     const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
         try {
+            setSubmitLoading(true);
             //console.log(values);
              await createReviewMilestone(values);
             form.reset();
+            setSubmitLoading(false);
             //console.log("Service created successfully:", response.data);
             setIsOpen(false);
             fetchMilestones();
@@ -148,10 +151,18 @@ const milestoneFormSchema = z.object({
 
           <Button
             type="submit"
+            disabled={submitLoading}
             className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all flex items-center justify-center gap-3 w-full"
           >
-            <FaCheckCircle className="text-white text-xl" />
-            Add Review Milestone
+            {submitLoading ? (<div
+                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                  aria-hidden="true"
+                ></div>) :
+                (<>
+                <FaCheckCircle className="text-white text-xl" />
+                <span>Add Review Milestone</span>
+                </>)}
+            
           </Button>
         </form>
       </motion.div>
