@@ -36,6 +36,7 @@ import ProviderProfile from "./provider/ProviderProfile";
 import ApplicationReview from "./Expert/ExpertProfile";
 import ExpertProfile from "./Expert/ExpertProfile";
 import TrackingExpert from "./funder/FunderProfile/components/TrackingExpert";
+import UserGuide from "./UserGuide";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -47,12 +48,8 @@ const publicRoutes: RouteObject[] = [
     element: <AboutUs />,
   },
   {
-    path: RouteNames.EVENTS,
-    element: <Events />,
-  },
-  {
-    path: RouteNames.BLOGS_LIST,
-    element: <BlogList />,
+    path: RouteNames.USER_GUIDE,
+    element: <UserGuide />,
   },
   {
     path: RouteNames.BLOGS_DETAIL,

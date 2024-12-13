@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { IoLocation } from "react-icons/io5";
 import { GiGraduateCap } from "react-icons/gi";
-import { FaCalendar } from "react-icons/fa";
+import { FaCalendar, FaDollarSign } from "react-icons/fa";
 import { RiMoneyDollarCircleFill } from "react-icons/ri";
 
 const truncateString = (str: string, num: number) => {
@@ -86,7 +86,7 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
 
             </div>
             <div className="flex justify-start items-center gap-2 mb-4">
-              <RiMoneyDollarCircleFill color="#1eb2a6" size={24} />
+              <FaDollarSign color="#1eb2a6" size={24} />
               <p className="text-black">
                 {scholarshipProgram?.scholarshipAmount}
               </p>

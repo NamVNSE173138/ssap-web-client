@@ -59,20 +59,20 @@ const Major = () => {
     }
   };
 
-  const majorIcons: any = {
-      Agriculture: <MdAgriculture size={75} className="ml-3 mt-3" />,
-      Sciences: <FaMicroscope size={75} className="ml-3 mt-3" />,
-      Architecture: <MdArchitecture size={75} className="ml-3 mt-3" />,
-      "Business & Management": <BsFillSuitcaseLgFill size={75} className="ml-3 mt-3" />,
-      "Computer Science": <BsTerminal size={75} className="ml-3 mt-3" />,
-      "Creative Art & Design": <MdFormatPaint size={75} className="ml-3 mt-3" />,
-      "Mechanism & Technology": <BsRulers size={75} className="ml-3 mt-3" />,
-      "Public Health": <FaMedkit size={75} className="ml-3 mt-3" />,
-      Humanities: <FaUser size={75} className="ml-3 mt-3" />,
-      Law: <GoLaw size={75} className="ml-3 mt-3" />,
-      "Social Science & Media": <FaCamera size={75} className="ml-3 mt-3" />,
-      "Tourism & Hotel": <FaHotel size={75} className="ml-3 mt-3" />
-  };
+  const majorIcons: any = [
+      <MdAgriculture size={75} className="ml-3 mt-3" />,
+      <FaMicroscope size={75} className="ml-3 mt-3" />,
+      <MdArchitecture size={75} className="ml-3 mt-3" />,
+      <BsFillSuitcaseLgFill size={75} className="ml-3 mt-3" />,
+      <BsTerminal size={75} className="ml-3 mt-3" />,
+      <MdFormatPaint size={75} className="ml-3 mt-3" />,
+      <BsRulers size={75} className="ml-3 mt-3" />,
+      <FaMedkit size={75} className="ml-3 mt-3" />,
+      <FaUser size={75} className="ml-3 mt-3" />,
+      <GoLaw size={75} className="ml-3 mt-3" />,
+      <FaCamera size={75} className="ml-3 mt-3" />,
+      <FaHotel size={75} className="ml-3 mt-3" />
+  ];
 
 
 
@@ -130,7 +130,7 @@ const Major = () => {
       <div
         className="flex justify-center items-center"
       >
-        {majorIcons[major.name]}
+        {majorIcons[major.id - 1]}
       </div>
       <div
         className="flex justify-center items-center"
