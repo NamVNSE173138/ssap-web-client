@@ -20,6 +20,7 @@ import { getAllScholarshipProgram, getScholarshipProgram, searchScholarshipProgr
 import { FaCalendar, FaDollarSign, FaInfoCircle } from "react-icons/fa";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
+import { IoMdClose } from "react-icons/io";
 const ScholarshipProgram = () => {
   const [data, setData] =
     useState<ScholarshipProgramType[]>(scholarshipProgram);
@@ -35,39 +36,8 @@ const ScholarshipProgram = () => {
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
   const scholarshipStatus: string = "";
   const [scholarshipCategory, setScholarshipCategory] = useState<string>("");
-  const [scholarshipKeyword, setScholarshipKeyword] = useState<string>("");
+  const [keyword, setKeyword] = useState<string>("");
   const [fullData, setFullData] = useState<ScholarshipProgramType[]>(scholarshipProgram);
-
-  const handleSearch = async () => {
-    if (!scholarshipKeyword || scholarshipAmount[0] == null || scholarshipAmount[1] == null || !scholarshipCategory || !scholarshipStatus || !scholarshipDeadline) {
-      setLoading(true);
-      await fetchData();
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await searchScholarshipProgram(
-        scholarshipKeyword,
-        scholarshipAmount[0],
-        scholarshipAmount[1],
-        scholarshipCategory,
-        scholarshipStatus,
-        scholarshipDeadline && new Date(scholarshipDeadline).toISOString());
-
-      const scholarships = [];
-      for (let res of response.data) {
-        const scholarshipProgram = await getScholarshipProgram(res.id);
-        scholarships.push(scholarshipProgram.data);
-      }
-
-      setData(scholarships);
-      filterScholarships();
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchData = async () => {
     try {
@@ -96,12 +66,24 @@ const ScholarshipProgram = () => {
 
   const filterScholarships = () => {
     const dataFull = fullData;
-    const filteredScholarships = dataFull.filter((scholarship) => {
+
+    const filteredByKeyword = dataFull.filter((scholarship) => {
+      const keywordLower = keyword.toLowerCase();
+      return (
+        scholarship.name.toLowerCase().includes(keywordLower) ||
+        (scholarship.university).name.toLowerCase().includes(keywordLower) ||
+        (scholarship.major).name.toLowerCase().includes(keywordLower)
+      );
+    });
+
+    const filteredScholarships = filteredByKeyword.filter((scholarship) => {
       const scholarshipValue = scholarship.scholarshipAmount;
       const scholarshipDeadlineDate = new Date(scholarship.deadline);
 
-      const isWithinAmountRange = scholarshipValue >= scholarshipAmount[0] && scholarshipValue <= scholarshipAmount[1];
-      const isAfterDeadline = scholarshipDeadline ? scholarshipDeadlineDate >= new Date(scholarshipDeadline) : true;
+      const isWithinAmountRange =
+        scholarshipValue >= scholarshipAmount[0] && scholarshipValue <= scholarshipAmount[1];
+      const isAfterDeadline =
+        scholarshipDeadline ? scholarshipDeadlineDate >= new Date(scholarshipDeadline) : true;
 
       return isWithinAmountRange && isAfterDeadline;
     });
@@ -109,13 +91,16 @@ const ScholarshipProgram = () => {
     setData(filteredScholarships);
   };
 
+
   useEffect(() => {
     fetchData();
   }, []);
 
   useEffect(() => {
     filterScholarships();
-  }, [scholarshipAmount, data]);
+  }, [keyword, scholarshipAmount, scholarshipDeadline, fullData]);
+
+
 
   return (
     <div>
@@ -140,64 +125,28 @@ const ScholarshipProgram = () => {
             </Breadcrumb>
           </div>
 
-          <form action="" className="w-full">
-            <div className="flex items-center mb-5  rounded-sm relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full  cursor-pointer ">
-              <SearchIcon className="w-[20px] h-[20px] ml-3 rounded-full" />
-              <input value={scholarshipKeyword} onChange={(e) => setScholarshipKeyword(e.target.value)}
-                placeholder="Search scholarships by keyword" className="w-full outline-none py-[13px] pl-[16px] pr-[32px]" type="text" />
+          <div className="w-full mt-6">
+            <div className="relative w-full">
+              <input
+                className="w-2/3 h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 ease-in-out rounded-lg shadow-lg bg-gradient-to-r  text-lg placeholder-gray-500 text-gray-800"
+                placeholder="Search for scholarship, university, major..."
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  console.log(e.target.value);
+                }}
+              />
+              <SearchIcon className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500 text-xl" />
+              {keyword && (
+                <IoMdClose
+                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-500 cursor-pointer text-xl hover:text-red-500 transition-colors"
+                  onClick={() => setKeyword("")}
+                />
+              )}
             </div>
-            <div className="grid gap-[16px] grid-cols-1 lg:grid-cols-[1fr_120px]">
-              <div className="flex gap-[16px] flex-col lg:flex-row flex-wrap">
-                <div className=" rounded-sm py-[13px] pl-[16px] pr-[32px] relative after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-full sm:1/2 lg:w-1/5 cursor-pointer ">
-                  <label hidden>Study Major</label>
-                  <select className="w-full">
-                    <option value="">Select study major</option>
-                    {majors.map((major, index) => (
-                      <option key={index} value={major.name}>
-                        {major.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
-                  <label hidden>Study destination</label>
-                  <select className="w-full">
-                    <option value="">Select a study destination</option>
-                    {countries.map((country, index) => (
-                      <option key={index} value={country.name}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className=" rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
-                  <label hidden>Scholarship Categories</label>
-                  <select value={scholarshipCategory} onChange={(e) => setScholarshipCategory(e.target.value)} className="w-full">
-                    <option value="">Select a scholarship categories</option>
-                    {categories.map((category, index) => (
-                      <option key={index} value={category.name}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="rounded-sm py-[13px] pl-[16px] pr-[32px] relative  after:absolute after:right-[16px] after:top-[22px] bg-white after:w-[12px] after:h-[7px] w-1/5 cursor-pointer">
-                  <label hidden>Scholarship Certificates</label>
-                  <select className="w-full">
-                    <option value="">Select a scholarship certificates</option>
-                    {certificates.map((certificate, index) => (
-                      <option key={index} value={certificate.name}>
-                        {certificate.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className=" flex w-full text-white  justify-center rounded-full">
-                <Button className="bg-[#1eb2a6] w-full h-full" type="button" onClick={handleSearch}>Search</Button>
-              </div>
-            </div>
-          </form>
+          </div>
+
+
         </div>
       </div>
 
@@ -278,7 +227,7 @@ const ScholarshipProgram = () => {
             </p>
           ) : data.length === 0 ? (
             <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
-              No scholarship programs found.
+              No data found matching your search.
             </p>
           ) : (
             data.map((scholarship: any) => (
