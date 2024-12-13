@@ -224,7 +224,7 @@ const Service = () => {
       let hasMorePages = true;
 
       while (hasMorePages) {
-        const response = await getServicesByProviderPaginated(Number(user.id),currentPage,pageSize);
+        const response = await getServicesByProviderPaginated(Number(user.id), currentPage, pageSize);
 
         if (response.data.statusCode === 200) {
           const services = response.data.data.items || [];
@@ -252,7 +252,7 @@ const Service = () => {
     try {
       let response: any = {};
       if (user?.role === "Provider") {
-        response = await getServicesByProviderPaginated(Number(user.id),currentPage,pageSize);
+        response = await getServicesByProviderPaginated(Number(user.id), currentPage, pageSize);
         // response = await axios.get(
         //   `${BASE_URL}/api/services/by-provider-paginated/${user.id}`,
         //   {
@@ -418,25 +418,23 @@ const Service = () => {
             </BreadcrumbList>
           </Breadcrumb>
 
-
           <div className="w-full mt-6">
-        <div className="relative w-full">
-          <Input
-            className="w-1/2 h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
-            placeholder="Search for services..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+          <div className="relative w-full">
+        <input
+          className="w-2/3 h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
+          placeholder="Search for services..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
+        {searchTerm && (
+          <IoMdClose
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
+            onClick={clearSearch}
           />
-          <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
-          
-          {searchTerm && (
-            <IoMdClose
-              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
-              onClick={clearSearch}
-            />
-          )}          
-        </div>
+        )}
       </div>
+          </div>
         </div>
       </div>
 
