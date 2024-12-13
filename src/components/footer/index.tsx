@@ -17,7 +17,7 @@ const Footer = () => {
                         <p></p>
                     </div>
                 </div>
-                <div className="mt-16 basis-1/2 md:mt-0 text-black">
+                {/*<div className="mt-16 basis-1/2 md:mt-0 text-black">
                     <p className="mt-9 mb-4 font-semibold text-[30px]">ORGANIZATION</p>
                     <menu className="flex flex-col gap-1.5 text-[16px] text-black">
                         <li className='hover:underline'>
@@ -59,7 +59,7 @@ const Footer = () => {
                             <Link to="/ac-cleaning-services">FOOTER</Link>
                         </li>
                     </menu>
-                </div>
+                </div>*/}
         </div>
         
         <Background/>

@@ -12,6 +12,7 @@ import { formatDate } from "@/lib/date-formatter";
 import Select from "react-select";
 import QuillEditor from "@/components/Quill/QuillEditor";
 import { IoCalendar } from "react-icons/io5";
+import { FaCheckCircle } from "react-icons/fa";
 
 interface AddAwardDialogProps {
     isOpen: boolean;
@@ -28,6 +29,7 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
     const { id } = useParams<{ id: string }>();
 
     const [fileType, setFileType] = useState<any>([]);
+    const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 
     const typeOptions = [
         { value: 'Academic Transcript', label: 'Academic Transcript' },
@@ -106,10 +108,12 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
 
     const handleSubmit = async (values: z.infer<typeof awardFormSchema>) => {
         try {
+            setSubmitLoading(true);
              await createAwardMilestone(values);
             //console.log(values);
             setFileType([]);
             form.reset();
+            setSubmitLoading(false);
             //console.log("Service created successfully:", response.data);
             setIsOpen(false);
             fetchAwards();
@@ -197,7 +201,16 @@ const AddAwardDialog = ({ isOpen, setIsOpen, fetchAwards, reviewMilestones, awar
                                 className="bg-sky-500 hover:bg-sky-600 text-white w-full py-3 rounded-full mt-4"
                                 type="submit"
                             >
-                                Add Award Milestone
+                            {submitLoading ? (<div
+                              className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                              aria-hidden="true"
+                            ></div>) :
+                            (<>
+                            <FaCheckCircle className="text-white text-xl" />
+                            <span>Add Award Milestone</span>
+                            </>)}
+
+                               
                             </Button>
                         </form>
                     </motion.div>
