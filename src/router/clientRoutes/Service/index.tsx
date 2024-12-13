@@ -6,9 +6,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import ServiceSkeleton from "./ServiceSkeleton";
-import { BASE_URL } from "@/constants/api";
 import { ServiceType } from "./data";
 import ServiceCard from "@/components/Services/ServiceCard";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
@@ -45,7 +43,7 @@ import {
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
-import { getPaginatedServices, getServicesByProvider, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
+import { getPaginatedServices, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
 import { MdDateRange } from "react-icons/md";
 import MultiStepUpgradeSubscriptionModal from "../Activity/SubscriptionUpgradeModal";
 
@@ -74,7 +72,6 @@ const Service = () => {
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [numberOfServicesLeft, setNumberOfServicesLeft] = useState<number>(0);
-  const [allServices, setAllServices] = useState<any>(null);
   const [subscriptionDetails, setSubscriptionDetails] =
     useState<SubscriptionDetails | null>(null);
   const [isSubscriptionDetailModalOpen, setIsSubscriptionDetailModalOpen] =

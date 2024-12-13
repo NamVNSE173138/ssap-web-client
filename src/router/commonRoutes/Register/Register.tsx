@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaEnvelope, FaEye, FaEyeSlash, FaIdBadge, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUsers } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaEyeSlash, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUsers } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ import { Table, TableBody, TableContainer } from "@mui/material";
 import DocumentRows from "./DocumentRows";
 import { Button } from "@/components/ui/button";
 import { HiOutlinePlusCircle } from "react-icons/hi";
-import { forgotPassword, sendOtp, verifyOtp } from "@/services/ApiServices/accountService";
+import { sendOtp, verifyOtp } from "@/services/ApiServices/accountService";
 import { addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
 
 const formSchema = z.object({

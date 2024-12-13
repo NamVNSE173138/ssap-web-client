@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
-import { BASE_URL } from "@/constants/api";
+import { fetchSecondReviewData } from "@/services/ApiServices/applicationService";
 
 interface FirstReviewProps {
   scholarshipId: string;
@@ -13,28 +12,42 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchFirstReviewData = async () => {
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/api/applications/reviews/result`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            params: {
-              isFirstReview: false,
-              scholarshipProgramId: scholarshipId, 
-            },
-          }
-        );
-        console.log("REVIEW RESULT", response.data.data);
+  // useEffect(() => {
+  //   const fetchSecondReviewData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${BASE_URL}/api/applications/reviews/result`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           params: {
+  //             isFirstReview: false,
+  //             scholarshipProgramId: scholarshipId, 
+  //           },
+  //         }
+  //       );
+  //       console.log("REVIEW RESULT", response.data.data);
         
-        if (response.data.statusCode === 200) {
-          setData(response.data.data);
-        } else {
-          setError("Failed to fetch first review data"); 
-        }
+  //       if (response.data.statusCode === 200) {
+  //         setData(response.data.data);
+  //       } else {
+  //         setError("Failed to fetch first review data"); 
+  //       }
+  //     } catch (err) {
+  //       setError((err as Error).message); 
+  //     } finally {
+  //       setLoading(false); 
+  //     }
+  //   };
+
+  //   fetchSecondReviewData();
+  // }, [scholarshipId, token]); 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedData = await fetchSecondReviewData(scholarshipId, token);
+        setData(fetchedData);   
       } catch (err) {
         setError((err as Error).message); 
       } finally {
@@ -42,8 +55,9 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
       }
     };
 
-    fetchFirstReviewData();
-  }, [scholarshipId, token]); 
+    fetchData(); 
+  }, [scholarshipId, token]);
+
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },

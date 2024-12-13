@@ -8,10 +8,8 @@ import {
 import { Link } from "react-router-dom";
 import ScholarshipProgramSkeleton from "./ScholarshipProgramSkeleton";
 import { Card } from "@/components/ScholarshipProgram";
-import axios from "axios";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { BASE_URL } from "@/constants/api";
 import { getAllCountries } from "@/services/ApiServices/countryService";
 import { getAllMajors } from "@/services/ApiServices/majorService";
 import { getAllCategories } from "@/services/ApiServices/categoryService";
@@ -19,7 +17,7 @@ import { SearchIcon } from "lucide-react";
 import { getAllCertificates } from "@/services/ApiServices/certificateService";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Slider } from "@mui/material";
 import { getAllScholarshipProgram, getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
-import { FaCalendar, FaCalendarAlt, FaCircle, FaDollarSign, FaInfoCircle } from "react-icons/fa";
+import { FaCalendar, FaDollarSign, FaInfoCircle } from "react-icons/fa";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 const ScholarshipProgram = () => {
@@ -35,7 +33,7 @@ const ScholarshipProgram = () => {
 
   const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 50000]);
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
-  const [scholarshipStatus, setScholarshipStatus] = useState<string>("");
+  const scholarshipStatus: string = "";
   const [scholarshipCategory, setScholarshipCategory] = useState<string>("");
   const [scholarshipKeyword, setScholarshipKeyword] = useState<string>("");
   const [fullData, setFullData] = useState<ScholarshipProgramType[]>(scholarshipProgram);
