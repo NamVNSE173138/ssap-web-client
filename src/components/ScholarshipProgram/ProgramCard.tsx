@@ -12,7 +12,6 @@ import {
 import { IoLocation } from "react-icons/io5";
 import { GiGraduateCap } from "react-icons/gi";
 import { FaCalendar, FaDollarSign } from "react-icons/fa";
-import { RiMoneyDollarCircleFill } from "react-icons/ri";
 
 const truncateString = (str: string, num: number) => {
   if (str.length <= num) {
