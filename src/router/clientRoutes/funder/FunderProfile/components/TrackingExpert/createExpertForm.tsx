@@ -3,19 +3,22 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
+import ScreenSpinner from "@/components/ScreenSpinner";
+import { notification } from "antd";
 
 interface ExpertFormProps {
   onSubmit: (formData: any) => Promise<void>;
   initialData: any;
   handelUploadFile : any;
+  success: any;
 }
 
-const ExpertForm: React.FC<ExpertFormProps> = ({ onSubmit, initialData, handelUploadFile }) => {
+const ExpertForm: React.FC<ExpertFormProps> = ({ onSubmit, initialData, handelUploadFile, success }) => {
   const [formData, setFormData] = useState(initialData);
   const [majors, setMajors] = useState<any[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchMajors = async () => {
       try {
@@ -49,11 +52,18 @@ const ExpertForm: React.FC<ExpertFormProps> = ({ onSubmit, initialData, handelUp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     await onSubmit(formData);
     setFormData(initialData);
+    setIsLoading(false);
+    if (success) {
+    notification.success({message: "Expert is created successfully!"})
+    }
+    else return notification.error({message: "Fail to create expert!"})
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block font-semibold">Name:</label>
@@ -148,6 +158,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({ onSubmit, initialData, handelUp
         Submit
       </button>
     </form>
+    {isLoading && <ScreenSpinner />}
+    </>
   );
 };
 

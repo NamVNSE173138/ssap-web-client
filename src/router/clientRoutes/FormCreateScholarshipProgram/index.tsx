@@ -307,7 +307,9 @@ const FormCreateScholarshipProgram = () => {
             <CardContent>
               <div className=" grid grid-cols-6 gap-4 my-5 ">
                 <div className="space-y-2 col-start-1 col-end-4">
-                  <Label htmlFor="scholarshiptype" className="text-md">Scholarship Type</Label>
+                  <Label htmlFor="scholarshiptype" className="text-md">
+                    Scholarship Type
+                  </Label>
                   <Select
                     name="scholarshiptype"
                     options={categories}
@@ -325,7 +327,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-end-7 col-span-3">
-                  <Label htmlFor="name" className="text-md">Scholarship Name</Label>
+                  <Label htmlFor="name" className="text-md">
+                    Scholarship Name
+                  </Label>
                   <Input
                     {...form.register("name")}
                     type="text"
@@ -340,13 +344,15 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-start-1 col-end-7">
-                  <Label htmlFor="description" className="text-md">Scholarship Description</Label>
+                  <Label htmlFor="description" className="text-md">
+                    Scholarship Description
+                  </Label>
                   <Textarea
-                     {...form.register("description")}
-                     id="description"
-                     placeholder="Enter description"
-                     rows={4}
-                   />
+                    {...form.register("description")}
+                    id="description"
+                    placeholder="Enter description"
+                    rows={4}
+                  />
                   {/* <Input
                      {...form.register("description")}
                      type="text"
@@ -361,7 +367,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 ">
-                  <Label htmlFor="price" className="text-md">Price</Label>
+                  <Label htmlFor="price" className="text-md">
+                    Price
+                  </Label>
                   <Input
                     {...form.register("price")}
                     type="text"
@@ -376,7 +384,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="quantity" className="text-md">Quantity</Label>
+                  <Label htmlFor="quantity" className="text-md">
+                    Quantity
+                  </Label>
                   <Input
                     {...form.register("quantity")}
                     type="text"
@@ -391,7 +401,10 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="quantityOfAwardMilestones" className="text-md">
+                  <Label
+                    htmlFor="quantityOfAwardMilestones"
+                    className="text-md"
+                  >
                     Quantity of Award Milestones
                   </Label>
                   <Input
@@ -408,7 +421,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-start-4 col-end-6">
-                  <Label htmlFor="imageUrl" className="text-md">Upload Image</Label>
+                  <Label htmlFor="imageUrl" className="text-md">
+                    Upload Image
+                  </Label>
                   <Input
                     type="file"
                     id="imageUrl"
@@ -423,8 +438,10 @@ const FormCreateScholarshipProgram = () => {
                   )}
                 </div>
 
-                <div className="space-y-2" >
-                  <Label htmlFor="deadline" className="text-md">Deadline</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="deadline" className="text-md">
+                    Deadline
+                  </Label>
                   <Input
                     {...form.register("deadline")}
                     type="date"
@@ -439,7 +456,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-span-2 col-end-3">
-                  <Label htmlFor="university" className="text-md">University</Label>
+                  <Label htmlFor="university" className="text-md">
+                    University
+                  </Label>
                   <Select
                     {...form.register("university")}
                     options={universities}
@@ -454,7 +473,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-span-2 col-end-5">
-                  <Label htmlFor="certificate" className="text-md">Certificates</Label>
+                  <Label htmlFor="certificate" className="text-md">
+                    Certificates
+                  </Label>
                   <Select
                     {...form.register("certificate")}
                     options={certificates}
@@ -470,7 +491,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-span-2 col-end-7">
-                  <Label htmlFor="major" className="text-md">Major</Label>
+                  <Label htmlFor="major" className="text-md">
+                    Major
+                  </Label>
                   <Select
                     {...form.register("major")}
                     options={majors}
@@ -485,7 +508,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-start-1 col-end-7">
-                  <Label htmlFor="criteria" className="text-md">Criteria</Label>
+                  <Label htmlFor="criteria" className="text-md">
+                    Criteria
+                  </Label>
                   {criteriaFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">
                       <Input
@@ -509,7 +534,9 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-start-1 col-end-7">
-                  <Label htmlFor="reviewMilestone" className="text-md">Review Milestones</Label>
+                  <Label htmlFor="reviewMilestone" className="text-md">
+                    Review Milestones
+                  </Label>
                   {reviewMilestoneFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">
                       <Input
@@ -543,15 +570,12 @@ const FormCreateScholarshipProgram = () => {
                     Add New Milestone
                   </Button>
                 </div>
-
-                
               </div>
             </CardContent>
-            
           </Card>
           <div className="flex justify-end">
-                  <Button type="submit">Create Program</Button>
-                </div>
+            <Button type="submit">Create Program</Button>
+          </div>
         </form>
         {isLoading && <ScreenSpinner />}
       </div>

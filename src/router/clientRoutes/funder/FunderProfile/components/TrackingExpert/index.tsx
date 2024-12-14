@@ -101,7 +101,7 @@ const TrackingExpert = () => {
   return (
     <Tabs.Content value="expert" className="pt-4 w-full">
       <div className="grid grid-cols-12">
-        <div className="col-span-12 col-start-1 p-6">
+        <div className="col-span-12 col-start-1 ">
           <Tabs.Root defaultValue="create">
             <Tabs.List className="flex space-x-4 border-b-2 my-5 bg-white shadow-2 rounded-lg">
               <Tabs.Trigger
@@ -137,13 +137,8 @@ const TrackingExpert = () => {
                     onSubmit={handleFormSubmit}
                     initialData={initialFormData}
                     handelUploadFile={handleFileChange}
+                    success = {success}
                   />
-                  {error && <p className="text-red-600 mt-4">{error}</p>}
-                  {success && (
-                    <p className="text-green-600 mt-4">
-                      Expert data submitted successfully!
-                    </p>
-                  )}
                 </Card>
               </Tabs.Content>
 
