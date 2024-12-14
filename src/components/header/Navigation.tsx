@@ -7,7 +7,7 @@ type NavItem = {
   text: string;
   to: string;
 };
-
+//User Guide
 const navItems: NavItem[] = [
   {
     text: navigation.ABOUT_US,
@@ -24,25 +24,27 @@ const navItems: NavItem[] = [
   {
     text: navigation.CHAT,
     to: RouteNames.CHAT,
-  },
-  
+  }, {
+    text: navigation.USER_GUIDE,
+    to: RouteNames.USER_GUIDE,
+  }
 ];
 
 const Navigation = () => {
   return (
     <nav>
       <div className="flex justify-between mr-10">
-        <ul className=" text-xl font-normal flex justify-around gap-10" style={{color: "#fff"}}>
+        <ul className=" text-xl font-normal flex justify-around gap-10" style={{ color: "#fff" }}>
           {navItems.map((item) => (
             <li key={item.text} className="group/nav">
               <Link className="text-xl" to={item.to}>{item.text}</Link>
               <div className="h-[2px] bg-[#1eb2a6] scale-x-0 group-hover/nav:scale-x-100 transition" />
             </li>
           ))}
-          <DropdownNotification/>
+          <DropdownNotification />
         </ul>
       </div>
-      
+
     </nav>
   );
 };

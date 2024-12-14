@@ -11,6 +11,7 @@ const navigation = {
     CHAT: 'Chat',
     SERVICES: 'Services',
     REVIEW: 'Review',
+    USER_GUIDE: 'Guide'
 };
 
 export default navigation;

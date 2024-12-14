@@ -3,9 +3,7 @@ import RouteNames from "../../constants/routeNames";
 import Home from "./Home";
 import AccountInfo from "./AccountInfo";
 import AboutUs from "./AboutUs";
-import Events from "./Events";
 import BlogDetail from "./BlogDetail";
-import BlogList from "./BlogList";
 import ScholarshipProgram from "./ScholarshipProgram";
 import ChangePassword from "./ChangePassword";
 import Major from "./Major";
@@ -36,6 +34,7 @@ import ProviderProfile from "./provider/ProviderProfile";
 import ApplicationReview from "./Expert/ExpertProfile";
 import ExpertProfile from "./Expert/ExpertProfile";
 import TrackingExpert from "./funder/FunderProfile/components/TrackingExpert";
+import UserGuide from "./UserGuide";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -47,12 +46,8 @@ const publicRoutes: RouteObject[] = [
     element: <AboutUs />,
   },
   {
-    path: RouteNames.EVENTS,
-    element: <Events />,
-  },
-  {
-    path: RouteNames.BLOGS_LIST,
-    element: <BlogList />,
+    path: RouteNames.USER_GUIDE,
+    element: <UserGuide />,
   },
   {
     path: RouteNames.BLOGS_DETAIL,

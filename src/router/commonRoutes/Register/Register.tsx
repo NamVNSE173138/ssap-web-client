@@ -146,14 +146,15 @@ const Register = () => {
     },
   });
 
-   const onError = (_error:any) => {
-    if (errors != {} as any) {
+  const onError = () => {
+    if (Object.keys(errors).length > 0) {
       notification.error({
-        message: "Something's wrong in previous step!",
+        message: "Something's wrong in the previous step!",
         description: "Please check the errors in the form and try again.",
       });
     }
-  };
+    console.log(errors);
+  };    
 
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState);
