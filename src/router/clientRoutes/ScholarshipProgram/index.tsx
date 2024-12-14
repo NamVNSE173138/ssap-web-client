@@ -16,10 +16,9 @@ import { getAllCategories } from "@/services/ApiServices/categoryService";
 import { SearchIcon } from "lucide-react";
 import { getAllCertificates } from "@/services/ApiServices/certificateService";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Slider } from "@mui/material";
-import { getAllScholarshipProgram, getScholarshipProgram, searchScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendar, FaDollarSign, FaInfoCircle } from "react-icons/fa";
 import { HiOutlineChevronDown } from "react-icons/hi";
-import { Button } from "@/components/ui/button";
 import { IoMdClose } from "react-icons/io";
 const ScholarshipProgram = () => {
   const [data, setData] =
@@ -27,15 +26,13 @@ const ScholarshipProgram = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [countries, setCountries] = useState<{ name: string }[]>([]);
-  const [majors, setMajors] = useState<{ name: string }[]>([]);
-  const [categories, setCategories] = useState<{ name: string }[]>([]);
-  const [certificates, setCertificates] = useState<{ name: string }[]>([]);
+  const [_countries, setCountries] = useState<{ name: string }[]>([]);
+  const [_majors, setMajors] = useState<{ name: string }[]>([]);
+  const [_categories, setCategories] = useState<{ name: string }[]>([]);
+  const [_certificates, setCertificates] = useState<{ name: string }[]>([]);
 
   const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 50000]);
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
-  const scholarshipStatus: string = "";
-  const [scholarshipCategory, setScholarshipCategory] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
   const [fullData, setFullData] = useState<ScholarshipProgramType[]>(scholarshipProgram);
 
