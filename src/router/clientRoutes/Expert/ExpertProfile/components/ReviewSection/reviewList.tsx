@@ -1,6 +1,7 @@
 import React from "react";
 import { formatDate } from "@/lib/date-formatter";
-
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 type ApprovalItem = {
   id: number;
@@ -11,7 +12,8 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string; // Added to store document URL
-  applicationReviews?: { id: number }[];
+  applicationReviews?: { id: number, score: number; }[];
+  
 };
 
 type ApprovalTableProps = {
@@ -19,11 +21,13 @@ type ApprovalTableProps = {
   onRowClick: (item: ApprovalItem) => void;
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
+  document: any;
 };
 
 const ReviewList: React.FC<ApprovalTableProps> = ({
   applications,
   onRowClick,
+  document,
 }) => {
   return (
     <div className="overflow-auto bg-white shadow rounded-lg">
@@ -43,15 +47,33 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               Applied On
             </th>
             <th className="p-4 text-left text-sm font-semibold text-gray-600">
+              Score
+            </th>
+            <th className="p-4 text-left text-sm font-semibold text-gray-600">
               Status
             </th>
-            {/* <th className="p-4 text-left text-sm font-semibold text-gray-600">
+            <th className="p-4 text-left text-sm font-semibold text-gray-600">
               Actions
-            </th> */}
+            </th>
           </tr>
         </thead>
         <tbody>
-          {applications.map((item) => (
+          {applications.map((item) => {
+            // const isScored = item.applicationReviews?.some(
+            //   (review) => review.score !== null && review.score !== undefined
+            // );
+            const isScored = item.applicationReviews?.some(
+              (review) => review.score !== null && review.score !== undefined && review.score > 0
+            ) || false;
+            console.log("isScore", isScored);
+            
+
+            const score = item.applicationReviews?.find(
+              (review) => review.score !== undefined
+            )?.score || "Not Scored";
+            console.log("Score", score);
+
+            return (
             <tr
               key={item.id}
               onClick={() => onRowClick(item)}
@@ -67,6 +89,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               <td className="p-4 text-sm text-gray-800">
                 {formatDate(item.appliedDate)}
               </td>
+              <td className="p-4 text-sm text-gray-800">{score}</td>
               <td
                 className={`p-4 text-sm font-medium ${
                   item.status === "Approved"
@@ -78,30 +101,46 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               >
                 {item.status}
               </td>
-              {/* <td className="p-4 text-sm">
+              <td className="p-4 text-sm">
                 <div className="flex items-center space-x-2">
-                  <Button
-                    className="w-full h-full bg-green-500 text-white"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onApprove(item.id);
-                    }}
-                  >
-                    Approve
+                  <Button className={`w-full h-full ${
+                        isScored
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-blue-500 text-white"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isScored) onRowClick(item);
+                      }}
+                      disabled={isScored}>
+                    <Link
+                      to={document}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className=" inline-block rounded-lg"
+                    >
+                      Review Document
+                    </Link>
                   </Button>
                   <Button
-                    className="w-full h-full bg-red-500 text-white"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onReject(item.id);
-                    }}
-                  >
-                    Reject
-                  </Button>
+                      className={`w-full h-full ${
+                        isScored
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-green-500 text-white"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isScored) onRowClick(item);
+                      }}
+                      disabled={isScored}
+                    >
+                      {isScored ? "Scored" : "Score"}
+                    </Button>
                 </div>
-              </td> */}
+              </td>
             </tr>
-          ))}
+            )
+          })}
         </tbody>
       </table>
     </div>
@@ -109,15 +148,3 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
 };
 
 export default ReviewList;
-
-
-
-
-
-
-
-
-
-
-
-
