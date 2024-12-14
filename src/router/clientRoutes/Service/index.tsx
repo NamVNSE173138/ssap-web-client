@@ -24,7 +24,6 @@ import {
 import { IoIosSearch, IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
-import { Input } from "@/components/ui/input";
 import {
   getAccountById,
   getAccountWallet,
