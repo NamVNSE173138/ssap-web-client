@@ -1,11 +1,12 @@
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 
-export async function sendMessage(senderId: number, receiverId: number, message: string) {
+export async function sendMessage(senderId: number, receiverId: number, message: string, isRead: boolean) {
   const response = await axios.post(`${BASE_URL}/api/chats/send-message`, {
     senderId,
     receiverId,
     message,
+    isRead
   });
   return response.data;
 }
