@@ -4,21 +4,28 @@ import { BASE_URL } from "@/constants/api";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import {ScholarshipProgramType,} from "../ScholarshipProgram/data";
+import { ScholarshipProgramType, } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
-import {Avatar,Button,Divider,FormControl,InputAdornment,InputLabel,List,ListItem,ListItemAvatar,ListItemText,OutlinedInput,Paper,Typography,} from "@mui/material";
+import { Avatar, Button, Divider, FormControl, InputAdornment, InputLabel, List, ListItem, ListItemAvatar, ListItemText, OutlinedInput, Paper, Typography, } from "@mui/material";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { SendNotification } from "@/services/ApiServices/notification";
-import {getScholarshipProgram,updateScholarshipStatus,
+import {
+  getScholarshipProgram, updateScholarshipStatus,
 } from "@/services/ApiServices/scholarshipProgramService";
-import {FaCheckCircle,FaExternalLinkAlt,FaSearch,FaTimes,FaTrophy,
+import {
+  FaCheckCircle, FaExternalLinkAlt, FaSearch, FaTimes, FaTrophy,
 } from "react-icons/fa";
 import { notification } from "antd";
 import ApplicationStatus from "@/constants/applicationStatus";
 import * as Tabs from "@radix-ui/react-tabs";
 import FirstReview from "./firstReview";
 import SecondReview from "./secondReview";
+import { updateApplication } from "@/services/ApiServices/applicationService";
+import { getUploadedScholarshipContract } from "@/services/ApiServices/applicantService";
+import { getFunderExperts, getFunderProfile } from "@/services/ApiServices/funderService";
+import { IoCloudUpload } from "react-icons/io5";
+import Modal from "antd/es/modal/Modal";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +39,9 @@ const ChooseWinner = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [availableScholarships, setAvailableScholarships] = useState(0);
   const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [generateFile, setGenerateFile] = useState(null);
+  const [applicationFiles, setApplicationFiles] = useState<File[]>([]);
 
   const statusColor = {
     [ApplicationStatus.Submitted]: "blue",
@@ -49,13 +59,13 @@ const ChooseWinner = () => {
       const scholarship = await getScholarshipProgram(parseInt(id));
       console.log("APPLICATION", response);
       console.log("Scholarship", scholarship);
-      
+
       if (response.statusCode == 200) {
         setApplicants(
           response.data.filter(
             (row: any) =>
               (row.status == "Submitted" ||
-              row.status == "Reviewing") &&
+                row.status == "Reviewing") &&
               new Date(row.updatedAt) < new Date(scholarship.data.deadline)
           )
         );
@@ -65,8 +75,8 @@ const ChooseWinner = () => {
           );
           setAvailableScholarships(
             data?.numberOfScholarships -
-              response.data.filter((row: any) => row.status == "Approved")
-                .length
+            response.data.filter((row: any) => row.status == "Approved")
+              .length
           );
         }
       } else {
@@ -79,7 +89,22 @@ const ChooseWinner = () => {
     }
   };
 
+  const handlePreviewTemplate = async () => {
+    if (!data) return null;
+    const funderProfile = await getFunderProfile(data?.funderId);
+    const generateForFile = {
+      ApplicantName: selectedRows[0].applicant.username,
+      ScholarshipAmount: data?.scholarshipAmount,
+      ScholarshipProviderName: funderProfile.data.username,
+      Deadline: data?.deadline,
+    };
+
+    const file = await getUploadedScholarshipContract(generateForFile);
+    setGenerateFile(file);
+  };
+
   const applyForSelectedWinners = async () => {
+    setModalIsOpen(true);
     try {
       setLoading(true);
       const applyPromises = selectedRows.map(async (row) => {
@@ -92,18 +117,7 @@ const ChooseWinner = () => {
           applicationDocuments: [],
           applicationReviews: [],
         };
-
-        const response = await axios.put(
-          `${BASE_URL}/api/applications/${row.id}`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        return response;
+        const response = await updateApplication(row.id, payload);
       });
 
       await Promise.all(applyPromises);
@@ -153,19 +167,17 @@ const ChooseWinner = () => {
       width: 130,
       flex: 0.5,
       renderCell: (params) => {
-        console.log("PARAM",params)
+        console.log("PARAM", params)
         return (
           <span className="flex justify-end gap-2 items-center">
             <span className="relative flex h-3 w-3">
               <span
-                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${
-                  statusColor[params.row.status]
-                }-500 opacity-75`}
+                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[params.row.status]
+                  }-500 opacity-75`}
               ></span>
               <span
-                className={`relative inline-flex rounded-full h-3 w-3 bg-${
-                  statusColor[params.row.status]
-                }-500`}
+                className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[params.row.status]
+                  }-500`}
               ></span>
             </span>
             <span
@@ -177,7 +189,7 @@ const ChooseWinner = () => {
         );
       },
     },
-    {field: "expertReview", headerName: "Reviewed by Expert", width: 130, flex: 1},
+    { field: "expertReview", headerName: "Reviewed by Expert", width: 130, flex: 1 },
     {
       field: "score", headerName: "Score", width: 130, flex: 1
     },
@@ -217,8 +229,8 @@ const ChooseWinner = () => {
           0
           ? 0
           : data?.numberOfScholarships -
-              applicants.filter((row: any) => row.status == "Approved").length -
-              selectedRowData.length
+          applicants.filter((row: any) => row.status == "Approved").length -
+          selectedRowData.length
       );
   };
 
@@ -229,12 +241,12 @@ const ChooseWinner = () => {
   // Filter rows based on search query
   const filteredRows = applicants
     ? applicants.filter(
-        (row: any) =>
-          row.applicant.username
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (row: any) =>
+        row.applicant.username
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   const fetchData = async () => {
@@ -382,13 +394,13 @@ const ChooseWinner = () => {
                 <Tabs.Trigger value="finalReview" className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]">Final Review</Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value="firstReview">
-              <FirstReview scholarshipId={id ?? ""} token={token ?? ""} />
+                <FirstReview scholarshipId={id ?? ""} token={token ?? ""} />
               </Tabs.Content>
               <Tabs.Content value="secondReview">
-              <SecondReview scholarshipId={id ?? ""} token={token ?? ""} />
+                <SecondReview scholarshipId={id ?? ""} token={token ?? ""} />
               </Tabs.Content>
               <Tabs.Content value="finalReview">
-              <Paper
+                <Paper
                   sx={{
                     height: 400,
                     width: "100%",
@@ -405,8 +417,8 @@ const ChooseWinner = () => {
                           "https://github.com/shadcn.png",
                         username: app.applicant.username,
                         status: app.status,
-                        expertReview: app.expertReview ?? "Not reviewed", 
-  score: app.score ?? "N/A",
+                        expertReview: app.expertReview ?? "Not reviewed",
+                        score: app.score ?? "N/A",
                         choosable:
                           availableScholarships > 0 ||
                           selectedRows.includes(
@@ -428,37 +440,77 @@ const ChooseWinner = () => {
                   )}
                 </Paper>
                 <div className="flex justify-end mt-4 gap-5">
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={handleClearSelection}
-                className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500"
-              >
-                <FaSearch className="text-white text-2xl" />
-                <span className="text-lg font-semibold">Clear Selection</span>
-              </Button>
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={handleClearSelection}
+                    className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500"
+                  >
+                    <FaSearch className="text-white text-2xl" />
+                    <span className="text-lg font-semibold">Clear Selection</span>
+                  </Button>
 
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                onClick={applyForSelectedWinners}
-                className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500"
-              >
-                {loading ? (
-                  <div
-                    className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                    aria-hidden="true"
-                  ></div>
-                ) : (
-                  <FaCheckCircle className="text-white text-2xl" />
-                )}
-                <span className="text-lg font-semibold">Apply</span>
-              </Button>
-            </div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    onClick={applyForSelectedWinners}
+                    className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500"
+                  >
+                    {loading ? (
+                      <div
+                        className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                        aria-hidden="true"
+                      ></div>
+                    ) : (
+                      <FaCheckCircle className="text-white text-2xl" />
+                    )}
+                    <span className="text-lg font-semibold">Apply</span>
+                  </Button>
+                </div>
               </Tabs.Content>
-              
             </Tabs.Root>
+
+            <Modal
+              open={modalIsOpen}
+              onCancel={() => setModalIsOpen(false)}
+              onOk={applyForSelectedWinners}
+            >
+              <h2 className="flex justify-center">Send contract to applicant</h2>
+              <br></br>
+              <button className="mt-8" onClick={handlePreviewTemplate}>Preview our template</button>
+              {generateFile && (
+                <div>
+                  <p>Generated file is ready for review!</p>
+                </div>
+              )}
+
+              <div className="mb-5">
+                <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
+                  <IoCloudUpload className="text-blue-500" />
+                  Submit File(s)
+                </label>
+                <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
+                  <input
+                    type="file"
+                    multiple
+                    className="w-full hidden"
+                    id="file-upload"
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files) setApplicationFiles(Array.from(files));
+                    }}
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="cursor-pointer text-blue-500 hover:underline"
+                  >
+                    <IoCloudUpload className="text-4xl mx-auto text-gray-400 mb-2" />
+                    Click to upload files
+                  </label>
+                </div>
+              </div>
+            </Modal>
 
             <div className="my-4 text-lg text-gray-700">
               Selected Winners:{" "}
@@ -476,44 +528,3 @@ const ChooseWinner = () => {
 };
 
 export default ChooseWinner;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
