@@ -16,6 +16,7 @@ import { SearchIcon } from "lucide-react";
 import { BASE_URL } from "@/constants/api";
 import { formatDate } from "@/lib/date-formatter";
 import { notification } from "antd";
+import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const [experts, setExperts] = useState<any[]>([]);
@@ -25,14 +26,26 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
 
+  const [selectedReviewMilestone, setSelectedReviewMilestone] = useState<any>(null);
+
   // Fetch experts related to the scholarship program
   const fetchExperts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const [response, reviewMilestones] = await Promise.all([axios.get(
         `${BASE_URL}/api/scholarship-programs/${scholarshipId}/experts`
-      );
+      ),
+      getAllReviewMilestonesByScholarship(scholarshipId)
+      ]);
       console.log("Fetched Experts:", response.data); 
+
+      console.log("Fetched Applications:", reviewMilestones.data.find(
+        (milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date())
+      ?? reviewMilestones.data[0]);
+      setSelectedReviewMilestone(reviewMilestones.data.find(
+        (milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date())
+      ?? reviewMilestones.data[0]);
+
       if (Array.isArray(response.data.data)) {
         setExperts(response.data.data); 
       } else {
@@ -49,7 +62,8 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const fetchApplications = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await 
+      axios.get(
         `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`
       );
       setApplications(response.data.data || []);
@@ -161,7 +175,10 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         {step === 1 && (
           <>
             {/* <h3>Select Expert:</h3> */}
-            <DialogTitle>Select Expert</DialogTitle>
+            <DialogTitle>Select Expert for 
+            <span className="text-sky-500">{selectedReviewMilestone && 
+            ` ${selectedReviewMilestone.description}`}</span>
+            </DialogTitle>
             {loading ? (
               <CircularProgress />
             ) : (

@@ -405,8 +405,10 @@ const ChooseWinner = () => {
                           "https://github.com/shadcn.png",
                         username: app.applicant.username,
                         status: app.status,
-                        expertReview: app.expertReview ?? "Not reviewed", 
-  score: app.score ?? "N/A",
+                        score: app.applicationReviews ? 
+                            app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0)/app.applicationReviews.length 
+                            : "N/A",
+                        expertReview: app.applicationReviews.length > 0 ? "Reviewed" : "Not reviewed", 
                         choosable:
                           availableScholarships > 0 ||
                           selectedRows.includes(
