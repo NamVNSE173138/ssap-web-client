@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import navigation from "../../constants/multilingual/navigation";
 import RouteNames from "../../constants/routeNames";
 import DropdownNotification from "@/router/adminRoutes/Dashboard/components/Header/DropdownNotification";
+import useMediaQuery from "@/hooks/useMediaQuery";
+import { useState } from "react";
 
 type NavItem = {
   text: string;
@@ -31,6 +33,9 @@ const navItems: NavItem[] = [
 ];
 
 const Navigation = () => {
+  const isAboveMediumScreens = useMediaQuery('(min-width: 1060px)');
+  const flexBetween = 'flex items-center justify-between';
+  const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
   return (
     <nav>
       <div className="flex justify-between mr-10">
