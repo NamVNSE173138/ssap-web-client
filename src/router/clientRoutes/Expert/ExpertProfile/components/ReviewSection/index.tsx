@@ -11,18 +11,19 @@ import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { notification } from "antd";
+import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 type ApprovalItem = {
   id: number;
   applicantName: string;
+  scholarshipProgramId: number;
   scholarshipName: string;
   university: string;
   appliedDate: string;
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
-  applicationReviews?: { id: number, score: number }[]; // Ensure to include applicationReviews for ID
-  
+  applicationReviews?: { id: number; score: number; expertId: number }[]; // Ensure to include applicationReviews for ID
 };
 
 const ApprovalList: React.FC = () => {
@@ -35,7 +36,7 @@ const ApprovalList: React.FC = () => {
   const [score, setScore] = useState<number | string>("");
   const [comment, setComment] = useState("");
   // const [isFirstReview, setIsFirstReview] = useState(true);
-  const isFirstReview = true;
+  // const isFirstReview = true;
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchApplicationReview = async () => {
@@ -59,6 +60,7 @@ const ApprovalList: React.FC = () => {
           return {
             id: app.id,
             applicantName: applicantResponse.data.username,
+            scholarshipProgramId: app.scholarshipProgramId,
             scholarshipName: scholarshipResponse.data.data.name,
             university: scholarshipResponse.data.data.university.name,
             appliedDate: app.appliedDate,
@@ -84,15 +86,21 @@ const ApprovalList: React.FC = () => {
   }, [user.id]);
 
   const handleRowClick = (item: ApprovalItem) => {
-    const isScored = item.applicationReviews?.some(
-      (review) => review.score !== null && review.score !== undefined && review.score > 0
-    ) || false;
-  if (isScored) {
-    notification.info({message: "This application has already been scored. You cannot score it again."});
-    return; // Prevent opening dialog
-  }
+    const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
+            if(!review) return;
+            const isScored = review.some(
+              (review) => review.score !== null && review.score !== undefined && review.score > 0
+            ) || false;
+            console.log("isScore", isScored);
+    if (isScored) {
+      notification.info({
+        message:
+          "This application has already been scored. You cannot score it again.",
+      });
+      return; // Prevent opening dialog
+    }
     setSelectedItem(item);
-    setScore(""); 
+    setScore("");
     setComment("");
   };
 
@@ -128,12 +136,30 @@ const ApprovalList: React.FC = () => {
 
   const handleScoreSubmit = async () => {
     setIsLoading(true);
-    if (!selectedItem || score === "") return; 
+
+    if (!selectedItem || score === "") return;
     const reviewId = selectedItem.applicationReviews?.[0]?.id;
     if (!reviewId) {
       console.error("Review ID not found.");
       return;
     }
+    if (!selectedItem) return null;
+    const reviewMilestone = await getAllReviewMilestonesByScholarship(
+      selectedItem.scholarshipProgramId
+    );
+    console.log("reviewmilestone", reviewMilestone);
+    const currentDate = new Date();
+    let isReview = true
+    reviewMilestone?.data.forEach((review: any) => {
+      if (
+        new Date(review.fromDate) < currentDate &&
+        new Date(review.toDate) > currentDate
+      ) {
+        if (review.description.toLowerCase() === "application review") {
+          isReview = true
+        } else {isReview = false}
+      }
+    });
     const numericScore = Number(score);
     try {
       const payload = {
@@ -141,11 +167,11 @@ const ApprovalList: React.FC = () => {
         comment,
         isPassed: numericScore >= 50,
         score: Number(score),
-        isFirstReview,
+        isFirstReview: isReview,
       };
       await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
       console.log("Review submitted successfully:", payload);
-      notification.success({message: "Review submitted successfully"})
+      notification.success({ message: "Review submitted successfully" });
       setIsLoading(false);
       setSelectedItem(null);
       fetchApplicationReview();
@@ -153,7 +179,7 @@ const ApprovalList: React.FC = () => {
       setComment("");
     } catch (error) {
       console.error("Failed to submit review:", error);
-      notification.error({message: "Failed to submit review"})
+      notification.error({ message: "Failed to submit review" });
     }
   };
 
