@@ -465,14 +465,17 @@ const ChooseWinner = () => {
                     borderRadius: "8px",
                     boxShadow: 3,
                     padding: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
                   {filteredRows.length > 0 ? (
-                    <div style={{ overflowX: "auto" }}>
+                    <div style={{ overflowX: "auto", flex: 1 }}>
                       <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
-                            <th style={{ padding: "12px", fontWeight: "600" }}>Checkbox</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}></th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>ID</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Username</th>
@@ -488,7 +491,7 @@ const ChooseWinner = () => {
                               <td style={{ padding: "12px" }}>
                                 <input
                                   type="checkbox"
-                                  disabled={availableScholarships == 0 && !selectedRows.includes(app)}
+                                  disabled={availableScholarships === 0 && !selectedRows.includes(app)}
                                   checked={selectedRows.some((row) => row.id === app.id)}
                                   onChange={() => handleSelectionChange(app.id)}
                                 />
@@ -500,7 +503,7 @@ const ChooseWinner = () => {
                               <td style={{ padding: "12px" }}>{app.applicant.username}</td>
                               <td style={{ padding: "12px" }}>{app.status}</td>
                               <td style={{ padding: "12px" }}>{app.expertReview ?? "Not reviewed"}</td>
-                              <td style={{ padding: "12px", textAlign: "center" }}>{app.applicationReviews.length ? app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length : "N/a"}</td>
+                              <td style={{ padding: "12px", textAlign: "center" }}>{app.applicationReviews.length ? (app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length).toFixed(1) : "N/A"}</td>
                               <td style={{ padding: "12px", textAlign: "center" }}>
                                 <Link
                                   target="_blank"
@@ -535,26 +538,34 @@ const ChooseWinner = () => {
                   ) : (
                     <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
                   )}
-                </Paper>
 
-                <div className="flex justify-between mt-4 gap-6">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    onClick={openApplyModal}
-                    className="text-white py-3 px-6 rounded-lg shadow-md bg-gradient-to-r from-blue-600 to-teal-500 hover:scale-105 transition-all duration-200 transform"
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div>
-                    ) : (
-                      <FaCheckCircle className="text-white text-2xl" />
+                  <div className="flex justify-end my-4 text-lg text-gray-700">
+                    Selected Winners:{" "}
+                    {selectedRows.map((row: any, index: number) =>
+                      index > 0 ? `, ${row.applicant.username}` : row.applicant.username
                     )}
-                    <span className="text-lg font-semibold">Apply</span>
-                  </Button>
-                </div>
+                  </div>
+
+                  <div className="flex justify-end mt-4 gap-6">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={openApplyModal}
+                      className="text-white py-3 px-6 rounded-lg shadow-md bg-gradient-to-r from-blue-600 to-teal-500 hover:scale-105 transition-all duration-200 transform"
+                    >
+                      {loading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div>
+                      ) : (
+                        <FaCheckCircle className="text-white text-2xl" />
+                      )}
+                      <span className="text-lg font-semibold">Apply</span>
+                    </Button>
+                  </div>
+                </Paper>
               </Tabs.Content>
             </Tabs.Root>
+
             <Modal
               open={modalIsOpen}
               onCancel={() => setModalIsOpen(false)}
@@ -576,6 +587,9 @@ const ChooseWinner = () => {
                 <p className="text-sm text-gray-600 mb-6">
                   Use this form to preview and upload the contract files before sending them to the applicant.
                 </p>
+                <p className="mb-4 text-sm text-yellow-600">
+                  If you use the auto-generated contract service, please note that only one contract will be generated. Or you can choose individual winners for this scholarship
+                </p>
 
                 <div className="flex justify-center">
                   <button
@@ -591,6 +605,9 @@ const ChooseWinner = () => {
                     <h3 className="text-lg font-medium mb-2">Generated File</h3>
                     <p className="mb-4">
                       Your contract has been successfully generated and is ready for review. Click the link below to view or download it.
+                    </p>
+                    <p className="mb-4 text-sm text-gray-600">
+                      If you use the auto-generated contract service, please note that only one contract will be generated.
                     </p>
                     <a
                       href={generateFile}
@@ -645,16 +662,8 @@ const ChooseWinner = () => {
                   </div>
                 )}
               </div>
-            </Modal>
 
-            <div className="my-4 text-lg text-gray-700">
-              Selected Winners:{" "}
-              {selectedRows.map((row: any, index: number) =>
-                index > 0
-                  ? `, ${row.applicant.username}`
-                  : row.applicant.username
-              )}
-            </div>
+            </Modal>
           </div>
         </div>
       </section>
