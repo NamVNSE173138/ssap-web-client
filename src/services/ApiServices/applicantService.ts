@@ -6,7 +6,7 @@ const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 export async function getUploadedScholarshipContract(request: any) {
     try {
         const response = await axios.post(
-            `${BASE_URL}/api/contract-uploaded`,
+            `${BASE_URL}/api/applicants/contract-uploaded`,
             request,
             ngrokSkipWarning
         );

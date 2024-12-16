@@ -9,12 +9,13 @@ import Spinner from "@/components/Spinner";
 import { Avatar, Button, Divider, FormControl, InputAdornment, InputLabel, List, ListItem, ListItemAvatar, ListItemText, OutlinedInput, Paper, Typography, } from "@mui/material";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { SendNotification } from "@/services/ApiServices/notification";
+import { SendNotification, sendWinnerEmail } from "@/services/ApiServices/notification";
 import {
   getScholarshipProgram, updateScholarshipStatus,
 } from "@/services/ApiServices/scholarshipProgramService";
 import {
-  FaCheckCircle, FaExternalLinkAlt, FaSearch, FaTimes, FaTrophy,
+  FaCheckCircle, FaExternalLinkAlt, FaEye, FaGraduationCap, FaSearch, FaTimes, FaTrophy,
+  FaUser,
 } from "react-icons/fa";
 import { notification } from "antd";
 import ApplicationStatus from "@/constants/applicationStatus";
@@ -24,8 +25,9 @@ import SecondReview from "./secondReview";
 import { updateApplication } from "@/services/ApiServices/applicationService";
 import { getUploadedScholarshipContract } from "@/services/ApiServices/applicantService";
 import { getFunderExperts, getFunderProfile } from "@/services/ApiServices/funderService";
-import { IoCloudUpload } from "react-icons/io5";
+import { IoCloudUpload, IoDocumentText } from "react-icons/io5";
 import Modal from "antd/es/modal/Modal";
+import { uploadFile } from "@/services/ApiServices/testService";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +43,7 @@ const ChooseWinner = () => {
   const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [generateFile, setGenerateFile] = useState(null);
-  const [applicationFiles, setApplicationFiles] = useState<File[]>([]);
+  const [constractFiles, setConstractFiles] = useState<File[]>([]);
 
   const statusColor = {
     [ApplicationStatus.Submitted]: "blue",
@@ -90,21 +92,47 @@ const ChooseWinner = () => {
   };
 
   const handlePreviewTemplate = async () => {
-    if (!data) return null;
-    const funderProfile = await getFunderProfile(data?.funderId);
-    const generateForFile = {
-      ApplicantName: selectedRows[0].applicant.username,
-      ScholarshipAmount: data?.scholarshipAmount,
-      ScholarshipProviderName: funderProfile.data.username,
-      Deadline: data?.deadline,
-    };
+    try {
+      if (!data) {
+        notification.error({
+          message: "No data available for preview.",
+        });
+        return;
+      }
 
-    const file = await getUploadedScholarshipContract(generateForFile);
-    setGenerateFile(file);
+      const funderProfile = await getFunderProfile(data?.funderId);
+      const generateForFile = {
+        applicantName: selectedRows[0].applicant.username,
+        scholarshipAmount: data?.scholarshipAmount + "",
+        scholarshipProviderName: funderProfile.data.username,
+        deadline: data?.deadline,
+      };
+
+      const file = await getUploadedScholarshipContract(generateForFile);
+      if (file) {
+        notification.success({
+          message: "Preview generated successfully!",
+        });
+        setGenerateFile(file.data);
+      } else {
+        notification.error({
+          message: "Failed to generate preview.",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      notification.error({
+        message: "Error generating preview.",
+      });
+    }
+  };
+
+  const openApplyModal = () => {
+    setModalIsOpen(true);
   };
 
   const applyForSelectedWinners = async () => {
-    setModalIsOpen(true);
+    setModalIsOpen(false);
     try {
       setLoading(true);
       const applyPromises = selectedRows.map(async (row) => {
@@ -117,31 +145,36 @@ const ChooseWinner = () => {
           applicationDocuments: [],
           applicationReviews: [],
         };
-        const response = await updateApplication(row.id, payload);
-      });
 
-      await Promise.all(applyPromises);
-      if (availableScholarships == 0) {
-        await updateScholarshipStatus(Number(data?.id), "FINISHED");
-      }
-      notification.success({
-        message: "Selected applicants have been approved!",
-      });
-      await fetchData();
-      for (let row of selectedRows) {
+        await updateApplication(row.id, payload);
+        await sendWinnerEmail(row.applicantId, constractFiles);
+
         await SendNotification({
           topic: row.applicantId.toString(),
           link: `/funder/application/${row.id}`,
           title: "Your application has been approved",
           body: `Your application for ${data?.name} has been approved.`,
         });
+      });
+
+      await Promise.all(applyPromises);
+
+      if (availableScholarships === 0) {
+        await updateScholarshipStatus(Number(data?.id), "FINISHED");
       }
+
+      notification.success({
+        message: "Selected applicants have been approved!",
+      });
+      await fetchData();
     } catch (error) {
+      console.error(error);
       setError("Failed to apply for selected winners.");
     } finally {
       setLoading(false);
     }
   };
+
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
@@ -214,31 +247,33 @@ const ChooseWinner = () => {
 
   const paginationModel = { page: 0, pageSize: 5 };
 
-  const handleSelectionChange = (selectionModel: any) => {
-    const selectedRowData = applicants.filter((row: any) =>
-      selectionModel.includes(row.id)
-    );
-    //console.log(selectedRowData.slice(0, availableScholarships));
+  const handleSelectionChange = (appId: number) => {
+    // Check if the appId is already in selectedRows
+    console.log(selectedRows);
+    const isSelected = selectedRows.some((row) => row.id === appId);
+    let fakeSelectedRows;
+    if (isSelected) {
+      // If already selected, remove it from selectedRows
+      fakeSelectedRows = selectedRows.filter((row) => row.id !== appId);
+      setSelectedRows((prev) => prev.filter((row) => row.id !== appId));
+    } else {
+      // If not selected, add it to selectedRows
+      fakeSelectedRows = [...selectedRows, applicants.find((row: any) => row.id === appId)];
+      setSelectedRows((prev) => [...prev, applicants.find((row: any) => row.id === appId)]);
+    }
 
-    setSelectedRows(selectedRowData.slice(0, availableScholarships));
-    if (data)
-      setAvailableScholarships(
-        data?.numberOfScholarships -
-          applicants.filter((row: any) => row.status == "Approved").length -
-          selectedRowData.length <=
-          0
-          ? 0
-          : data?.numberOfScholarships -
-          applicants.filter((row: any) => row.status == "Approved").length -
-          selectedRowData.length
-      );
+    // Update available scholarships logic
+    if (data) {
+      const approvedCount = applicants.filter((row: any) => row.status === "Approved").length;
+      const newAvailableScholarships = data.numberOfScholarships - approvedCount - fakeSelectedRows.length;
+      setAvailableScholarships(newAvailableScholarships < 0 ? 0 : newAvailableScholarships);
+    }
   };
 
   const handleClearSelection = async () => {
     setSelectedRows([]);
   };
 
-  // Filter rows based on search query
   const filteredRows = applicants
     ? applicants.filter(
       (row: any) =>
@@ -283,7 +318,6 @@ const ChooseWinner = () => {
       <section className="bg-white lg:bg-gray-50 py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-            {/* Title Section */}
             <p className="text-4xl font-semibold text-sky-600 flex items-center gap-2">
               <FaTrophy className="text-4xl text-sky-500" />
               Choose Scholarship Winner
@@ -294,13 +328,12 @@ const ChooseWinner = () => {
               <span className="text-sky-500">{scholarshipWinners.length}</span>
             </p>
 
-            {/* Scholarship Winners List */}
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
               {scholarshipWinners.map((winner) => (
-                <div key={winner.id}>
+                <div key={winner.id} className="p-4 mb-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-all duration-300">
                   <ListItem
                     alignItems="flex-start"
-                    className="hover:bg-sky-50 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl"
+                    className="flex items-center gap-4"
                   >
                     <ListItemAvatar>
                       <Avatar
@@ -309,8 +342,10 @@ const ChooseWinner = () => {
                           winner.applicant.avatarUrl ??
                           "https://github.com/shadcn.png"
                         }
+                        sx={{ width: 60, height: 60 }}
                       />
                     </ListItemAvatar>
+
                     <ListItemText
                       primary={
                         <span className="font-bold text-sky-600">
@@ -330,10 +365,10 @@ const ChooseWinner = () => {
                     <Link
                       target="_blank"
                       to={`/funder/application/${winner.id}`}
-                      className="text-sky-500 underline hover:text-sky-600 transition-all"
+                      className="flex items-center gap-2 text-sky-500 underline hover:text-sky-600 transition-all mt-4"
                     >
-                      <FaExternalLinkAlt className="inline-block text-sky-500 ml-2" />
-                      View Profile
+                      <FaUser className="text-sky-500" />
+                      <span className="text-sm">View Profile</span>
                     </Link>
                   </ListItem>
                   <Divider variant="inset" component="li" />
@@ -341,9 +376,12 @@ const ChooseWinner = () => {
               ))}
             </List>
 
-            <p className="text-lg font-semibold my-5 text-gray-700">
-              <span>Number of scholarships left: </span>
-              <span className="text-sky-500">{availableScholarships}</span>
+            <p className="text-xl font-semibold my-5 text-gray-800 flex items-center gap-2 hover:text-sky-500 transition-all duration-300">
+              <FaGraduationCap className="text-sky-500 text-2xl" />
+              <span className="text-gray-600">Number of scholarships left:</span>
+              <span className="text-sky-500 text-2xl font-bold">
+                {availableScholarships}
+              </span>
             </p>
 
             <FormControl fullWidth sx={{ marginBottom: "20px" }}>
@@ -356,6 +394,8 @@ const ChooseWinner = () => {
                   paddingRight: "8px",
                   top: "-8px",
                   fontSize: "14px",
+                  fontWeight: "600",
+                  color: "gray.700",
                 }}
               >
                 Search Applicants
@@ -364,14 +404,14 @@ const ChooseWinner = () => {
                 id="outlined-adornment-search"
                 startAdornment={
                   <InputAdornment position="start">
-                    <FaSearch className="text-sky-500 transition-all duration-300 transform hover:scale-110" />
+                    <FaSearch className="text-sky-500 transition-all duration-200 transform hover:scale-105" />
                   </InputAdornment>
                 }
                 endAdornment={
                   searchQuery && (
                     <InputAdornment position="end">
                       <FaTimes
-                        className="text-sky-500 cursor-pointer transition-all duration-300 transform hover:scale-110"
+                        className="text-sky-500 cursor-pointer transition-all duration-200 transform hover:scale-105"
                         onClick={() => setSearchQuery("")}
                       />
                     </InputAdornment>
@@ -381,18 +421,36 @@ const ChooseWinner = () => {
                 label="Search Applicants"
                 className="border-2 border-sky-500 rounded-md shadow-md transition-all duration-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 hover:shadow-lg"
                 sx={{
-                  paddingTop: "10px",
-                  paddingBottom: "10px",
+                  paddingTop: "12px",
+                  paddingBottom: "12px",
+                  backgroundColor: "#F7FAFC",
+                  borderColor: "gray.300",
                 }}
               />
             </FormControl>
 
             <Tabs.Root defaultValue="firstReview" className="w-full">
-              <Tabs.List className="flex space-x-4 border-b-2 my-5 bg-white shadow-2 rounded-lg w-full h-full">
-                <Tabs.Trigger value="firstReview" className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]">First Review</Tabs.Trigger>
-                <Tabs.Trigger value="secondReview" className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]">Second Review</Tabs.Trigger>
-                <Tabs.Trigger value="finalReview" className="px-4 py-2 text-lg font-semibold focus:outline-none data-[state=active]:border-b-2 data-[state=active]:text-[#1eb2a6]">Final Review</Tabs.Trigger>
+              <Tabs.List className="flex justify-between border-b-2 my-5 bg-white shadow-md rounded-lg w-full h-full">
+                <Tabs.Trigger
+                  value="firstReview"
+                  className="flex-1 px-6 py-3 text-lg font-medium focus:outline-none text-center transition-all duration-300 transform hover:scale-105 hover:text-sky-600 data-[state=active]:text-[#1eb2a6] data-[state=active]:border-b-2 border-transparent"
+                >
+                  First Review
+                </Tabs.Trigger>
+                <Tabs.Trigger
+                  value="secondReview"
+                  className="flex-1 px-6 py-3 text-lg font-medium focus:outline-none text-center transition-all duration-300 transform hover:scale-105 hover:text-sky-600 data-[state=active]:text-[#1eb2a6] data-[state=active]:border-b-2 border-transparent"
+                >
+                  Second Review
+                </Tabs.Trigger>
+                <Tabs.Trigger
+                  value="finalReview"
+                  className="flex-1 px-6 py-3 text-lg font-medium focus:outline-none text-center transition-all duration-300 transform hover:scale-105 hover:text-sky-600 data-[state=active]:text-[#1eb2a6] data-[state=active]:border-b-2 border-transparent"
+                >
+                  Final Review
+                </Tabs.Trigger>
               </Tabs.List>
+
               <Tabs.Content value="firstReview">
                 <FirstReview scholarshipId={id ?? ""} token={token ?? ""} />
               </Tabs.Content>
@@ -406,62 +464,89 @@ const ChooseWinner = () => {
                     width: "100%",
                     borderRadius: "8px",
                     boxShadow: 3,
+                    padding: "16px",
                   }}
                 >
                   {filteredRows.length > 0 ? (
-                    <DataGrid
-                      rows={filteredRows.map((app: any) => ({
-                        id: app.id,
-                        avatarUrl:
-                          app.applicant.avatarUrl ??
-                          "https://github.com/shadcn.png",
-                        username: app.applicant.username,
-                        status: app.status,
-                        expertReview: app.expertReview ?? "Not reviewed",
-                        score: app.score ?? "N/A",
-                        choosable:
-                          availableScholarships > 0 ||
-                          selectedRows.includes(
-                            (row: any) => row.id === app.id
-                          ),
-                      }))}
-                      onRowSelectionModelChange={handleSelectionChange}
-                      columns={columns}
-                      initialState={{ pagination: { paginationModel } }}
-                      pageSizeOptions={[5, 10]}
-                      checkboxSelection
-                      sx={{ border: 0 }}
-                      isRowSelectable={(params) => params.row.choosable}
-                    />
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <thead>
+                          <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Checkbox</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>ID</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Username</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Status</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Reviewed by Expert</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Score</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredRows.map((app: any, index: any) => (
+                            <tr key={app.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
+                              <td style={{ padding: "12px" }}>
+                                <input
+                                  type="checkbox"
+                                  disabled={availableScholarships == 0 && !selectedRows.includes(app)}
+                                  checked={selectedRows.some((row) => row.id === app.id)}
+                                  onChange={() => handleSelectionChange(app.id)}
+                                />
+                              </td>
+                              <td style={{ padding: "12px" }}>{app.id}</td>
+                              <td style={{ padding: "12px" }}>
+                                <img src={app.applicant.avatarUrl ?? "https://github.com/shadcn.png"} alt="Avatar" style={{ width: "40px", borderRadius: "50%" }} />
+                              </td>
+                              <td style={{ padding: "12px" }}>{app.applicant.username}</td>
+                              <td style={{ padding: "12px" }}>{app.status}</td>
+                              <td style={{ padding: "12px" }}>{app.expertReview ?? "Not reviewed"}</td>
+                              <td style={{ padding: "12px", textAlign: "center" }}>{app.applicationReviews.length ? app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length : "N/a"}</td>
+                              <td style={{ padding: "12px", textAlign: "center" }}>
+                                <Link
+                                  target="_blank"
+                                  to={`/funder/application/${app.id}`}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "5px",
+                                    textDecoration: "none",
+                                    color: "inherit",
+                                  }}
+                                >
+                                  <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                    style={{
+                                      fontSize: "14px",
+                                      padding: "6px 12px",
+                                      borderRadius: "5px",
+                                    }}
+                                  >
+                                    <FaEye /> View Profile
+                                  </Button>
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   ) : (
-                    <p className="text-center text-gray-500 mt-4 text-xl">
-                      No scholarship applicants yet
-                    </p>
+                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
                   )}
                 </Paper>
-                <div className="flex justify-end mt-4 gap-5">
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    onClick={handleClearSelection}
-                    className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500"
-                  >
-                    <FaSearch className="text-white text-2xl" />
-                    <span className="text-lg font-semibold">Clear Selection</span>
-                  </Button>
 
+                <div className="flex justify-between mt-4 gap-6">
                   <Button
                     variant="contained"
                     color="primary"
                     disabled={loading}
-                    onClick={applyForSelectedWinners}
-                    className="text-white flex items-center gap-3 py-3 px-6 rounded-lg shadow-lg hover:shadow-2xl transform transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500"
+                    onClick={openApplyModal}
+                    className="text-white py-3 px-6 rounded-lg shadow-md bg-gradient-to-r from-blue-600 to-teal-500 hover:scale-105 transition-all duration-200 transform"
                   >
                     {loading ? (
-                      <div
-                        className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                        aria-hidden="true"
-                      ></div>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div>
                     ) : (
                       <FaCheckCircle className="text-white text-2xl" />
                     )}
@@ -470,45 +555,95 @@ const ChooseWinner = () => {
                 </div>
               </Tabs.Content>
             </Tabs.Root>
-
             <Modal
               open={modalIsOpen}
               onCancel={() => setModalIsOpen(false)}
-              onOk={applyForSelectedWinners}
+              onOk={() => {
+                if (constractFiles.length === 0) {
+                  notification.error({
+                    message: "You need to provide a contract for the applicant!",
+                  });
+                  return;
+                }
+                applyForSelectedWinners();
+              }}
             >
-              <h2 className="flex justify-center">Send contract to applicant</h2>
-              <br></br>
-              <button className="mt-8" onClick={handlePreviewTemplate}>Preview our template</button>
-              {generateFile && (
-                <div>
-                  <p>Generated file is ready for review!</p>
-                </div>
-              )}
+              <div className="text-center p-6 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  Send Contract to Applicant
+                </h2>
 
-              <div className="mb-5">
-                <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-                  <IoCloudUpload className="text-blue-500" />
-                  Submit File(s)
-                </label>
-                <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
-                  <input
-                    type="file"
-                    multiple
-                    className="w-full hidden"
-                    id="file-upload"
-                    onChange={(e) => {
-                      const files = e.target.files;
-                      if (files) setApplicationFiles(Array.from(files));
-                    }}
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className="cursor-pointer text-blue-500 hover:underline"
+                <p className="text-sm text-gray-600 mb-6">
+                  Use this form to preview and upload the contract files before sending them to the applicant.
+                </p>
+
+                <div className="flex justify-center">
+                  <button
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow transition-all duration-300"
+                    onClick={handlePreviewTemplate}
                   >
-                    <IoCloudUpload className="text-4xl mx-auto text-gray-400 mb-2" />
-                    Click to upload files
-                  </label>
+                    Preview Template
+                  </button>
                 </div>
+
+                {generateFile && (
+                  <div className="mt-6 w-full max-w-lg bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded shadow">
+                    <h3 className="text-lg font-medium mb-2">Generated File</h3>
+                    <p className="mb-4">
+                      Your contract has been successfully generated and is ready for review. Click the link below to view or download it.
+                    </p>
+                    <a
+                      href={generateFile}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 text-center rounded-md transition-all duration-300 shadow-md"
+                    >
+                      View Generated Contract
+                    </a>
+                  </div>
+                )}
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload Contract Files
+                  </label>
+                  <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
+                    <input
+                      type="file"
+                      multiple
+                      className="w-full hidden"
+                      id="file-upload"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files) setConstractFiles(Array.from(files));
+                      }}
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="cursor-pointer flex flex-col items-center justify-center text-blue-500 hover:underline"
+                    >
+                      <IoCloudUpload className="text-4xl text-gray-400 mb-2" />
+                      <span>Click to upload files</span>
+                    </label>
+                  </div>
+                </div>
+
+                {constractFiles.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-sm font-medium text-gray-700">Selected Files:</h3>
+                    <ul className="mt-2 space-y-2">
+                      {constractFiles.map((file: File, index: number) => (
+                        <li
+                          key={index}
+                          className="text-sm text-gray-600 flex items-center gap-2"
+                        >
+                          <IoDocumentText className="text-blue-500" />
+                          {file.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </Modal>
 
