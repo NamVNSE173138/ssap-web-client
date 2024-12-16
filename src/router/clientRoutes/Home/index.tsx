@@ -23,12 +23,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import RouteNames from "@/constants/routeNames";
 
-// const container = {
-//   hidden: {},
-//   visible: {
-//     transition: { staggerChildren: 0.2 },
-//   },
-// };
 
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);

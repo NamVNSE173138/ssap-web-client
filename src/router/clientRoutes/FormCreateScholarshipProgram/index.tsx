@@ -40,7 +40,7 @@ const formSchema = z.object({
     .refine((quantity) => !isNaN(parseInt(quantity)), {
       message: "Number of award milestones must be a number",
     }),
-  imageUrl: z.string(),
+  imageUrl: z.string().min(1, "Please upload image"),
   deadline: z.string().min(1, "Please enter a deadline date"),
   status: z.string(),
   university: z.string().min(1, "Please choose a university"),
@@ -62,8 +62,8 @@ const formSchema = z.object({
         description: z
           .string()
           .min(1, "Review milestone description is required"),
-        fromDate: z.string(),
-        toDate: z.string(),
+        fromDate: z.string().min(1, "From date is required"),
+        toDate: z.string().min(1, "To date is required"),
       })
     )
     .min(1, "Please add at least one review milestone"),
@@ -517,10 +517,23 @@ const FormCreateScholarshipProgram = () => {
                         {...form.register(`criteria.${index}.name`)}
                         placeholder="Enter criterion name"
                       />
+                      {form.formState.errors.criteria?.[index]?.name && (
+                        <span className="text-red-500">
+                          {form.formState.errors.criteria[index].name?.message}
+                        </span>
+                      )}
                       <Input
                         {...form.register(`criteria.${index}.description`)}
                         placeholder="Enter criterion description"
                       />
+                      {form.formState.errors.criteria?.[index]?.description && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.criteria[index].description
+                              ?.message
+                          }
+                        </span>
+                      )}
                     </div>
                   ))}
                   <Button
@@ -529,7 +542,7 @@ const FormCreateScholarshipProgram = () => {
                       appendCriteria({ name: "", description: "" })
                     }
                   >
-                    Add New Criterion
+                    Add New Criteria
                   </Button>
                 </div>
 
@@ -545,16 +558,42 @@ const FormCreateScholarshipProgram = () => {
                         )}
                         placeholder="Enter milestone description"
                       />
+                      {form.formState.errors.reviewMilestones?.[index]
+                        ?.description && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.reviewMilestones[index]
+                              .description?.message
+                          }
+                        </span>
+                      )}
                       <Input
                         {...form.register(`reviewMilestones.${index}.fromDate`)}
                         type="date"
                         placeholder="From Date"
                       />
+                      {form.formState.errors.reviewMilestones?.[index]
+                        ?.fromDate && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.reviewMilestones[index]
+                              .fromDate?.message
+                          }
+                        </span>
+                      )}
                       <Input
                         {...form.register(`reviewMilestones.${index}.toDate`)}
                         type="date"
                         placeholder="To Date"
                       />
+                      {form.formState.errors.reviewMilestones?.[index]?.toDate && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.reviewMilestones[index].toDate
+                              ?.message
+                          }
+                        </span>
+                      )}
                     </div>
                   ))}
                   <Button
