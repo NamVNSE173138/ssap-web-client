@@ -36,7 +36,6 @@ export async function updateApplication(id: number, application: any) {
   return response.data;
 }
 
-
 export async function extendApplication(profileData: any) {
 
   const response = await axios.put(
@@ -46,8 +45,6 @@ export async function extendApplication(profileData: any) {
   );
   return response.data;
 }
-
-
 
 export async function getApplicationByApplicantIdAndScholarshipId(applicantId: number, scholarshipId: number) {
   const response = await axios.get(
