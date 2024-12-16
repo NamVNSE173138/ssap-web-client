@@ -2,17 +2,19 @@ import React from "react";
 import { formatDate } from "@/lib/date-formatter";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 type ApprovalItem = {
   id: number;
   applicantName: string;
+  scholarshipProgramId: number;
   scholarshipName: string;
   university: string;
   appliedDate: string;
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string; // Added to store document URL
-  applicationReviews?: { id: number, score: number; }[];
+  applicationReviews?: { id: number, score: number, expertId: number }[];
   
 };
 
@@ -29,6 +31,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
   onRowClick,
   document,
 }) => {
+  const user = useSelector((state: any) => state.token.user);
   return (
     <div className="overflow-auto bg-white shadow rounded-lg">
       <table className="w-full table-auto border-collapse">
@@ -62,13 +65,15 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
             // const isScored = item.applicationReviews?.some(
             //   (review) => review.score !== null && review.score !== undefined
             // );
-            const isScored = item.applicationReviews?.some(
+            const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
+            if(!review) return;
+            const isScored = review.some(
               (review) => review.score !== null && review.score !== undefined && review.score > 0
             ) || false;
             console.log("isScore", isScored);
             
 
-            const score = item.applicationReviews?.find(
+            const score = review.find(
               (review) => review.score !== undefined
             )?.score || "Not Scored";
             console.log("Score", score);
