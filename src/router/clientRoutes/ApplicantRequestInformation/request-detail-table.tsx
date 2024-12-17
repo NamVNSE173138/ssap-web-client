@@ -8,13 +8,11 @@ import {
   TableRow,
   Typography,
   Box,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   TextField,
-  DialogActions,
   IconButton,
   styled,
 } from "@mui/material";
@@ -37,6 +35,8 @@ import ChatIcon from "@mui/icons-material/Chat";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { toast } from "react-toastify";
 import { notification } from "antd";
+import { Button, DialogActions } from '@mui/material';
+import { Cancel, Save, Close, Send } from '@mui/icons-material';
 
 const RequestDetailTable = ({
   showButtons,
@@ -65,6 +65,7 @@ const RequestDetailTable = ({
   const [hasFeedback, setHasFeedback] = useState(false);
   const [finishDate, setFinishDate] = useState<Date | null>(null);
   const [canProvideFeedback, setCanProvideFeedback] = useState(true);
+  const maxCharacters = 100;
 
   if (!requestDetails || requestDetails.length === 0) {
     return (
@@ -165,6 +166,11 @@ const RequestDetailTable = ({
       return;
     }
 
+    if (comment.length > maxCharacters) {
+      notification.error({ message: "Comment is around 100 characters!" });
+      return;
+    }
+
     if (rating !== null && comment) {
       const feedbackData = {
         content: comment,
@@ -204,10 +210,22 @@ const RequestDetailTable = ({
 
   const handleSaveFeedback = async () => {
     if (!userFeedback) return;
+    if (rating === null || !comment.trim()) {
+      notification.error({ message: "Please provide a rating and a comment!" });
+      return;
+    }
+
+    if (comment.length > maxCharacters) {
+      notification.error({ message: "Comment is around 100 characters!" });
+      return;
+    }
     try {
       await updateFeedback(userFeedback.id, {
         content: comment,
         rating,
+        applicantId: user.id,
+        feedbackDate: new Date().toISOString(),
+        serviceId: request.requestDetails[0].serviceId,
       });
       notification.success({ message: "Feedback updated successfully." });
       setIsEditing(false);
@@ -485,15 +503,48 @@ const RequestDetailTable = ({
                 onChange={(e) => setComment(e.target.value)}
                 sx={{ marginTop: 2 }}
               />
+              <Typography
+                variant="body2"
+                sx={{
+                  color: comment.length > maxCharacters ? 'red' : 'black',
+                  marginTop: 1
+                }}
+              >
+                {comment.length}/{maxCharacters}
+              </Typography>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ justifyContent: 'space-between', padding: 2 }}>
               <Button
                 onClick={() => setOpenFeedbackDialog(false)}
-                color="secondary"
+                color="error"
+                variant="outlined"
+                startIcon={<Cancel />}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: '#f44336',
+                    color: 'white'
+                  },
+                  borderRadius: '8px',
+                  marginRight: 1
+                }}
               >
                 Cancel
               </Button>
-              <Button onClick={handleFeedbackSubmit} color="primary">
+              <Button
+                onClick={handleFeedbackSubmit}
+                color="primary"
+                variant="contained"
+                startIcon={<Send />}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: '#1976d2',
+                    boxShadow: '0 3px 5px rgba(0, 0, 0, 0.3)',
+                  },
+                  borderRadius: '8px',
+                  marginLeft: 'auto',
+                  padding: '8px 16px'
+                }}
+              >
                 Submit
               </Button>
             </DialogActions>
@@ -546,14 +597,49 @@ const RequestDetailTable = ({
             disabled={!isEditing}
             sx={{ marginTop: 2 }}
           />
+          <Typography
+            variant="body2"
+            sx={{
+              color: comment.length > maxCharacters ? 'red' : 'black',
+              marginTop: 1
+            }}
+          >
+            {comment.length}/{maxCharacters}
+          </Typography>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: 'space-between', padding: 2 }}>
           {isEditing ? (
             <>
-              <Button onClick={() => setIsEditing(false)} color="secondary">
+              <Button
+                onClick={() => setIsEditing(false)}
+                color="error"
+                variant="outlined"
+                startIcon={<Cancel />}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: '#f44336',
+                    color: 'white'
+                  },
+                  borderRadius: '8px',
+                  marginRight: 1
+                }}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSaveFeedback} color="primary">
+              <Button
+                onClick={handleSaveFeedback}
+                color="primary"
+                variant="contained"
+                startIcon={<Save />}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: '#1976d2',
+                    boxShadow: '0 3px 5px rgba(0, 0, 0, 0.3)',
+                  },
+                  borderRadius: '8px',
+                  marginLeft: 1
+                }}
+              >
                 Save
               </Button>
             </>
@@ -561,6 +647,17 @@ const RequestDetailTable = ({
             <Button
               onClick={() => setOpenUserFeedbackDialog(false)}
               color="primary"
+              variant="contained"
+              startIcon={<Close />}
+              sx={{
+                '&:hover': {
+                  backgroundColor: '#1976d2',
+                  boxShadow: '0 3px 5px rgba(0, 0, 0, 0.3)',
+                },
+                borderRadius: '8px',
+                marginLeft: 'auto',
+                padding: '8px 16px'
+              }}
             >
               Close
             </Button>
