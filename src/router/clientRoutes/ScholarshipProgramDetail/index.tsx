@@ -388,15 +388,15 @@ const ScholarshipProgramDetail = () => {
             </Breadcrumb>
           </div>
           <div className="">
-            <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
+            <div className="lg:flex-row items-center lg:items-center flex-row flex gap-[20px] lg:gap-[25px] ">
               <SchoolLogo
                 imageUrl={data.imageUrl || "https://github.com/shadcn.png"}
               />
               <div>
-                <p className="text-[#000] text-5xl  lg:line-clamp-3 line-clamp-5 font-medium">
+                <p className="text-[#000] text-3xl md:text-4xl lg:text-5xl  lg:line-clamp-3 line-clamp-5 font-medium">
                   {data.name}
                 </p>
-                <p className="text-[#000] text-3xl text-heading-5 hidden lg:block mt-[12px]">
+                <p className="text-[#000] text-xl md:text-2xl lg:text-3xl text-heading-5 hidden lg:block mt-[12px]">
                   {data.description.length > 50
                     ? `${data.description.substring(0, 50)}...`
                     : data.description}
@@ -404,7 +404,7 @@ const ScholarshipProgramDetail = () => {
               </div>
             </div>
 
-            <div className="text-white text-center flex flex-wrap h-[50px] mt-[26px] w-full">
+            <div className="text-white text-center flex flex-wrap h-[40px] lg:h-[50px] mt-[26px] w-full">
               {isApplicant == "Applicant" || !user ? (
                 <>
                   {existingApplication &&
@@ -415,7 +415,7 @@ const ScholarshipProgramDetail = () => {
                         onClick={() =>
                           navigate(`/scholarship-program/${id}/application`)
                         }
-                        className="flex-1 text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f] "
+                        className="flex-1 text-lg lg:text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f] "
                       >
                         Apply now{" "}
                       </Button>
@@ -490,12 +490,7 @@ const ScholarshipProgramDetail = () => {
               ) : (
                 authorized != "Unauthorized" && (
                   <div className="flex justify-between w-full gap-3">
-                    {/* <Button
-                      onClick={() => navigate("")}
-                      className="flex-1 text-lg bg-blue-700 py-2 w-full h-full flex items-center justify-center"
-                    >
-                      <FaEdit className="mr-2" /> Edit
-                    </Button> */}
+                    
 
                     <Button
                       onClick={() => handleOpenApplicantDialog()}

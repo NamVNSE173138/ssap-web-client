@@ -8,14 +8,6 @@ interface FirstReviewProps {
   token: string;
 }
 
-const statusColor = {
-  Submitted: "blue",
-  Awarded: "green",
-  Approved: "blue",
-  Rejected: "red",
-  NeedExtend: "yellow",
-  Reviewing: "yellow",
-};
 
 const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   const [data, setData] = useState<any[]>([]);
