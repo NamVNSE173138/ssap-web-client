@@ -129,7 +129,7 @@ const ScholarshipProgram = () => {
             </Breadcrumb>
           </div>
 
-          <div className="w-full mt-6">
+          <div className="w-full mt-4 lg:mt-6">
             <div className="relative w-full">
               <input
                 className="w-2/3 h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 ease-in-out rounded-lg shadow-lg bg-gradient-to-r  text-lg placeholder-gray-500 text-gray-800"
@@ -156,8 +156,8 @@ const ScholarshipProgram = () => {
 
       <div className="flex px-10 gap-5">
 
-        <div className="w-[250px] mt-10">
-          <span className="bg-[#1eb2a6] w-[98%] mx-auto mb-3 rounded-full h-[3px] block"></span>
+        <div className="w-[200px] lg:w-[250px] mt-10">
+          <span className="bg-[#1eb2a6] w-full mx-auto mb-3 rounded-full h-[3px] block"></span>
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
@@ -165,8 +165,8 @@ const ScholarshipProgram = () => {
               id="panel1-header"
             >
               <div className="flex items-center gap-3">
-                <FaDollarSign className="text-[#1eb2a6] text-xl" />
-                <p className="font-semibold text-lg text-gray-800">Amount</p>
+                <FaDollarSign className="text-[#1eb2a6] text-lg lg:text-xl" />
+                <p className="font-semibold text-md lg:text-lg text-gray-800">Amount</p>
               </div>
             </AccordionSummary>
             <AccordionDetails>
@@ -198,8 +198,8 @@ const ScholarshipProgram = () => {
               id="panel2-header"
             >
               <div className="flex items-center gap-3">
-                <FaCalendar className="text-[#1eb2a6] text-xl" />
-                <p className="font-semibold text-lg text-gray-800">Deadline</p>
+                <FaCalendar className="text-[#1eb2a6] text-lg lg:text-xl" />
+                <p className="font-semibold text-md lg:text-lg text-gray-800">Deadline</p>
                 <FaInfoCircle
                   className="text-gray-600 cursor-pointer"
                   title="The date you filter must be less than the deadline date of that scholarship."
@@ -213,7 +213,7 @@ const ScholarshipProgram = () => {
                 <input
                   value={scholarshipDeadline}
                   onChange={(e) => setScholarshipDeadline(e.target.value)}
-                  className="w-full outline-none py-[13px] pl-[16px] pr-[32px]"
+                  className="w-[85%] lg:w-full outline-none py-[13px] pl-[16px] pr-[32px]"
                   type="date"
                 />
               </div>
@@ -222,7 +222,7 @@ const ScholarshipProgram = () => {
         </div>
 
 
-        <menu className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 justify-between items-start gap-10 mt-10 my-8  px-12">
+        <menu className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between items-start gap-10 mt-10 my-8  px-12">
           {loading ? (
             <ScholarshipProgramSkeleton />
           ) : error ? (
