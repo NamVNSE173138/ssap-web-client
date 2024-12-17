@@ -33,8 +33,11 @@ const serviceFormSchema = z.object({
   name: z
     .string()
     .min(1, "Please enter the service name")
-    .max(40, "Service name must not exceed 40 characters"),
-  description: z.string().min(1, "Please enter a description"),
+    .max(40, "Service name must not exceed 100 characters"),
+  description: z
+    .string()
+    .min(1, "Please enter a description")
+    .max(200, "Description must be under 200 characters"),
   type: z
     .string()
     .min(1, "Please select a service type")
@@ -142,6 +145,7 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
   }, [isOpen, user?.id, form]);
 
   const handleSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
+
     try {
       setIsSubmitting(true);
       const response = await addService(values);
@@ -191,11 +195,17 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                     placeholder="Service Name"
                     className="input-custom"
                   />
-                  {form.formState.errors.name && <p className="text-red-500">{form.formState.errors.name.message}</p>}
+                  {form.formState.errors.name && (
+                    <p className="text-red-500">{form.formState.errors.name.message}</p>
+                  )}
+                  <p className="text-gray-500 text-sm mt-2">
+                    {form.watch("name")?.length || 0}/100 characters entered
+                  </p>
                 </div>
 
+
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-2  mb-2">
+                  <div className="flex items-center gap-2 mb-2">
                     <FaPen className="text-blue-600" />
                     <Label>Description</Label>
                   </div>
@@ -205,6 +215,9 @@ const AddServiceModal = ({ isOpen, setIsOpen, fetchServices }: AddServiceModalPr
                     className="w-full p-2 mb-2 border border-gray-300 rounded-lg resize-y min-h-[100px] hover:border-blue-400 focus:border-blue-500 transition-all"
                   />
                   {form.formState.errors.description && <p className="text-red-500">{form.formState.errors.description.message}</p>}
+                  <p className="text-gray-500 text-sm mt-2">
+                    {form.watch("description")?.length || 0}/200 characters entered
+                  </p>
                 </div>
 
                 <div className="flex flex-col">

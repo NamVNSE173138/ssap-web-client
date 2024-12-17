@@ -100,3 +100,23 @@ export async function AccountActiveEmail(userId: number) {
   );
   return response.data;
 }
+
+export async function sendWinnerEmail(applicantId: number, files: File[]) {
+  const formData = new FormData();
+
+  files.forEach((file) => {
+    formData.append("contractFiles", file);
+  });
+
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/send-winner-email?applicantId=${applicantId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+}

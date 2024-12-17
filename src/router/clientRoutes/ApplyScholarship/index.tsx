@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   NotifyFunderNewApplicant,
-  
+
 } from "@/services/ApiServices/notification";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import EditableTable from "./application-document-table";
@@ -13,8 +13,7 @@ import Background from "../../../assets/back.webp";
 import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { notification } from "antd";
 import { addApplication } from "@/services/ApiServices/applicationService";
-
-
+import ScholarshipContractDialog from "./ScholarshipContractDialog";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -39,6 +38,7 @@ const ApplyScholarship = () => {
     //{ id: 1, name: 'CV', type: "PDF", file: null, isNew: false },
     //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
   ]);
+  const [isContractOpen, setContractOpen] = useState(false);
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
@@ -67,6 +67,11 @@ const ApplyScholarship = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApplyLoading(true);
+    if (!formData.agreeTerms) {
+      notification.error({ message: "You must agree to the terms." });
+      setApplyLoading(false);
+      return;
+    }
     const program = await getScholarshipProgram(Number(id));
 
     if (!program) {
@@ -74,12 +79,11 @@ const ApplyScholarship = () => {
       setApplyLoading(false);
       return;
     }
-    if(program.data.status == "FINISHED") {
+    if (program.data.status == "FINISHED") {
       alert("Program is finished");
       setApplyLoading(false);
       return;
     }
-
 
     setRows(
       rows.map((row) => ({
@@ -95,8 +99,8 @@ const ApplyScholarship = () => {
     const applicationDocuments = [];
     for (const row of rows) {
       if (!row.name || !row.type || !row.file) {
-          setApplyLoading(false);
-          return;
+        setApplyLoading(false);
+        return;
       }
       const formData = new FormData();
       formData.append("File", row.file);
@@ -123,8 +127,7 @@ const ApplyScholarship = () => {
 
       if (response.statusCode === 200) {
         const result = await response.data;
-        notification.success({message:"Application submitted successfully"});
-        console.log("Application submitted:", result);
+        notification.success({ message: "Application submitted successfully" });
       } else {
         console.error("Failed to submit application");
       }
@@ -133,8 +136,8 @@ const ApplyScholarship = () => {
     } catch (error) {
       console.error("Error submitting application:", error);
     }
-    finally{
-        setApplyLoading(false)
+    finally {
+      setApplyLoading(false)
     }
   };
 
@@ -253,8 +256,8 @@ const ApplyScholarship = () => {
               />
             </div>
 
-            <div className="flex gap-[12px] flex-col lg:col-span-2 ">
-              <div className="flex items-center">
+            <div className="flex gap-[12px] flex-col lg:col-span-2">
+              <div className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   name="agreeTerms"
@@ -267,19 +270,23 @@ const ApplyScholarship = () => {
                 <label
                   htmlFor="agreeTerms"
                   className="relative cursor-pointer flex items-center text-sm before:content-[''] before:block before:min-w-[20px] before:h-[20px] before:mr-[12px] before:rounded-[4px] before:bg-white before:border before:border-gray-500 peer-checked:before:bg-blue-500 peer-checked:before:border-blue-500 after:content-[''] after:absolute after:top-[50%] after:left-[4px] after:translate-y-[-50%] after:w-[12px] after:h-[12px] after:border-r-2 after:border-b-2 after:border-transparent peer-checked:after:border-white peer-checked:after:rotate-45"
-                ></label>
+                />
                 <span className="text-black">
                   I agree to SSAP{" "}
-                  <a href="#" className="mx-[4px] underline hover:no-underline">
-                    Terms
-                  </a>{" "}
-                  and{" "}
-                  <a href="#" className="mx-[4px] underline hover:no-underline">
-                    Privacy
+                  <a
+                    href="#"
+                    className="mx-[4px] underline hover:no-underline"
+                    onClick={() => setContractOpen(true)}
+                  >
+                    Terms and Privacy
                   </a>
+                  {" "}and proceed to read the scholarship contract.
                 </span>
               </div>
+
+              <ScholarshipContractDialog isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
             </div>
+
 
             <div className="mt-[20px] lg:mt-[16px]">
               <button
@@ -291,7 +298,7 @@ const ApplyScholarship = () => {
                   className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
                   aria-hidden="true"
                 ></div>) :
-                (<span>Apply now</span>)}
+                  (<span>Apply now</span>)}
               </button>
             </div>
           </form>

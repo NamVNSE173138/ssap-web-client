@@ -17,6 +17,7 @@ import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { FaTrophy } from "react-icons/fa";
 import { Textarea } from "@/components/ui/textarea";
+import ScholarshipContractDialogForFunder from "../funder/FunderProfile/components/Activity/ScholarshipContractDialogForFunder";
 
 interface OptionType {
   value: string;
@@ -76,6 +77,8 @@ const FormCreateScholarshipProgram = () => {
   const [majors, setMajors] = useState<OptionType[]>([]);
   const [imageFile, setImageFile] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isContractOpen, setContractOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedUniversity, setSelectedUniversity] =
@@ -245,6 +248,14 @@ const FormCreateScholarshipProgram = () => {
     values: z.infer<typeof formSchema>
   ) => {
     setIsLoading(true);
+    if (!isChecked) {
+      notification.error({
+        message: "Error",
+        description: "You must fill in check box to create.",
+      });
+      setIsLoading(false);
+      return;
+    }
     try {
       if (!funderId) throw new Error("Funder ID not available");
 
@@ -612,11 +623,34 @@ const FormCreateScholarshipProgram = () => {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex flex-col items-start">
+            <span className="text-black">
+              <input
+                type="checkbox"
+                id="agreement"
+                checked={isChecked}
+                onChange={() => setIsChecked(!isChecked)}
+                className="mr-2"
+              />
+              I agree to SSAP{" "}
+              <a
+                href="#"
+                className="mx-[4px] underline hover:no-underline"
+                onClick={() => setContractOpen(true)}
+              >
+                Terms and Privacy
+              </a>
+              {" "}and proceed to read the scholarship contract.
+            </span>
+          </div>
+
           <div className="flex justify-end">
             <Button type="submit">Create Program</Button>
           </div>
         </form>
         {isLoading && <ScreenSpinner />}
+        <ScholarshipContractDialogForFunder isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
       </div>
     </>
   );
