@@ -138,7 +138,8 @@ const ApprovalList: React.FC = () => {
     setIsLoading(true);
 
     if (!selectedItem || score === "") return;
-    const reviewId = selectedItem.applicationReviews?.[0]?.id;
+    const reviewId = selectedItem.applicationReviews?.
+        find((review) => review.expertId == user.id)?.id;
     if (!reviewId) {
       console.error("Review ID not found.");
       return;
