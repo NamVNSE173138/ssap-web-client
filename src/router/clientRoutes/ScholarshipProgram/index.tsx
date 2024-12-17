@@ -38,12 +38,19 @@ const ScholarshipProgram = () => {
 
   const fetchData = async () => {
     try {
-      const response = await getAllScholarshipProgram();
-      const countryDatas = await getAllCountries();
-      const majorDatas = await getAllMajors();
-      const categoriesDatas = await getAllCategories();
-      const certificatesDatas = await getAllCertificates();
-
+      const [
+    response,
+    countryDatas,
+    majorDatas,
+    categoriesDatas,
+    certificatesDatas
+  ] = await Promise.all([
+    getAllScholarshipProgram(),
+    getAllCountries(),
+    getAllMajors(),
+    getAllCategories(),
+    getAllCertificates()
+  ]);
       if (response.data.statusCode === 200) {
         setData(response.data.data.items);
         setFullData(response.data.data.items);
