@@ -41,7 +41,7 @@ const formSchema = z.object({
     .refine((quantity) => !isNaN(parseInt(quantity)), {
       message: "Number of award milestones must be a number",
     }),
-  imageUrl: z.string().min(1, "Please upload image"),
+  //imageUrl: z.string().min(1, "Please upload image"),
   deadline: z.string().min(1, "Please enter a deadline date"),
   status: z.string(),
   university: z.string().min(1, "Please choose a university"),
