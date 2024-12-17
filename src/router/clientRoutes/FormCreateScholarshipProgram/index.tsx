@@ -17,6 +17,7 @@ import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { FaTrophy } from "react-icons/fa";
 import { Textarea } from "@/components/ui/textarea";
+import ScholarshipContractDialogForFunder from "../funder/FunderProfile/components/Activity/ScholarshipContractDialogForFunder";
 
 interface OptionType {
   value: string;
@@ -40,7 +41,7 @@ const formSchema = z.object({
     .refine((quantity) => !isNaN(parseInt(quantity)), {
       message: "Number of award milestones must be a number",
     }),
-  imageUrl: z.string(),
+  //imageUrl: z.string().min(1, "Please upload image"),
   deadline: z.string().min(1, "Please enter a deadline date"),
   status: z.string(),
   university: z.string().min(1, "Please choose a university"),
@@ -62,8 +63,8 @@ const formSchema = z.object({
         description: z
           .string()
           .min(1, "Review milestone description is required"),
-        fromDate: z.string(),
-        toDate: z.string(),
+        fromDate: z.string().min(1, "From date is required"),
+        toDate: z.string().min(1, "To date is required"),
       })
     )
     .min(1, "Please add at least one review milestone"),
@@ -76,6 +77,8 @@ const FormCreateScholarshipProgram = () => {
   const [majors, setMajors] = useState<OptionType[]>([]);
   const [imageFile, setImageFile] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isContractOpen, setContractOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedUniversity, setSelectedUniversity] =
@@ -245,6 +248,14 @@ const FormCreateScholarshipProgram = () => {
     values: z.infer<typeof formSchema>
   ) => {
     setIsLoading(true);
+    if (!isChecked) {
+      notification.error({
+        message: "Error",
+        description: "You must fill in check box to create.",
+      });
+      setIsLoading(false);
+      return;
+    }
     try {
       if (!funderId) throw new Error("Funder ID not available");
 
@@ -517,10 +528,23 @@ const FormCreateScholarshipProgram = () => {
                         {...form.register(`criteria.${index}.name`)}
                         placeholder="Enter criterion name"
                       />
+                      {form.formState.errors.criteria?.[index]?.name && (
+                        <span className="text-red-500">
+                          {form.formState.errors.criteria[index].name?.message}
+                        </span>
+                      )}
                       <Input
                         {...form.register(`criteria.${index}.description`)}
                         placeholder="Enter criterion description"
                       />
+                      {form.formState.errors.criteria?.[index]?.description && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.criteria[index].description
+                              ?.message
+                          }
+                        </span>
+                      )}
                     </div>
                   ))}
                   <Button
@@ -529,7 +553,7 @@ const FormCreateScholarshipProgram = () => {
                       appendCriteria({ name: "", description: "" })
                     }
                   >
-                    Add New Criterion
+                    Add New Criteria
                   </Button>
                 </div>
 
@@ -545,16 +569,42 @@ const FormCreateScholarshipProgram = () => {
                         )}
                         placeholder="Enter milestone description"
                       />
+                      {form.formState.errors.reviewMilestones?.[index]
+                        ?.description && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.reviewMilestones[index]
+                              .description?.message
+                          }
+                        </span>
+                      )}
                       <Input
                         {...form.register(`reviewMilestones.${index}.fromDate`)}
                         type="date"
                         placeholder="From Date"
                       />
+                      {form.formState.errors.reviewMilestones?.[index]
+                        ?.fromDate && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.reviewMilestones[index]
+                              .fromDate?.message
+                          }
+                        </span>
+                      )}
                       <Input
                         {...form.register(`reviewMilestones.${index}.toDate`)}
                         type="date"
                         placeholder="To Date"
                       />
+                      {form.formState.errors.reviewMilestones?.[index]?.toDate && (
+                        <span className="text-red-500">
+                          {
+                            form.formState.errors.reviewMilestones[index].toDate
+                              ?.message
+                          }
+                        </span>
+                      )}
                     </div>
                   ))}
                   <Button
@@ -573,11 +623,34 @@ const FormCreateScholarshipProgram = () => {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex flex-col items-start">
+            <span className="text-black">
+              <input
+                type="checkbox"
+                id="agreement"
+                checked={isChecked}
+                onChange={() => setIsChecked(!isChecked)}
+                className="mr-2"
+              />
+              I agree to SSAP{" "}
+              <a
+                href="#"
+                className="mx-[4px] underline hover:no-underline"
+                onClick={() => setContractOpen(true)}
+              >
+                Terms and Privacy
+              </a>
+              {" "}and proceed to read the scholarship contract.
+            </span>
+          </div>
+
           <div className="flex justify-end">
             <Button type="submit">Create Program</Button>
           </div>
         </form>
         {isLoading && <ScreenSpinner />}
+        <ScholarshipContractDialogForFunder isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
       </div>
     </>
   );

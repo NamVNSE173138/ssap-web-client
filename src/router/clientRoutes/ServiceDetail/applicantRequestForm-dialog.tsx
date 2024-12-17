@@ -92,6 +92,11 @@ const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalPro
       return;
     }
 
+    if (description.length > 200) {
+      notification.error({ message: "Description cannot exceed 200 characters." });
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -210,7 +215,7 @@ const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalPro
                 </FormControl>
 
                 <div>
-                  <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
+                  <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
                     <IoText className="text-blue-500" />
                     Description
                   </label>
@@ -221,6 +226,12 @@ const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalPro
                     className="w-full border rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                     placeholder="Provide a brief description"
                   />
+                  <div
+                    className={`text-sm mt-1 ${description.length > 200 ? 'text-red-500' : 'text-gray-500'
+                      }`}
+                  >
+                    {description.length}/{200}
+                  </div>
                 </div>
 
                 <div className="mb-5">

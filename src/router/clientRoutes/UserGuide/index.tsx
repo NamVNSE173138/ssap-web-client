@@ -39,22 +39,22 @@ const UserGuide = () => {
                     ></div>
 
                     <p style={{ marginBottom: '20px' }}>
-                        First, once you successfully register as a Provider to create services for the SSAP, you must wait for us to review your application for system confirmation.
+                        1. First, once you successfully register as a Provider to create services for the SSAP, you must wait for us to review your application for system confirmation.
                     </p>
                     <p style={{ marginBottom: '20px' }}>
-                        If your application is denied, you will need to resubmit your documents. If they are complete, we will review them again.
+                        2. If your application is denied, you will need to resubmit your documents. If they are complete, we will review them again.
                     </p>
                     <p style={{ marginBottom: '20px' }}>
                         Once confirmed, you can create a wallet and add money to it. After funding your wallet, you can purchase our Subscription packages, which provide you with usage credits to “Add Service,” each of which has a validity period.
                     </p>
                     <p style={{ marginBottom: '20px' }}>
-                        Upon successfully purchasing a Subscription package, you can “Add Service.” Each time you add a service, you will use one credit. You can also upgrade your package to increase your credits.
+                        3. Upon successfully purchasing a Subscription package, you can “Add Service.” Each time you add a service, you will use one credit. You can also upgrade your package to increase your credits.
                     </p>
                     <p style={{ marginBottom: '20px' }}>
-                        Once you add a service, if any applicants wish to utilize your services (we will notify you via the notification bell at the top), they will pay into your wallet. You can then find the service and view the applicants through the “View Applicants” button.
+                        4. Once you add a service, if any applicants wish to utilize your services (we will notify you via the notification bell at the top), they will pay into your wallet. You can then find the service and view the applicants through the “View Applicants” button.
                     </p>
                     <p style={{ marginBottom: '20px' }}>
-                        You must respond to applicant requests by commenting. If you do not comment within 7 days, we will temporarily lock your account due to unprofessional conduct.
+                        5. You must respond to applicant requests by commenting. If you do not comment within 7 days, we will temporarily lock your account due to unprofessional conduct.
                     </p>
                     <br></br>
                     <p style={{ fontWeight: 'bold', marginLeft: '570px' }}>
@@ -100,10 +100,10 @@ const UserGuide = () => {
                         }}
                     >
                         <p style={{ marginBottom: '20px' }}>
-                            First, once you successfully register as an Applicant on our SSAP, you must wait for the funder to review your application to confirm that you meet the criteria and requirements for the scholarship.
+                            1. First, once you successfully register as an Applicant on our SSAP, you must wait for the funder to review your application to confirm that you meet the criteria and requirements for the scholarship.
                         </p>
                         <p style={{ marginBottom: '20px' }}>
-                            You need to create your own wallet and add funds because:
+                            2. You need to create your own wallet and add funds because:
                         </p>
                         <ul style={{ marginBottom: '20px', paddingLeft: '20px' }}>
                             <li>- You may need money to purchase services from the Service Providers in our system. These services may include reviewing your CV or other assistance. When you purchase a service, you must pay 100% of the service fee, and the Provider will provide feedback.</li>
@@ -112,10 +112,10 @@ const UserGuide = () => {
                             <li>- The purpose of this wallet is for the funder to transfer money to you if you win the scholarship.</li>
                         </ul>
                         <p style={{ marginBottom: '20px' }}>
-                            The funder will select the winners for the scholarship, and if you are denied, you will need to apply again (optional).
+                            3. The funder will select the winners for the scholarship, and if you are denied, you will need to apply again (optional).
                         </p>
                         <p style={{ marginBottom: '20px' }}>
-                            You must also submit the required documentation, such as your academic transcript reports, for each scholarship term. If you fail to submit these, the funder has the right to terminate the contract and stop funding your scholarship.
+                            4. You must also submit the required documentation, such as your academic transcript reports, for each scholarship term. If you fail to submit these, the funder has the right to terminate the contract and stop funding your scholarship.
                         </p>
                         <p style={{ fontWeight: 'bold', marginLeft: '570px' }}>
                             We wish you success!

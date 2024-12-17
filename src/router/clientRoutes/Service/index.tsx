@@ -42,7 +42,7 @@ import {
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
-import { getPaginatedServices, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
+import { getPaginatedServices, getServicesByProviderId, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
 import { MdDateRange } from "react-icons/md";
 import MultiStepUpgradeSubscriptionModal from "../Activity/SubscriptionUpgradeModal";
 
@@ -201,6 +201,7 @@ const Service = () => {
         if (subscription && subscription.data) {
           const numberOfServicesAllowed = subscription.data.numberOfServices ?? 0;
           const totalServices = await fetchTotalServices();
+          console.log(totalServices);
 
           const servicesLeft = numberOfServicesAllowed - totalServices;
           updateNumberOfServicesLeft(Math.max(servicesLeft, 0));
@@ -218,25 +219,8 @@ const Service = () => {
     try {
       if (!user) return null;
       let totalServices = 0;
-      let pageIndex = 1;
-      const pageSize = 6;
-      let hasMorePages = true;
-
-      while (hasMorePages) {
-        const response = await getServicesByProviderPaginated(Number(user.id), currentPage, pageSize);
-
-        if (response.data.statusCode === 200) {
-          const services = response.data.data.items || [];
-          totalServices += services.length;
-          const totalPages = response.data.data.totalPages || 1;
-
-          hasMorePages = pageIndex < totalPages;
-          pageIndex++;
-        } else {
-          hasMorePages = false;
-        }
-      }
-
+      const response = await getServicesByProviderId(Number(user.id));
+      totalServices = response.data.length;
       return totalServices;
     } catch (err) {
       console.error("Error fetching total services:", err);
@@ -252,24 +236,9 @@ const Service = () => {
       let response: any = {};
       if (user?.role === "Provider") {
         response = await getServicesByProviderPaginated(Number(user.id), currentPage, pageSize);
-        // response = await axios.get(
-        //   `${BASE_URL}/api/services/by-provider-paginated/${user.id}`,
-        //   {
-        //     params: {
-        //       pageIndex: currentPage,
-        //       pageSize: pageSize,
-        //     },
-        //   },
-        // );
         console.log(response);
       } else {
         response = await getPaginatedServices(currentPage, pageSize)
-        // response = await axios.get(`${BASE_URL}/api/services/paginated`, {
-        //   params: {
-        //     pageIndex: currentPage,
-        //     pageSize: pageSize,
-        //   },
-        // });
       }
 
       if (response.data.statusCode === 200) {
@@ -418,21 +387,21 @@ const Service = () => {
           </Breadcrumb>
 
           <div className="w-full mt-6">
-          <div className="relative w-full">
-        <input
-          className="w-2/3 h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
-          placeholder="Search for services..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
-        {searchTerm && (
-          <IoMdClose
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
-            onClick={clearSearch}
-          />
-        )}
-      </div>
+            <div className="relative w-full">
+              <input
+                className="w-2/3 h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
+                placeholder="Search for services..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
+              {searchTerm && (
+                <IoMdClose
+                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
+                  onClick={clearSearch}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

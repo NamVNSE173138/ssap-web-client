@@ -18,7 +18,6 @@ const TrackingExpert = () => {
   const [experts, setExperts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [imageFile, setImageFile] = useState<File[]>([]);
 
   const initialFormData = {
@@ -69,35 +68,65 @@ const TrackingExpert = () => {
 
   useEffect(() => {
     fetchExperts();
-  }, []); // Fetch experts on component mount
+  }, []); 
+
+  // const handleFormSubmit = async (formData: any) => {
+  //   setError(null);
+  //   setSuccess(false);
+  //   try {
+  //     const imageUrl = await uploadFile(imageFile);
+  //     if (imageUrl && imageUrl.data) {
+  //       formData.avatarUrl = imageUrl.data.toString();
+  //     }
+
+  //     console.log("EXPERT", formData);
+
+  //     const response = await axios.post(`${BASE_URL}/api/experts`, formData, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+
+  //     console.log("Response:", response.data);
+  //     setSuccess(true);
+
+  //     fetchExperts();
+  //   } catch (err: any) {
+  //     console.error("Error:", err.response?.data || err.message);
+  //     setError(err.response?.data?.message || "An error occurred");
+  //   }
+  // };
 
   const handleFormSubmit = async (formData: any) => {
-    setError(null);
-    setSuccess(false);
+    setError(null); 
     try {
-      const imageUrl = await uploadFile(imageFile);
+      const imageUrl = imageFile ? await uploadFile(imageFile) : null;
       if (imageUrl && imageUrl.data) {
         formData.avatarUrl = imageUrl.data.toString();
       }
-
+  
       console.log("EXPERT", formData);
-
+  
       const response = await axios.post(`${BASE_URL}/api/experts`, formData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+  
       console.log("Response:", response.data);
-      setSuccess(true);
-
-      fetchExperts();
+  
+      notification.success({ message: "Expert is created successfully!" }); 
+  
+      fetchExperts(); 
     } catch (err: any) {
       console.error("Error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "An error occurred");
+      const errorMessage = err.response?.data?.message || "An error occurred";
+      setError(errorMessage); 
+      notification.error({ message: errorMessage }); 
+      throw new Error(errorMessage); 
     }
   };
-
+  
   return (
     <Tabs.Content value="expert" className="pt-4 w-full">
       <div className="grid grid-cols-12">
@@ -137,7 +166,7 @@ const TrackingExpert = () => {
                     onSubmit={handleFormSubmit}
                     initialData={initialFormData}
                     handelUploadFile={handleFileChange}
-                    success = {success}
+                    // success = {success}
                   />
                 </Card>
               </Tabs.Content>
