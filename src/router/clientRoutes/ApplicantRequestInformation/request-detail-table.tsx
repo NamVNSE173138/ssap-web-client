@@ -24,6 +24,7 @@ import { updateFinishRequest } from "@/services/ApiServices/requestService";
 import { useEffect, useState } from "react";
 import {
   addFeedback,
+  notifyFeedbackSuccess,
   updateFeedback,
 } from "@/services/ApiServices/feedbackService";
 import { Star } from "lucide-react";
@@ -173,8 +174,17 @@ const RequestDetailTable = ({
         serviceId: request.requestDetails[0].serviceId,
       };
 
+      const serviceInfo = await getServiceById(request.requestDetails[0].serviceId);
+      const serviceNameInfo = serviceInfo.data.name;
+      const providerIdServiceInfo = serviceInfo.data.providerId;
+
       try {
         await addFeedback(feedbackData);
+        const notificationData = {
+          providerId: providerIdServiceInfo,
+          serviceName: serviceNameInfo,
+        };
+        await notifyFeedbackSuccess(notificationData);
         setOpenFeedbackDialog(false);
         setHasFeedback(true);
         notification.success({ message: "Feedback successfully!" });
