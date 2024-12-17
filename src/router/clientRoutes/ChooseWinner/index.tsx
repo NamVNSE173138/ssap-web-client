@@ -43,7 +43,7 @@ const ChooseWinner = () => {
   const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [generateFile, setGenerateFile] = useState(null);
-  const [constractFiles, setConstractFiles] = useState<File[]>([]);
+  const [contractFiles, setContractFiles] = useState<File[]>([]);
 
   const statusColor = {
     [ApplicationStatus.Submitted]: "blue",
@@ -147,7 +147,7 @@ const ChooseWinner = () => {
         };
 
         await updateApplication(row.id, payload);
-        await sendWinnerEmail(row.applicantId, constractFiles);
+        await sendWinnerEmail(row.applicantId, contractFiles);
 
         await SendNotification({
           topic: row.applicantId.toString(),
@@ -570,7 +570,7 @@ const ChooseWinner = () => {
               open={modalIsOpen}
               onCancel={() => setModalIsOpen(false)}
               onOk={() => {
-                if (constractFiles.length === 0) {
+                if (contractFiles.length === 0) {
                   notification.error({
                     message: "You need to provide a contract for the applicant!",
                   });
@@ -632,7 +632,7 @@ const ChooseWinner = () => {
                       id="file-upload"
                       onChange={(e) => {
                         const files = e.target.files;
-                        if (files) setConstractFiles(Array.from(files));
+                        if (files) setContractFiles(Array.from(files));
                       }}
                     />
                     <label
@@ -645,11 +645,11 @@ const ChooseWinner = () => {
                   </div>
                 </div>
 
-                {constractFiles.length > 0 && (
+                {contractFiles.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-sm font-medium text-gray-700">Selected Files:</h3>
                     <ul className="mt-2 space-y-2">
-                      {constractFiles.map((file: File, index: number) => (
+                      {contractFiles.map((file: File, index: number) => (
                         <li
                           key={index}
                           className="text-sm text-gray-600 flex items-center gap-2"

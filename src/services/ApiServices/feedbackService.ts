@@ -22,3 +22,8 @@ export async function updateFeedback(id:number, updateFeedbackDto:any) {
     const response = await axios.put(`${BASE_URL}/api/feedbacks/${id}`, updateFeedbackDto, ngrokSkipWarning);
     return response.data;
 }
+
+export async function notifyFeedbackSuccess(feedbackNotificationDto: { providerId: number; serviceName: string }) {
+    const response = await axios.post(`${BASE_URL}/api/notifications/notify-feedback-success`, feedbackNotificationDto, ngrokSkipWarning);
+    return response.data;
+}
