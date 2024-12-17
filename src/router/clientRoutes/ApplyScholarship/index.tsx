@@ -126,7 +126,7 @@ const ApplyScholarship = () => {
       const response = await addApplication(applicationData);
 
       if (response.statusCode === 200) {
-        const result = await response.data;
+         await response.data;
         notification.success({ message: "Application submitted successfully" });
       } else {
         console.error("Failed to submit application");

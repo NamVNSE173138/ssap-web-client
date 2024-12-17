@@ -8,26 +8,24 @@ import { ScholarshipProgramType, } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
 import { Avatar, Button, Divider, FormControl, InputAdornment, InputLabel, List, ListItem, ListItemAvatar, ListItemText, OutlinedInput, Paper, Typography, } from "@mui/material";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { SendNotification, sendWinnerEmail } from "@/services/ApiServices/notification";
 import {
   getScholarshipProgram, updateScholarshipStatus,
 } from "@/services/ApiServices/scholarshipProgramService";
 import {
-  FaCheckCircle, FaExternalLinkAlt, FaEye, FaGraduationCap, FaSearch, FaTimes, FaTrophy,
+  FaCheckCircle, FaEye, FaGraduationCap, FaSearch, FaTimes, FaTrophy,
   FaUser,
 } from "react-icons/fa";
 import { notification } from "antd";
-import ApplicationStatus from "@/constants/applicationStatus";
 import * as Tabs from "@radix-ui/react-tabs";
 import FirstReview from "./firstReview";
 import SecondReview from "./secondReview";
 import { updateApplication } from "@/services/ApiServices/applicationService";
 import { getUploadedScholarshipContract } from "@/services/ApiServices/applicantService";
-import { getFunderExperts, getFunderProfile } from "@/services/ApiServices/funderService";
+import { getFunderProfile } from "@/services/ApiServices/funderService";
 import { IoCloudUpload, IoDocumentText } from "react-icons/io5";
 import Modal from "antd/es/modal/Modal";
-import { uploadFile } from "@/services/ApiServices/testService";
+// import { uploadFile } from "@/services/ApiServices/testService";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,14 +43,7 @@ const ChooseWinner = () => {
   const [generateFile, setGenerateFile] = useState(null);
   const [contractFiles, setContractFiles] = useState<File[]>([]);
 
-  const statusColor = {
-    [ApplicationStatus.Submitted]: "blue",
-    [ApplicationStatus.Awarded]: "green",
-    [ApplicationStatus.Approved]: "blue",
-    [ApplicationStatus.Rejected]: "red",
-    [ApplicationStatus.NeedExtend]: "yellow",
-    [ApplicationStatus.Reviewing]: "yellow",
-  };
+  
 
   const fetchApplicants = async (scholarshipId: number, data: any) => {
     try {
@@ -176,76 +167,76 @@ const ChooseWinner = () => {
   };
 
 
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    {
-      field: "avatarUrl",
-      headerName: "Avatar",
-      width: 130,
-      flex: 0.5,
-      renderCell: (params) => {
-        return (
-          <img
-            src={params.value}
-            alt="avatar"
-            style={{ width: 50, height: 50, borderRadius: 50 }}
-          />
-        );
-      },
-    },
-    { field: "username", headerName: "Username", width: 130, flex: 1 },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 130,
-      flex: 0.5,
-      renderCell: (params) => {
-        console.log("PARAM", params)
-        return (
-          <span className="flex justify-end gap-2 items-center">
-            <span className="relative flex h-3 w-3">
-              <span
-                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[params.row.status]
-                  }-500 opacity-75`}
-              ></span>
-              <span
-                className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[params.row.status]
-                  }-500`}
-              ></span>
-            </span>
-            <span
-              className={`text-${statusColor[params.value]}-500 font-medium`}
-            >
-              {params.value}
-            </span>
-          </span>
-        );
-      },
-    },
-    { field: "expertReview", headerName: "Reviewed by Expert", width: 130, flex: 1 },
-    {
-      field: "score", headerName: "Score", width: 130, flex: 1
-    },
-    {
-      field: "link",
-      headerName: "Action",
-      renderCell: (params) => {
-        return (
-          <Link
-            target="_blank"
-            className="text-sky-500 underline"
-            to={`/funder/application/${params.row.id}`}
-          >
-            View Profile
-          </Link>
-        );
-      },
-      flex: 1,
-      width: 130,
-    },
-  ];
+  // const columns: GridColDef[] = [
+  //   { field: "id", headerName: "ID", width: 70 },
+  //   {
+  //     field: "avatarUrl",
+  //     headerName: "Avatar",
+  //     width: 130,
+  //     flex: 0.5,
+  //     renderCell: (params) => {
+  //       return (
+  //         <img
+  //           src={params.value}
+  //           alt="avatar"
+  //           style={{ width: 50, height: 50, borderRadius: 50 }}
+  //         />
+  //       );
+  //     },
+  //   },
+  //   { field: "username", headerName: "Username", width: 130, flex: 1 },
+  //   {
+  //     field: "status",
+  //     headerName: "Status",
+  //     width: 130,
+  //     flex: 0.5,
+  //     renderCell: (params) => {
+  //       console.log("PARAM", params)
+  //       return (
+  //         <span className="flex justify-end gap-2 items-center">
+  //           <span className="relative flex h-3 w-3">
+  //             <span
+  //               className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[params.row.status]
+  //                 }-500 opacity-75`}
+  //             ></span>
+  //             <span
+  //               className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[params.row.status]
+  //                 }-500`}
+  //             ></span>
+  //           </span>
+  //           <span
+  //             className={`text-${statusColor[params.value]}-500 font-medium`}
+  //           >
+  //             {params.value}
+  //           </span>
+  //         </span>
+  //       );
+  //     },
+  //   },
+  //   { field: "expertReview", headerName: "Reviewed by Expert", width: 130, flex: 1 },
+  //   {
+  //     field: "score", headerName: "Score", width: 130, flex: 1
+  //   },
+  //   {
+  //     field: "link",
+  //     headerName: "Action",
+  //     renderCell: (params) => {
+  //       return (
+  //         <Link
+  //           target="_blank"
+  //           className="text-sky-500 underline"
+  //           to={`/funder/application/${params.row.id}`}
+  //         >
+  //           View Profile
+  //         </Link>
+  //       );
+  //     },
+  //     flex: 1,
+  //     width: 130,
+  //   },
+  // ];
 
-  const paginationModel = { page: 0, pageSize: 5 };
+  
 
   const handleSelectionChange = (appId: number) => {
     // Check if the appId is already in selectedRows
@@ -270,9 +261,7 @@ const ChooseWinner = () => {
     }
   };
 
-  const handleClearSelection = async () => {
-    setSelectedRows([]);
-  };
+  
 
   const filteredRows = applicants
     ? applicants.filter(

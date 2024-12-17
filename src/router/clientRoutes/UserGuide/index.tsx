@@ -3,6 +3,59 @@ import { useSelector } from "react-redux";
 
 const UserGuide = () => {
     const user = useSelector((state: RootState) => state.token.user);
+    if (user?.role !== "Applicant" && user?.role !== "Provider" && user?.role !== "Funder") {
+        return (
+            <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial, sans-serif', backgroundColor: '#e5f6f6' }}>
+                <h1 style={{ fontSize: '38px', color: '#2C3E50', fontWeight: '700', marginBottom: '20px', marginTop: '50px' }}>
+                    User Guide
+                </h1>
+
+                <div
+                    style={{
+                        fontSize: '20px',
+                        lineHeight: '1.8',
+                        color: '#555',
+                        margin: '40px auto',
+                        maxWidth: '900px',
+                        padding: '30px 40px',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '20px',
+                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
+                        textAlign: 'left',
+                        position: 'relative',
+                    }}
+                >
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '20px',
+                            left: '20px',
+                            width: '60px',
+                            height: '60px',
+                            backgroundColor: '#FF6F20',
+                            borderRadius: '50%',
+                            opacity: 0.2,
+                        }}
+                    ></div>
+
+                    <p style={{ marginBottom: '20px' }}>
+                        1. If you are an Applicant, you are allowed to apply for scholarships available on the system provided by Funder, or you can buy services from Service Providers.
+                    </p>
+                    <p style={{ marginBottom: '20px' }}>
+                        2. If you are a Provider, you are allowed to create your own services and if there is any Request from Applicant, you are required to reply by commenting.
+                    </p>
+                    <p style={{ marginBottom: '20px' }}>
+                        3. If you are a Funder, you are allowed to create your own scholarships and if any applicant applies, you can view the profile and meet the criteria, then you have the right to choose that person as the winner for your scholarship. And you must make sure that you have enough money to pay for that applicant.
+                    </p>
+                    <br />
+                    <p style={{ fontWeight: 'bold', marginLeft: '570px' }}>
+                        We wish you success!
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     if (user?.role === "Provider") {
         return (
             <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial, sans-serif', backgroundColor: '#e5f6f6' }}>
@@ -131,7 +184,7 @@ const UserGuide = () => {
         return (
             <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial, sans-serif', backgroundColor: '#e5f6f6' }}>
                 <h1 style={{ fontSize: '38px', color: '#2C3E50', fontWeight: '700', marginBottom: '20px', marginTop: '50px' }}>
-                    Funder Guide  
+                    Funder Guide
                 </h1>
 
                 <div
