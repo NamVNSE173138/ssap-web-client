@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { createWallet, getAccountWallet, updateWalletBankInformation } from "@/services/ApiServices/accountService";
 import { createCheckoutSession, getTransactionsByWalletSenderId } from "@/services/ApiServices/paymentService";
-// import { loadStripe } from '@stripe/stripe-js';
 
 const Wallet = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -20,7 +19,8 @@ const Wallet = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isUpdateBankModalOpen, setIsUpdateBankModalOpen] = useState(false);
   const [isModalWithdrawOpen, setIsModalWithdrawOpen] = useState(false);
-  // const stripePromise = loadStripe('pk_test_51QCMb308u8J7LaJOAREpbPlmyfVpd22yS6ltclWgXSrdsB5OxGxSdo6zlhm54FdxUaRoX0zsKvlVdVSrjVessc0I00xFufsjzu');
+  const [accountNameError, setAccountNameError] = useState("");
+  const [accountNumberError, setAccountNumberError] = useState("");
 
   useEffect(() => {
     const fetchWalletData = async () => {
@@ -73,17 +73,17 @@ const Wallet = () => {
       notification.error({ message: 'User not found. Please login.' });
       return;
     }
-  
+
     if (!addAmount || isNaN(Number(addAmount)) || Number(addAmount) <= 0) {
       setError('Please enter a valid amount');
       return;
     }
-  
+
     setError(null);
-  
+
     try {
       setLoading(true);
-  
+
       const checkoutSessionRequest = {
         email: user.email,
         amount: Number(addAmount),
@@ -91,13 +91,13 @@ const Wallet = () => {
         receiverId: user.id,
         description: 'Add Money to Wallet',
       };
-  
+
       const { data } = await createCheckoutSession(checkoutSessionRequest);
       console.log(data)
-  
+
       if (data) {
         window.location.href = data.sessionUrl;
-  
+
       } else {
         notification.error({ message: 'Unable to create payment session. Please try again.' });
       }
@@ -108,7 +108,7 @@ const Wallet = () => {
       setLoading(false);
     }
   };
-  
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -117,6 +117,16 @@ const Wallet = () => {
 
   const handleCreateWallet = async () => {
     if (!user) return null;
+    setAccountNameError("");
+    setAccountNumberError("");
+    if (!/^[a-zA-Z\s]+$/.test(bankAccountName) || bankAccountName.length > 50) {
+      setAccountNameError("Account Name must be letters only and up to 50 characters.");
+      return;
+    }
+    if (!/^\d+$/.test(bankAccountNumber) || bankAccountNumber.length > 20) {
+      setAccountNumberError("Account Number must be digits only and up to 20 characters.");
+      return;
+    }
 
     try {
       const newWallet = await createWallet(Number(user.id), {
@@ -136,6 +146,19 @@ const Wallet = () => {
   };
 
   const handleUpdateBankInformation = async () => {
+    setAccountNameError("");
+    setAccountNumberError("");
+
+    if (!/^[a-zA-Z\s]+$/.test(bankAccountName) || bankAccountName.length > 50) {
+      setAccountNameError("Account Name must be letters only and up to 50 characters.");
+      return;
+    }
+
+    if (!/^\d+$/.test(bankAccountNumber) || bankAccountNumber.length > 20) {
+      setAccountNumberError("Account Number must be digits only and up to 20 characters.");
+      return;
+    }
+
     if (!user) return null;
     try {
       const updatedWallet = await updateWalletBankInformation(Number(user.id), {
@@ -297,16 +320,24 @@ const Wallet = () => {
           <Input
             value={bankAccountName}
             onChange={(e) => setBankAccountName(e.target.value)}
-            className="mt-2 p-3 border rounded-lg w-full"
+            className={`mt-2 p-3 border rounded-lg w-full ${accountNameError ? 'border-red-500' : ''}`}
           />
+          {accountNameError && <div className="text-red-500 text-sm">{accountNameError}</div>}
+          <div className={`text-sm mt-1 ${bankAccountName.length > 50 ? 'text-red-500' : 'text-gray-500'}`}>
+            {bankAccountName.length}/50
+          </div>
         </div>
         <div className="mb-4">
           <label className="text-blue-600 font-semibold">Bank Account Number:</label>
           <Input
             value={bankAccountNumber}
             onChange={(e) => setBankAccountNumber(e.target.value)}
-            className="mt-2 p-3 border rounded-lg w-full"
+            className={`mt-2 p-3 border rounded-lg w-full ${accountNumberError ? 'border-red-500' : ''}`}
           />
+          {accountNumberError && <div className="text-red-500 text-sm">{accountNumberError}</div>}
+          <div className={`text-sm mt-1 ${bankAccountNumber.length > 20 ? 'text-red-500' : 'text-gray-500'}`}>
+            {bankAccountNumber.length}/20
+          </div>
         </div>
       </Modal>
 
@@ -338,8 +369,12 @@ const Wallet = () => {
             placeholder="Enter bank account name"
             value={bankAccountName}
             onChange={(e) => setBankAccountName(e.target.value)}
-            className="mt-2 p-3 border rounded-lg w-full"
+            className={`mt-2 p-3 border rounded-lg w-full ${accountNameError ? 'border-red-500' : ''}`}
           />
+          {accountNameError && <div className="text-red-500 text-sm">{accountNameError}</div>}
+          <div className={`text-sm mt-1 ${bankAccountName.length > 50 ? 'text-red-500' : 'text-gray-500'}`}>
+            {bankAccountName.length}/50
+          </div>
         </div>
         <div className="mb-4">
           <label className="text-blue-600 font-semibold">Bank Account Number:</label>
@@ -347,8 +382,12 @@ const Wallet = () => {
             placeholder="Enter bank account number"
             value={bankAccountNumber}
             onChange={(e) => setBankAccountNumber(e.target.value)}
-            className="mt-2 p-3 border rounded-lg w-full"
+            className={`mt-2 p-3 border rounded-lg w-full ${accountNumberError ? 'border-red-500' : ''}`}
           />
+          {accountNumberError && <div className="text-red-500 text-sm">{accountNumberError}</div>}
+          <div className={`text-sm mt-1 ${bankAccountNumber.length > 20 ? 'text-red-500' : 'text-gray-500'}`}>
+            {bankAccountNumber.length}/20
+          </div>
         </div>
       </Modal>
 

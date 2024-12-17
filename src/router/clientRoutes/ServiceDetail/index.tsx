@@ -166,7 +166,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setCanEdit(true);
       } else {
         console.log("Hrllo");
-        
+
         setCanEdit(false);
       }
 
@@ -219,7 +219,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
           setExistingRequestId(null);
           setRequestStatus(null);
         }
-        setCanEdit(existingRequest.length !=0 ? false : true);
+        setCanEdit(existingRequest.length != 0 ? false : true);
         return response.data;
       } else {
         setError("Failed to get applicants");
@@ -321,6 +321,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
       });
       return;
     }
+
+    if (description.length > 200) {
+      notification.error({ message: "Description cannot exceed 200 characters." });
+      return;
+    }
+
     if (!paymentMethod) {
       notification.error({ message: "Please select a payment method." });
       return;
@@ -436,6 +442,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-300 focus:outline-none shadow-sm"
                 />
+                <div
+                  className={`text-sm mt-1 ${description.length > 200 ? 'text-red-500' : 'text-gray-500'
+                    }`}
+                >
+                  {description.length}/{200}
+                </div>
               </div>
 
               <div className="mb-5">
@@ -486,8 +498,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   <div
                     onClick={() => setPaymentMethod("Wallet")}
                     className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet"
-                        ? "border-blue-500 bg-blue-100"
-                        : "border-gray-300 hover:bg-gray-100"
+                      ? "border-blue-500 bg-blue-100"
+                      : "border-gray-300 hover:bg-gray-100"
                       }`}
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
@@ -500,8 +512,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   <div
                     onClick={() => setPaymentMethod("Cash")}
                     className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash"
-                        ? "border-green-500 bg-green-100"
-                        : "border-gray-300 hover:bg-gray-100"
+                      ? "border-green-500 bg-green-100"
+                      : "border-gray-300 hover:bg-gray-100"
                       }`}
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
@@ -746,8 +758,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         <button
                           onClick={() => openEditDialog()}
                           className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
-                              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                              : "bg-yellow-500 hover:bg-yellow-400 text-white"
+                            ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                            : "bg-yellow-500 hover:bg-yellow-400 text-white"
                             }`}
                           disabled={!canEdit}
                           title={
@@ -767,8 +779,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         <button
                           onClick={() => setConfirmationDialogOpen(true)}
                           className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
-                              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                              : "bg-red-600 hover:bg-red-500 text-white"
+                            ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                            : "bg-red-600 hover:bg-red-500 text-white"
                             }`}
                           disabled={!canEdit}
                           title={

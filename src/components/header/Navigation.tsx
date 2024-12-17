@@ -66,14 +66,18 @@ import navigation from "../../constants/multilingual/navigation";
 import RouteNames from "../../constants/routeNames";
 import DropdownNotification from "@/router/adminRoutes/Dashboard/components/Header/DropdownNotification";
 import useMediaQuery from "@/hooks/useMediaQuery";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
+import { getAllMessages } from "@/services/ApiServices/chatService";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 type NavItem = {
   text: string;
   to: string;
 };
+
 //User Guide
 const navItems: NavItem[] = [
   {
@@ -98,9 +102,28 @@ const navItems: NavItem[] = [
   },
 ];
 
-const Navigation = () => {
+const Navigation= ()=> {
   const isAboveMediumScreens = useMediaQuery("(min-width: 1060px)");
   const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
+  const [numberOfUnreadMsg, setNumberOfUnreadMsgs] = useState<number>(0);
+  const user = useSelector((state: RootState) => state.token.user);
+
+  const getCheckHaveMsg = async () => {
+    if(!user) return null;
+    const allMessagesResponse = await getAllMessages(parseInt(user.id));
+        const allMessages = allMessagesResponse.data;
+          const unreadMessages = allMessages.filter((message: any) =>
+            message.receiverId == user.id && !message.isRead
+          ).length;
+          setNumberOfUnreadMsgs(unreadMessages);
+          console.log(unreadMessages)
+          console.log(allMessages)
+  }
+  
+  useEffect(()=>{
+    getCheckHaveMsg();
+  },[]);
+  
   return (
     <nav>
       <div>
@@ -114,6 +137,9 @@ const Navigation = () => {
                 <li key={item.text} className="group/nav">
                   <Link className="text-xl" to={item.to}>
                     {item.text}
+                    {item.text === 'Chat' && numberOfUnreadMsg > 0 && (
+                    <span className="h-3 w-3 bg-red-500 rounded-full ml-1 inline-block" />
+                    )}
                   </Link>
                   <div className="h-[2px] bg-[#1eb2a6] scale-x-0 group-hover/nav:scale-x-100 transition" />
                 </li>

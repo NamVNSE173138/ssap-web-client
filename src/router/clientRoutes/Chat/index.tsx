@@ -36,6 +36,7 @@ const Chat: React.FC = () => {
   const [isChatEnabled, setIsChatEnabled] = useState<boolean>(false);
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
 
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const chatUserId = queryParams.get("id");
@@ -52,7 +53,7 @@ const Chat: React.FC = () => {
     const role = user.role;
     const response = await getAllAccounts();
     const accountsWithCount = response.map((account: Account) => ({ ...account, unreadCount: 0 }));
-  
+
     const filteredAccounts = accountsWithCount.filter((account: any) => {
       if (role === "Provider") {
         return account.roleName === "Applicant";
@@ -61,25 +62,25 @@ const Chat: React.FC = () => {
       }
       return false;
     });
-  
+
     const allMessagesResponse = await getAllMessages(parseInt(user.id));
     const allMessages = allMessagesResponse.data;
-  
+
     const updatedAccounts = filteredAccounts.map((account: any) => {
       const unreadMessages = allMessages.filter((message: any) =>
         message.senderId === account.id && !message.isRead
       ).length;
-  
+
       return {
         ...account,
         unreadCount: unreadMessages
       };
     });
-  
+
     // Sắp xếp tài khoản theo số lượng tin nhắn chưa đọc
-    const sortedAccounts = updatedAccounts.sort((a:any, b:any) => b.unreadCount - a.unreadCount);
+    const sortedAccounts = updatedAccounts.sort((a: any, b: any) => b.unreadCount - a.unreadCount);
     setAccounts(sortedAccounts);
-  
+
     if (role === "Applicant") {
       const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
       const requestData = requestsResponse.data;
@@ -171,7 +172,7 @@ const Chat: React.FC = () => {
           : acc
       )
     );
-    
+
 
     if (user?.role === "Applicant") {
       const requestsResponse = await getRequestsByApplicantId(parseInt(user.id));
@@ -186,32 +187,33 @@ const Chat: React.FC = () => {
     return <></>;
   }
 
+
   return (
     <div className="flex h-screen bg-gray-100 p-8 gap-5">
       <div className="w-1/3 bg-white border-r border-gray-200 p-5 overflow-y-auto rounded-lg shadow-xl ">
         <ul className="space-y-4">
           {accounts.map((account) => (
             <li
-            key={account.id}
-            onClick={() => handleAccountClick(account)}
-            className={`p-3 rounded-lg flex items-center cursor-pointer transition-all duration-200 transform hover:scale-105 ${selectedUser?.id === account.id
-              ? "bg-blue-100 text-blue-700"
-              : "bg-white hover:bg-blue-50"
-              }`}
-          >
-            <img
-              src={account.avatarUrl || "https://github.com/shadcn.png"}
-              alt={account.username}
-              className="w-12 h-12 rounded-full mr-4 shadow-md"
-            />
-            <div className="flex items-center">
-              <span className="text-gray-800 font-medium truncate">{account.username}</span>
-              {account.unreadCount > 0 && (
-                <span className="h-3 w-3 bg-red-500 rounded-full ml-2" />
-              )}
-            </div>
-            <FaComment className="ml-auto text-gray-500 hover:text-blue-600" size={24} />
-          </li>
+              key={account.id}
+              onClick={() => handleAccountClick(account)}
+              className={`p-3 rounded-lg flex items-center cursor-pointer transition-all duration-200 transform hover:scale-105 ${selectedUser?.id === account.id
+                ? "bg-blue-100 text-blue-700"
+                : "bg-white hover:bg-blue-50"
+                }`}
+            >
+              <img
+                src={account.avatarUrl || "https://github.com/shadcn.png"}
+                alt={account.username}
+                className="w-12 h-12 rounded-full mr-4 shadow-md"
+              />
+              <div className="flex items-center">
+                <span className="text-gray-800 font-medium truncate">{account.username}</span>
+                {account.unreadCount > 0 && (
+                  <span className="h-3 w-3 bg-red-500 rounded-full ml-2" />
+                )}
+              </div>
+              <FaComment className="ml-auto text-gray-500 hover:text-blue-600" size={24} />
+            </li>
           ))}
         </ul>
       </div>
@@ -258,8 +260,8 @@ const Chat: React.FC = () => {
               </p>
             )
           )}
-          <div  ref={endOfMessagesRef} />
-          
+          <div ref={endOfMessagesRef} />
+
         </div>
 
         {selectedUser && (
