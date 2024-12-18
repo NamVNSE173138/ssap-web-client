@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import ApplicationStatus from "@/constants/applicationStatus";
-import { formatDate } from "@/lib/date-formatter";
+import {formatOnlyDate } from "@/lib/date-formatter";
 import {
   Dialog,
   DialogTitle,
@@ -36,6 +36,7 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
   const submittingApplications = applications.filter(
     (application: any) =>
       (application.status == "Submitted" ||
+      application.status == "Rejected" ||
       application.status == "Reviewing") &&
       new Date(application.updatedAt) < new Date(scholarship.deadline)
   );
@@ -121,9 +122,14 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
                     />
                     <ListItemText
                       primary={
-                        <span className="text-sm text-gray-500">
-                          Applied on {formatDate(app.appliedDate)}
-                        </span>
+                        <>
+                        <div className="text-sm text-gray-500">
+                          Applied on {formatOnlyDate(app.appliedDate)}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Updated at {formatOnlyDate(app.updatedAt)}
+                        </div>
+                        </>
                       }
                     />
                   </div>

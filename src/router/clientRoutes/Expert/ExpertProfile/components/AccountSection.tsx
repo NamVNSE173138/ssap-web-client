@@ -18,7 +18,7 @@ const AccountSection = (props: any) => {
   return (
     <Tabs.Content value="account" className="pt-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Funder Profile</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Expert Profile</h1>
         <Button
           onClick={(e) => {
             if (isEditing) {

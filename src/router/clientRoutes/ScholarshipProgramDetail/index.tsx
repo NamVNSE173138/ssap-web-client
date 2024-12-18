@@ -96,7 +96,7 @@ const ScholarshipProgramDetail = () => {
   const [reviewingDialogOpen, setReviewingDialogOpen] =
     useState<boolean>(false);
   // const [selectedExpert, setSelectedExpert] = useState<any>(null);
-  const selectedExpert: any = null
+  const selectedExpert: any = null;
 
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
   const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] =
@@ -488,10 +488,9 @@ const ScholarshipProgramDetail = () => {
                   )}
                 </>
               ) : (
-                authorized != "Unauthorized" && (
+                authorized != "Unauthorized" &&
+                user.id == data.funderId && (
                   <div className="flex justify-between w-full gap-3">
-                    
-
                     <Button
                       onClick={() => handleOpenApplicantDialog()}
                       className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
@@ -609,7 +608,7 @@ const ScholarshipProgramDetail = () => {
                   Funding Type
                 </p>
                 <p className="text-lg font-semibold text-gray-800">
-                  {"Not specified"}
+                  {"Wallet or Cash"}
                 </p>
               </div>
             </div>
@@ -697,31 +696,14 @@ const ScholarshipProgramDetail = () => {
                       </div>
                       <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
                         <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaRegListAlt className="text-gray-500" />
-                          Average applications per year:
+                          <FaInfoCircle className="text-gray-500" />
+                          Funding details:
                         </p>
-                        <span>Not specified</span>
+                        <span>{data.description}</span>
                       </div>
                     </div>
 
                     {/* Qualification & Number of awards */}
-                    <div className="flex gap-4 flex-wrap justify-between mb-6">
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaAward className="text-gray-500" />
-                          Qualification:
-                        </p>
-                        <span>Not specified</span>
-                      </div>
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaRegListAlt className="text-gray-500" />
-                          Number of awards available:
-                        </p>
-                        <span>{data.numberOfScholarships}</span>
-                      </div>
-                    </div>
-
                     <div className="flex gap-4 flex-wrap justify-between mb-6">
                       <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
                         <p className="text-gray-700 font-bold flex items-center gap-2">
@@ -732,45 +714,10 @@ const ScholarshipProgramDetail = () => {
                       </div>
                       <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
                         <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaInfoCircle className="text-gray-500" />
-                          Eligible intake:
+                          <FaRegListAlt className="text-gray-500" />
+                          Number of awards available:
                         </p>
-                        <span>Not specified</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-4 flex-wrap justify-between mb-6">
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaInfoCircle className="text-gray-500" />
-                          Funding details:
-                        </p>
-                        <span>{data.description}</span>
-                      </div>
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaInfoCircle className="text-gray-500" />
-                          Funding type:
-                        </p>
-                        <span>Not specified</span>
-                      </div>
-                    </div>
-
-                    {/* Delivery mode & Deadline */}
-                    <div className="flex gap-4 flex-wrap justify-between">
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaInfoCircle className="text-gray-500" />
-                          Delivery mode:
-                        </p>
-                        <span>Not specified</span>
-                      </div>
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaInfoCircle className="text-gray-500" />
-                          Course/offer application deadline:
-                        </p>
-                        <span>Not specified</span>
+                        <span>{data.numberOfScholarships}</span>
                       </div>
                     </div>
                   </AccordionDetails>
