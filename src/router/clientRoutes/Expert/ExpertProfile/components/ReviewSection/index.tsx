@@ -112,6 +112,7 @@ const ApprovalList: React.FC = () => {
     setSelectedReview(review);
     setScore("");
     setComment("");
+    window.open(item.documentUrl, "_blank");
   };
 
   const handleApprove = async (id: number) => {
