@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import ScreenSpinner from "@/components/ScreenSpinner";
-import { FaTrophy } from "react-icons/fa";
+import { FaInfoCircle, FaTrophy } from "react-icons/fa";
 import { Textarea } from "@/components/ui/textarea";
 import ScholarshipContractDialogForFunder from "../funder/FunderProfile/components/Activity/ScholarshipContractDialogForFunder";
 
@@ -41,7 +41,7 @@ const formSchema = z.object({
     .refine((quantity) => !isNaN(parseInt(quantity)), {
       message: "Number of award milestones must be a number",
     }),
-  //imageUrl: z.string().min(1, "Please upload image"),
+  imageUrl: z.string().optional(),
   deadline: z.string().min(1, "Please enter a deadline date"),
   status: z.string(),
   university: z.string().min(1, "Please choose a university"),
@@ -320,6 +320,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-4">
                   <Label htmlFor="scholarshiptype" className="text-md">
                     Scholarship Type
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     name="scholarshiptype"
@@ -340,12 +341,13 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-end-7 col-span-3">
                   <Label htmlFor="name" className="text-md">
                     Scholarship Name
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("name")}
                     type="text"
                     id="name"
-                    placeholder="Enter scholarship name"
+                    placeholder="Enter scholarship name (Name must be at most 100 characters)"
                   />
                   {form.formState.errors.name && (
                     <span className="text-red-500">
@@ -357,11 +359,12 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-7">
                   <Label htmlFor="description" className="text-md">
                     Scholarship Description
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Textarea
                     {...form.register("description")}
                     id="description"
-                    placeholder="Enter description"
+                    placeholder="Enter description (Description must be at most 200 characters)"
                     rows={4}
                   />
                   {/* <Input
@@ -380,6 +383,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 ">
                   <Label htmlFor="price" className="text-md">
                     Price
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("price")}
@@ -397,12 +401,13 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2">
                   <Label htmlFor="quantity" className="text-md">
                     Quantity
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("quantity")}
                     type="text"
                     id="quantity"
-                    placeholder="Enter quantity"
+                    placeholder="Quantity of Scholarship Program"
                   />
                   {form.formState.errors.quantity && (
                     <span className="text-red-500">
@@ -417,6 +422,7 @@ const FormCreateScholarshipProgram = () => {
                     className="text-md"
                   >
                     Quantity of Award Milestones
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("quantityOfAwardMilestones")}
@@ -434,6 +440,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-4 col-end-6">
                   <Label htmlFor="imageUrl" className="text-md">
                     Upload Image
+                    <span className="text-red-500 text-sm"> (* Optional)</span>
                   </Label>
                   <Input
                     type="file"
@@ -452,6 +459,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2">
                   <Label htmlFor="deadline" className="text-md">
                     Deadline
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("deadline")}
@@ -469,6 +477,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-3">
                   <Label htmlFor="university" className="text-md">
                     University
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     {...form.register("university")}
@@ -486,6 +495,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-5">
                   <Label htmlFor="certificate" className="text-md">
                     Certificates
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     {...form.register("certificate")}
@@ -504,6 +514,8 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-7">
                   <Label htmlFor="major" className="text-md">
                     Major
+                    
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     {...form.register("major")}
@@ -521,12 +533,13 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-7">
                   <Label htmlFor="criteria" className="text-md">
                     Criteria
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   {criteriaFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">
                       <Input
                         {...form.register(`criteria.${index}.name`)}
-                        placeholder="Enter criterion name"
+                        placeholder="Ex: Academic Excellence"
                       />
                       {form.formState.errors.criteria?.[index]?.name && (
                         <span className="text-red-500">
@@ -535,7 +548,7 @@ const FormCreateScholarshipProgram = () => {
                       )}
                       <Input
                         {...form.register(`criteria.${index}.description`)}
-                        placeholder="Enter criterion description"
+                        placeholder="Ex: Requires a minimum GPA of 3.5 or equivalent, recognizing outstanding academic performance through grades, test scores, or awards."
                       />
                       {form.formState.errors.criteria?.[index]?.description && (
                         <span className="text-red-500">
@@ -558,8 +571,13 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-start-1 col-end-7">
-                  <Label htmlFor="reviewMilestone" className="text-md">
+                  <Label htmlFor="reviewMilestone" className="text-md flex items-center gap-2">
                     Review Milestones
+                    <FaInfoCircle
+                  className="text-gray-600 cursor-pointer"
+                  title="The start day must be after the deadline"
+                />
+                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   {reviewMilestoneFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">

@@ -8,7 +8,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
 import { AiOutlineSend } from "react-icons/ai";
 import { FaComment, FaRegUser } from "react-icons/fa";
-import Navigation from "@/components/header/Navigation";
 
 interface Account {
   id: number;
@@ -36,7 +35,6 @@ const Chat: React.FC = () => {
   const location = useLocation();
   const [isChatEnabled, setIsChatEnabled] = useState<boolean>(false);
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
-  const [totalUnreadCount, setTotalUnreadCount] = useState<number>(0);
 
 
   useEffect(() => {
