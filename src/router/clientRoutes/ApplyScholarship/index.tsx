@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,6 +14,7 @@ import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgram
 import { notification } from "antd";
 import { addApplication } from "@/services/ApiServices/applicationService";
 import ScholarshipContractDialog from "./ScholarshipContractDialog";
+import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -39,6 +40,13 @@ const ApplyScholarship = () => {
     //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
   ]);
   const [isContractOpen, setContractOpen] = useState(false);
+
+  const fetchProfile = async () => {
+    if(!user) return;
+    const response = await getApplicantProfileById(user.id);
+    if(response.statusCode !== 200) return;
+    setFormData({...formData, first_name: response.data.firstName, last_name: response.data.lastName, email: response.data.applicant.email, phone_number: response.data.applicant.phoneNumber});
+  };
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
@@ -140,6 +148,10 @@ const ApplyScholarship = () => {
       setApplyLoading(false)
     }
   };
+
+  useEffect(() => {
+      fetchProfile();
+  }, []);
 
   return (
     <section className="p-10">
