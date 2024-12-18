@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { formatDate } from "@/lib/date-formatter";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 type ApprovalItem = {
@@ -31,6 +31,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
   onRowClick,
   document,
 }) => {
+  const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   return (
     <div className="overflow-auto bg-white shadow rounded-lg">
@@ -117,7 +118,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               </td>
               <td className="p-4 text-sm">
                 <div className="flex items-center space-x-2">
-                  <Button className={`w-full h-full ${
+                   <Button className={`w-full h-full ${
                         isScored
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-blue-500 text-white"
