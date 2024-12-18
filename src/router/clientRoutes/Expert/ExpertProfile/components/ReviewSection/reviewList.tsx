@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { formatDate } from "@/lib/date-formatter";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -14,13 +14,13 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string; // Added to store document URL
-  applicationReviews?: { id: number, score: number, expertId: number }[];
+  applicationReviews?: { id: number, description: string, score: number, expertId: number, status: string }[];
   
 };
 
 type ApprovalTableProps = {
   applications: ApprovalItem[];
-  onRowClick: (item: ApprovalItem) => void;
+  onRowClick: (item: ApprovalItem, review: any) => void;
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
   document: any;
@@ -44,6 +44,9 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               Scholarship Name
             </th>
             <th className="p-4 text-left text-sm font-semibold text-gray-600">
+              Review Milestone
+            </th>
+            <th className="p-4 text-left text-sm font-semibold text-gray-600">
               University
             </th>
             <th className="p-4 text-left text-sm font-semibold text-gray-600">
@@ -65,46 +68,52 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
             // const isScored = item.applicationReviews?.some(
             //   (review) => review.score !== null && review.score !== undefined
             // );
-            const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
-            if(!review) return;
-            const isScored = review.some(
-              (review) => review.score !== null && review.score !== undefined && review.score > 0
-            ) || false;
-            console.log("isScore", isScored);
             
-
-            const score = review.find(
-              (review) => review.score !== undefined
-            )?.score || "Not Scored";
-            console.log("Score", score);
-
             return (
-            <tr
-              key={item.id}
-              onClick={() => onRowClick(item)}
-              className="hover:bg-gray-50"
-            >
-              <td className="p-4 text-sm text-gray-800">
-                {item.applicantName}
-              </td>
-              <td className="p-4 text-sm text-gray-800">
+              <Fragment key={item.id}>
+              {item.applicationReviews?.map((review) => {
+                  //const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
+                  if(review.expertId != user.id) return;
+                  const isScored = (review.score !== null && review.score !== undefined && review.score > 0
+                          );
+                  console.log("isScore", isScored);
+
+                  const score = review.score !== undefined
+                          ? review.score : "Not Scored";
+                  console.log("Score", score);
+                  return (
+                  <tr
+                    key={review.id}
+                    onClick={() => onRowClick(item, review)}
+                    className="hover:bg-gray-50"
+                  >
+                    <td className="p-4 text-sm text-gray-800" 
+                    >
+                        {item.applicantName}
+                    </td>
+              <td className="p-4 text-sm text-gray-800"
+              >
                 {item.scholarshipName}
               </td>
-              <td className="p-4 text-sm text-gray-800">{item.university}</td>
-              <td className="p-4 text-sm text-gray-800">
+              <td className="p-4 text-sm text-gray-800"
+              >{review.description}</td>
+              <td className="p-4 text-sm text-gray-800"
+              >{item.university}</td>
+              <td className="p-4 text-sm text-gray-800"
+              >
                 {formatDate(item.appliedDate)}
               </td>
               <td className="p-4 text-sm text-gray-800">{score}</td>
               <td
                 className={`p-4 text-sm font-medium ${
-                  item.status === "Approved"
+                  review.status === "Passed"
                     ? "text-green-600"
-                    : item.status === "Rejected"
+                    : review.status === "Failed"
                     ? "text-red-600"
                     : "text-yellow-600"
                 }`}
               >
-                {item.status}
+                {review.status}
               </td>
               <td className="p-4 text-sm">
                 <div className="flex items-center space-x-2">
@@ -115,7 +124,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!isScored) onRowClick(item);
+                        if (!isScored) onRowClick(item, review);
                       }}
                       disabled={isScored}>
                     <Link
@@ -135,7 +144,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!isScored) onRowClick(item);
+                        if (!isScored) onRowClick(item, review);
                       }}
                       disabled={isScored}
                     >
@@ -143,7 +152,10 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
                     </Button>
                 </div>
               </td>
-            </tr>
+              </tr>
+                  )
+              })}
+            </Fragment>
             )
           })}
         </tbody>

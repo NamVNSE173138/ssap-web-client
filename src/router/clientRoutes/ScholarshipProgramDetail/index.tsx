@@ -488,7 +488,7 @@ const ScholarshipProgramDetail = () => {
                   )}
                 </>
               ) : (
-                authorized != "Unauthorized" && (
+                authorized != "Unauthorized" && user.id == data.funderId && (
                   <div className="flex justify-between w-full gap-3">
                     
 
