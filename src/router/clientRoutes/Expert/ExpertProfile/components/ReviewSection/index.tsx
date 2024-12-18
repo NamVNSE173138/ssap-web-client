@@ -23,7 +23,7 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
-  applicationReviews?: { id: number; score: number; expertId: number }[]; // Ensure to include applicationReviews for ID
+  applicationReviews?: { id: number, description: string, score: number, expertId: number, status: string }[];
 };
 
 const ApprovalList: React.FC = () => {

@@ -9,7 +9,8 @@ import HeaderAvatar from "./HeaderAvatar";
 
 const Header = () => {
   const user = useSelector((state: RootState) => state.token.user);
-
+  console.log("ROLE", user?.role);
+  
   
   return (
     <header
@@ -20,7 +21,10 @@ const Header = () => {
       <div className="flex justify-between items-center">
         <Navigation />
         {user ? (
+          <div className="flex items-center gap-5">
           <HeaderAvatar />
+          <span className="text-black text-lg lg:text-xl font-medium">{user?.role}</span>
+          </div>
         ) : (
           <div className="flex justify-between gap-8">
             <div className="flex justify-center ml-9 p-2 rounded-xl" style={{ backgroundColor: "#1eb2a6" }}

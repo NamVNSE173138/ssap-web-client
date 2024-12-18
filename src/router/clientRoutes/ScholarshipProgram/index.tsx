@@ -10,11 +10,7 @@ import ScholarshipProgramSkeleton from "./ScholarshipProgramSkeleton";
 import { Card } from "@/components/ScholarshipProgram";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { getAllCountries } from "@/services/ApiServices/countryService";
-import { getAllMajors } from "@/services/ApiServices/majorService";
-import { getAllCategories } from "@/services/ApiServices/categoryService";
 import { SearchIcon } from "lucide-react";
-import { getAllCertificates } from "@/services/ApiServices/certificateService";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Slider } from "@mui/material";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendar, FaDollarSign, FaInfoCircle } from "react-icons/fa";
@@ -25,12 +21,6 @@ const ScholarshipProgram = () => {
     useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  /*const [_countries, setCountries] = useState<{ name: string }[]>([]);
-  const [_majors, setMajors] = useState<{ name: string }[]>([]);
-  const [_categories, setCategories] = useState<{ name: string }[]>([]);
-  const [_certificates, setCertificates] = useState<{ name: string }[]>([]);
-*/
   const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 50000]);
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
