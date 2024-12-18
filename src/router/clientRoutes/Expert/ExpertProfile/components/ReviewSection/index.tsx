@@ -29,6 +29,7 @@ type ApprovalItem = {
 const ApprovalList: React.FC = () => {
   const user = useSelector((state: any) => state.token.user);
   const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
+  const [selectedReview, setSelectedReview] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -85,13 +86,21 @@ const ApprovalList: React.FC = () => {
     fetchApplicationReview();
   }, [user.id]);
 
-  const handleRowClick = (item: ApprovalItem) => {
-    const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
+  const handleRowClick = (item: ApprovalItem, review: any) => {
+    /*const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
             if(!review) return;
             const isScored = review.some(
               (review) => review.score !== null && review.score !== undefined && review.score > 0
             ) || false;
-            console.log("isScore", isScored);
+            console.log("isScore", isScored);*/
+      if(review.expertId != user.id) return;
+                  const isScored = (review.score !== null && review.score !== undefined && review.score > 0
+                          );
+                  console.log("isScore", isScored);
+
+                  const score = review.score !== undefined
+                          ? review.score : "Not Scored";
+                  console.log("Score", score);
     if (isScored) {
       notification.info({
         message:
@@ -100,6 +109,7 @@ const ApprovalList: React.FC = () => {
       return; // Prevent opening dialog
     }
     setSelectedItem(item);
+    setSelectedReview(review);
     setScore("");
     setComment("");
   };
@@ -137,9 +147,8 @@ const ApprovalList: React.FC = () => {
   const handleScoreSubmit = async () => {
     setIsLoading(true);
 
-    if (!selectedItem || score === "") return;
-    const reviewId = selectedItem.applicationReviews?.
-        find((review) => review.expertId == user.id)?.id;
+    if (!selectedItem || !selectedReview || score === "") return;
+    const reviewId = selectedReview.id
     if (!reviewId) {
       console.error("Review ID not found.");
       return;
