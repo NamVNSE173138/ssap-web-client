@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import ApplicationStatus from "@/constants/applicationStatus";
-import { formatDate, formatOnlyDate } from "@/lib/date-formatter";
+import {formatOnlyDate } from "@/lib/date-formatter";
 import {
   Dialog,
   DialogTitle,
