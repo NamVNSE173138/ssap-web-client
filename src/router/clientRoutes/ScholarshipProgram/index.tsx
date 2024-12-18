@@ -26,11 +26,11 @@ const ScholarshipProgram = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [_countries, setCountries] = useState<{ name: string }[]>([]);
+  /*const [_countries, setCountries] = useState<{ name: string }[]>([]);
   const [_majors, setMajors] = useState<{ name: string }[]>([]);
   const [_categories, setCategories] = useState<{ name: string }[]>([]);
   const [_certificates, setCertificates] = useState<{ name: string }[]>([]);
-
+*/
   const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 50000]);
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
@@ -40,24 +40,24 @@ const ScholarshipProgram = () => {
     try {
       const [
     response,
-    countryDatas,
+    /*countryDatas,
     majorDatas,
     categoriesDatas,
-    certificatesDatas
+    certificatesDatas*/
   ] = await Promise.all([
     getAllScholarshipProgram(),
-    getAllCountries(),
+    /*getAllCountries(),
     getAllMajors(),
     getAllCategories(),
-    getAllCertificates()
+    getAllCertificates()*/
   ]);
       if (response.data.statusCode === 200) {
         setData(response.data.data.items);
         setFullData(response.data.data.items);
-        setCountries(countryDatas.data);
+        /*setCountries(countryDatas.data);
         setMajors(majorDatas.data.items);
         setCategories(categoriesDatas.data);
-        setCertificates(certificatesDatas.data);
+        setCertificates(certificatesDatas.data);*/
       } else {
         setError("Failed to fetch data");
       }
