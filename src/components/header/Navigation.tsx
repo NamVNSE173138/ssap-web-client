@@ -102,28 +102,28 @@ const navItems: NavItem[] = [
   },
 ];
 
-const Navigation= ()=> {
+const Navigation = () => {
   const isAboveMediumScreens = useMediaQuery("(min-width: 1060px)");
   const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
   const [numberOfUnreadMsg, setNumberOfUnreadMsgs] = useState<number>(0);
   const user = useSelector((state: RootState) => state.token.user);
 
   const getCheckHaveMsg = async () => {
-    if(!user) return null;
+    if (!user) return null;
     const allMessagesResponse = await getAllMessages(parseInt(user.id));
-        const allMessages = allMessagesResponse.data;
-          const unreadMessages = allMessages.filter((message: any) =>
-            message.receiverId == user.id && !message.isRead
-          ).length;
-          setNumberOfUnreadMsgs(unreadMessages);
-          console.log(unreadMessages)
-          console.log(allMessages)
+    const allMessages = allMessagesResponse.data;
+    const unreadMessages = allMessages.filter((message: any) =>
+      message.receiverId == user.id && !message.isRead
+    ).length;
+    setNumberOfUnreadMsgs(unreadMessages);
+    console.log(unreadMessages)
+    console.log(allMessages)
   }
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     getCheckHaveMsg();
-  },[]);
-  
+  }, []);
+
   return (
     <nav>
       <div>
@@ -137,8 +137,8 @@ const Navigation= ()=> {
                 <li key={item.text} className="group/nav">
                   <Link className="text-xl" to={item.to}>
                     {item.text}
-                    {item.text === 'Chat' && numberOfUnreadMsg > 0 && (
-                    <span className="h-3 w-3 bg-red-500 rounded-full ml-1 inline-block" />
+                    {user?.role === "Provider" && item.text === 'Chat' && numberOfUnreadMsg > 0 && (
+                      <span className="h-3 w-3 bg-red-500 rounded-full ml-1 inline-block" />
                     )}
                   </Link>
                   <div className="h-[2px] bg-[#1eb2a6] scale-x-0 group-hover/nav:scale-x-100 transition" />
@@ -149,28 +149,28 @@ const Navigation= ()=> {
           </div>
         ) : (
           <div className="flex items-center justify-between gap-2">
-            
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            variants={{
-              hidden: { opacity: 0, x: 50 },
-              visible: { opacity: 1, x: 0 },
-            }}
-          >
-            
-            <button
-              className="rounded-full bg-blue-500 p-2"
-              onClick={() => setIsMenuToggled(!isMenuToggled)}
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              variants={{
+                hidden: { opacity: 0, x: 50 },
+                visible: { opacity: 1, x: 0 },
+              }}
             >
-              <Bars3Icon className="h-6 w-6 text-white" />
-            </button>
-          </motion.div>
-          <div className="mb-5">
-          <DropdownNotification />
-          </div>
+
+              <button
+                className="rounded-full bg-blue-500 p-2"
+                onClick={() => setIsMenuToggled(!isMenuToggled)}
+              >
+                <Bars3Icon className="h-6 w-6 text-white" />
+              </button>
+            </motion.div>
+            <div className="mb-5">
+              <DropdownNotification />
+            </div>
           </div>
         )}
       </div>
