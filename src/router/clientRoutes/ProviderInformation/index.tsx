@@ -153,12 +153,25 @@ const ProviderInformation = () => {
               Services Provided
             </h3>
             <button
+              disabled={!user}
               onClick={handleRequestForm}
-              className="flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-8 py-4 bg-white rounded-xl shadow-xl transform hover:scale-105"
+              className={`flex justify-center items-center transition-all duration-300 gap-4 px-8 py-4 rounded-xl shadow-xl transform ${!user
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-white hover:bg-blue-600 hover:text-white hover:scale-105"
+                }`}
             >
-              <IoIosPaper className="text-3xl text-blue-500 transition-all ease-in-out transform hover:scale-110" />
-              <p className="text-xl text-blue-600 font-semibold">Request Form</p>
+              <IoIosPaper
+                className={`text-3xl transition-all ease-in-out transform ${!user ? "text-gray-500" : "text-blue-500 hover:scale-110"
+                  }`}
+              />
+              <p
+                className={`text-xl font-semibold ${!user ? "text-gray-500" : "text-blue-600"
+                  }`}
+              >
+                Request Form
+              </p>
             </button>
+
           </div>
 
           {/* Services Grid */}
