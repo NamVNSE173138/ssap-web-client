@@ -117,6 +117,8 @@ const Navigation = () => {
     ).length;
     setNumberOfUnreadMsgs(unreadMessages);
     console.log(unreadMessages);
+    console.log("User Role:", user?.role);
+    console.log("Unread Messages:", numberOfUnreadMsg);
     console.log(allMessages);
   };
 
@@ -150,7 +152,7 @@ const Navigation = () => {
                     <li key={item.text} className="group/nav">
                       <Link className="text-xl" to={item.to}>
                         {item.text}
-                        {user?.role == "Provider" &&
+                        {(user?.role == "Provider" || user?.role == "Applicant") &&
                           item.text === "Chat" &&
                           numberOfUnreadMsg > 0 && (
                             <span className="h-3 w-3 bg-red-500 rounded-full ml-1 inline-block" />
