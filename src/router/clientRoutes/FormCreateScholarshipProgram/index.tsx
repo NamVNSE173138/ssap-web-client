@@ -568,7 +568,7 @@ const FormCreateScholarshipProgram = () => {
                 </div>
 
                 <div className="space-y-2 col-start-1 col-end-7">
-                  <Label htmlFor="reviewMilestone" className="text-md flex items-center gap-2">
+                  <Label htmlFor="reviewMilestone" className="text-md flex items-center gap-2 ">
                     Review Milestones
                     <FaInfoCircle
                   className="text-gray-600 cursor-pointer"
