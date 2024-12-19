@@ -10,6 +10,7 @@ import {
   ListItemText,
   CircularProgress,
   TextField,
+  IconButton,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
@@ -17,6 +18,7 @@ import { BASE_URL } from "@/constants/api";
 import { formatDate } from "@/lib/date-formatter";
 import { notification } from "antd";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
+import { GridCloseIcon } from "@mui/x-data-grid";
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const [experts, setExperts] = useState<any[]>([]);
@@ -37,19 +39,19 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
       ),
       getAllReviewMilestonesByScholarship(scholarshipId)
       ]);
-      console.log("Fetched Experts:", response.data); 
+      console.log("Fetched Experts:", response.data);
 
       console.log("Fetched Applications:", reviewMilestones.data.find(
         (milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date())
-      ?? reviewMilestones.data[0]);
+        ?? reviewMilestones.data[0]);
       setSelectedReviewMilestone(reviewMilestones.data.find(
         (milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date())
-      ?? reviewMilestones.data[0]);
+        ?? reviewMilestones.data[0]);
 
       if (Array.isArray(response.data.data)) {
-        setExperts(response.data.data); 
+        setExperts(response.data.data);
       } else {
-        setExperts([]); 
+        setExperts([]);
       }
     } catch (error) {
       console.error("Failed to fetch experts:", error);
@@ -62,10 +64,10 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const fetchApplications = async () => {
     setLoading(true);
     try {
-      const response = await 
-      axios.get(
-        `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`
-      );
+      const response = await
+        axios.get(
+          `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`
+        );
       setApplications(response.data.data || []);
     } catch (error) {
       console.error("Failed to fetch applications:", error);
@@ -76,15 +78,15 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
 
   useEffect(() => {
     if (open) {
-      fetchExperts(); 
+      fetchExperts();
     }
   }, [open]);
 
   // Handle expert selection and move to Step 2
   const handleExpertSelection = (expert: any) => {
     setSelectedExpert(expert);
-    fetchApplications(); 
-    setStep(2); 
+    fetchApplications();
+    setStep(2);
   };
 
   const handleApplicationSelection = (applicationId: number) => {
@@ -95,62 +97,65 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
     );
   };
 
- 
+
   const assignExpert = async () => {
     if (!selectedApplications.length || !selectedExpert) {
       alert("Please select an expert and applications before assigning.");
       return;
     }
-  
+
     try {
       // Fetch scholarship program details
       const scholarshipResponse = await axios.get(
         `${BASE_URL}/api/scholarship-programs/${scholarshipId}`
       );
-  
+
       const scholarshipData = scholarshipResponse.data.data;
       const reviewMilestones = scholarshipData.reviewMilestones;
-  
+
       // Get current date and time
       const currentDate = new Date();
-  
-      let isFirstReview = true; 
-  
+
+      let isFirstReview = true;
+
       if (reviewMilestones && reviewMilestones.length > 0) {
-        
+
         const secondReviewMilestone = reviewMilestones.find(
           (milestone: any) =>
             milestone.description.toLowerCase() === "interview"
         );
-  
+
         if (secondReviewMilestone) {
           const secondReviewStart = new Date(secondReviewMilestone.fromDate);
           const secondReviewEnd = new Date(secondReviewMilestone.toDate);
-  
-          
+
+
           if (
             currentDate >= secondReviewStart &&
             currentDate <= secondReviewEnd
           ) {
-            isFirstReview = false; 
+            isFirstReview = false;
           }
         }
       }
-  
+
       const payload = {
         isFirstReview,
         reviewDate: currentDate.toISOString(),
         expertId: selectedExpert.id,
-        applicationIds: selectedApplications, 
+        applicationIds: selectedApplications,
       };
-  
+
       const response = await axios.post(
         `${BASE_URL}/api/applications/reviews/assign-expert`,
         payload
       );
-  
+
       if (response.status === 200) {
         notification.success({ message: "Expert successfully assigned!" });
+        setStep(1);
+        setSelectedExpert(null);
+        setSelectedApplications([]);
         onClose();
       } else {
         notification.error({
@@ -159,34 +164,86 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
       }
     } catch (error: any) {
       notification.error({
-        message: `Failed to assign expert: ${
-          error.response?.data?.message || "Unknown error"
-        }`,
+        message: `Failed to assign expert: ${error.response?.data?.message || "Unknown error"
+          }`,
       });
     }
   };
-  
+
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-      
-      <div className="p-5">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="lg"
+      PaperProps={{
+        style: {
+          borderRadius: "16px",
+        },
+      }}
+    >
+      <div className="p-6 space-y-4">
+        {/* Step Indicator */}
+        <div className="flex items-center justify-center mb-6">
+          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"}`}>
+            1
+          </div>
+          <div className="h-1 w-20 bg-gray-300 mx-2"></div>
+          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 2 ? "bg-blue-600" : "bg-gray-300"}`}>
+            2
+          </div>
+          <div className="h-1 w-20 bg-gray-300 mx-2"></div>
+          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 3 ? "bg-blue-600" : "bg-gray-300"}`}>
+            3
+          </div>
+        </div>
+
         {/* Step 1: Select Expert */}
         {step === 1 && (
           <>
-            {/* <h3>Select Expert:</h3> */}
-            <DialogTitle>Select Expert for 
-            <span className="text-sky-500">{selectedReviewMilestone && 
-            ` ${selectedReviewMilestone.description}`}</span>
+            <DialogTitle
+              style={{
+                fontWeight: 700,
+                fontSize: "1.5rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>Select Expert for{" "}
+                <span className="text-sky-500">
+                  {selectedReviewMilestone?.description || ""}
+                </span>
+              </span>
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={onClose}
+                style={{
+                  position: "absolute",
+                  top: "16px",
+                  right: "40px",
+                  padding: 0,
+                  color: "#0369a1",
+                  fontSize: "2rem",
+                }}
+              >
+                <GridCloseIcon style={{ fontSize: "inherit" }} />
+              </IconButton>
             </DialogTitle>
+
             {loading ? (
-              <CircularProgress />
+              <div className="flex justify-center items-center">
+                <CircularProgress style={{ color: "#0ea5e9" }} />
+              </div>
             ) : (
               <>
                 {/* Search Bar */}
                 <TextField
                   fullWidth
                   placeholder="Search Experts"
+                  variant="outlined"
                   onChange={(e) => {
                     const searchValue = e.target.value.toLowerCase();
                     setExperts((prevExperts) =>
@@ -201,32 +258,55 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon />
+                        <SearchIcon style={{ color: "#0ea5e9" }} />
                       </InputAdornment>
                     ),
+                  }}
+                  style={{
+                    marginBottom: "1rem",
+                    borderColor: "#0ea5e9",
                   }}
                 />
 
                 {/* Experts List */}
                 <List>
                   {experts
-                    .filter((expert) => expert.isVisible !== false) 
+                    .filter((expert) => expert.isVisible !== false)
                     .map((expert: any) => (
                       <ListItem
                         key={expert.id}
                         component="div"
                         onClick={() => handleExpertSelection(expert)}
-                        style={{ cursor: "pointer" }}
+                        style={{
+                          cursor: "pointer",
+                          border: "1px solid #dbeafe",
+                          borderRadius: "8px",
+                          marginBottom: "0.5rem",
+                          padding: "0.8rem",
+                          transition: "all 0.2s ease-in-out",
+                        }}
+                        className="hover:bg-sky-100"
                       >
                         <ListItemText
-                          primary={expert.username}
+                          primary={
+                            <span
+                              style={{
+                                fontWeight: "bold",
+                                color: "#0369a1",
+                              }}
+                            >
+                              {expert.username}
+                            </span>
+                          }
                           secondary={`Major: ${expert.major || "N/A"}`}
                         />
                       </ListItem>
                     ))}
 
                   {experts.every((expert) => expert.isVisible === false) && (
-                    <p>No experts match your search.</p>
+                    <p className="text-center text-gray-500">
+                      No experts match your search.
+                    </p>
                   )}
                 </List>
               </>
@@ -237,35 +317,51 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         {/* Step 2: Select Applications */}
         {step === 2 && (
           <>
-            <DialogTitle>Select Applications</DialogTitle>
+            <DialogTitle
+              style={{
+                fontWeight: 700,
+                fontSize: "1.5rem",
+              }}
+            >
+              Select Applications
+            </DialogTitle>
             <List>
               {applications.map((application: any) => (
-                <ListItem key={application.id}>
+                <ListItem
+                  key={application.id}
+                  style={{
+                    border: "1px solid #dbeafe",
+                    borderRadius: "8px",
+                    marginBottom: "0.5rem",
+                    padding: "0.8rem",
+                  }}
+                >
                   <Checkbox
                     checked={selectedApplications.includes(application.id)}
                     onChange={() => handleApplicationSelection(application.id)}
+                    style={{ color: "#0369a1" }}
                   />
                   <ListItemText
-                    primary={application.applicant.username}
-                    secondary={`Applied on: ${formatDate(
-                      application.appliedDate
-                    )}`}
+                    primary={
+                      <span style={{ color: "#0369a1", fontWeight: "bold" }}>
+                        {application.applicant.username}
+                      </span>
+                    }
+                    secondary={`Applied on: ${formatDate(application.appliedDate)}`}
                   />
                 </ListItem>
               ))}
             </List>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "1rem",
-              }}
-            >
+            <div className="flex justify-between mt-4">
               <Button variant="outlined" onClick={() => setStep(1)}>
                 Back
               </Button>
               <Button
                 variant="contained"
+                style={{
+                  backgroundColor: "#0ea5e9",
+                  color: "white",
+                }}
                 onClick={() => setStep(3)}
                 disabled={!selectedApplications.length}
               >
@@ -278,27 +374,35 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         {/* Step 3: Confirm Assignment */}
         {step === 3 && (
           <>
-            <DialogTitle>Assign Expert</DialogTitle>
-            <p>
-              <strong>Expert:</strong> {selectedExpert.username}
-            </p>
-            <p>
-              <strong>Applications:</strong> {selectedApplications.length}{" "}
-              selected
-            </p>
-            <div
+            <DialogTitle
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "1rem",
+                fontWeight: 700,
+                fontSize: "1.5rem",
               }}
             >
+              Assign Expert
+            </DialogTitle>
+            <div className="space-y-2">
+              <p>
+                <strong style={{ color: "#0369a1" }}>Expert:</strong>{" "}
+                {selectedExpert.username}
+              </p>
+              <p>
+                <strong style={{ color: "#0369a1" }}>Applications:</strong>{" "}
+                {selectedApplications.length} selected
+              </p>
+            </div>
+            <br></br>
+            <div className="flex justify-between mt-4">
               <Button variant="outlined" onClick={() => setStep(2)}>
                 Back
               </Button>
               <Button
                 variant="contained"
-                color="primary"
+                style={{
+                  backgroundColor: "#0ea5e9",
+                  color: "white",
+                }}
                 onClick={assignExpert}
               >
                 Assign
@@ -308,6 +412,8 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         )}
       </div>
     </Dialog>
+
+
   );
 };
 

@@ -153,7 +153,7 @@ const ProviderInformation = () => {
               Services Provided
             </h3>
             <button
-              disabled={!user}
+              disabled={!user || user?.role !== "Applicant"}
               onClick={handleRequestForm}
               className={`flex justify-center items-center transition-all duration-300 gap-4 px-8 py-4 rounded-xl shadow-xl transform ${!user
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
