@@ -229,14 +229,14 @@ const ApplyScholarship = () => {
                   Phone number*
                 </label>
                 <div className="flex gap-[20px]">
-                  <input
+                  {/* <input
                     type="text"
                     disabled
                     name="dialCode"
                     id="dialCode"
                     className="max-w-[100px] rounded-md border-2 cursor-not-allowed outline-2"
                     value="+86"
-                  />
+                  /> */}
                   <input
                     type="text"
                     name="phone_number"

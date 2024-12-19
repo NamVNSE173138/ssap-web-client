@@ -18,6 +18,7 @@ import { formatDate } from "@/lib/date-formatter";
 import { notification } from "antd";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
+
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const [experts, setExperts] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
@@ -25,6 +26,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const [selectedExpert, setSelectedExpert] = useState<any>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
+  const [assignLoading, setAssignLoading] = useState(false)
 
   const [selectedReviewMilestone, setSelectedReviewMilestone] = useState<any>(null);
 
@@ -97,11 +99,12 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
 
  
   const assignExpert = async () => {
+    
     if (!selectedApplications.length || !selectedExpert) {
       alert("Please select an expert and applications before assigning.");
       return;
     }
-  
+    setAssignLoading(true)
     try {
       // Fetch scholarship program details
       const scholarshipResponse = await axios.get(
@@ -148,7 +151,8 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         `${BASE_URL}/api/applications/reviews/assign-expert`,
         payload
       );
-  
+      setAssignLoading(false)
+
       if (response.status === 200) {
         notification.success({ message: "Expert successfully assigned!" });
         onClose();
@@ -300,13 +304,19 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 variant="contained"
                 color="primary"
                 onClick={assignExpert}
+                disabled={assignLoading}
               >
-                Assign
+                {assignLoading ? (<div
+                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                  aria-hidden="true"
+                ></div>) :
+                  (<span>Assign</span>)}
               </Button>
             </div>
           </>
         )}
       </div>
+      {/* {loading && <ScreenSpinner/>} */}
     </Dialog>
   );
 };
