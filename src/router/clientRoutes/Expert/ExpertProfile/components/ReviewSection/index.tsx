@@ -12,6 +12,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { notification } from "antd";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
+import { z } from "zod";
 
 type ApprovalItem = {
   id: number;
@@ -23,8 +24,19 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
-  applicationReviews?: { id: number, description: string, score: number, expertId: number, status: string }[];
+  applicationReviews?: {
+    id: number;
+    description: string;
+    score: number;
+    expertId: number;
+    status: string;
+  }[];
 };
+
+const expertReviewSchema = z.object({
+  score: z.string(),
+  description: z.string(),
+})
 
 const ApprovalList: React.FC = () => {
   const user = useSelector((state: any) => state.token.user);
@@ -36,8 +48,6 @@ const ApprovalList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [score, setScore] = useState<number | string>("");
   const [comment, setComment] = useState("");
-  // const [isFirstReview, setIsFirstReview] = useState(true);
-  // const isFirstReview = true;
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchApplicationReview = async () => {
@@ -93,14 +103,13 @@ const ApprovalList: React.FC = () => {
               (review) => review.score !== null && review.score !== undefined && review.score > 0
             ) || false;
             console.log("isScore", isScored);*/
-      if(review.expertId != user.id) return;
-                  const isScored = (review.score !== null && review.score !== undefined && review.score > 0
-                          );
-                  console.log("isScore", isScored);
+    if (review.expertId != user.id) return;
+    const isScored =
+      review.score !== null && review.score !== undefined && review.score > 0;
+    console.log("isScore", isScored);
 
-                  const score = review.score !== undefined
-                          ? review.score : "Not Scored";
-                  console.log("Score", score);
+    const score = review.score !== undefined ? review.score : "Not Scored";
+    console.log("Score", score);
     if (isScored) {
       notification.info({
         message:
@@ -145,39 +154,101 @@ const ApprovalList: React.FC = () => {
     }
   };
 
+  // const handleScoreSubmit = async () => {
+  //   setIsLoading(true);
+
+  //   if (!selectedItem || !selectedReview || score === "") return;
+  //   const reviewId = selectedReview.id;
+  //   if (!reviewId) {
+  //     console.error("Review ID not found.");
+  //     return;
+  //   }
+  //   if (!selectedItem) return null;
+  //   const reviewMilestone = await getAllReviewMilestonesByScholarship(
+  //     selectedItem.scholarshipProgramId
+  //   );
+  //   console.log("reviewmilestone", reviewMilestone);
+  //   const currentDate = new Date();
+  //   let isReview = true;
+  //   reviewMilestone?.data.forEach((review: any) => {
+  //     if (
+  //       new Date(review.fromDate) < currentDate &&
+  //       new Date(review.toDate) > currentDate
+  //     ) {
+  //       if (review.description.toLowerCase() === "application review") {
+  //         isReview = true;
+  //       } else {
+  //         isReview = false;
+  //       }
+  //     }
+  //   });
+  //   const numericScore = Number(score);
+  //   try {
+  //     const payload = {
+  //       applicationReviewId: reviewId,
+  //       comment,
+  //       isPassed: numericScore >= 50,
+  //       score: Number(score),
+  //       isFirstReview: isReview,
+  //     };
+  //     await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
+  //     console.log("Review submitted successfully:", payload);
+  //     notification.success({ message: "Review submitted successfully" });
+  //     setIsLoading(false);
+  //     setSelectedItem(null);
+  //     fetchApplicationReview();
+  //     setScore("");
+  //     setComment("");
+  //   } catch (error) {
+  //     console.error("Failed to submit review:", error);
+  //     notification.error({ message: "Failed to submit review" });
+  //   }
+  // };
   const handleScoreSubmit = async () => {
     setIsLoading(true);
-
+  
     if (!selectedItem || !selectedReview || score === "") return;
-    const reviewId = selectedReview.id
-    if (!reviewId) {
-      console.error("Review ID not found.");
-      return;
-    }
-    if (!selectedItem) return null;
-    const reviewMilestone = await getAllReviewMilestonesByScholarship(
-      selectedItem.scholarshipProgramId
-    );
-    console.log("reviewmilestone", reviewMilestone);
-    const currentDate = new Date();
-    let isReview = true
-    reviewMilestone?.data.forEach((review: any) => {
-      if (
-        new Date(review.fromDate) < currentDate &&
-        new Date(review.toDate) > currentDate
-      ) {
-        if (review.description.toLowerCase() === "application review") {
-          isReview = true
-        } else {isReview = false}
-      }
-    });
-    const numericScore = Number(score);
+  
     try {
+      // Validate form data using Zod schema
+      expertReviewSchema.parse({
+        score: score.toString(),
+        description: comment,
+      });
+  
+      // If validation passes, continue with your review submission logic
+      const reviewId = selectedReview.id;
+      if (!reviewId) {
+        console.error("Review ID not found.");
+        return;
+      }
+  
+      const reviewMilestone = await getAllReviewMilestonesByScholarship(
+        selectedItem.scholarshipProgramId
+      );
+      console.log("reviewmilestone", reviewMilestone);
+  
+      const currentDate = new Date();
+      let isReview = true;
+      reviewMilestone?.data.forEach((review: any) => {
+        if (
+          new Date(review.fromDate) < currentDate &&
+          new Date(review.toDate) > currentDate
+        ) {
+          if (review.description.toLowerCase() === "application review") {
+            isReview = true;
+          } else {
+            isReview = false;
+          }
+        }
+      });
+  
+      const numericScore = Number(score);
       const payload = {
         applicationReviewId: reviewId,
         comment,
         isPassed: numericScore >= 50,
-        score: Number(score),
+        score: numericScore,
         isFirstReview: isReview,
       };
       await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
@@ -189,10 +260,18 @@ const ApprovalList: React.FC = () => {
       setScore("");
       setComment("");
     } catch (error) {
-      console.error("Failed to submit review:", error);
-      notification.error({ message: "Failed to submit review" });
+      
+      if (error instanceof z.ZodError) {
+        
+        const errorMessage = error.errors.map((err) => err.message).join(", ");
+        notification.error({ message: `Validation failed: ${errorMessage}` });
+      } else {
+        notification.error({ message: "Failed to submit review" });
+      }
+      setIsLoading(false);
     }
   };
+  
 
   const filteredApplications = applications.filter((app) =>
     [app.applicantName, app.scholarshipName, app.university].some((field) =>
@@ -296,6 +375,7 @@ const ApprovalList: React.FC = () => {
                       <Button
                         onClick={handleScoreSubmit}
                         className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
+                        // disabled={score === "" || comment === "" || Number(score) < 1 || Number(score) > 100}
                       >
                         Submit Review
                       </Button>

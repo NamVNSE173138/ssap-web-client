@@ -469,7 +469,7 @@ const ChooseWinner = () => {
                             <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Username</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Status</th>
-                            <th style={{ padding: "12px", fontWeight: "600" }}>Reviewed by Expert</th>
+                            {/* <th style={{ padding: "12px", fontWeight: "600" }}>Reviewed by Expert</th> */}
                             <th style={{ padding: "12px", fontWeight: "600" }}>Score</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
                           </tr>
@@ -491,8 +491,8 @@ const ChooseWinner = () => {
                               </td>
                               <td style={{ padding: "12px" }}>{app.applicant.username}</td>
                               <td style={{ padding: "12px" }}>{app.status}</td>
-                              <td style={{ padding: "12px" }}>{app.expertReview ?? "Not reviewed"}</td>
-                              <td style={{ padding: "12px", textAlign: "center" }}>{app.applicationReviews.length ? (app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length).toFixed(1) : "N/A"}</td>
+                              {/* <td style={{ padding: "12px" }}>{app.expertReview ?? "Not reviewed"}</td> */}
+                              <td style={{ padding: "12px" }}>{app.applicationReviews.length ? (app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length).toFixed(1) : "N/A"}</td>
                               <td style={{ padding: "12px", textAlign: "center" }}>
                                 <Link
                                   target="_blank"

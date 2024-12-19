@@ -320,7 +320,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-4">
                   <Label htmlFor="scholarshiptype" className="text-md">
                     Scholarship Type
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     name="scholarshiptype"
@@ -341,7 +340,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-end-7 col-span-3">
                   <Label htmlFor="name" className="text-md">
                     Scholarship Name
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("name")}
@@ -359,7 +357,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-7">
                   <Label htmlFor="description" className="text-md">
                     Scholarship Description
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Textarea
                     {...form.register("description")}
@@ -383,7 +380,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 ">
                   <Label htmlFor="price" className="text-md">
                     Price
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                    
                   </Label>
                   <Input
                     {...form.register("price")}
@@ -401,7 +398,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2">
                   <Label htmlFor="quantity" className="text-md">
                     Quantity
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                   
                   </Label>
                   <Input
                     {...form.register("quantity")}
@@ -422,7 +419,7 @@ const FormCreateScholarshipProgram = () => {
                     className="text-md"
                   >
                     Quantity of Award Milestones
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                   
                   </Label>
                   <Input
                     {...form.register("quantityOfAwardMilestones")}
@@ -459,7 +456,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2">
                   <Label htmlFor="deadline" className="text-md">
                     Deadline
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                   
                   </Label>
                   <Input
                     {...form.register("deadline")}
@@ -477,7 +474,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-3">
                   <Label htmlFor="university" className="text-md">
                     University
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                   
                   </Label>
                   <Select
                     {...form.register("university")}
@@ -495,7 +492,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-5">
                   <Label htmlFor="certificate" className="text-md">
                     Certificates
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                   
                   </Label>
                   <Select
                     {...form.register("certificate")}
@@ -515,7 +512,7 @@ const FormCreateScholarshipProgram = () => {
                   <Label htmlFor="major" className="text-md">
                     Major
                     
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                  
                   </Label>
                   <Select
                     {...form.register("major")}
@@ -533,7 +530,7 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-7">
                   <Label htmlFor="criteria" className="text-md">
                     Criteria
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+               
                   </Label>
                   {criteriaFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">
@@ -577,7 +574,7 @@ const FormCreateScholarshipProgram = () => {
                   className="text-gray-600 cursor-pointer"
                   title="The start day must be after the deadline"
                 />
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                   
                   </Label>
                   {reviewMilestoneFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">
