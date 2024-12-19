@@ -1,5 +1,5 @@
 import ApplicationStatus from "@/constants/applicationStatus";
-import { Avatar,  Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import { Avatar, Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
 import { FaRegEye, FaTrophy, FaUserCircle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
@@ -11,13 +11,13 @@ interface AwardDialogProps {
 }
 
 const statusColor = {
-    [ApplicationStatus.Submitted]: "blue",
-    [ApplicationStatus.Awarded]: "green",
-    [ApplicationStatus.Approved]: "blue",
-    [ApplicationStatus.Rejected]: "red",
-    [ApplicationStatus.NeedExtend]: "yellow",
-    [ApplicationStatus.Reviewing]: "yellow",
-  }
+  [ApplicationStatus.Submitted]: "blue",
+  [ApplicationStatus.Awarded]: "green",
+  [ApplicationStatus.Approved]: "blue",
+  [ApplicationStatus.Rejected]: "red",
+  [ApplicationStatus.NeedExtend]: "yellow",
+  [ApplicationStatus.Reviewing]: "yellow",
+}
 
 const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProps) => {
   return (
@@ -31,7 +31,7 @@ const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProp
       <DialogTitle className="flex items-center justify-between gap-5 bg-gradient-to-r from-blue-500 to-teal-500 text-white p-6">
         <div className="flex items-center gap-4">
           <FaTrophy className="text-3xl text-sky-500" />
-          <span className="font-bold text-2xl">Award Milestones</span>
+          <span className="font-bold text-2xl">Award Progress</span>
         </div>
         <button
           onClick={() => setIsOpen(false)}
@@ -49,49 +49,58 @@ const AwardDialog = ({ isOpen, setIsOpen, winningApplications }: AwardDialogProp
           <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
             {winningApplications.map((application: any, index: number) => (
               <div key={index}>
-                <ListItem alignItems="flex-start" className="hover:bg-blue-50 transition duration-200 rounded-lg">
+                <ListItem alignItems="flex-start" className="hover:bg-blue-50 transition duration-200 rounded-lg shadow-sm p-4">
                   <ListItemAvatar>
-                    <Avatar alt={application.applicant.username} src={application.applicant.avatarUrl || "https://github.com/shadcn.png"} />
+                    <Avatar
+                      alt={application.applicant.username}
+                      src={application.applicant.avatarUrl || "https://github.com/shadcn.png"}
+                    />
                   </ListItemAvatar>
-                  <ListItemText
-                    primary={
+
+                  <div className="flex w-full justify-between items-center">
+                    {/* Username and Email Section */}
+                    <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <FaUserCircle className="text-blue-500 text-lg" />
                         <span className="font-semibold text-lg text-gray-800">{application.applicant.username}</span>
-                        
                       </div>
-                    }
-                    secondary={
-                      <>
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ color: 'text.primary', display: 'inline' }}
-                        >
-                          {application.applicant.email}
-                        </Typography>
-                        
-                      </>
-                    }
-                  />
-                      <span className="flex justify-end gap-2 items-center mr-[45%] mt-[2%]">
-                        <span className="relative flex h-3 w-3">
-                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[application.status]}-500 opacity-75`}></span>
-                          <span className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[application.status]}-500`}></span>
-                        </span>
-                        <span className={`text-${statusColor[application.status]}-500 font-medium`}>{application.status}</span>
-                      </span>
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ color: 'text.primary' }}
+                        className="text-gray-600"
+                      >
+                        {application.applicant.email}
+                      </Typography>
+                    </div>
 
-                      
-                  <Link
-                    target="_blank"
-                    to={`/funder/application/${application.id}`}
-                    className="text-blue-600 underline hover:text-blue-800 flex items-center gap-2"
-                  >
-                    <FaRegEye className="text-blue-500" />
-                    View Award Progress
-                  </Link>
+                    {/* Status Section */}
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-3 w-3">
+                        <span
+                          className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[application.status]}-500 opacity-75`}
+                        ></span>
+                        <span
+                          className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[application.status]}-500`}
+                        ></span>
+                      </span>
+                      <span className={`text-${statusColor[application.status]}-500 font-medium`}>
+                        {application.status}
+                      </span>
+                    </div>
+
+                    {/* View Award Progress Link */}
+                    <Link
+                      target="_blank"
+                      to={`/funder/application/${application.id}`}
+                      className="text-blue-600 underline hover:text-blue-800 flex items-center gap-2"
+                    >
+                      <FaRegEye className="text-blue-500" />
+                      View Award Progress
+                    </Link>
+                  </div>
                 </ListItem>
+
                 <Divider variant="fullWidth" component="li" />
               </div>
             ))}
