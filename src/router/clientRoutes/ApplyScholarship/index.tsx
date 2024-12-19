@@ -74,12 +74,17 @@ const ApplyScholarship = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApplyLoading(true);
     if (!formData.agreeTerms) {
       notification.error({ message: "You must agree to the terms." });
       setApplyLoading(false);
       return;
     }
+    if(rows.length == 0) {
+        notification.error({ message: "You have to upload at least one document." });
+        return;
+    }
+
+    setApplyLoading(true);
     const program = await getScholarshipProgram(Number(id));
 
     if (!program) {

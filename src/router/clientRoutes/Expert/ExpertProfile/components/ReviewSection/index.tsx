@@ -205,10 +205,12 @@ const ApprovalList: React.FC = () => {
   //   }
   // };
   const handleScoreSubmit = async () => {
+  
+    if (!selectedItem || !selectedReview || score === "") {
+        notification.error({ message: "Please input a score" });
+        return;
+    }
     setIsLoading(true);
-  
-    if (!selectedItem || !selectedReview || score === "") return;
-  
     try {
       // Validate form data using Zod schema
       expertReviewSchema.parse({
