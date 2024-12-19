@@ -1,5 +1,5 @@
 import ApplicationStatus from "@/constants/applicationStatus";
-import { Avatar, Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import { Avatar, Dialog, DialogTitle, Divider, List, ListItem, ListItemAvatar, Typography } from "@mui/material";
 import { FaRegEye, FaTrophy, FaUserCircle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
