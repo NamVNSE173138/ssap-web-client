@@ -21,7 +21,7 @@ const Header = () => {
       <div className="flex justify-between items-center">
         <Navigation />
         {user ? (
-          <div className="flex items-center gap-5">
+          <div className="flex items-center ml-5 gap-5">
           <HeaderAvatar />
           <span className="text-black text-lg lg:text-xl font-medium">{user?.role}</span>
           </div>

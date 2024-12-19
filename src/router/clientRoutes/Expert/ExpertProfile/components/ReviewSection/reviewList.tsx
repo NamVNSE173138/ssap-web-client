@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { formatDate } from "@/lib/date-formatter";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 type ApprovalItem = {
@@ -13,7 +13,7 @@ type ApprovalItem = {
   appliedDate: string;
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
-  documentUrl?: string; // Added to store document URL
+  documentUrl?: string; 
   applicationReviews?: { id: number, description: string, score: number, expertId: number, status: string }[];
   
 };
@@ -31,7 +31,6 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
   onRowClick,
   document,
 }) => {
-  const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   return (
     <div className="overflow-auto bg-white shadow rounded-lg">
