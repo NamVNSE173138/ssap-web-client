@@ -18,8 +18,10 @@ const AwardMilestoneDialog = ({ open, onClose, awardMilestones, reviewMilestones
   return (<>
     <Dialog onClose={() => onClose(false)} open={open} fullWidth style={{ zIndex: 40 }}>
       <DialogTitle className="text-2xl font-semibold flex items-center gap-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+        <div className="flex gap-2 font-bold">
         <FaCalendarAlt className="text-sky-500 text-3xl" />
         Award Milestones
+        </div>
       </DialogTitle>
 
       <div className="w-full flex justify-between items-center p-4">

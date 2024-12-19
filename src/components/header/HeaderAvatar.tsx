@@ -92,6 +92,7 @@ const HeaderAvatar = () => {
             <AvatarImage
               src={avatar || "https://github.com/shadcn.png"}
               alt="@shadcn"
+              className=""
             />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>

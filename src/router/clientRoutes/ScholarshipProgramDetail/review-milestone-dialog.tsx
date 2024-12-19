@@ -1,6 +1,5 @@
-import { formatDate } from "@/lib/date-formatter";
-import {  Dialog, DialogTitle, List, Paper } from "@mui/material";
-import { IoIosAddCircleOutline } from "react-icons/io";
+import { formatOnlyDate } from "@/lib/date-formatter";
+import { Dialog, DialogTitle, List, Paper } from "@mui/material";
 import AddMilestoneModal from "./add-milestone-dialog";
 import { useState } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
@@ -17,11 +16,13 @@ const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestone
   return (<>
     <Dialog onClose={() => onClose(false)} open={open} fullWidth style={{ zIndex: 40 }}>
       <DialogTitle className="text-2xl font-semibold  flex items-center gap-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+        <div className="flex gap-2 font-bold">
         <FaCalendarAlt className="text-sky-500 text-3xl" />
         Review Milestones
+        </div>
       </DialogTitle>
 
-      <div className="w-full flex justify-end p-4">
+      {/* <div className="w-full flex justify-end p-4">
         <button
           onClick={() => handleOpenAdd(true)}
           className="w-auto flex items-center hover:bg-blue-500 hover:text-white transition-all duration-200 gap-3 px-6 py-3 bg-blue-100 rounded-lg shadow-md hover:shadow-xl"
@@ -29,7 +30,7 @@ const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestone
           <IoIosAddCircleOutline className="text-3xl text-blue-500" />
           <p className="text-xl text-blue-600">Add Review Milestone</p>
         </button>
-      </div>
+      </div> */}
 
       <List sx={{ pt: 0 }}>
         {reviewMilestones.length === 0 && (
@@ -45,12 +46,12 @@ const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestone
 
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">From:</p>
-                <p className="text-gray-600">{formatDate(milestone.fromDate)}</p>
+                <p className="text-gray-600">{formatOnlyDate(milestone.fromDate)}</p>
               </div>
 
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">To:</p>
-                <p className="text-gray-600">{formatDate(milestone.toDate)}</p>
+                <p className="text-gray-600">{formatOnlyDate(milestone.toDate)}</p>
               </div>
             </div>
 

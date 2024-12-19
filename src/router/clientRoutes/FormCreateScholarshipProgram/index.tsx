@@ -57,17 +57,39 @@ const formSchema = z.object({
       })
     )
     .min(1, "Please add at least one criterion"),
-  reviewMilestones: z
+    reviewMilestones: z
     .array(
       z.object({
-        description: z
-          .string()
-          .min(1, "Review milestone description is required"),
-        fromDate: z.string().min(1, "From date is required"),
-        toDate: z.string().min(1, "To date is required"),
+        description: z.string().min(1, "Review milestone description is required"),
+        fromDate: z.string().min(1, "From Date is required"),
+        toDate: z.string().min(1, "To Date is required"),
       })
     )
-    .min(1, "Please add at least one review milestone"),
+    .min(2, "Please add at least two review milestones") // At least "Review Application" and "Interview"
+    .refine(
+      (milestones) => {
+        const reviewMilestone = milestones[0];
+        const interviewMilestone = milestones[1];
+        console.log(new Date(reviewMilestone.fromDate))
+        console.log(new Date(interviewMilestone.fromDate))
+  
+        // Check if dates are valid
+        if (
+          reviewMilestone &&
+          interviewMilestone &&
+          new Date(interviewMilestone.fromDate) <=
+            new Date(reviewMilestone.toDate)
+        ) {
+          return false;
+        }
+  
+        return true;
+      },
+      {
+        message:
+          "Interview From Date must be after Application Review's To Date",
+      }
+    ),  
 });
 
 const FormCreateScholarshipProgram = () => {
@@ -108,9 +130,13 @@ const FormCreateScholarshipProgram = () => {
       certificate: [],
       major: "",
       criteria: [{ name: "", description: "" }],
-      reviewMilestones: [{ description: "", fromDate: "", toDate: "" }],
+      reviewMilestones: [
+        { description: "Application Review", fromDate: "", toDate: "" },
+        { description: "Interview", fromDate: "", toDate: "" },
+      ],
     },
   });
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -126,16 +152,20 @@ const FormCreateScholarshipProgram = () => {
     }
   };
 
-  const { fields: criteriaFields, append: appendCriteria } = useFieldArray({
+  const {
+    fields: criteriaFields,
+    append: appendCriteria,
+    remove: removeCriteria,
+  } = useFieldArray({
     name: "criteria",
     control: form.control,
   });
 
-  const { fields: reviewMilestoneFields, append: appendReviewMilestone } =
-    useFieldArray({
-      name: "reviewMilestones",
-      control: form.control,
-    });
+  // const { fields: reviewMilestoneFields, append: appendReviewMilestone } =
+  //   useFieldArray({
+  //     name: "reviewMilestones",
+  //     control: form.control,
+  //   });
 
   const handleCategoryChange = (selectedOption: OptionType | null) => {
     setSelectedCategory(selectedOption ? selectedOption.value : "");
@@ -320,7 +350,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-4">
                   <Label htmlFor="scholarshiptype" className="text-md">
                     Scholarship Type
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     name="scholarshiptype"
@@ -341,7 +370,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-end-7 col-span-3">
                   <Label htmlFor="name" className="text-md">
                     Scholarship Name
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("name")}
@@ -359,7 +387,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-start-1 col-end-7">
                   <Label htmlFor="description" className="text-md">
                     Scholarship Description
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Textarea
                     {...form.register("description")}
@@ -383,7 +410,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 ">
                   <Label htmlFor="price" className="text-md">
                     Price
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("price")}
@@ -401,7 +427,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2">
                   <Label htmlFor="quantity" className="text-md">
                     Quantity
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("quantity")}
@@ -422,7 +447,6 @@ const FormCreateScholarshipProgram = () => {
                     className="text-md"
                   >
                     Quantity of Award Milestones
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("quantityOfAwardMilestones")}
@@ -459,7 +483,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2">
                   <Label htmlFor="deadline" className="text-md">
                     Deadline
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Input
                     {...form.register("deadline")}
@@ -477,7 +500,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-3">
                   <Label htmlFor="university" className="text-md">
                     University
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     {...form.register("university")}
@@ -495,7 +517,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-5">
                   <Label htmlFor="certificate" className="text-md">
                     Certificates
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     {...form.register("certificate")}
@@ -514,8 +535,6 @@ const FormCreateScholarshipProgram = () => {
                 <div className="space-y-2 col-span-2 col-end-7">
                   <Label htmlFor="major" className="text-md">
                     Major
-                    
-                    <span className="text-red-500 text-sm"> (* Required)</span>
                   </Label>
                   <Select
                     {...form.register("major")}
@@ -530,10 +549,10 @@ const FormCreateScholarshipProgram = () => {
                   )}
                 </div>
 
-                <div className="space-y-2 col-start-1 col-end-7">
+                {/* <div className="space-y-2 col-start-1 col-end-7">
                   <Label htmlFor="criteria" className="text-md">
                     Criteria
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+               
                   </Label>
                   {criteriaFields.map((field: any, index: any) => (
                     <div key={field.id} className="space-y-2">
@@ -568,57 +587,43 @@ const FormCreateScholarshipProgram = () => {
                   >
                     Add New Criteria
                   </Button>
-                </div>
+                </div> */}
 
                 <div className="space-y-2 col-start-1 col-end-7">
-                  <Label htmlFor="reviewMilestone" className="text-md flex items-center gap-2">
-                    Review Milestones
-                    <FaInfoCircle
-                  className="text-gray-600 cursor-pointer"
-                  title="The start day must be after the deadline"
-                />
-                    <span className="text-red-500 text-sm"> (* Required)</span>
+                  <Label htmlFor="criteria" className="text-md">
+                    Criteria
                   </Label>
-                  {reviewMilestoneFields.map((field: any, index: any) => (
-                    <div key={field.id} className="space-y-2">
+                  {criteriaFields.map((field: any, index: any) => (
+                    <div
+                      key={field.id}
+                      className="space-y-2 relative border p-4 rounded-md"
+                    >
+                      {criteriaFields.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCriteria(index)}
+                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                        >
+                          ✕
+                        </button>
+                      )}
                       <Input
-                        {...form.register(
-                          `reviewMilestones.${index}.description`
-                        )}
-                        placeholder="Enter milestone description"
+                        {...form.register(`criteria.${index}.name`)}
+                        placeholder="Ex: Academic Excellence"
                       />
-                      {form.formState.errors.reviewMilestones?.[index]
-                        ?.description && (
+                      {form.formState.errors.criteria?.[index]?.name && (
                         <span className="text-red-500">
-                          {
-                            form.formState.errors.reviewMilestones[index]
-                              .description?.message
-                          }
+                          {form.formState.errors.criteria[index].name?.message}
                         </span>
                       )}
                       <Input
-                        {...form.register(`reviewMilestones.${index}.fromDate`)}
-                        type="date"
-                        placeholder="From Date"
+                        {...form.register(`criteria.${index}.description`)}
+                        placeholder="Ex: Requires a minimum GPA of 3.5 or equivalent, recognizing outstanding academic performance through grades, test scores, or awards."
                       />
-                      {form.formState.errors.reviewMilestones?.[index]
-                        ?.fromDate && (
+                      {form.formState.errors.criteria?.[index]?.description && (
                         <span className="text-red-500">
                           {
-                            form.formState.errors.reviewMilestones[index]
-                              .fromDate?.message
-                          }
-                        </span>
-                      )}
-                      <Input
-                        {...form.register(`reviewMilestones.${index}.toDate`)}
-                        type="date"
-                        placeholder="To Date"
-                      />
-                      {form.formState.errors.reviewMilestones?.[index]?.toDate && (
-                        <span className="text-red-500">
-                          {
-                            form.formState.errors.reviewMilestones[index].toDate
+                            form.formState.errors.criteria[index].description
                               ?.message
                           }
                         </span>
@@ -628,15 +633,119 @@ const FormCreateScholarshipProgram = () => {
                   <Button
                     type="button"
                     onClick={() =>
-                      appendReviewMilestone({
-                        description: "",
-                        fromDate: "",
-                        toDate: "",
-                      })
+                      appendCriteria({ name: "", description: "" })
                     }
                   >
-                    Add New Milestone
+                    Add New Criteria
                   </Button>
+                </div>
+
+                <div className="space-y-2 col-start-1 col-end-7">
+                  <Label
+                    htmlFor="reviewMilestone"
+                    className="text-md flex items-center gap-2"
+                  >
+                    Review Milestones
+                    <FaInfoCircle
+                      className="text-gray-600 cursor-pointer"
+                      title="The start day must be after the deadline"
+                    />
+                  </Label>
+
+                  {/* Milestone 1: Review Application */}
+                  <div className="space-y-2">
+                    <Input
+                      value="Application Review"
+                      disabled
+                      className="bg-gray-100 cursor-not-allowed"
+                    />
+                    <Input
+                      {...form.register("reviewMilestones.0.fromDate", {
+                        required: "From Date is required",
+                      })}
+                      type="date"
+                      placeholder="From Date"
+                    />
+                    {form.formState.errors.reviewMilestones?.[0]?.fromDate && (
+                      <span className="text-red-500">
+                        {
+                          form.formState.errors.reviewMilestones[0].fromDate
+                            .message
+                        }
+                      </span>
+                    )}
+                    
+                    <Input
+                      {...form.register("reviewMilestones.0.toDate", {
+                        required: "To Date is required",
+                      })}
+                      type="date"
+                      placeholder="To Date"
+                    />
+                    {form.formState.errors.reviewMilestones?.[0]?.toDate && (
+                      <span className="text-red-500">
+                        {
+                          form.formState.errors.reviewMilestones[0].toDate
+                            .message
+                        }
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Milestone 2: Interview */}
+                  <div className="space-y-2">
+                    <Input
+                      value="Interview"
+                      disabled
+                      className="bg-gray-100 cursor-not-allowed"
+                    />
+                    <Input
+                      {...form.register("reviewMilestones.1.fromDate", {
+                        required: "From Date is required",
+                        validate: (value) => {
+                          const reviewToDate = form.getValues(
+                            "reviewMilestones.0.toDate"
+                          );
+                          if (new Date(value) <= new Date(reviewToDate)) {
+                            return "From Date must be after Application Review's To Date";
+                          }
+                          return true;
+                        },
+                      })}
+                      type="date"
+                      placeholder="From Date"
+                    />
+                    {form.formState.errors.reviewMilestones?.root?.message && (
+                      <span className="text-red-500">
+                        {
+                          form.formState.errors.reviewMilestones?.root?.message                        }
+                      </span>
+                    )}
+                    <Input
+                      {...form.register("reviewMilestones.1.toDate", {
+                        required: "To Date is required",
+                        validate: (value) => {
+                          const interviewFromDate = form.getValues(
+                            "reviewMilestones.1.fromDate"
+                          );
+                          if (new Date(value) <= new Date(interviewFromDate)) {
+                            return "To Date must be after Interview's From Date";
+                          }
+                          return true;
+                        },
+                      })}
+                      type="date"
+                      placeholder="To Date"
+                    />
+                    {form.formState.errors.reviewMilestones?.[1]?.toDate && (
+                      <span className="text-red-500">
+                        {
+                          form.formState.errors.reviewMilestones[1].toDate
+                            .message
+                        }
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -658,8 +767,8 @@ const FormCreateScholarshipProgram = () => {
                 onClick={() => setContractOpen(true)}
               >
                 Terms and Privacy
-              </a>
-              {" "}and proceed to read the scholarship contract.
+              </a>{" "}
+              and proceed to read the scholarship contract.
             </span>
           </div>
 
@@ -668,7 +777,10 @@ const FormCreateScholarshipProgram = () => {
           </div>
         </form>
         {isLoading && <ScreenSpinner />}
-        <ScholarshipContractDialogForFunder isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
+        <ScholarshipContractDialogForFunder
+          isOpen={isContractOpen}
+          onClose={() => setContractOpen(false)}
+        />
       </div>
     </>
   );

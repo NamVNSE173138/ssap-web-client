@@ -73,6 +73,7 @@ import {
   FaUserTie,
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { notification } from "antd";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -271,6 +272,11 @@ const ScholarshipProgramDetail = () => {
   };
 
   const handleAssignExpertDialog = async () => {
+    if (!data) return;
+    if (new Date(data?.deadline) > new Date()) {
+      notification.error({message: "You can not assign before deadline"});
+      return;
+    }
     setAssignExpertDialogOpen(true);
     setLoading(true);
     if (!data) return;

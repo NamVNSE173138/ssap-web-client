@@ -13,7 +13,7 @@ type ApprovalItem = {
   appliedDate: string;
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
-  documentUrl?: string; // Added to store document URL
+  documentUrl?: string; 
   applicationReviews?: { id: number, description: string, score: number, expertId: number, status: string }[];
   
 };
@@ -117,7 +117,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
               </td>
               <td className="p-4 text-sm">
                 <div className="flex items-center space-x-2">
-                  <Button className={`w-full h-full ${
+                   <Button className={`w-full h-full ${
                         isScored
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-blue-500 text-white"

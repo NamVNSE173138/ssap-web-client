@@ -74,12 +74,17 @@ const ApplyScholarship = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApplyLoading(true);
     if (!formData.agreeTerms) {
       notification.error({ message: "You must agree to the terms." });
       setApplyLoading(false);
       return;
     }
+    if(rows.length == 0) {
+        notification.error({ message: "You have to upload at least one document." });
+        return;
+    }
+
+    setApplyLoading(true);
     const program = await getScholarshipProgram(Number(id));
 
     if (!program) {
@@ -224,14 +229,14 @@ const ApplyScholarship = () => {
                   Phone number*
                 </label>
                 <div className="flex gap-[20px]">
-                  <input
+                  {/* <input
                     type="text"
                     disabled
                     name="dialCode"
                     id="dialCode"
                     className="max-w-[100px] rounded-md border-2 cursor-not-allowed outline-2"
                     value="+86"
-                  />
+                  /> */}
                   <input
                     type="text"
                     name="phone_number"
