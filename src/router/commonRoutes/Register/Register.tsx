@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaEnvelope, FaEye, FaEyeSlash, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUser, FaUsers } from "react-icons/fa";
+import { FaBook, FaBuilding, FaCalendarAlt, FaEnvelope, FaEye, FaEyeSlash, FaFileAlt, FaFlag, FaGraduationCap, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUniversity, FaUser, FaUserAlt, FaUsers, FaUserTie, FaVenusMars } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { sendOtp, verifyOtp } from "@/services/ApiServices/accountService";
 import { addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
+import { getAllUniversities } from "@/services/ApiServices/universityService";
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -98,6 +99,35 @@ const Register = () => {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [schools, setSchools] = useState<string[]>([]);
+  const [customSchool, setCustomSchool] = useState<boolean>(false);
+  const [selectedSchool, setSelectedSchool] = useState<string>("");
+
+  const getSchool = async () => {
+    try {
+      const response = await getAllUniversities();
+      const schoolNames = response.data.map((school: any) => school.name);
+      console.log(schoolNames)
+      setSchools(schoolNames);
+    } catch (error) {
+      console.log("Error fetching universities:", error);
+    }
+  };
+
+  useEffect(() => {
+    getSchool();
+  }, []);
+
+  const handleSelectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === "Other") {
+      setCustomSchool(true);
+      setSelectedSchool("");
+    } else {
+      setCustomSchool(false);
+      setSelectedSchool(value);
+    }
+  };
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
@@ -154,7 +184,7 @@ const Register = () => {
       });
     }
     console.log(errors);
-  };    
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState);
@@ -740,108 +770,116 @@ const Register = () => {
                       <span className="text-black-600">📋</span>
                       <span className="text-black-600 text-2xl">Basic Information</span>
                     </h3>
-                    <div className="flex justify-center">
-                      <div className="space-y-1 w-3/4">
-                        <label className="block text-gray-700 font-medium">
-                          <FaUser className="inline text-blue-600 mr-2" /> Username
-                        </label>
-                        <div className="flex items-center border p-3 rounded-md border-gray-400">
-                          <input
-                            {...register("username")}
-                            placeholder="Enter your username"
-                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                          />
-                        </div>
-                        {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center">
-                      <div className="space-y-1 w-3/4">
-                        <label className="block text-gray-700 font-medium">
-                          <FaEnvelope className="inline text-blue-600 mr-2" /> Email
-                        </label>
-                        <div className="flex items-center border p-3 rounded-md border-gray-400">
-                          <input
-                            {...register("email")}
-                            value={email}
-                            disabled
-                            placeholder="Enter your email"
-                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                          />
-                        </div>
-                        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center">
-                      <div className="space-y-1 w-3/4">
-                        <label className="block text-gray-700 font-medium">
-                          <FaPhoneAlt className="inline text-blue-600 mr-2" /> Phone Number
-                        </label>
-                        <div className="flex items-center border p-3 rounded-md border-gray-400">
-                          <input
-                            {...register("phoneNumber")}
-                            placeholder="Enter your phone number"
-                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                          />
-                        </div>
-                        {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center">
-                      <div className="space-y-1 w-3/4">
-                        <label className="block text-gray-700 font-medium">
-                          <FaKey className="inline text-blue-600 mr-2" /> Password
-                        </label>
-                        <div className="flex items-center border p-3 rounded-md border-gray-400">
-                          <input
-                            {...register("password")}
-                            placeholder="Enter your password"
-                            type={showPassword ? "text" : "password"}
-                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                          />
-                          <div className="ml-3 cursor-pointer" onClick={togglePasswordVisibility}>
-                            {showPassword ? (
-                              <FaEyeSlash className="text-gray-500" />
-                            ) : (
-                              <FaEye className="text-gray-500" />
-                            )}
+                    <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Username */}
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">
+                            <FaUser className="inline text-blue-600 mr-2" /> Username
+                          </label>
+                          <div className="relative">
+                            <input
+                              {...register("username")}
+                              placeholder="Enter your username"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
                           </div>
+                          {errors.username && (
+                            <p className="text-red-500 text-sm mt-2">{errors.username.message}</p>
+                          )}
                         </div>
-                        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-                      </div>
-                    </div>
 
-                    <div className="flex justify-center">
-                      <div className="space-y-1 w-3/4">
-                        <label className="block text-gray-700 font-medium">
-                          <FaMapMarkedAlt className="inline text-blue-600 mr-2" /> Address
-                        </label>
-                        <div className="flex items-center border p-3 rounded-md border-gray-400">
-                          <input
-                            {...register("address")}
-                            placeholder="Enter your address"
-                            className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                          />
+                        {/* Email */}
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">
+                            <FaEnvelope className="inline text-blue-600 mr-2" /> Email
+                          </label>
+                          <div className="relative">
+                            <input
+                              {...register("email")}
+                              value={email?.length > 18 ? `${email.substring(0, 15)}...` : email}
+                              disabled
+                              placeholder="Enter your email"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+                          {errors.email && (
+                            <p className="text-red-500 text-sm mt-2">{errors.email.message}</p>
+                          )}
                         </div>
-                        {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
-                      </div>
-                    </div>
 
-                    <div className="flex justify-center">
-                      <div className="space-y-1 w-3/4">
-                        <label className="block text-gray-700 font-medium">
-                          <FaImage className="inline text-blue-600 mr-2" /> Upload Avatar
-                        </label>
-                        <div className="flex items-center border p-3 rounded-md border-gray-400">
-                          <input
-                            type="file"
-                            onChange={handleFileChange}
-                            className="w-full text-gray-800 p-3 focus:outline-none"
-                            accept="image/*"
-                          />
+                        {/* Phone Number */}
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">
+                            <FaPhoneAlt className="inline text-blue-600 mr-2" /> Phone
+                          </label>
+                          <div className="relative">
+                            <input
+                              {...register("phoneNumber")}
+                              placeholder="Enter your phone number"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+                          {errors.phoneNumber && (
+                            <p className="text-red-500 text-sm mt-2">{errors.phoneNumber.message}</p>
+                          )}
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">
+                            <FaKey className="inline text-blue-600 mr-2" /> Password
+                          </label>
+                          <div className="flex items-center">
+                            <input
+                              {...register("password")}
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter your password"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={togglePasswordVisibility}
+                              className="ml-3 text-gray-500 hover:text-blue-500"
+                            >
+                              {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                          </div>
+                          {errors.password && (
+                            <p className="text-red-500 text-sm mt-2">{errors.password.message}</p>
+                          )}
+                        </div>
+
+                        {/* Address */}
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">
+                            <FaMapMarkedAlt className="inline text-blue-600 mr-2" /> Address
+                          </label>
+                          <div className="relative">
+                            <input
+                              {...register("address")}
+                              placeholder="Enter your address"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+                          {errors.address && (
+                            <p className="text-red-500 text-sm mt-2">{errors.address.message}</p>
+                          )}
+                        </div>
+
+                        {/* Avatar Upload */}
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">
+                            <FaImage className="inline text-blue-600 mr-2" /> Upload Avatar
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="file"
+                              onChange={handleFileChange}
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                              accept="image/*"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -857,106 +895,70 @@ const Register = () => {
                             />
                           </span>
                         </h3>
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              First Name
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                        <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* First Name */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">First Name</label>
                               <input
                                 {...register("firstName")}
                                 placeholder="Enter your first name"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
                             </div>
-                            {errors.firstName && (
-                              <p className="text-red-500 text-sm">{errors.firstName.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Last Name
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* Last Name */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Last Name</label>
                               <input
                                 {...register("lastName")}
                                 placeholder="Enter your last name"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
                             </div>
-                            {errors.lastName && (
-                              <p className="text-red-500 text-sm">{errors.lastName.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Birth Date
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* Birth Date */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Birth Date</label>
                               <input
                                 {...register("birthDate")}
                                 type="date"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.birthDate && <p className="text-red-500 text-sm mt-1">{errors.birthDate.message}</p>}
                             </div>
-                            {errors.birthDate && (
-                              <p className="text-red-500 text-sm">{errors.birthDate.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Gender
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* Gender */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Gender</label>
                               <select
                                 {...register("gender")}
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="">Select your gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                               </select>
+                              {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>}
                             </div>
-                            {errors.gender && (
-                              <p className="text-red-500 text-sm">{errors.gender.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Major (Optional)
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* Major */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Major (Optional)</label>
                               <input
                                 {...register("major")}
                                 placeholder="Enter your major"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.major && <p className="text-red-500 text-sm mt-1">{errors.major.message}</p>}
                             </div>
-                            {errors.major && (
-                              <p className="text-red-500 text-sm">{errors.major.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              GPA (Optional)
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* GPA */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">GPA (Optional)</label>
                               <input
                                 {...register("gpa", {
                                   setValueAs: (value) => (value === "" ? undefined : Number(value)),
@@ -968,70 +970,67 @@ const Register = () => {
                                 })}
                                 type="number"
                                 placeholder="Enter your GPA"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.gpa && <p className="text-red-500 text-sm mt-1">{errors.gpa.message}</p>}
                             </div>
-                            {errors.gpa && (
-                              <p className="text-red-500 text-sm">{errors.gpa.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              School (Optional)
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
-                              <input
-                                {...register("school")}
-                                placeholder="Enter your school"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                              />
+                            {/* School */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">University</label>
+                              {customSchool ? (
+                                <input
+                                  {...register("school")}
+                                  placeholder="Enter your school"
+                                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              ) : (
+                                <select
+                                  {...register("school")} // Đảm bảo rằng trường "school" được đăng ký vào react-hook-form
+                                  value={selectedSchool}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    handleSelectionChange(e); // Giữ logic xử lý
+                                    setValue("school", value, { shouldValidate: true }); // Đồng bộ giá trị với react-hook-form
+                                    setSelectedSchool(value); // Cập nhật giá trị vào state selectedSchool
+                                  }}
+                                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="">Select a school</option>
+                                  {schools.map((school: string, index: number) => (
+                                    <option key={index} value={school}>
+                                      {school}
+                                    </option>
+                                  ))}
+                                  <option value="Other">Other</option>
+                                </select>
+                              )}
+                              {errors.school && <p className="text-red-500 text-sm mt-1">{errors.school.message}</p>}
                             </div>
-                            {errors.school && (
-                              <p className="text-red-500 text-sm">{errors.school.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Nationality (Optional)
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* Nationality */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Nationality (Optional)</label>
                               <input
                                 {...register("nationality")}
                                 placeholder="Enter your nationality"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.nationality && <p className="text-red-500 text-sm mt-1">{errors.nationality.message}</p>}
                             </div>
-                            {errors.nationality && (
-                              <p className="text-red-500 text-sm">{errors.nationality.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Ethnicity (Optional)
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
+                            {/* Ethnicity */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Ethnicity (Optional)</label>
                               <input
                                 {...register("ethnicity")}
                                 placeholder="Enter your ethnicity"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
+                              {errors.ethnicity && <p className="text-red-500 text-sm mt-1">{errors.ethnicity.message}</p>}
                             </div>
-                            {errors.ethnicity && (
-                              <p className="text-red-500 text-sm">{errors.ethnicity.message}</p>
-                            )}
                           </div>
                         </div>
-
                       </>
                     )}
                     {(selectedRole === 4 || selectedRole === 2) && (
@@ -1046,48 +1045,43 @@ const Register = () => {
                             />
                           </span>
                         </h3>
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Organization Name
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
-                              <input
-                                {...register("organizationName")}
-                                placeholder="Enter your organization name"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                              />
-                            </div>
-                            {errors.organizationName && (
-                              <p className="text-red-500 text-sm">{errors.organizationName.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                          <div className="space-y-1 w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Contact Person Name
-                            </label>
-                            <div className="flex items-center border p-3 rounded-md border-gray-400">
-                              <input
-                                {...register("contactPersonName")}
-                                placeholder="Enter contact person name"
-                                className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
-                              />
+                        <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Organization Name and Contact Person Name (Same Row) */}
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Organization Name</label>
+                              <div className="flex items-center border p-3 rounded-md border-gray-400">
+                                <input
+                                  {...register("organizationName")}
+                                  placeholder="Enter your organization name"
+                                  className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                />
+                              </div>
+                              {errors.organizationName && (
+                                <p className="text-red-500 text-sm mt-1">{errors.organizationName.message}</p>
+                              )}
                             </div>
-                            {errors.contactPersonName && (
-                              <p className="text-red-500 text-sm">{errors.contactPersonName.message}</p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="space-y-4 flex justify-center w-full">
-                          <div className="w-3/4">
-                            <label className="block text-gray-700 font-medium">
-                              Documents
-                            </label>
-                            <div className="">
+                            <div>
+                              <label className="block text-gray-700 font-medium mb-2">Contact Person Name</label>
+                              <div className="flex items-center border p-3 rounded-md border-gray-400">
+                                <input
+                                  {...register("contactPersonName")}
+                                  placeholder="Enter contact person name"
+                                  className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                />
+                              </div>
+                              {errors.contactPersonName && (
+                                <p className="text-red-500 text-sm mt-1">{errors.contactPersonName.message}</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Documents Section */}
+                          <div className="mt-8">
+                            <label className="block text-gray-700 font-medium mb-2">Documents</label>
+                            <div>
                               <Button
                                 type="button"
                                 onClick={handleAddRow}
@@ -1126,7 +1120,6 @@ const Register = () => {
                               </div>
                             </div>
 
-
                             {errors.documents && (
                               <p className="text-red-500 text-sm mt-2">{errors.documents.message}</p>
                             )}
@@ -1152,7 +1145,6 @@ const Register = () => {
                     </button>
                   </div>
                 </div>
-
               )}
 
               {currentStep === 4 && (
@@ -1163,55 +1155,77 @@ const Register = () => {
                       <span className="text-black-600">📋</span>
                       <span className="text-black-600 text-2xl">Basic Information</span>
                     </h3>
-                    <div className="flex space-x-6 overflow-y-auto max-h-[270px]">
-                      <div className="flex-1">
-                        {selectedFile && (
-                          <div className="mt-4 flex justify-center">
-                            <div>
-                              <p className="font-semibold text-lg text-gray-800 text-center">Avatar:</p>
-                              <img
-                                src={URL.createObjectURL(selectedFile)}
-                                alt="Avatar Preview"
-                                className="mt-2 w-32 h-32 object-cover rounded-full mx-auto"
-                              />
+
+                    <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Avatar Preview */}
+                        <div className="flex items-center space-x-3">
+                          {selectedFile && (
+                            <div className="mt-4 flex justify-center">
+                              <div>
+                                <p className="font-semibold text-lg text-gray-800 text-center">Avatar:</p>
+                                <img
+                                  src={URL.createObjectURL(selectedFile)}
+                                  alt="Avatar Preview"
+                                  className="mt-2 ml-9 w-32 h-32 object-cover rounded-full mx-auto"
+                                />
+                              </div>
                             </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1 space-y-4">
+                          {/* Role */}
+                          <div className="flex items-center space-x-3">
+                            <FaUsers className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Role:</strong> {selectedRole === 2 ? "Funder" : selectedRole === 4 ? "Provider" : "Applicant"}
+                            </p>
                           </div>
-                        )}
-                      </div>
 
-                      <div className="border-l border-gray-400 h-full "></div>
-                      <div className="flex-1 space-y-4">
-                        <div className="flex items-center space-x-3">
-                          <FaUsers className="text-blue-600 text-2xl" />
-                          <p className="text-lg text-gray-800 font-medium">
-                            <strong>Role:</strong> {selectedRole === 2 ? "Funder" : selectedRole === 4 ? "Provider" : "Applicant"}
-                          </p>
+                          {/* Username */}
+                          <div className="flex items-center space-x-3">
+                            <FaUser className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Username:</strong> {watch("username")?.length > 13 ? `${watch("username").substring(0, 10)}...` : watch("username") || "Not provided"}
+                            </p>
+                          </div>
+
+                          {/* Email */}
+                          <div className="flex items-center space-x-3">
+                            <FaEnvelope className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Email:</strong> {watch("email") || "Not provided"}
+                            </p>
+                          </div>
+
+                          {/* Phone Number */}
+                          <div className="flex items-center space-x-3">
+                            <FaPhoneAlt className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Phone:</strong> {watch("phoneNumber") || "Not provided"}
+                            </p>
+                          </div>
+
+                          {/* Password */}
+                          <div className="flex items-center space-x-3">
+                            <FaKey className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Password:</strong> {watch("password") ? "••••••••" : "Not provided"}
+                            </p>
+                          </div>
+
+                          {/* Address */}
+                          <div className="flex items-center space-x-3">
+                            <FaMapMarkedAlt className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Address:</strong> {watch("address") || "Not provided"}
+                            </p>
+                          </div>
                         </div>
-
-                        <div className="flex items-center space-x-3">
-                          <FaUser className="text-blue-600 text-2xl" />
-                          <p className="text-lg text-gray-800 font-medium">
-                            <strong>Username:</strong> {watch("username")}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center space-x-3">
-                          <FaEnvelope className="text-blue-600 text-2xl" />
-                          <p className="text-lg text-gray-800 font-medium">
-                            <strong>Email:</strong> {watch("email")}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center space-x-3">
-                          <FaPhoneAlt className="text-blue-600 text-2xl" />
-                          <p className="text-lg text-gray-800 font-medium">
-                            <strong>Phone Number:</strong> {watch("phoneNumber")}
-                          </p>
-                        </div>
-
-
                       </div>
                     </div>
+
                     <br></br>
                     {(selectedRole === 5) && (
                       <>
@@ -1219,111 +1233,152 @@ const Register = () => {
                           <span className="text-black-600">📋</span>
                           <span className="text-black-600 text-2xl flex items-center gap-2">
                             Profile Information
-
                           </span>
                         </h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>First Name:</strong> {watch("firstName") || "Not provided"}
-                            </p>
-                          </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Last Name:</strong> {watch("lastName") || "Not provided"}
-                            </p>
-                          </div>
+                        <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+                          <div className="flex space-x-6">
+                            {/* Left Section */}
+                            <div className="flex-1 space-y-4">
+                              {/* First Name */}
+                              <div className="flex items-center space-x-3">
+                                <FaUserAlt className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>First Name:</strong> {watch("firstName") || "Not provided"}
+                                </p>
+                              </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Birth Date:</strong> {watch("birthDate") || "Not provided"}
-                            </p>
-                          </div>
+                              {/* GPA */}
+                              <div className="flex items-center space-x-3">
+                                <FaGraduationCap className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>GPA:</strong> {watch("gpa") !== undefined ? watch("gpa") : "Not provided"}
+                                </p>
+                              </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Gender:</strong> {watch("gender") || "Not provided"}
-                            </p>
-                          </div>
+                              {/* Birth Date */}
+                              <div className="flex items-center space-x-3">
+                                <FaCalendarAlt className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Birth Date:</strong> {
+                                    watch("birthDate") ? new Date(watch("birthDate")).toLocaleDateString("en-US") : "Not provided"
+                                  }
+                                </p>
+                              </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Major:</strong> {watch("major") || "Not provided"}
-                            </p>
-                          </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>GPA:</strong> {watch("gpa") || "Not provided"}
-                            </p>
-                          </div>
+                              {/* Gender */}
+                              <div className="flex items-center space-x-3">
+                                <FaVenusMars className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Gender:</strong> {watch("gender") || "Not provided"}
+                                </p>
+                              </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>School:</strong> {watch("school") || "Not provided"}
-                            </p>
-                          </div>
+                              {/* Major */}
+                              <div className="flex items-center space-x-3">
+                                <FaBook className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Major:</strong> {watch("major") || "Not provided"}
+                                </p>
+                              </div>
+                            </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Nationality:</strong> {watch("nationality") || "Not provided"}
-                            </p>
-                          </div>
+                            {/* Vertical Divider */}
+                            <div className="border-l border-gray-400 h-full"></div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Ethnicity:</strong> {watch("ethnicity") || "Not provided"}
-                            </p>
+                            {/* Right Section */}
+                            <div className="flex-1 space-y-4">
+                              {/* Last Name */}
+                              <div className="flex items-center space-x-3">
+                                <FaUserAlt className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Last Name:</strong> {watch("lastName") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* University */}
+                              <div className="flex items-center space-x-3">
+                                <FaUniversity className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>University:</strong> {watch("school") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* Nationality */}
+                              <div className="flex items-center space-x-3">
+                                <FaFlag className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Nationality:</strong> {watch("nationality") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* Ethnicity */}
+                              <div className="flex items-center space-x-3">
+                                <FaUsers className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Ethnicity:</strong> {watch("ethnicity") || "Not provided"}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </>
                     )}
                     {(selectedRole === 4 || selectedRole === 2) && (
                       <>
-                        <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                          <span className="text-black-600">📋</span>
-                          <span className="text-black-600 text-2xl flex items-center gap-2">
-                            Necessary Information
-
-                          </span>
+                        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                          <span className="text-blue-600">📋</span>
+                          <span className="text-2xl">Necessary Information</span>
                         </h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Organization Name:</strong> {watch("organizationName") || "Not provided"}
-                            </p>
+
+                        <div className="max-w-5xl mx-auto p-6 bg-white bg-opacity-75 shadow-lg rounded-lg">
+                          {/* Combined Section for Organization and Contact Person */}
+                          <div className="grid grid-cols-2 gap-6 mb-6">
+                            {/* Organization Name */}
+                            <div className="flex items-center space-x-3 p-4 border rounded-lg border-gray-300 shadow-sm">
+                              <FaBuilding className="text-blue-600 text-2xl" />
+                              <p className="text-lg text-gray-800 font-medium">
+                                <strong>Organization Name:</strong> {watch("organizationName") || "Not provided"}
+                              </p>
+                            </div>
+
+                            {/* Contact Person Name */}
+                            <div className="flex items-center space-x-3 p-4 border rounded-lg border-gray-300 shadow-sm">
+                              <FaUserTie className="text-blue-600 text-2xl" />
+                              <p className="text-lg text-gray-800 font-medium">
+                                <strong>Contact Person Name:</strong> {watch("contactPersonName") || "Not provided"}
+                              </p>
+                            </div>
                           </div>
 
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
-                              <strong>Contact Person Name:</strong> {watch("contactPersonName") || "Not provided"}
-                            </p>
-                          </div>
-
-                          <div className="flex items-center space-x-3">
-                            <p className="text-lg text-gray-800 font-medium">
+                          {/* Documents Section */}
+                          <div className="flex items-center space-x-3 mb-4">
+                            <FaFileAlt className="text-blue-600 text-2xl" />
+                            <span className="text-lg text-gray-800 font-medium">
                               <strong>Documents:</strong>
-                              {rows && rows.length > 0 ? (
-                                rows.map((row: any, index: number) => (
-                                  <div key={index} className="flex space-x-4">
-                                    <div className="text-sm text-gray-700">
-                                      <strong>#{index + 1}</strong>
-                                    </div>
-
-                                    <div className="text-sm text-gray-700">
-                                      <strong>Name:</strong> {row.name?.length > 10 ? `${row.name.substring(0, 15)}...` : row.name}
-                                    </div>
-
-                                    <div className="text-sm text-gray-700">
-                                      <strong>Type:</strong> {row.type}
-                                    </div>
+                            </span>
+                          </div>
+                          <div className="space-y-2">
+                            {rows && rows.length > 0 ? (
+                              rows.map((row: any, index: number) => (
+                                <div key={index} className="flex items-center p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50">
+                                  <div className="text-sm text-gray-700 mr-4">
+                                    <strong>#{index + 1}</strong>
                                   </div>
-                                ))
-                              ) : (
-                                <span className="text-lg text-gray-800 font-medium">No documents uploaded</span>
-                              )}
-                            </p>
+                                  <div className="text-sm text-gray-700 mr-4">
+                                    <strong>Name:</strong> {row.name?.length > 10 ? `${row.name.substring(0, 15)}...` : row.name}
+                                  </div>
+                                  <div className="text-sm text-gray-700">
+                                    <strong>Type:</strong> {row.type}
+                                  </div>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-lg text-gray-800 font-medium p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50">
+                                No documents uploaded
+                              </div>
+                            )}
                           </div>
                         </div>
                       </>
