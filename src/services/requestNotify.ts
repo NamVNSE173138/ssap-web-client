@@ -16,10 +16,12 @@ export const requestNotify = async (id: string) => {
 
           if (currentToken) {
             console.log(currentToken);
+            return currentToken;
           } else {
             console.log('No registration token available. Request permission to generate one.');
             //setError('No registration token available');
           }
+          return null;
         } else {
           console.log('Permission denied');
           //setError('Notification permission denied');

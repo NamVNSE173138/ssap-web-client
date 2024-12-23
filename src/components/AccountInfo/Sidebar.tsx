@@ -16,6 +16,7 @@ import { BiLogOutCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useMediaQuery from "../../hooks/useMediaQuery";
+import { removeFcmToken } from "@/reducers/fcmTokenSlice";
 
 type SidebarProps = {
   className?: string;
@@ -126,6 +127,7 @@ const Sidebar = ({ className, needRefresh }: SidebarProps) => {
     setTimeout(() => {
       dispatch(removeToken());
       dispatch(removeUser());
+      dispatch(removeFcmToken());
       localStorage.removeItem("token");
       navigate(RouteNames.HOME);
     }, 500);

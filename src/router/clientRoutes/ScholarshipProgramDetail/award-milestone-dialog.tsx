@@ -5,6 +5,7 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import { useState } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 import AddAwardDialog from "./add-award-dialog";
+import { format } from "date-fns";
 
 const AwardMilestoneDialog = ({ open, onClose, awardMilestones, reviewMilestones, fetchAwardMilestones, scholarship }: any) => {
   
@@ -50,12 +51,12 @@ const AwardMilestoneDialog = ({ open, onClose, awardMilestones, reviewMilestones
 
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">From:</p>
-                <p className="text-gray-600">{formatDate(milestone.fromDate)}</p>
+                <p className="text-gray-600">{format(new Date(milestone.fromDate), "MM/dd/yyyy")}</p>
               </div>
 
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">To:</p>
-                <p className="text-gray-600">{formatDate(milestone.toDate)}</p>
+                <p className="text-gray-600">{format(new Date(milestone.toDate), "MM/dd/yyyy")}</p>
               </div>
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">Amount:</p>
