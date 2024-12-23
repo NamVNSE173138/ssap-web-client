@@ -1,33 +1,38 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header/index";
 import Footer from "../../components/footer/index";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useEffect } from "react";
 import { requestNotify } from "@/services/requestNotify";
 import { useToast } from "@/components/ui/use-toast";
 import { NotifyNewUser } from "@/services/ApiServices/notification";
 import { getMessaging, onMessage } from "firebase/messaging";
+import { setFcmToken } from "@/reducers/fcmTokenSlice";
 
 const ClientLayout = () => {
   const user = useSelector((state: RootState) => state.token.user);
+  const fcm = useSelector((state: RootState) => state.fcmToken.token);
   //const unread = useSelector((state: RootState) => state.unreadNotify.unreadNotify);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
   const { sendNotification } = location.state || { sendNotification: false };
   const messaging = getMessaging();
 
   const notify = async () => {
-    if (user != null) {
-      await requestNotify(user.id);
+    if (user != null && fcm == null) {
+      const fcmToken = await requestNotify(user.id);
+      
+      if (fcmToken != null) {
+         dispatch(setFcmToken(fcmToken));
+      }
       if (sendNotification) await NotifyNewUser(parseInt(user.id));
     }
   };
 
-  useEffect(() => {
-    notify();
-    const playNotificationSound = () => {
+  const playNotificationSound = () => {
       const audio = new Audio("/noti-sound.mp3");
       audio.play().catch((error) => {
         console.error("Error playing sound:", error);
@@ -58,6 +63,10 @@ const ClientLayout = () => {
         });
       }
     });
+
+
+  useEffect(() => {
+    notify();
   }, []);
 
   return (
