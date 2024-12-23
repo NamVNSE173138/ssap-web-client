@@ -268,22 +268,30 @@ const FunderApplication = () => {
       };
 
       const messaging = getMessaging();
-      navigator.serviceWorker.addEventListener('message', (event) => {
-          
+      
+
+  useEffect(() => {
+    fetchApplication();
+    navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data.notification && event.data.data.topic == user?.id && window.location.pathname.includes("/funder/application")) {
           fetchApplication();
         }
       });
 
-      onMessage(messaging, (payload: any) => {
+     const unsubscribe = onMessage(messaging, (payload: any) => {
         if (payload.notification && payload.data.topic == user?.id && window.location.pathname.includes("/funder/application")) {
           fetchApplication();
         }
       });
 
-
-  useEffect(() => {
-    fetchApplication();
+      return () => {
+        navigator.serviceWorker.removeEventListener('message', (event) => {
+          if (event.data.notification && event.data.data.topic == user?.id && window.location.pathname.includes("/funder/application")) {
+            fetchApplication();
+          }
+        })
+        unsubscribe();
+      }
   }, [])
   if (!id) return <NotFound />
   if (loading) {
