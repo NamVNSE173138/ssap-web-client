@@ -40,7 +40,12 @@ const ClientLayout = () => {
     };
 
     //get notification when app is active
-    onMessage(messaging, (payload: any) => {
+    
+
+
+  useEffect(() => {
+    notify();
+    const unsubscribe = onMessage(messaging, (payload: any) => {
       if (
         payload.data.messageType != "push-received" &&
         payload.data.topic == user?.id
@@ -63,10 +68,24 @@ const ClientLayout = () => {
         });
       }
     });
-
-
-  useEffect(() => {
-    notify();
+    return () => {
+      navigator.serviceWorker.removeEventListener("message", (event) => {
+        if (event.data.notification && event.data.data.topic == user?.id) {
+          playNotificationSound();
+          toast({
+            title: event.data.notification.title,
+            description: event.data.notification.body,
+            duration: 5000,
+            variant: "default",
+            onClickCapture: () => {
+              navigate(event.data.data.link);
+              //console.log("decrementUnread");
+            },
+          });
+        }
+      });
+      unsubscribe();
+    }
   }, []);
 
   return (

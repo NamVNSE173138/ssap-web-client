@@ -7,6 +7,7 @@ import { RootState } from '@/store/store';
 import { Badge } from 'antd';
 import { formatDate } from '@/lib/date-formatter';
 import { IoIosNotifications, IoIosNotificationsOutline } from 'react-icons/io';
+import { getMessaging, onMessage } from 'firebase/messaging';
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -20,6 +21,8 @@ const DropdownNotification = () => {
 
   // const [title, setTitle] = useState("Scholarship Portal");
   const title = "Scholarship Portal";
+
+  const messaging = getMessaging();
 
   const fetchNotis = async () => {
     try {
@@ -88,11 +91,32 @@ const DropdownNotification = () => {
     }
   };
 
+
+
   useEffect(() => {
     fetchNotis();
-    navigator.serviceWorker.addEventListener('message', (_event) => {
-      fetchNotis();
+
+    const unsubscribeOnMessage = onMessage(messaging, (payload: any) => {
+      if (
+        payload.data.messageType != "push-received" &&
+        payload.data.topic == user?.id
+      ) {
+          fetchNotis();
+      }
     });
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data.notification && event.data.data.topic == user?.id) {
+        fetchNotis();
+      }
+    });
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', (event) => {
+        if (event.data.notification && event.data.data.topic == user?.id) {
+            fetchNotis();
+        }
+      });
+      unsubscribeOnMessage();
+    }
   }, [])
 
 

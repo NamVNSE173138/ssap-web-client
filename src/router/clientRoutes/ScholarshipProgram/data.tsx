@@ -9,8 +9,8 @@ export type ScholarshipProgramType = {
   // numberOfRenewals: number;
   funderId: number;
   // providerId: number;
-  createAt: Date;
-  updateAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   status: string;
   criteria:Array<{
     id:string;

@@ -68,6 +68,7 @@ import {
   FaInfoCircle,
   FaMapMarkerAlt,
   FaRegListAlt,
+  FaRocket,
   FaTag,
   FaTrash,
   FaTrophy,
@@ -76,6 +77,7 @@ import {
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { notification } from "antd";
+import AccelaratePhaseDialog from "./accelarate-phase";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -115,6 +117,9 @@ const ScholarshipProgramDetail = () => {
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [awardMilestoneDialogOpen, setAwardMilestoneDialogOpen] =
+    useState<boolean>(false);
+
+  const [accelaratePhaseDialogOpen, setAccelaratePhaseDialogOpen] =
     useState<boolean>(false);
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
@@ -319,6 +324,14 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
+  const handleOpenAccelarateDialog = async () => {
+    setAccelaratePhaseDialogOpen(true);
+    setLoading(true);
+    if (!data) return;
+    //await fetchWinningApplications(parseInt(data?.id));
+    setLoading(false);
+  };
+
   // const handleOpenReviewingDialog = async () => {
   //   setSelectedExpert(experts);
   //   setReviewingDialogOpen(true);
@@ -410,7 +423,18 @@ const ScholarshipProgramDetail = () => {
                     : data.description}
                 </p>
               </div>
+              
             </div>
+            <span className="flex justify-start ps-5 pt-5 gap-2 items-center">
+                <span className="relative flex h-3 w-3">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500`}></span>
+                  <span className={`relative inline-flex rounded-full h-3 w-3 bg-green-500`}></span>
+                </span>
+                <span className={`text-green-500 text-2xl font-medium`}>
+                    {data.status}
+                </span>
+              </span>
+
 
             <div className="text-white text-center flex flex-wrap h-[40px] lg:h-[50px] mt-[26px] w-full">
               {isApplicant == "Applicant" || !user ? (
@@ -510,6 +534,12 @@ const ScholarshipProgramDetail = () => {
                       className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaUserTie className="mr-2" /> Assign Expert
+                    </Button>
+                    <Button
+                      onClick={() => handleOpenAccelarateDialog()}
+                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
+                    >
+                      <FaRocket className="mr-2" /> Accelarate Phase
                     </Button>
                     <Button
                       onClick={() => handleOpenReviewMilestoneDialog()}
@@ -617,6 +647,18 @@ const ScholarshipProgramDetail = () => {
                 </p>
                 <p className="text-lg font-semibold text-gray-800">
                   {"Wallet or Cash"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-500">Created At</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {data.deadline
+                    ? format(new Date(data.createdAt), "MM/dd/yyyy")
+                    : "Not specified"}
                 </p>
               </div>
             </div>
@@ -1097,6 +1139,13 @@ const ScholarshipProgramDetail = () => {
             );
             return response.data.data || [];
           }}
+        />
+      )}
+      {authorized != "Unauthorized" && (
+        <AccelaratePhaseDialog
+          isOpen={accelaratePhaseDialogOpen}
+          setIsOpen={(open: boolean) => setAccelaratePhaseDialogOpen(open)}
+          //winningApplications={winningApplications ?? []}
         />
       )}
     </div>
