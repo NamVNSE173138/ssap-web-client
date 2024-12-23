@@ -8,6 +8,7 @@ import { deleteToken } from 'firebase/messaging';
 import { messaging } from '@/services/firebase';
 import { removeToken, removeUser } from '@/reducers/tokenSlice';
 import RouteNames from '@/constants/routeNames';
+import { removeFcmToken } from '@/reducers/fcmTokenSlice';
 
 const DropdownUser = ({ setIsLoading }: any) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -22,6 +23,7 @@ const handleLogout = () => {
     setTimeout(() => {
       dispatch(removeToken());
       dispatch(removeUser());
+      dispatch(removeFcmToken());
       localStorage.removeItem('token');
       navigate(RouteNames.HOME);
       setIsLoading(false);
