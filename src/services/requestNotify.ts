@@ -5,6 +5,7 @@ import { subscribeToTopic } from "./ApiServices/notification";
 export const requestNotify = async (id: string) => {
       try {
         // Register the service worker
+        
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
 
         const permission = await Notification.requestPermission();
