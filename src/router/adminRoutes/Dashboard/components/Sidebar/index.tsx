@@ -9,6 +9,7 @@ import RouteNames from '@/constants/routeNames';
 import ScreenSpinner from '@/components/ScreenSpinner';
 import { BsSuitcase2 } from 'react-icons/bs';
 import { SchoolIcon, TableIcon } from 'lucide-react';
+import { removeFcmToken } from '@/reducers/fcmTokenSlice';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -41,6 +42,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     setTimeout(() => {
       dispatch(removeToken());
       dispatch(removeUser());
+      dispatch(removeFcmToken());
       localStorage.removeItem('token');
       navigate(RouteNames.HOME);
       setIsLoading(false);
