@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, List, Paper } from "@mui/material";
 import AddMilestoneModal from "./add-milestone-dialog";
 import { useState } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
+import { format } from "date-fns";
 
 const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestones, scholarship, fetchReviewMilestones }: any) => {
   
@@ -46,12 +47,12 @@ const ReviewMilestoneDialog = ({ open, onClose, reviewMilestones, awardMilestone
 
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">From:</p>
-                <p className="text-gray-600">{formatOnlyDate(milestone.fromDate)}</p>
+                <p className="text-gray-600">{format(new Date(milestone.fromDate), "MM/dd/yyyy")}</p>
               </div>
 
               <div className="flex gap-2 items-center mt-2">
                 <p className="font-semibold text-gray-700">To:</p>
-                <p className="text-gray-600">{formatOnlyDate(milestone.toDate)}</p>
+                <p className="text-gray-600">{format(new Date(milestone.toDate), "MM/dd/yyyy")}</p>
               </div>
             </div>
 

@@ -32,6 +32,7 @@ import { deleteToken } from "firebase/messaging";
 import { RootState } from "@/store/store";
 import { FiDollarSign } from "react-icons/fi";
 import RoleNames from "@/constants/roleNames";
+import { removeFcmToken } from "@/reducers/fcmTokenSlice";
 
 const HeaderAvatar = () => {
   const avatar = useSelector((state: RootState) => state.token.avatar);
@@ -46,6 +47,7 @@ const HeaderAvatar = () => {
     setTimeout(() => {
       dispatch(removeToken());
       dispatch(removeUser());
+      dispatch(removeFcmToken());
       localStorage.removeItem("token");
       navigate(RouteNames.HOME);
       setIsLoading(false);

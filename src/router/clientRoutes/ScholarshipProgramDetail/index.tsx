@@ -625,7 +625,7 @@ const ScholarshipProgramDetail = () => {
                 <p className="text-sm font-semibold text-gray-500">Deadline</p>
                 <p className="text-lg font-semibold text-gray-800">
                   {data.deadline
-                    ? format(new Date(data.deadline), "dd/MM/yyyy")
+                    ? format(new Date(data.deadline), "MM/dd/yyyy")
                     : "Not specified"}
                 </p>
               </div>
