@@ -58,9 +58,11 @@ import {
   FaCalendarAlt,
   FaCertificate,
   FaCheckCircle,
+  FaClipboardList,
   FaCode,
   FaCreditCard,
   FaDollarSign,
+  FaExclamationCircle,
   FaEye,
   FaGraduationCap,
   FaInfoCircle,
@@ -274,7 +276,7 @@ const ScholarshipProgramDetail = () => {
   const handleAssignExpertDialog = async () => {
     if (!data) return;
     if (new Date(data?.deadline) > new Date()) {
-      notification.error({message: "You can not assign before deadline"});
+      notification.error({ message: "You can not assign before deadline" });
       return;
     }
     setAssignExpertDialogOpen(true);
@@ -441,23 +443,23 @@ const ScholarshipProgramDetail = () => {
                       </Button>
                       {existingApplication[0].status ==
                         ApplicationStatus.NeedExtend && (
-                        <Button
-                          onClick={() =>
-                            navigate(
-                              `/funder/application/${existingApplication[0].id}`
-                            )
-                          }
-                          className="flex-1 text-xl w-full bg-yellow-500 h-full mr-3"
-                        >
-                          Extend Application{" "}
-                        </Button>
-                      )}
+                          <Button
+                            onClick={() =>
+                              navigate(
+                                `/funder/application/${existingApplication[0].id}`
+                              )
+                            }
+                            className="flex-1 text-xl w-full bg-yellow-500 h-full mr-3"
+                          >
+                            Extend Application{" "}
+                          </Button>
+                        )}
 
                       {/*JSON.stringify(awardMilestones)*/}
                       {existingApplication[0].status ==
                         ApplicationStatus.Submitted &&
                         new Date(existingApplication[0].updatedAt) <
-                          new Date(data.deadline) && (
+                        new Date(data.deadline) && (
                           <AlertDialog>
                             <AlertDialogTrigger
                               className="flex-1 text-xl w-full h-full bg-transparent border text-red-700 hover:bg-red-800 hover:text-white border-red-700 rounded-[5px] cursor-pointer flex justify-center items-center"
@@ -647,331 +649,392 @@ const ScholarshipProgramDetail = () => {
       </div>
 
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
-        <div className="max-w-[1216px] mx-auto">
-          <div className="mb-6 px-4 sm:px-6 xl:px-0">
-            <div className="relative flex items-center gap-3">
-              <div className="p-2 bg-[#1eb2a6] rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="white"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.75 9.75L15.75 15.75M15.75 9.75L9.75 15.75M6 4.5H18M6 19.5H18M3 9H21M3 15H21"
-                  />
-                </svg>
+        <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+          <div className="max-w-[1216px] mx-auto ">
+            <div className="mb-6 px-4 sm:px-6 xl:px-0">
+              <div className="relative flex items-center gap-3">
+                <div className="p-2 bg-[#1eb2a6] rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="white"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9.75 9.75L15.75 15.75M15.75 9.75L9.75 15.75M6 4.5H18M6 19.5H18M3 9H21M3 15H21"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                  About the Scholarship
+                </h2>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                About the Scholarship
-              </h2>
+              <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
             </div>
-            <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4">
-            <div className="lg:col-span-3 px-[16px] xsm:px-[24px] 2xl:px-0">
-              <div className="lg:pe-[112px]">
-                <Accordion defaultExpanded>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1-content"
-                    id="panel1-header"
-                    className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
-                  >
-                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                      <FaInfoCircle className="text-[#1eb2a6]" />
-                      Overview
-                    </h3>
-                  </AccordionSummary>
-                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                    {/* Awarding institution & Applications */}
-                    <div className="flex gap-4 flex-wrap justify-between mb-6">
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaUniversity className="text-gray-500" />
-                          Awarding institution:
-                        </p>
-                        <Link to="" className="text-blue-500 hover:underline">
-                          {data.name}
-                        </Link>
-                      </div>
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaInfoCircle className="text-gray-500" />
-                          Funding details:
-                        </p>
-                        <span>{data.description}</span>
-                      </div>
-                    </div>
-
-                    {/* Qualification & Number of awards */}
-                    <div className="flex gap-4 flex-wrap justify-between mb-6">
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaDollarSign className="text-gray-500" />
-                          Value of Award:
-                        </p>
-                        <span>{data.scholarshipAmount}$</span>
-                      </div>
-                      <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                        <p className="text-gray-700 font-bold flex items-center gap-2">
-                          <FaRegListAlt className="text-gray-500" />
-                          Number of awards available:
-                        </p>
-                        <span>{data.numberOfScholarships}</span>
-                      </div>
-                    </div>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel2-content"
-                    id="panel2-header"
-                    className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
-                  >
-                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                      <FaTag className="text-[#1eb2a6]" />
-                      Scholarship Category
-                    </h3>
-                  </AccordionSummary>
-                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                    {/* Category Name */}
-                    <div className="w-full flex items-start gap-3 mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
-                      <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
-                      <div>
-                        <p className="text-gray-700 font-bold">
-                          Category Name:
-                        </p>
-                        <p className="text-gray-600">{data.category.name}</p>
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
-                      <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
-                      <div>
-                        <p className="text-gray-700 font-bold">Description:</p>
-                        <p className="text-gray-600">
-                          {data.category.description}
-                        </p>
-                      </div>
-                    </div>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel2-content"
-                    id="panel2-header"
-                    className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
-                  >
-                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                      <FaBook className="text-[#1eb2a6]" />
-                      Applicable Majors & Skills
-                    </h3>
-                  </AccordionSummary>
-
-                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                    {data?.major ? (
-                      <Accordion key={data.major.id}>
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-controls={`major-${data.major.id}-content`}
-                          id={`major-${data.major.id}-header`}
-                          className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                        >
-                          <h4 className="font-bold text-gray-700 flex items-center gap-2">
-                            <FaBook className="text-gray-500" />
-                            {data.major.name}
-                          </h4>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
-                            <FaInfoCircle className="text-gray-400 text-xl mt-1" />
-                            <div>
-                              <p className="text-gray-700 font-bold">
-                                Description:
-                              </p>
-                              <p className="text-gray-600">
-                                {data.major.description}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="w-full">
-                            <h5 className="font-bold text-gray-700 mb-3">
-                              Skills:
-                            </h5>
-
-                            <div>
-                              {data.major.skills.map((skill) => (
-                                <Accordion key={skill.id}>
-                                  <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls={`skill-${skill.id}-content`}
-                                    id={`skill-${skill.id}-header`}
-                                    className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                                  >
-                                    <h6 className="font-bold text-gray-700 flex items-center gap-2">
-                                      <FaCode className="text-gray-500" />
-                                      {skill.name}
-                                    </h6>
-                                  </AccordionSummary>
-                                  <AccordionDetails>
-                                    <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
-                                      <FaInfoCircle className="text-gray-400 text-xl mt-1" />
-                                      <div>
-                                        <p className="text-gray-700 font-bold">
-                                          Description:
-                                        </p>
-                                        <p className="text-gray-600">
-                                          {skill.description}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </AccordionDetails>
-                                </Accordion>
-                              ))}
-                            </div>
-                          </div>
-                        </AccordionDetails>
-                      </Accordion>
-                    ) : (
-                      <p className="text-gray-600 italic">
-                        No majors or skills available at the moment.
-                      </p>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel3-content"
-                    id="panel3-header"
-                    className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
-                  >
-                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                      <FaUniversity className="text-[#1eb2a6]" />
-                      Applicable University
-                    </h3>
-                  </AccordionSummary>
-
-                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                    {data?.university ? (
-                      <Accordion key={data.university.id}>
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-controls={`university-${data.university.id}-content`}
-                          id={`university-${data.university.id}-header`}
-                          className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                        >
-                          <div className="flex flex-col">
-                            <h4 className="font-bold text-gray-700 flex items-center gap-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+              style={{ transform: "translateX(50px)" }}>
+              {/* Cột bên trái */}
+              <div className="flex flex-col gap-6">
+                <div className="lg:col-span-1 px-[16px] xsm:px-[24px] 2xl:px-0">
+                  <div className="lg:pe-[112px]">
+                    <Accordion defaultExpanded={false}>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1-content"
+                        id="panel1-header"
+                        className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
+                      >
+                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                          <FaInfoCircle className="text-[#1eb2a6]" />
+                          Overview
+                        </h3>
+                      </AccordionSummary>
+                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                        {/* Awarding institution & Applications */}
+                        <div className="flex gap-4 flex-wrap justify-between mb-6">
+                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <p className="text-gray-700 font-bold flex items-center gap-2">
                               <FaUniversity className="text-gray-500" />
-                              {data.university.name}
-                            </h4>
-                            <span className="text-gray-600 flex items-center gap-1">
-                              <FaMapMarkerAlt className="text-gray-400" />
-                              {data.university.city}
-                            </span>
+                              Awarding institution:
+                            </p>
+                            <Link to="" className="text-blue-500 hover:underline">
+                              {data.name}
+                            </Link>
                           </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
-                            <FaInfoCircle className="text-gray-400 text-xl mt-1" />
-                            <div>
-                              <p className="text-gray-700 font-bold">
-                                Description:
-                              </p>
-                              <p className="text-gray-600">
-                                {data.university.description}
-                              </p>
-                            </div>
+                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <p className="text-gray-700 font-bold flex items-center gap-2">
+                              <FaInfoCircle className="text-gray-500" />
+                              Funding details:
+                            </p>
+                            <span>{data.description}</span>
                           </div>
-                        </AccordionDetails>
-                      </Accordion>
-                    ) : (
-                      <p className="text-gray-600 italic">
-                        No applicable universities available at the moment.
-                      </p>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel3-content"
-                    id="panel3-header"
-                    className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
-                  >
-                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                      <FaCertificate className="text-[#1eb2a6]" />
-                      Required Certificates
-                    </h3>
-                  </AccordionSummary>
-                  <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                    {data.certificates && data.certificates.length > 0 ? (
-                      data.certificates.map((certificate) => (
-                        <Accordion key={certificate.id} className="mt-4">
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls={`certificate-${certificate.id}-content`}
-                            id={`certificate-${certificate.id}-header`}
-                            className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                          >
-                            <div className="flex items-center gap-2">
-                              <FaCertificate className="text-gray-500" />
-                              <span className="font-bold text-gray-700">
-                                {certificate.name}
-                              </span>
-                            </div>
-                          </AccordionSummary>
-                          <AccordionDetails>
-                            <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-                              <div className="flex items-start gap-3">
+                        </div>
+
+                        {/* Qualification & Number of awards */}
+                        <div className="flex gap-4 flex-wrap justify-between mb-6">
+                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <p className="text-gray-700 font-bold flex items-center gap-2">
+                              <FaDollarSign className="text-gray-500" />
+                              Value of Award:
+                            </p>
+                            <span>{data.scholarshipAmount}$</span>
+                          </div>
+                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <p className="text-gray-700 font-bold flex items-center gap-2">
+                              <FaRegListAlt className="text-gray-500" />
+                              Number of awards available:
+                            </p>
+                            <span>{data.numberOfScholarships}</span>
+                          </div>
+                        </div>
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="criteria-content"
+                        id="criteria-header"
+                        className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
+                      >
+                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                          <FaClipboardList className="text-[#1eb2a6]" />
+                          Eligibility Criteria
+                        </h3>
+                      </AccordionSummary>
+                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                        {data.criteria && data.criteria.length > 0 ? (
+                          <div className="flex flex-col gap-4">
+                            {data.criteria.map((criterion) => (
+                              <div
+                                key={criterion.name}
+                                className="p-4 bg-gray-50 rounded-lg shadow-sm"
+                              >
+                                <div>
+                                  <p className="text-gray-700 font-bold text-md">
+                                    {criterion.name}
+                                  </p>
+                                  <p className="text-gray-600 text-sm">
+                                    {criterion.description}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center text-center gap-2">
+                            <FaExclamationCircle className="text-red-500 text-4xl" />
+                            <p className="text-gray-600 italic">
+                              No eligibility criteria specified.
+                            </p>
+                          </div>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel2-content"
+                        id="panel2-header"
+                        className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
+                      >
+                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                          <FaTag className="text-[#1eb2a6]" />
+                          Scholarship Category
+                        </h3>
+                      </AccordionSummary>
+                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                        {/* Category Name */}
+                        <div className="w-full flex items-start gap-3 mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
+                          <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
+                          <div>
+                            <p className="text-gray-700 font-bold">
+                              Category Name:
+                            </p>
+                            <p className="text-gray-600">{data.category.name}</p>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                          <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
+                          <div>
+                            <p className="text-gray-700 font-bold">Description:</p>
+                            <p className="text-gray-600">
+                              {data.category.description}
+                            </p>
+                          </div>
+                        </div>
+                      </AccordionDetails>
+                    </Accordion>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cột bên phải */}
+              <div className="flex flex-col gap-6">
+                <div className="lg:col-span-1 px-[16px] xsm:px-[24px] 2xl:px-0">
+                  <div className="lg:pe-[112px]">
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel3-content"
+                        id="panel3-header"
+                        className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
+                      >
+                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                          <FaBook className="text-[#1eb2a6]" />
+                          Applicable Majors & Skills
+                        </h3>
+                      </AccordionSummary>
+
+                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                        {data?.major ? (
+                          <Accordion key={data.major.id}>
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls={`major-${data.major.id}-content`}
+                              id={`major-${data.major.id}-header`}
+                              className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                            >
+                              <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                                <FaBook className="text-gray-500" />
+                                {data.major.name}
+                              </h4>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
                                 <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                                 <div>
                                   <p className="text-gray-700 font-bold">
                                     Description:
                                   </p>
                                   <p className="text-gray-600">
-                                    {certificate.description}
+                                    {data.major.description}
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-start gap-3">
-                                <FaTag className="text-gray-400 text-xl mt-1" />
+
+                              <div className="w-full">
+                                <h5 className="font-bold text-gray-700 mb-3">
+                                  Skills:
+                                </h5>
+
+                                <div>
+                                  {data.major.skills.map((skill) => (
+                                    <Accordion key={skill.id}>
+                                      <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls={`skill-${skill.id}-content`}
+                                        id={`skill-${skill.id}-header`}
+                                        className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                                      >
+                                        <h6 className="font-bold text-gray-700 flex items-center gap-2">
+                                          <FaCode className="text-gray-500" />
+                                          {skill.name}
+                                        </h6>
+                                      </AccordionSummary>
+                                      <AccordionDetails>
+                                        <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                                          <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                                          <div>
+                                            <p className="text-gray-700 font-bold">
+                                              Description:
+                                            </p>
+                                            <p className="text-gray-600">
+                                              {skill.description}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </AccordionDetails>
+                                    </Accordion>
+                                  ))}
+                                </div>
+                              </div>
+                            </AccordionDetails>
+                          </Accordion>
+                        ) : (
+                          <p className="text-gray-600 italic">
+                            No majors or skills available at the moment.
+                          </p>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel3-content"
+                        id="panel3-header"
+                        className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
+                      >
+                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                          <FaUniversity className="text-[#1eb2a6]" />
+                          Applicable University
+                        </h3>
+                      </AccordionSummary>
+
+                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                        {data?.university ? (
+                          <Accordion key={data.university.id}>
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls={`university-${data.university.id}-content`}
+                              id={`university-${data.university.id}-header`}
+                              className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                            >
+                              <div className="flex flex-col">
+                                <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                                  <FaUniversity className="text-gray-500" />
+                                  {data.university.name}
+                                </h4>
+                                <span className="text-gray-600 flex items-center gap-1">
+                                  <FaMapMarkerAlt className="text-gray-400" />
+                                  {data.university.city}
+                                </span>
+                              </div>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                                 <div>
                                   <p className="text-gray-700 font-bold">
-                                    Type:
+                                    Description:
                                   </p>
                                   <p className="text-gray-600">
-                                    {certificate.type}
+                                    {data.university.description}
                                   </p>
                                 </div>
                               </div>
-                            </div>
-                          </AccordionDetails>
-                        </Accordion>
-                      ))
-                    ) : (
-                      <p className="text-gray-600 italic">
-                        No certificates required.
-                      </p>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
+                            </AccordionDetails>
+                          </Accordion>
+                        ) : (
+                          <p className="text-gray-600 italic">
+                            No applicable universities available at the moment.
+                          </p>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel3-content"
+                        id="panel3-header"
+                        className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
+                      >
+                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                          <FaCertificate className="text-[#1eb2a6]" />
+                          Required Certificates
+                        </h3>
+                      </AccordionSummary>
+                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
+                        {data.certificates && data.certificates.length > 0 ? (
+                          data.certificates.map((certificate) => (
+                            <Accordion key={certificate.id} className="mt-4">
+                              <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls={`certificate-${certificate.id}-content`}
+                                id={`certificate-${certificate.id}-header`}
+                                className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <FaCertificate className="text-gray-500" />
+                                  <span className="font-bold text-gray-700">
+                                    {certificate.name}
+                                  </span>
+                                </div>
+                              </AccordionSummary>
+                              <AccordionDetails>
+                                <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
+                                  <div className="flex items-start gap-3">
+                                    <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                                    <div>
+                                      <p className="text-gray-700 font-bold">
+                                        Description:
+                                      </p>
+                                      <p className="text-gray-600">
+                                        {certificate.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-start gap-3">
+                                    <FaTag className="text-gray-400 text-xl mt-1" />
+                                    <div>
+                                      <p className="text-gray-700 font-bold">
+                                        Type:
+                                      </p>
+                                      <p className="text-gray-600">
+                                        {certificate.type}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </AccordionDetails>
+                            </Accordion>
+                          ))
+                        ) : (
+                          <p className="text-gray-600 italic">
+                            No certificates required.
+                          </p>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
+
       {authorized != "Unauthorized" && (
         <AccountDialog
           open={applicantDialogOpen}

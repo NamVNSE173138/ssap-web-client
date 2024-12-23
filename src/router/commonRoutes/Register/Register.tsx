@@ -677,9 +677,13 @@ const Register = () => {
                   Verify Step
                 </h2>
                 <div className="space-y-6 overflow-y-auto max-h-[270px]">
-                  <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <span className="text-black-600 text-2xl">Enter your email</span>
+                  <h3 className="flex items-center justify-between mb-4">
+                    <span className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+                      Enter your email
+                      <span className="text-red-500 text-sm font-medium">(*)</span>
+                    </span>
                   </h3>
+
 
                   <div className="flex justify-center">
                     <div className="space-y-1 w-3/4">
@@ -715,7 +719,9 @@ const Register = () => {
                   {isOtpSent && (
                     <div>
                       <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                        <span className="text-black-600 text-2xl">Enter OTP</span>
+                        <span className="text-xl font-semibold text-gray-700 flex items-center gap-2">Enter OTP
+                          <span className="text-red-500 text-sm font-medium">(*)</span>
+                        </span>
                       </h3>
                       <div className="flex justify-center">
                         <div className="space-y-1 w-3/4">
@@ -776,6 +782,7 @@ const Register = () => {
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
                             <FaUser className="inline text-blue-600 mr-2" /> Username
+                            <span className="text-red-500 text-sm font-medium"> (*)</span>
                           </label>
                           <div className="relative">
                             <input
@@ -793,6 +800,7 @@ const Register = () => {
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
                             <FaEnvelope className="inline text-blue-600 mr-2" /> Email
+                            <span className="text-red-500 text-sm font-medium"> (*)</span>
                           </label>
                           <div className="relative">
                             <input
@@ -812,6 +820,7 @@ const Register = () => {
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
                             <FaPhoneAlt className="inline text-blue-600 mr-2" /> Phone
+                            <span className="text-red-500 text-sm font-medium"> (*)</span>
                           </label>
                           <div className="relative">
                             <input
@@ -829,6 +838,7 @@ const Register = () => {
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
                             <FaKey className="inline text-blue-600 mr-2" /> Password
+                            <span className="text-red-500 text-sm font-medium"> (*)</span>
                           </label>
                           <div className="flex items-center">
                             <input
@@ -854,6 +864,7 @@ const Register = () => {
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
                             <FaMapMarkedAlt className="inline text-blue-600 mr-2" /> Address
+                            <span className="text-red-500 text-sm font-medium"> (*)</span>
                           </label>
                           <div className="relative">
                             <input
@@ -871,6 +882,7 @@ const Register = () => {
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
                             <FaImage className="inline text-blue-600 mr-2" /> Upload Avatar
+                            <span className="text-red-500 text-sm font-medium"> (*)</span>
                           </label>
                           <div className="relative">
                             <input
@@ -947,7 +959,7 @@ const Register = () => {
 
                             {/* Major */}
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">Major (Optional)</label>
+                              <label className="block text-gray-700 font-medium mb-2">Major</label>
                               <input
                                 {...register("major")}
                                 placeholder="Enter your major"
@@ -958,7 +970,7 @@ const Register = () => {
 
                             {/* GPA */}
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">GPA (Optional)</label>
+                              <label className="block text-gray-700 font-medium mb-2">GPA</label>
                               <input
                                 {...register("gpa", {
                                   setValueAs: (value) => (value === "" ? undefined : Number(value)),
@@ -977,7 +989,13 @@ const Register = () => {
 
                             {/* School */}
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">University</label>
+                              <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                University
+                                <FaInfoCircle
+                                  className="text-gray-600 cursor-pointer"
+                                  title="Our system will filter the scholarship list based on the school. If you do not enter the school information here, you can still go to Profile to add."
+                                />
+                              </label>
                               {customSchool ? (
                                 <input
                                   {...register("school")}
@@ -986,13 +1004,13 @@ const Register = () => {
                                 />
                               ) : (
                                 <select
-                                  {...register("school")} // Đảm bảo rằng trường "school" được đăng ký vào react-hook-form
+                                  {...register("school")}
                                   value={selectedSchool}
                                   onChange={(e) => {
                                     const value = e.target.value;
-                                    handleSelectionChange(e); // Giữ logic xử lý
-                                    setValue("school", value, { shouldValidate: true }); // Đồng bộ giá trị với react-hook-form
-                                    setSelectedSchool(value); // Cập nhật giá trị vào state selectedSchool
+                                    handleSelectionChange(e);
+                                    setValue("school", value, { shouldValidate: true });
+                                    setSelectedSchool(value);
                                   }}
                                   className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
@@ -1002,15 +1020,17 @@ const Register = () => {
                                       {school}
                                     </option>
                                   ))}
-                                  <option value="Other">Other</option>
                                 </select>
                               )}
-                              {errors.school && <p className="text-red-500 text-sm mt-1">{errors.school.message}</p>}
+                              {errors.school && (
+                                <p className="text-red-500 text-sm mt-1">{errors.school.message}</p>
+                              )}
                             </div>
+
 
                             {/* Nationality */}
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">Nationality (Optional)</label>
+                              <label className="block text-gray-700 font-medium mb-2">Nationality</label>
                               <input
                                 {...register("nationality")}
                                 placeholder="Enter your nationality"
@@ -1021,7 +1041,7 @@ const Register = () => {
 
                             {/* Ethnicity */}
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">Ethnicity (Optional)</label>
+                              <label className="block text-gray-700 font-medium mb-2">Ethnicity</label>
                               <input
                                 {...register("ethnicity")}
                                 placeholder="Enter your ethnicity"
@@ -1050,7 +1070,9 @@ const Register = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Organization Name and Contact Person Name (Same Row) */}
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">Organization Name</label>
+                              <label className="block text-gray-700 font-medium mb-2">Organization Name
+                                <span className="text-red-500 text-sm font-medium"> (*)</span>
+                              </label>
                               <div className="flex items-center border p-3 rounded-md border-gray-400">
                                 <input
                                   {...register("organizationName")}
@@ -1064,7 +1086,9 @@ const Register = () => {
                             </div>
 
                             <div>
-                              <label className="block text-gray-700 font-medium mb-2">Contact Person Name</label>
+                              <label className="block text-gray-700 font-medium mb-2">Contact Person Name
+                                <span className="text-red-500 text-sm font-medium"> (*)</span>
+                              </label>
                               <div className="flex items-center border p-3 rounded-md border-gray-400">
                                 <input
                                   {...register("contactPersonName")}
@@ -1080,7 +1104,9 @@ const Register = () => {
 
                           {/* Documents Section */}
                           <div className="mt-8">
-                            <label className="block text-gray-700 font-medium mb-2">Documents</label>
+                            <label className="block text-gray-700 font-medium mb-2">Documents
+                              <span className="text-red-500 text-sm font-medium"> (*)</span>
+                            </label>
                             <div>
                               <Button
                                 type="button"

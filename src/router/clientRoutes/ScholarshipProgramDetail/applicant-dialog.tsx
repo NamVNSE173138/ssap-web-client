@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import ApplicationStatus from "@/constants/applicationStatus";
-import {formatOnlyDate } from "@/lib/date-formatter";
+import { formatOnlyDate } from "@/lib/date-formatter";
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,7 @@ import {
   Tab,
   Tabs,
 } from "@mui/material";
+import { format } from "date-fns";
 // import { Button } from "@radix-ui/themes";
 
 import { useState } from "react";
@@ -36,8 +37,8 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
   const submittingApplications = applications.filter(
     (application: any) =>
       (application.status == "Submitted" ||
-      application.status == "Rejected" ||
-      application.status == "Reviewing") &&
+        application.status == "Rejected" ||
+        application.status == "Reviewing") &&
       new Date(application.updatedAt) < new Date(scholarship.deadline)
   );
 
@@ -123,12 +124,12 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
                     <ListItemText
                       primary={
                         <>
-                        <div className="text-sm text-gray-500">
-                          Applied on {formatOnlyDate(app.appliedDate)}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Updated at {formatOnlyDate(app.updatedAt)}
-                        </div>
+                          <div className="text-sm text-gray-500">
+                            Applied on{" "}
+                            {app.appliedDate
+                              ? format(new Date(app.appliedDate), "MM/dd/yyyy")
+                              : "Not specified"}
+                          </div>
                         </>
                       }
                     />
@@ -136,20 +137,17 @@ const AccountDialog = ({ open, onClose, applications, scholarship }: any) => {
                   <span className="flex justify-end gap-2 items-center">
                     <span className="relative flex h-3 w-3">
                       <span
-                        className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${
-                          statusColor[app.status]
-                        }-500 opacity-75`}
+                        className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]
+                          }-500 opacity-75`}
                       ></span>
                       <span
-                        className={`relative inline-flex rounded-full h-3 w-3 bg-${
-                          statusColor[app.status]
-                        }-500`}
+                        className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[app.status]
+                          }-500`}
                       ></span>
                     </span>
                     <span
-                      className={`text-${
-                        statusColor[app.status]
-                      }-500 font-medium`}
+                      className={`text-${statusColor[app.status]
+                        }-500 font-medium`}
                     >
                       {app.status}
                     </span>

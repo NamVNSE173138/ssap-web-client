@@ -45,6 +45,7 @@ import { getSubscriptionByProviderId } from "@/services/ApiServices/subscription
 import { getPaginatedServices, getServicesByProviderId, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
 import { MdDateRange } from "react-icons/md";
 import MultiStepUpgradeSubscriptionModal from "../Activity/SubscriptionUpgradeModal";
+import { SearchIcon } from "lucide-react";
 
 interface SubscriptionDetails {
   name: string;
@@ -386,15 +387,15 @@ const Service = () => {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="w-full mt-6">
+          <div className="w-full mt-4 lg:mt-6">
             <div className="relative w-full">
               <input
-                className="w-2/3 h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
+                className="w-2/3 h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 ease-in-out rounded-lg shadow-lg bg-gradient-to-r  text-lg placeholder-gray-500 text-gray-800"
                 placeholder="Search for services..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
+              <SearchIcon className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500 text-xl" />
               {searchTerm && (
                 <IoMdClose
                   className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
@@ -527,6 +528,7 @@ const Service = () => {
           ))
         )}
       </ul>
+
       {filteredData.length === 0 && searchTerm && (
         <div className="flex flex-col items-center justify-center text-center py-16">
           <FaSadTear className="text-blue-500 text-6xl mb-4" />
