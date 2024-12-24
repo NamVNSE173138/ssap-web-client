@@ -1004,199 +1004,202 @@ const ScholarshipProgramDetail = () => {
         <br></br>
         <br></br>
 
-
-        <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-          <div className="max-w-[1216px] mx-auto">
-            <div className="mb-6 px-4 sm:px-6 xl:px-0">
-              <div className="relative flex items-center gap-3">
-                <div className="p-2 bg-[#1eb2a6] rounded-full">
-                  <FaCalendarAlt className="w-6 h-6 text-white" />
+        {isApplicant == "Funder" && (
+          <div>
+            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+              <div className="max-w-[1216px] mx-auto">
+                <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                  <div className="relative flex items-center gap-3">
+                    <div className="p-2 bg-[#1eb2a6] rounded-full">
+                      <FaCalendarAlt className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Review Milestone</h2>
+                  </div>
+                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Review Milestone</h2>
+                <br />
+                <List sx={{ pt: 0 }}>
+                  {!reviewMilestones || reviewMilestones.length === 0 ? (
+                    <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+                      No review milestones for this scholarship
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                      {reviewMilestones.map((milestone: any) => (
+                        <Paper
+                          elevation={3}
+                          key={milestone.id}
+                          className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
+                        >
+                          {/* Title */}
+                          <p className="font-bold text-2xl text-gray-900 mb-2">{milestone.description}</p>
+
+                          {/* Date Range */}
+                          <div className="flex flex-col gap-2 w-full">
+                            <div className="flex justify-between">
+                              <p className="text-gray-600 font-semibold">Start Date:</p>
+                              <p className="text-gray-700">{format(new Date(milestone.fromDate), "MM/dd/yyyy")}</p>
+                            </div>
+                            <div className="flex justify-between">
+                              <p className="text-gray-600 font-semibold">End Date:</p>
+                              <p className="text-gray-700">{format(new Date(milestone.toDate), "MM/dd/yyyy")}</p>
+                            </div>
+                          </div>
+
+                          {/* Divider */}
+                          <div className="w-full h-[1px] bg-gray-300 my-2"></div>
+                        </Paper>
+                      ))}
+                    </div>
+                  )}
+                </List>
               </div>
-              <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
-            </div>
-            <br />
-            <List sx={{ pt: 0 }}>
-              {!reviewMilestones || reviewMilestones.length === 0 ? (
-                <p className="p-10 text-center text-gray-500 font-semibold text-xl">
-                  No review milestones for this scholarship
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                  {reviewMilestones.map((milestone: any) => (
-                    <Paper
-                      elevation={3}
-                      key={milestone.id}
-                      className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
-                    >
-                      {/* Title */}
-                      <p className="font-bold text-2xl text-gray-900 mb-2">{milestone.description}</p>
-
-                      {/* Date Range */}
-                      <div className="flex flex-col gap-2 w-full">
-                        <div className="flex justify-between">
-                          <p className="text-gray-600 font-semibold">Start Date:</p>
-                          <p className="text-gray-700">{format(new Date(milestone.fromDate), "MM/dd/yyyy")}</p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p className="text-gray-600 font-semibold">End Date:</p>
-                          <p className="text-gray-700">{format(new Date(milestone.toDate), "MM/dd/yyyy")}</p>
-                        </div>
-                      </div>
-
-                      {/* Divider */}
-                      <div className="w-full h-[1px] bg-gray-300 my-2"></div>
-                    </Paper>
-                  ))}
-                </div>
-              )}
-            </List>
-          </div>
-        </div>
-
-        <br></br>
-        <br></br>
-
-        <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-          <div className="max-w-[1216px] mx-auto">
-            <div className="mb-6 px-4 sm:px-6 xl:px-0">
-              <div className="relative flex items-center gap-3">
-                <div className="p-2 bg-[#1eb2a6] rounded-full">
-                  <FaUsers className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Applied Applicants</h2>
-              </div>
-              <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
             </div>
 
-            {Array.isArray(applicants) && applicants.length !== 0 && (
-              <button
-                onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
-                className="flex mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
-              >
-                <IoIosAddCircleOutline className="text-2xl" />
-                <span className="text-lg font-medium">Choose Winners</span>
-              </button>
-            )}
-            <br />
+            <br></br>
+            <br></br>
 
-            {/* Tabs */}
-            <Tabs
-              value={selectedTab}
-              onChange={(_, newValue) => setSelectedTab(newValue)}
-              aria-label="Applications Tabs"
-              className="bg-white shadow-sm"
-              indicatorColor="primary"
-              textColor="inherit"
-              centered
-            >
-              <Tab label="Submitting Applications" sx={{ textTransform: "none", color: "blue", fontWeight: "bold" }} />
-              <Tab label="Winners Applications" sx={{ textTransform: "none", color: "green", fontWeight: "bold" }} />
+            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+              <div className="max-w-[1216px] mx-auto">
+                <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                  <div className="relative flex items-center gap-3">
+                    <div className="p-2 bg-[#1eb2a6] rounded-full">
+                      <FaUsers className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Applied Applicants</h2>
+                  </div>
+                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+                </div>
 
-            </Tabs>
+                {Array.isArray(applicants) && applicants.length !== 0 && (
+                  <button
+                    onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
+                    className="flex mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
+                  >
+                    <IoIosAddCircleOutline className="text-2xl" />
+                    <span className="text-lg font-medium">Choose Winners</span>
+                  </button>
+                )}
+                <br />
 
-            {/* Paper */}
-            <Paper
-              elevation={3}
-              style={{
-                padding: '20px',
-                borderRadius: '10px',
-                backgroundColor: '#fafafa',
-                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              {/* Table Header */}
-              <div
-                style={{
-                  display: 'flex',
-                  fontWeight: 'bold',
-                  backgroundColor: '#f1f1f1',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                }}
-              >
-                <div style={{ flex: 0.5 }}>#</div>
-                <div style={{ flex: 1 }}>Name</div>
-                <div style={{ flex: 1 }}>Status</div>
-                <div style={{ flex: 1 }}>Applied At</div>
-                <div style={{ flex: 1 }}>Actions</div>
-              </div>
+                {/* Tabs */}
+                <Tabs
+                  value={selectedTab}
+                  onChange={(_, newValue) => setSelectedTab(newValue)}
+                  aria-label="Applications Tabs"
+                  className="bg-white shadow-sm"
+                  indicatorColor="primary"
+                  textColor="inherit"
+                  centered
+                >
+                  <Tab label="Submitting Applications" sx={{ textTransform: "none", color: "blue", fontWeight: "bold" }} />
+                  <Tab label="Winners Applications" sx={{ textTransform: "none", color: "green", fontWeight: "bold" }} />
 
-              {/* Applicants List */}
-              {(selectedTab === 0 ? submittingApplications : winnersApplications)?.length > 0 ? (
-                (selectedTab === 0 ? submittingApplications : winnersApplications).map((app: any, index: number) => (
+                </Tabs>
+
+                {/* Paper */}
+                <Paper
+                  elevation={3}
+                  style={{
+                    padding: '20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#fafafa',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  {/* Table Header */}
                   <div
-                    key={app.id}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      backgroundColor: '#f9f9f9',
+                      fontWeight: 'bold',
+                      backgroundColor: '#f1f1f1',
                       padding: '10px',
                       borderRadius: '8px',
                       marginBottom: '10px',
-                      transition: 'background-color 0.3s ease',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
                   >
-                    {/* Cột số thứ tự */}
-                    <div style={{ flex: 0.5 }}>{index + 1}</div>
-
-                    {/* Cột tên ứng viên */}
-                    <div style={{ flex: 1 }}>{app.applicant.username}</div>
-
-                    {/* Cột status */}
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                      <span className="relative flex justify-center items-center gap-2">
-                        {/* Hiệu ứng nhấp nháy */}
-                        <span className="relative flex h-3 w-3">
-                          <span
-                            className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}
-                          ></span>
-                          <span
-                            className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[app.status]}-500`}
-                          ></span>
-                        </span>
-
-                        {/* Tên trạng thái */}
-                        <span className={`text-${statusColor[app.status]}-500 font-medium`}>
-                          {app.status}
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* Cột ngày nộp */}
-                    <div style={{ flex: 1 }}>
-                      {app.appliedDate ? format(new Date(app.appliedDate), 'MM/dd/yyyy') : 'N/A'}
-                    </div>
-
-                    {/* Cột actions */}
-                    <div style={{ flex: 1 }}>
-                      <Button
-                        onClick={() => navigate(`/funder/application/${app.id}`)}
-                        style={{
-                          backgroundColor: '#1e88e5',
-                          color: '#fff',
-                          padding: '6px 12px',
-                          borderRadius: '5px',
-                        }}
-                      >
-                        <IoIosEye style={{ marginRight: '8px' }} />
-                        View application
-                      </Button>
-                    </div>
+                    <div style={{ flex: 0.5 }}>#</div>
+                    <div style={{ flex: 1 }}>Name</div>
+                    <div style={{ flex: 1 }}>Status</div>
+                    <div style={{ flex: 1 }}>Applied At</div>
+                    <div style={{ flex: 1 }}>Actions</div>
                   </div>
 
-                ))
-              ) : (
-                <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
-              )}
-            </Paper>
+                  {/* Applicants List */}
+                  {(selectedTab === 0 ? submittingApplications : winnersApplications)?.length > 0 ? (
+                    (selectedTab === 0 ? submittingApplications : winnersApplications).map((app: any, index: number) => (
+                      <div
+                        key={app.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          backgroundColor: '#f9f9f9',
+                          padding: '10px',
+                          borderRadius: '8px',
+                          marginBottom: '10px',
+                          transition: 'background-color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                      >
+                        {/* Cột số thứ tự */}
+                        <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                        {/* Cột tên ứng viên */}
+                        <div style={{ flex: 1 }}>{app.applicant.username}</div>
+
+                        {/* Cột status */}
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                          <span className="relative flex justify-center items-center gap-2">
+                            {/* Hiệu ứng nhấp nháy */}
+                            <span className="relative flex h-3 w-3">
+                              <span
+                                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}
+                              ></span>
+                              <span
+                                className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[app.status]}-500`}
+                              ></span>
+                            </span>
+
+                            {/* Tên trạng thái */}
+                            <span className={`text-${statusColor[app.status]}-500 font-medium`}>
+                              {app.status}
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* Cột ngày nộp */}
+                        <div style={{ flex: 1 }}>
+                          {app.appliedDate ? format(new Date(app.appliedDate), 'MM/dd/yyyy') : 'N/A'}
+                        </div>
+
+                        {/* Cột actions */}
+                        <div style={{ flex: 1 }}>
+                          <Button
+                            onClick={() => navigate(`/funder/application/${app.id}`)}
+                            style={{
+                              backgroundColor: '#1e88e5',
+                              color: '#fff',
+                              padding: '6px 12px',
+                              borderRadius: '5px',
+                            }}
+                          >
+                            <IoIosEye style={{ marginRight: '8px' }} />
+                            View application
+                          </Button>
+                        </div>
+                      </div>
+
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
+                  )}
+                </Paper>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
       </section>
 
