@@ -19,11 +19,9 @@ import { useSelector } from "react-redux";
 import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
-import AccountDialog from "./applicant-dialog";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { getAllExperts } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
-import ReviewMilestoneDialog from "./review-milestone-dialog";
 import ReviewingApplicationDialog from "./expert-reviewing-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
@@ -46,7 +44,6 @@ import {
   AlertDialogHeader,
 } from "@/components/ui/alert-dialog";
 
-import AwardDialog from "./award-dialog";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate } from "@/lib/date-formatter";
@@ -67,16 +64,22 @@ import {
   FaGraduationCap,
   FaInfoCircle,
   FaMapMarkerAlt,
+  FaMoneyCheck,
+  FaMoneyCheckAlt,
   FaRegListAlt,
   FaRocket,
   FaTag,
+  FaTasks,
   FaTrash,
   FaTrophy,
   FaUniversity,
+  FaUsers,
   FaUserTie,
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { notification } from "antd";
+import { Avatar, notification } from "antd";
+import { IoIosAddCircleOutline, IoIosEye } from "react-icons/io";
+import { List, Paper, Tab, Tabs } from "@mui/material";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,6 +126,32 @@ const ScholarshipProgramDetail = () => {
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
+  const [selectedTab, setSelectedTab] = useState(0);
+  const submittingApplications = applicants?.filter(
+    (application: any) =>
+      (application.status === "Submitted" ||
+        application.status === "Rejected" ||
+        application.status === "Reviewing") &&
+      new Date(application.updatedAt) < new Date(data!.deadline)
+  );
+
+  const winnersApplications = applicants?.filter(
+    (application: any) =>
+      application.status === "Approved" ||
+      application.status === "Awarded" ||
+      application.status === "NeedExtend" ||
+      new Date(application.updatedAt) > new Date(data!.deadline)
+  );
+
+  const statusColor: any = {
+    Submitted: "blue",
+    Awarded: "green",
+    Approved: "green",
+    Rejected: "red",
+    NeedExtend: "yellow",
+    Reviewing: "yellow",
+  };
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -140,12 +169,6 @@ const ScholarshipProgramDetail = () => {
 
         setAuthorized(response.data.message);
         if (user) {
-          // <!--           const application = await getApplicationByApplicantIdAndScholarshipId(
-          //             parseInt(user?.id),
-          //             response.data.data.id
-          //           );
-          //           setExistingApplication(application.data); -->
-
           const application = await getApplicationByApplicantIdAndScholarshipId(
             parseInt(user?.id),
             response.data.data.id
@@ -154,9 +177,8 @@ const ScholarshipProgramDetail = () => {
           const award = await getAwardMilestoneByScholarship(
             response.data.data.id
           );
-          //setAwardMilestones(award.data.find((milestone: any) => new Date(milestone.fromDate) < new Date() && new Date(milestone.toDate) > new Date()));
-          //console.log(application.data);
-
+          await fetchApplicants(Number(id));
+          await fetchReviewMilestones(Number(id));
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
               if (
@@ -247,36 +269,6 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
-  const fetchWinningApplications = async (scholarshipId: number) => {
-    try {
-      const response = await getApplicationsByScholarship(scholarshipId);
-      //console.log(response);
-      if (response.statusCode == 200) {
-        //  setWinningApplications(
-        //   response.data.filter(
-        //    (application: any) => application.status === "APPROVED"
-        //   )
-        //);
-
-        setWinningApplications(
-          response.data.filter(
-            (application: any) =>
-              application.status === ApplicationStatus.Approved ||
-              application.status === ApplicationStatus.Awarded ||
-              application.status === ApplicationStatus.NeedExtend ||
-              new Date(application.updatedAt) > new Date(data!.deadline)
-          )
-        );
-      } else {
-        setError("Failed to get applicants");
-      }
-    } catch (error) {
-      setError((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAssignExpertDialog = async () => {
     if (!data) return;
     if (new Date(data?.deadline) > new Date()) {
@@ -290,23 +282,6 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
-  const handleOpenApplicantDialog = async () => {
-    setApplicantDialogOpen(true);
-    setLoading(true);
-    if (!data) return;
-    await fetchApplicants(parseInt(data?.id));
-    setLoading(false);
-  };
-
-  const handleOpenReviewMilestoneDialog = async () => {
-    setReviewMilestoneDialogOpen(true);
-    setLoading(true);
-    if (!data) return;
-    await fetchReviewMilestones(parseInt(data?.id));
-    await fetchAwardMilestones(parseInt(data?.id));
-    setLoading(false);
-  };
-
   const handleOpenAwardMilestoneDialog = async () => {
     setAwardMilestoneDialogOpen(true);
     setLoading(true);
@@ -314,27 +289,6 @@ const ScholarshipProgramDetail = () => {
     await fetchAwardMilestones(parseInt(data?.id));
     setLoading(false);
   };
-
-  const handleOpenAwardDialog = async () => {
-    setAwardDialogOpen(true);
-    setLoading(true);
-    if (!data) return;
-    await fetchWinningApplications(parseInt(data?.id));
-    setLoading(false);
-  };
-
-  const handleOpenAccelarateDialog = async () => {
-    setAccelaratePhaseDialogOpen(true);
-    setLoading(true);
-    if (!data) return;
-    //await fetchWinningApplications(parseInt(data?.id));
-    setLoading(false);
-  };
-
-  // const handleOpenReviewingDialog = async () => {
-  //   setSelectedExpert(experts);
-  //   setReviewingDialogOpen(true);
-  // };
 
   const cancelApplication = async () => {
     try {
@@ -454,16 +408,6 @@ const ScholarshipProgramDetail = () => {
 
                   {existingApplication && existingApplication.length > 0 && (
                     <>
-                      <Button
-                        onClick={() =>
-                          navigate(
-                            `/funder/application/${existingApplication[0].id}`
-                          )
-                        }
-                        className="flex-1 text-xl w-full bg-[#1eb2a6] hover:bg-[#0d978b] h-full mr-3"
-                      >
-                        View applications{" "}
-                      </Button>
                       {existingApplication[0].status ==
                         ApplicationStatus.NeedExtend && (
                           <Button
@@ -523,22 +467,10 @@ const ScholarshipProgramDetail = () => {
                 user.id == data.funderId && (
                   <div className="flex justify-between w-full gap-3">
                     <Button
-                      onClick={() => handleOpenApplicantDialog()}
-                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
-                    >
-                      <FaEye className="mr-2" /> View Applications
-                    </Button>
-                    <Button
                       onClick={() => handleAssignExpertDialog()}
                       className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaUserTie className="mr-2" /> Assign Expert
-                    </Button>
-                    <Button
-                      onClick={() => handleOpenReviewMilestoneDialog()}
-                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
-                    >
-                      <FaCheckCircle className="mr-2" /> Review Milestones
                     </Button>
                     <Button
                       onClick={() => handleOpenAwardMilestoneDialog()}
@@ -546,18 +478,6 @@ const ScholarshipProgramDetail = () => {
                     >
                       <FaTrophy className="mr-2" /> Award Milestones
                     </Button>
-                    <Button
-                      onClick={() => handleOpenAwardDialog()}
-                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
-                    >
-                      <FaTrophy className="mr-2" /> Award Progress
-                    </Button>
-                    {/* <Button
-                      onClick={() => handleOpenReviewingDialog()}
-                      className="flex-1 text-lg bg-blue-700 hover:bg-blue-600 w-full h-full flex items-center justify-center"
-                    >
-                      <FaTrophy className="mr-2" /> Expert Reviewing
-                    </Button> */}
                     <Button
                       onClick={deleteScholarship}
                       className="flex-1 text-lg bg-transparent text-red-700 border border-red-700 hover:bg-red-800 hover:text-white w-full h-full  flex items-center justify-center"
@@ -570,55 +490,56 @@ const ScholarshipProgramDetail = () => {
             </div>
 
             {data.status == "FINISHED" && !existingApplication && (
-            <div className="h-20 max-w-4xl p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-              <div className="text-xl font-semibold mr-3">
-                This scholarship has finished
-              </div>
+              <div className="h-20 max-w-4xl p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+                <div className="text-xl font-semibold mr-3">
+                  This scholarship has finished
+                </div>
               </div>
             )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Submitted &&
               data.status != "FINISHED" && (
-            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
 
-                <div className="text-xl font-semibold mr-3">
-                  Your application is being reviewed
-                </div>
+                  <div className="text-xl font-semibold mr-3">
+                    Your application is being reviewed
+                  </div>
                 </div>
               )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Rejected && (
-            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
 
-                <div className="text-xl font-semibold mr-3">
-                  Your application to this scholarship have not been approved
-                </div>
+                  <div className="text-xl font-semibold mr-3">
+                    Your application to this scholarship have not been approved
+                  </div>
                 </div>
               )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Approved && (
-            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                <div className="text-xl font-semibold mr-3">
-                  You have won this scholarship
-                </div>
+                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+                  <div className="text-xl font-semibold mr-3">
+                    You have won this scholarship
+                  </div>
                 </div>
               )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.NeedExtend && (
-            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                <div className="text-xl font-semibold mr-3">
-                  You need to extend this scholarship before{" "}
-                  {formatDate(extendBeforeDate)}
-                </div>
+                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+                  <div className="text-xl font-semibold mr-3">
+                    You need to extend this scholarship before{" "}
+                    {formatDate(extendBeforeDate)}
+                  </div>
                 </div>
               )}
           </div>
         </div>
       </div>
+
       <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
         <section className="w-full max-w-none flex justify-between items-center mx-auto py-6 lg:py-10 px-4 lg:px-0">
           <div className="flex w-full justify-around gap-12">
@@ -722,7 +643,6 @@ const ScholarshipProgramDetail = () => {
               </div>
               <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
             </div>
-
             <br></br>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"
               style={{ transform: "translateX(50px)" }}>
@@ -1078,48 +998,216 @@ const ScholarshipProgramDetail = () => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
+
+        <br></br>
+        <br></br>
+
+
+        <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+          <div className="max-w-[1216px] mx-auto">
+            <div className="mb-6 px-4 sm:px-6 xl:px-0">
+              <div className="relative flex items-center gap-3">
+                <div className="p-2 bg-[#1eb2a6] rounded-full">
+                  <FaCalendarAlt className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Review Milestone</h2>
+              </div>
+              <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+            </div>
+            <br />
+            <List sx={{ pt: 0 }}>
+              {!reviewMilestones || reviewMilestones.length === 0 ? (
+                <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+                  No review milestones for this scholarship
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                  {reviewMilestones.map((milestone: any) => (
+                    <Paper
+                      elevation={3}
+                      key={milestone.id}
+                      className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
+                    >
+                      {/* Title */}
+                      <p className="font-bold text-2xl text-gray-900 mb-2">{milestone.description}</p>
+
+                      {/* Date Range */}
+                      <div className="flex flex-col gap-2 w-full">
+                        <div className="flex justify-between">
+                          <p className="text-gray-600 font-semibold">Start Date:</p>
+                          <p className="text-gray-700">{format(new Date(milestone.fromDate), "MM/dd/yyyy")}</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p className="text-gray-600 font-semibold">End Date:</p>
+                          <p className="text-gray-700">{format(new Date(milestone.toDate), "MM/dd/yyyy")}</p>
+                        </div>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="w-full h-[1px] bg-gray-300 my-2"></div>
+                    </Paper>
+                  ))}
+                </div>
+              )}
+            </List>
+          </div>
+        </div>
+
+        <br></br>
+        <br></br>
+
+        <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+          <div className="max-w-[1216px] mx-auto">
+            <div className="mb-6 px-4 sm:px-6 xl:px-0">
+              <div className="relative flex items-center gap-3">
+                <div className="p-2 bg-[#1eb2a6] rounded-full">
+                  <FaUsers className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Applied Applicants</h2>
+              </div>
+              <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+            </div>
+
+            {Array.isArray(applicants) && applicants.length !== 0 && (
+              <button
+                onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
+                className="flex mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
+              >
+                <IoIosAddCircleOutline className="text-2xl" />
+                <span className="text-lg font-medium">Choose Winners</span>
+              </button>
+            )}
+            <br />
+
+            {/* Tabs */}
+            <Tabs
+              value={selectedTab}
+              onChange={(_, newValue) => setSelectedTab(newValue)}
+              aria-label="Applications Tabs"
+              className="bg-white shadow-sm"
+              indicatorColor="primary"
+              textColor="inherit"
+              centered
+            >
+              <Tab label="Submitting Applications" sx={{ textTransform: "none", color: "blue", fontWeight: "bold" }} />
+              <Tab label="Winners Applications" sx={{ textTransform: "none", color: "green", fontWeight: "bold" }} />
+
+            </Tabs>
+
+            {/* Paper */}
+            <Paper
+              elevation={3}
+              style={{
+                padding: '20px',
+                borderRadius: '10px',
+                backgroundColor: '#fafafa',
+                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              {/* Table Header */}
+              <div
+                style={{
+                  display: 'flex',
+                  fontWeight: 'bold',
+                  backgroundColor: '#f1f1f1',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  marginBottom: '10px',
+                }}
+              >
+                <div style={{ flex: 0.5 }}>#</div>
+                <div style={{ flex: 1 }}>Name</div>
+                <div style={{ flex: 1 }}>Status</div>
+                <div style={{ flex: 1 }}>Applied At</div>
+                <div style={{ flex: 1 }}>Actions</div>
+              </div>
+
+              {/* Applicants List */}
+              {(selectedTab === 0 ? submittingApplications : winnersApplications)?.length > 0 ? (
+                (selectedTab === 0 ? submittingApplications : winnersApplications).map((app: any, index: number) => (
+                  <div
+                    key={app.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#f9f9f9',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      marginBottom: '10px',
+                      transition: 'background-color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                  >
+                    {/* Cột số thứ tự */}
+                    <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                    {/* Cột tên ứng viên */}
+                    <div style={{ flex: 1 }}>{app.applicant.username}</div>
+
+                    {/* Cột status */}
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                      <span className="relative flex justify-center items-center gap-2">
+                        {/* Hiệu ứng nhấp nháy */}
+                        <span className="relative flex h-3 w-3">
+                          <span
+                            className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}
+                          ></span>
+                          <span
+                            className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[app.status]}-500`}
+                          ></span>
+                        </span>
+
+                        {/* Tên trạng thái */}
+                        <span className={`text-${statusColor[app.status]}-500 font-medium`}>
+                          {app.status}
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* Cột ngày nộp */}
+                    <div style={{ flex: 1 }}>
+                      {app.appliedDate ? format(new Date(app.appliedDate), 'MM/dd/yyyy') : 'N/A'}
+                    </div>
+
+                    {/* Cột actions */}
+                    <div style={{ flex: 1 }}>
+                      <Button
+                        onClick={() => navigate(`/funder/application/${app.id}`)}
+                        style={{
+                          backgroundColor: '#1e88e5',
+                          color: '#fff',
+                          padding: '6px 12px',
+                          borderRadius: '5px',
+                        }}
+                      >
+                        <IoIosEye style={{ marginRight: '8px' }} />
+                        View application
+                      </Button>
+                    </div>
+                  </div>
+
+                ))
+              ) : (
+                <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
+              )}
+            </Paper>
+          </div>
+        </div>
+
       </section>
 
-      {authorized != "Unauthorized" && (
-        <AccountDialog
-          open={applicantDialogOpen}
-          onClose={() => setApplicantDialogOpen(false)}
-          applications={applicants ?? []}
-          scholarship={data}
-        />
-      )}
       {authorized != "Unauthorized" && (
         <AssignExpertDialog
           open={assignExpertDialogOpen}
           onClose={() => setAssignExpertDialogOpen(false)}
-          // resetMajor={null}
-          // experts={experts ?? []}
           scholarshipId={id}
         />
       )}
-      {authorized != "Unauthorized" && (
-        <ReviewMilestoneDialog
-          open={reviewMilestoneDialogOpen}
-          onClose={(open: boolean) => setReviewMilestoneDialogOpen(open)}
-          scholarship={data}
-          awardMilestones={awardMilestones ?? []}
-          reviewMilestones={reviewMilestones ?? []}
-          fetchReviewMilestones={async () => {
-            if (!data) return;
-            await fetchReviewMilestones(parseInt(data?.id));
-          }}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <AwardDialog
-          isOpen={awardDialogOpen}
-          setIsOpen={(open: boolean) => setAwardDialogOpen(open)}
-          winningApplications={winningApplications ?? []}
-        />
-      )}
+
       {authorized != "Unauthorized" && data && (
         <AwardMilestoneDialog
           open={awardMilestoneDialogOpen}
