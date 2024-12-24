@@ -77,7 +77,6 @@ import {
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { notification } from "antd";
-import AccelaratePhaseDialog from "./accelarate-phase";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -423,17 +422,17 @@ const ScholarshipProgramDetail = () => {
                     : data.description}
                 </p>
               </div>
-              
+
             </div>
             <span className="flex justify-start ps-5 pt-5 gap-2 items-center">
-                <span className="relative flex h-3 w-3">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500`}></span>
-                  <span className={`relative inline-flex rounded-full h-3 w-3 bg-green-500`}></span>
-                </span>
-                <span className={`text-green-500 text-2xl font-medium`}>
-                    {data.status}
-                </span>
+              <span className="relative flex h-3 w-3">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500`}></span>
+                <span className={`relative inline-flex rounded-full h-3 w-3 bg-green-500`}></span>
               </span>
+              <span className={`text-green-500 text-2xl font-medium`}>
+                {data.status}
+              </span>
+            </span>
 
 
             <div className="text-white text-center flex flex-wrap h-[40px] lg:h-[50px] mt-[26px] w-full">
@@ -536,12 +535,6 @@ const ScholarshipProgramDetail = () => {
                       <FaUserTie className="mr-2" /> Assign Expert
                     </Button>
                     <Button
-                      onClick={() => handleOpenAccelarateDialog()}
-                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
-                    >
-                      <FaRocket className="mr-2" /> Accelarate Phase
-                    </Button>
-                    <Button
                       onClick={() => handleOpenReviewMilestoneDialog()}
                       className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
@@ -576,39 +569,51 @@ const ScholarshipProgramDetail = () => {
               )}
             </div>
 
-            {data.status == "FINISHED" && (
+            {data.status == "FINISHED" && !existingApplication && (
+            <div className="h-20 max-w-4xl p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
               <div className="text-xl font-semibold mr-3">
                 This scholarship has finished
+              </div>
               </div>
             )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Submitted &&
               data.status != "FINISHED" && (
+            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+
                 <div className="text-xl font-semibold mr-3">
                   Your application is being reviewed
+                </div>
                 </div>
               )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Rejected && (
+            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
+
                 <div className="text-xl font-semibold mr-3">
                   Your application to this scholarship have not been approved
+                </div>
                 </div>
               )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Approved && (
+            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
                 <div className="text-xl font-semibold mr-3">
                   You have won this scholarship
+                </div>
                 </div>
               )}
             {existingApplication &&
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.NeedExtend && (
+            <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
                 <div className="text-xl font-semibold mr-3">
                   You need to extend this scholarship before{" "}
                   {formatDate(extendBeforeDate)}
+                </div>
                 </div>
               )}
           </div>
@@ -718,6 +723,7 @@ const ScholarshipProgramDetail = () => {
               <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
             </div>
 
+            <br></br>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"
               style={{ transform: "translateX(50px)" }}>
               {/* Cột bên trái */}
@@ -1139,13 +1145,6 @@ const ScholarshipProgramDetail = () => {
             );
             return response.data.data || [];
           }}
-        />
-      )}
-      {authorized != "Unauthorized" && (
-        <AccelaratePhaseDialog
-          isOpen={accelaratePhaseDialogOpen}
-          setIsOpen={(open: boolean) => setAccelaratePhaseDialogOpen(open)}
-          //winningApplications={winningApplications ?? []}
         />
       )}
     </div>
