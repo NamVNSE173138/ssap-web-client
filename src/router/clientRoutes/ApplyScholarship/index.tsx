@@ -42,10 +42,10 @@ const ApplyScholarship = () => {
   const [isContractOpen, setContractOpen] = useState(false);
 
   const fetchProfile = async () => {
-    if(!user) return;
+    if (!user) return;
     const response = await getApplicantProfileById(user.id);
-    if(response.statusCode !== 200) return;
-    setFormData({...formData, first_name: response.data.firstName, last_name: response.data.lastName, email: response.data.applicant.email, phone_number: response.data.applicant.phoneNumber});
+    if (response.statusCode !== 200) return;
+    setFormData({ ...formData, first_name: response.data.firstName, last_name: response.data.lastName, email: response.data.applicant.email, phone_number: response.data.applicant.phoneNumber });
   };
 
   const handleAddRow = () => {
@@ -79,9 +79,9 @@ const ApplyScholarship = () => {
       setApplyLoading(false);
       return;
     }
-    if(rows.length == 0) {
-        notification.error({ message: "You have to upload at least one document." });
-        return;
+    if (rows.length == 0) {
+      notification.error({ message: "You have to upload at least one document." });
+      return;
     }
 
     setApplyLoading(true);
@@ -139,7 +139,7 @@ const ApplyScholarship = () => {
       const response = await addApplication(applicationData);
 
       if (response.statusCode === 200) {
-         await response.data;
+        await response.data;
         notification.success({ message: "Application submitted successfully" });
       } else {
         console.error("Failed to submit application");
@@ -155,7 +155,7 @@ const ApplyScholarship = () => {
   };
 
   useEffect(() => {
-      fetchProfile();
+    fetchProfile();
   }, []);
 
   return (
@@ -172,76 +172,75 @@ const ApplyScholarship = () => {
             university – and even scholarships!
           </p>
           <form
-            className="grid gap-[20px] lg:grid-cols-2 mt-[24px] lg:mt-[32px]"
+            className="grid gap-[24px] lg:grid-cols-2 mt-[24px] lg:mt-[32px]"
             onSubmit={handleSubmit}
           >
+            {/* First Name */}
             <div className="flex gap-[20px] flex-row">
               <div className="flex-1">
-                <label htmlFor="first_name" className="mb-[4px] block text-black">
+                <label htmlFor="first_name" className="mb-[8px] block text-lg font-semibold text-gray-800">
                   First name*
                 </label>
                 <input
                   type="text"
                   name="first_name"
                   id="first_name"
-                  className="w-full rounded-md border-2 py-[12px] px-[16px] bg-white"
+                  className="w-full rounded-lg border-2 py-[12px] px-[16px] bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                   value={formData.first_name}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
+
+            {/* Last Name */}
             <div className="flex gap-[20px] flex-row">
               <div className="flex-1">
-                <label htmlFor="last_name" className="mb-[4px] block text-black">
+                <label htmlFor="last_name" className="mb-[8px] block text-lg font-semibold text-gray-800">
                   Last name*
                 </label>
                 <input
                   type="text"
                   name="last_name"
                   id="last_name"
-                  className="w-full rounded-md border-2 py-[12px] px-[16px] bg-white"
+                  className="w-full rounded-lg border-2 py-[12px] px-[16px] bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                   value={formData.last_name}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
-            <div className="flex lg:col-span-2 gap-[20px] flex-row">
+
+            {/* Email */}
+            <div className="flex gap-[20px] lg:col-span-2">
               <div className="flex-1">
-                <label htmlFor="email" className="mb-[4px] block text-black">
+                <label htmlFor="email" className="mb-[8px] block text-lg font-semibold text-gray-800">
                   Email*
                 </label>
                 <input
                   type="email"
                   name="email"
                   id="email"
-                  className="w-full rounded-md border-2 py-[12px] px-[16px] bg-white"
+                  className="w-full rounded-lg border-2 py-[12px] px-[16px] bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                   value={formData.email}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
+
+            {/* Phone Number */}
             <div className="flex gap-[20px] lg:col-span-2">
               <div className="flex-1">
-                <label htmlFor="phone_number" className="mb-[4px] block text-black">
+                <label htmlFor="phone_number" className="mb-[8px] block text-lg font-semibold text-gray-800">
                   Phone number*
                 </label>
                 <div className="flex gap-[20px]">
-                  {/* <input
-                    type="text"
-                    disabled
-                    name="dialCode"
-                    id="dialCode"
-                    className="max-w-[100px] rounded-md border-2 cursor-not-allowed outline-2"
-                    value="+86"
-                  /> */}
                   <input
                     type="text"
                     name="phone_number"
                     id="phone_number"
-                    className="w-full rounded-md border-2 py-[12px] px-[16px] bg-white"
+                    className="w-full rounded-lg border-2 py-[12px] px-[16px] bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                     value={formData.phone_number}
                     onChange={handleChange}
                     required
@@ -250,20 +249,21 @@ const ApplyScholarship = () => {
               </div>
             </div>
 
+            {/* Add Document Button */}
             <div className="flex gap-[20px] lg:col-span-2">
               <div className="flex justify-between w-full">
                 <button
                   type="button"
                   onClick={handleAddRow}
-                  className="flex justify-start items-center hover:bg-[#1eb2a6] transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg active:scale-95 group"
+                  className="flex justify-start items-center hover:bg-[#1eb2a6] transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg shadow-md hover:scale-105"
                 >
                   <IoIosAddCircleOutline className="text-3xl text-black group-hover:text-white" />
-                  <p className="text-xl text-black group-hover:text-white">
-                    Add Document
-                  </p>
+                  <p className="text-xl text-black group-hover:text-white">Add Document</p>
                 </button>
               </div>
             </div>
+
+            {/* Editable Table */}
             <div className="flex gap-[20px] lg:col-span-2">
               <EditableTable
                 rows={rows}
@@ -273,6 +273,7 @@ const ApplyScholarship = () => {
               />
             </div>
 
+            {/* Terms and Conditions */}
             <div className="flex gap-[12px] flex-col lg:col-span-2">
               <div className="flex items-center space-x-3">
                 <input
@@ -286,13 +287,13 @@ const ApplyScholarship = () => {
                 />
                 <label
                   htmlFor="agreeTerms"
-                  className="relative cursor-pointer flex items-center text-sm before:content-[''] before:block before:min-w-[20px] before:h-[20px] before:mr-[12px] before:rounded-[4px] before:bg-white before:border before:border-gray-500 peer-checked:before:bg-blue-500 peer-checked:before:border-blue-500 after:content-[''] after:absolute after:top-[50%] after:left-[4px] after:translate-y-[-50%] after:w-[12px] after:h-[12px] after:border-r-2 after:border-b-2 after:border-transparent peer-checked:after:border-white peer-checked:after:rotate-45"
+                  className="relative cursor-pointer flex items-center text-sm text-gray-700 before:content-[''] before:block before:min-w-[20px] before:h-[20px] before:mr-[12px] before:rounded-[4px] before:bg-white before:border before:border-gray-500 peer-checked:before:bg-blue-500 peer-checked:before:border-blue-500 after:content-[''] after:absolute after:top-[50%] after:left-[4px] after:translate-y-[-50%] after:w-[12px] after:h-[12px] after:border-r-2 after:border-b-2 after:border-transparent peer-checked:after:border-white peer-checked:after:rotate-45"
                 />
-                <span className="text-black">
+                <span className="text-gray-700">
                   I agree to SSAP{" "}
                   <a
                     href="#"
-                    className="mx-[4px] underline hover:no-underline"
+                    className="mx-[4px] underline text-blue-600 hover:no-underline"
                     onClick={() => setContractOpen(true)}
                   >
                     Terms and Privacy
@@ -304,21 +305,25 @@ const ApplyScholarship = () => {
               <ScholarshipContractDialog isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
             </div>
 
-
+            {/* Submit Button */}
             <div className="mt-[20px] lg:mt-[16px]">
               <button
                 disabled={applyLoading}
                 type="submit"
-                className="text-white bg-[#1eb2a6] w-full lg:w-auto px-[20px] py-[12px] leading-6 rounded-[108px] border-2"
+                className="text-white bg-[#1eb2a6] w-full lg:w-auto px-[20px] py-[12px] leading-6 rounded-full shadow-lg hover:bg-[#17a28f] transition-colors duration-200"
               >
-                {applyLoading ? (<div
-                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                  aria-hidden="true"
-                ></div>) :
-                  (<span>Apply now</span>)}
+                {applyLoading ? (
+                  <div
+                    className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                    aria-hidden="true"
+                  ></div>
+                ) : (
+                  <span>Apply Now</span>
+                )}
               </button>
             </div>
           </form>
+
         </div>
         <div className="order-1 lg:order-2 hidden lg:block lg:col-span-5 xl:col-span-6 h-[110vh] mt-[5%]">
           <img

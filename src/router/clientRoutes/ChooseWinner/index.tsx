@@ -43,7 +43,7 @@ const ChooseWinner = () => {
   const [generateFile, setGenerateFile] = useState(null);
   const [contractFiles, setContractFiles] = useState<File[]>([]);
 
-  
+
 
   const fetchApplicants = async (scholarshipId: number, data: any) => {
     try {
@@ -57,8 +57,8 @@ const ChooseWinner = () => {
         setApplicants(
           response.data.filter(
             (row: any) =>
-              (row.status == "Submitted" ||
-                row.status == "Reviewing") /*&&
+            (row.status == "Submitted" ||
+              row.status == "Reviewing") /*&&
               new Date(row.updatedAt) < new Date(scholarship.data.deadline)*/
           )
         );
@@ -236,7 +236,7 @@ const ChooseWinner = () => {
   //   },
   // ];
 
-  
+
 
   const handleSelectionChange = (appId: number) => {
     // Check if the appId is already in selectedRows
@@ -261,7 +261,7 @@ const ChooseWinner = () => {
     }
   };
 
-  
+
 
   const filteredRows = applicants
     ? applicants.filter(
@@ -535,22 +535,23 @@ const ChooseWinner = () => {
                     )}
                   </div>
 
-                  <div className="flex justify-end mt-4 gap-6">
+                  <div className="flex justify-end mt-8">
                     <Button
                       variant="contained"
                       color="primary"
                       disabled={loading}
                       onClick={openApplyModal}
-                      className="text-white py-3 px-6 rounded-lg shadow-md bg-gradient-to-r from-blue-600 to-teal-500 hover:scale-105 transition-all duration-200 transform"
+                      className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
                     >
                       {loading ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div>
                       ) : (
-                        <FaCheckCircle className="text-white text-2xl" />
+                        <FaCheckCircle className="text-white text-2xl mr-2" />
                       )}
                       <span className="text-lg font-semibold">Apply</span>
                     </Button>
                   </div>
+
                 </Paper>
               </Tabs.Content>
             </Tabs.Root>

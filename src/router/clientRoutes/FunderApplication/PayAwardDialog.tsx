@@ -70,7 +70,6 @@ const PayAwardDialog = ({ isOpen, setIsOpen, application, amount, handlePayAward
 
 
   useEffect(() => {
-
   }, []);
 
   return (
@@ -94,82 +93,90 @@ const PayAwardDialog = ({ isOpen, setIsOpen, application, amount, handlePayAward
               onSubmit={form.handleSubmit(handlePayAward)}
               className="flex flex-col gap-4"
             >
-              <div className="space-y-1 grid grid-cols-3 items-center">
-                <Label>Applicant Name</Label>
+              <div className="space-y-8">
+                {/* Applicant Name Section */}
+                <div className="grid grid-cols-3 items-center gap-6">
+                  <Label className="text-lg text-gray-700">Applicant Name</Label>
+                  <div className="flex items-center col-span-2 bg-gray-50 rounded-lg shadow-sm p-4">
+                    <Input
+                      type="text"
+                      placeholder="Name"
+                      disabled
+                      value={application.applicant.username}
+                      className="w-full py-3 px-5 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
 
-                <div className="flex gap-3 items-center col-span-2">
-                  <img
-                    src={application.applicant.avatarUrl ?? "https://github.com/shadcn.png"}
-                    alt="Icon"
-                    className="w-7 h-7 rounded-full"
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Name"
-                    disabled
-                    value={application.applicant.username}
-                    className="col-span-2 "
-                  />
+                {/* Amount Section */}
+                <div className="grid grid-cols-3 items-center gap-6">
+                  <Label className="text-lg text-gray-700">Amount</Label>
+                  <div className="col-span-2 flex items-center bg-gray-50 rounded-lg shadow-sm p-4">
+                    <Input
+                      type="text"
+                      placeholder="Amount"
+                      disabled
+                      value={"$" + amount}
+                      className="col-span-2 font-semibold text-blue-700 border-gray-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Description Section */}
+                <div className="grid grid-cols-3 items-center gap-6">
+                  <Label className="text-lg text-gray-700">Description</Label>
+                  <div className="col-span-2 bg-gray-50 rounded-lg shadow-sm p-4">
+                    <TextArea
+                      placeholder="Provide a brief description"
+                      value={form.watch("description")}
+                      onChange={(e) => form.setValue("description", e.target.value)}
+                      className="w-full py-4 px-5 border border-gray-500 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Payment Method Section */}
+                <div>
+                  <label className="text-lg text-gray-700 font-medium mb-3 flex items-center gap-2">
+                    <IoCard className="text-blue-500" />
+                    Choose Payment Method
+                  </label>
+                  <div className="flex gap-6">
+                    {/* Wallet Payment Option */}
+                    <div
+                      onClick={() => form.setValue("paymentMethod", "Wallet")}
+                      className={`flex items-center gap-4 p-5 border rounded-lg cursor-pointer transition-all transform ${form.watch("paymentMethod") === "Wallet"
+                        ? "border-blue-500 bg-blue-100 scale-105"
+                        : "border-gray-300 hover:bg-gray-100"
+                        }`}
+                    >
+                      <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
+                        <IoWalletOutline className="text-2xl" />
+                      </div>
+                      <span className="font-medium text-gray-800">Pay by Wallet</span>
+                    </div>
+
+                    {/* Cash Payment Option */}
+                    <div
+                      onClick={() => form.setValue("paymentMethod", "Cash")}
+                      className={`flex items-center gap-4 p-5 border rounded-lg cursor-pointer transition-all transform ${form.watch("paymentMethod") === "Cash"
+                        ? "border-green-500 bg-green-100 scale-105"
+                        : "border-gray-300 hover:bg-gray-100"
+                        }`}
+                    >
+                      <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
+                        <IoCashOutline className="text-2xl" />
+                      </div>
+                      <span className="font-medium text-gray-800">Pay by Cash</span>
+                    </div>
+                  </div>
+                  {/* Error message if payment method is not selected */}
+                  {form.watch("paymentMethod") === "" && (
+                    <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
+                  )}
                 </div>
               </div>
 
-              <div className="space-y-1 grid grid-cols-3 items-center">
-                <Label>Amount</Label>
-
-                <Input
-                  type="text"
-                  placeholder="Amount"
-                  disabled
-                  value={"$" + amount}
-                  className="col-span-2 font-semibold text-blue-700"
-                />
-              </div>
-              <div className="space-y-1 grid grid-cols-3 items-center">
-                <Label>Description</Label>
-
-                <TextArea
-                  placeholder="Description"
-                  value={form.watch("description")}
-                  onChange={(e) => form.setValue("description", e.target.value)}
-                  className="col-span-2"
-                />
-              </div>
-              <div>
-                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
-                  <IoCard className="text-blue-500" />
-                  Choose Payment Method
-                </label>
-                <div className="flex gap-4">
-                  <div
-                    onClick={() => form.setValue("paymentMethod", "Wallet")}
-                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition ${form.watch("paymentMethod") === "Wallet"
-                      ? "border-blue-500 bg-blue-100"
-                      : "border-gray-300 hover:bg-gray-100"
-                      }`}
-                  >
-                    <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
-                      <IoWalletOutline className="text-2xl" />
-                    </div>
-                    <span className="font-medium text-gray-800">Pay by Wallet</span>
-                  </div>
-
-                  <div
-                    onClick={() => form.setValue("paymentMethod", "Cash")}
-                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition ${form.watch("paymentMethod") === "Cash"
-                      ? "border-green-500 bg-green-100"
-                      : "border-gray-300 hover:bg-gray-100"
-                      }`}
-                  >
-                    <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
-                      <IoCashOutline className="text-2xl" />
-                    </div>
-                    <span className="font-medium text-gray-800">Cash</span>
-                  </div>
-                </div>
-                {form.watch("paymentMethod") === "" && (
-                  <p className="text-red-500 text-sm mt-2">Please select a payment method.</p>
-                )}
-              </div>
 
               {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               {error == "Wallet not enough" && <Link to="/wallet" className="text-blue-500 underline">Add money to your wallet</Link>}
