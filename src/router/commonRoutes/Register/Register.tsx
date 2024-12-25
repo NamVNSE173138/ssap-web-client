@@ -1104,7 +1104,7 @@ const Register = () => {
 
                           {/* Documents Section */}
                           <div className="mt-8">
-                            <label className="block text-gray-700 font-medium mb-2">Documents
+                            <label className="block text-gray-700 font-medium mb-2">Require Documents
                               <span className="text-red-500 text-sm font-medium"> (*)</span>
                             </label>
                             <div>
