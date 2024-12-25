@@ -66,8 +66,8 @@ const DocumentTable = ({ documents, documentType, awardMilestones, rows, setRows
                       "Progress " +
                       (awardMilestones.findIndex(
                         (milestone: any) =>
-                          new Date(milestone.fromDate) < new Date(doc.updatedAt) &&
-                          new Date(doc.updatedAt) < new Date(milestone.toDate)
+                          new Date(milestone.fromDate) < new Date(doc.createdAt) &&
+                          new Date(doc.createdAt) < new Date(milestone.toDate)
                       ) + 1)
                     }
                   </span>

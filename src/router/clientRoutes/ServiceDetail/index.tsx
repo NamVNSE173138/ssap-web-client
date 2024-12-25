@@ -52,6 +52,9 @@ import {
   IoCard,
   IoCloseCircleOutline,
   IoInformationCircle,
+  IoAlbums,
+  IoBandage,
+  IoList,
 } from "react-icons/io5";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -142,6 +145,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [isContractOpen, setContractOpen] = useState(false);
   const [_isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [showSuggest, setShowSuggest] = useState(false);
 
   const fetchService = async () => {
     try {
@@ -416,11 +420,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     <div>
       {isDialogOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] transform transition-all scale-95 hover:scale-100">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 transform transition-all scale-95 hover:scale-100">
             <div className="mb-5 flex justify-between items-center">
               <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
                 <IoIosPaper className="text-3xl text-blue-500" />
-                <span>Create Request</span>
+                <span className="font-bold">CREATE REQUEST</span>
               </DialogTitle>
               <span
                 className="text-xl cursor-pointer text-gray-600 hover:text-red-500 transition-all"
@@ -432,23 +436,64 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-5">
-                <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
+                <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
                   <IoText className="text-blue-500" />
                   Description
                 </label>
                 <input
                   type="text"
                   placeholder="Enter a description"
+                  value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-300 focus:outline-none shadow-sm"
                 />
                 <div
-                  className={`text-sm mt-1 ${description.length > 200 ? 'text-red-500' : 'text-gray-500'
+                  className={`text-sm mt-1 ${description.length > 200 ? "text-red-500" : "text-gray-500"
                     }`}
                 >
                   {description.length}/{200}
                 </div>
+                <div className="flex items-center justify-between mt-3">
+                  <label className="text-gray-700 font-medium flex items-center gap-2">
+                    <IoList className="text-blue-500" />
+                    <div className="text-gray-400">(Suggest description)</div>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowSuggest(!showSuggest)} // Toggle state
+                    className="text-blue-500 hover:underline text-sm"
+                  >
+                    {showSuggest ? "Hide Suggestions" : "Show Suggestions"}
+                  </button>
+                </div>
+                {showSuggest && ( // Hiển thị form nếu state showSuggest là true
+                  <div className="max-w-7xl mx-auto p-6 bg-[rgba(219,216,216,0.95)] shadow-lg rounded-md mt-3">
+                    <ul className="space-y-2">
+                      {[
+                        "Provide feedback to refine my CV for a specific job application.",
+                        "Help me translate an academic essay into fluent English.",
+                        "Assist with writing a compelling essay for my scholarship application.",
+                        "Review my application documents to ensure they are error-free and impactful.",
+                        "Prepare me for an upcoming interview with personalized coaching.",
+                        "Draft a strong and persuasive recommendation letter for a scholarship.",
+                        "Support me in finding scholarships tailored to my background and goals.",
+                        "Proofread my research paper to enhance clarity and grammar.",
+                        "Guide me in developing a personalized scholarship strategy for maximum success.",
+                        "Offer insights into financial aid options to cover tuition costs.",
+                      ].map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="cursor-pointer text-blue-500 hover:underline"
+                          onClick={() => setDescription(suggestion)}
+                        >
+                          {suggestion}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
+
 
               <div className="mb-5">
                 <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
@@ -640,56 +685,40 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                 <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-[#1eb2a6] ">
+                    <h2 className="text-xl font-semibold text-[#1eb2a6]">
                       Feedback Details
                     </h2>
-                    <span
-                      className="text-xl cursor-pointer text-gray-500 hover:text-red-500 transition-all"
-                      onClick={handleCloseFeedbackDialog}
-                    >
-                      <IoCloseCircleOutline size={24} />
-                    </span>
                   </div>
 
                   {feedbacks.length > 0 ? (
                     <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                       <thead>
                         <tr className="bg-gray-100 text-gray-700">
-                          <th className="p-4 text-left font-semibold">
-                            Applicant Name
-                          </th>
-                          <th className="p-4 text-left font-semibold">
-                            Rating
-                          </th>
-                          <th className="p-4 text-left font-semibold">
-                            Comment
-                          </th>
-                          <th className="p-4 text-left font-semibold">Date</th>
+                          <th className="p-4 text-left font-semibold" style={{ width: '5%' }}>#</th> {/* Chiếm 0.5 */}
+                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Applicant Name</th> {/* Chiếm 2 */}
+                          <th className="p-4 text-left font-semibold" style={{ width: '10%' }}>Rating</th> {/* Chiếm 1 */}
+                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Comment</th> {/* Chiếm 2 */}
+                          <th className="p-4 text-left font-semibold" style={{ width: '15%' }}>Date</th> {/* Chiếm 1 */}
                         </tr>
                       </thead>
                       <tbody>
                         {feedbacks.map((feedback, index) => (
                           <tr key={index} className="border-t hover:bg-gray-50">
-                            <td className="p-4">
-                              {feedback.name || "********"}
-                            </td>
-                            <td className="p-4 flex items-center">
+                            <td className="p-4" style={{ width: '5%' }}>{index + 1}</td> {/* Chiếm 0.5 */}
+                            <td className="p-4" style={{ width: '20%' }}>{feedback.name || "********"}</td> {/* Chiếm 2 */}
+                            <td className="p-4 flex items-center" style={{ width: '10%' }}>
                               {[...Array(5)].map((_, i) => (
                                 <FaStar
                                   key={i}
-                                  color={
-                                    i < feedback.rating ? "#FFB800" : "#ddd"
-                                  }
+                                  color={i < feedback.rating ? "#FFB800" : "#ddd"}
                                   size={18}
                                 />
                               ))}
-                            </td>
-                            <td className="p-4">{feedback.content}</td>
-                            <td className="p-4">
-                              {new Date(
-                                feedback.feedbackDate
-                              ).toLocaleDateString('en-US')}
-                            </td>
+                            </td> {/* Chiếm 1 */}
+                            <td className="p-4" style={{ width: '20%' }}>{feedback.content}</td> {/* Chiếm 2 */}
+                            <td className="p-4" style={{ width: '15%' }}>
+                              {new Date(feedback.feedbackDate).toLocaleDateString('en-US')}
+                            </td> {/* Chiếm 1 */}
                           </tr>
                         ))}
                       </tbody>
@@ -698,22 +727,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                       <thead>
                         <tr className="bg-gray-100 text-gray-700">
-                          <th className="p-4 text-left font-semibold">
-                            Applicant Name
-                          </th>
-                          <th className="p-4 text-left font-semibold">
-                            Rating
-                          </th>
-                          <th className="p-4 text-left font-semibold">
-                            Comment
-                          </th>
-                          <th className="p-4 text-left font-semibold">Date</th>
+                          <th className="p-4 text-left font-semibold" style={{ width: '5%' }}>#</th>
+                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Applicant Name</th>
+                          <th className="p-4 text-left font-semibold" style={{ width: '10%' }}>Rating</th>
+                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Comment</th>
+                          <th className="p-4 text-left font-semibold" style={{ width: '15%' }}>Date</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td
-                            colSpan={4}
+                            colSpan={5}
                             className="p-4 text-center text-gray-600"
                           >
                             No feedback available.
@@ -733,6 +757,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 </div>
               </div>
             )}
+
             <div className="text-center flex h-[50px] mt-[26px]">
               <div className="flex justify-between w-full gap-4">
                 {showButtons && (
@@ -810,57 +835,62 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
           </h2>
 
           <div className="flex justify-center">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-3/5 bg-white shadow-lg rounded-xl p-8">
-              <div className="flex items-center space-x-4">
-                <FaInfoCircle className="text-blue-500 text-xl" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-3/5 bg-white shadow-xl rounded-2xl p-8">
+              {/* Service Type */}
+              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-blue-50">
+                <FaInfoCircle className="text-blue-500 text-3xl" />
                 <div>
-                  <p className="text-lg font-semibold text-gray-700">
-                    Service Type:
-                  </p>
+                  <p className="text-lg font-semibold text-gray-700">Service Type:</p>
                   <p className="text-gray-600">{serviceData.type}</p>
                 </div>
               </div>
-              <div className="flex ml-20 items-center space-x-4">
-                <FaDollarSign className="text-green-500 text-xl" />
+
+              {/* Price */}
+              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-green-50">
+                <FaDollarSign className="text-green-500 text-3xl" />
                 <div>
                   <p className="text-lg font-semibold text-gray-700">Price:</p>
                   <p className="text-gray-600">${serviceData.price}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <FaUser className="text-indigo-500 text-xl" />
+
+              {/* Provider Information */}
+              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-indigo-50">
+                <FaUser className="text-indigo-500 text-3xl" />
                 <div>
                   <Link
-                    to={RouteNames.PROVIDER_INFORMATION.replace(
-                      ":id",
-                      serviceData.providerId
-                    )}
+                    to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
                     className="text-[#1eb2a6] hover:underline text-lg font-semibold"
                   >
                     Provider Information
                   </Link>
                 </div>
               </div>
-              <div className="hidden items-center space-x-4">
-                <FaCheckCircle className="text-teal-500 text-xl" />
+
+              {/* Status */}
+              <div className="hidden flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-teal-50">
+                <FaCheckCircle className="text-teal-500 text-3xl" />
                 <div>
                   <p className="text-lg font-semibold text-gray-700">Status:</p>
                   <p className="text-gray-600">{serviceData.status}</p>
                 </div>
               </div>
-              <div className="flex ml-20 items-center space-x-4">
-                <FaClipboardList className="text-teal-500 text-xl" />
+
+              {/* About This Service */}
+              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-yellow-50">
+                <FaClipboardList className="text-teal-500 text-3xl" />
                 <div>
-                  <p className="text-lg font-semibold text-gray-700">
-                    About This Service:
-                  </p>
+                  <p className="text-lg font-semibold text-gray-700">About This Service:</p>
                   <p className="text-gray-600">{serviceData.description}</p>
                 </div>
               </div>
             </div>
           </div>
+          <br></br>
+          <br></br>
         </div>
       </section>
+
 
       <AccountApplicantDialog
         open={applicantDialogOpen}

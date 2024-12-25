@@ -1119,6 +1119,7 @@ const ScholarshipProgramDetail = () => {
                     }}
                   >
                     <div style={{ flex: 0.5 }}>#</div>
+                    <div style={{ flex: 1 }}>Avatar</div>
                     <div style={{ flex: 1 }}>Name</div>
                     <div style={{ flex: 1 }}>Status</div>
                     <div style={{ flex: 1 }}>Applied At</div>
@@ -1145,6 +1146,19 @@ const ScholarshipProgramDetail = () => {
                       >
                         {/* Cột số thứ tự */}
                         <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                        <div style={{ flex: 1 }}>
+                          <img
+                            src={app.applicant.avatarUrl || '/path/to/default-avatar.jpg'}
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '2px solid #0369a1',
+                            }}
+                          />
+                        </div>
 
                         {/* Cột tên ứng viên */}
                         <div style={{ flex: 1 }}>{app.applicant.username}</div>
@@ -1198,6 +1212,124 @@ const ScholarshipProgramDetail = () => {
                 </Paper>
               </div>
             </div>
+
+            <br></br>
+            <br></br>
+
+            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+              <div className="max-w-[1216px] mx-auto">
+                <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                  <div className="relative flex items-center gap-3">
+                    <div className="p-2 bg-[#1eb2a6] rounded-full">
+                      <FaCalendarAlt className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Expert List</h2>
+                  </div>
+                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+                </div>
+
+                <button
+                    // onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
+                    className="flex mb-5 mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
+                  >
+                    <IoIosAddCircleOutline className="text-2xl" />
+                    <span className="text-lg font-medium">Choose Application</span>
+                  </button>
+
+                {/* Experts Section */}
+                <Paper
+                  elevation={3}
+                  style={{
+                    padding: '20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#fafafa',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      fontWeight: 'bold',
+                      backgroundColor: '#f1f1f1',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      marginBottom: '10px',
+                    }}
+                  >
+                    <div style={{ flex: 0.5 }}>#</div>
+                    <div style={{ flex: 1 }}>Avatar</div>
+                    <div style={{ flex: 1 }}>Expert Name</div>
+                    <div style={{ flex: 1 }}>Major</div>
+                    <div style={{ flex: 1 }}>Actions</div>
+                  </div>
+
+                  {/* Expert Cards */}
+                  {(_experts && Array.isArray(_experts) && _experts.filter((expert: any) => expert.isVisible !== false).length > 0) ? (
+                    _experts.filter((expert: any) => expert.isVisible !== false).map((expert: any, index: any) => (
+                      <div
+                        key={expert.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          backgroundColor: '#f9f9f9',
+                          padding: '10px',
+                          borderRadius: '8px',
+                          marginBottom: '10px',
+                          transition: 'background-color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                      >
+                        {/* Cột số thứ tự */}
+                        <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                        <div style={{ flex: 1 }}>
+                          <img
+                            src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '2px solid #0369a1',
+                            }}
+                          />
+                        </div>
+
+                        {/* Cột tên chuyên gia */}
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                        </div>
+
+                        {/* Cột major */}
+                        <div style={{ flex: 1 }}>
+                          {expert.major || 'N/A'}
+                        </div>
+
+                        {/* Cột actions */}
+                        <div style={{ flex: 1 }}>
+                          <Button
+                            // onClick={() => handleExpertSelection(expert)}
+                            style={{
+                              backgroundColor: '#1e88e5',
+                              color: '#fff',
+                              padding: '6px 12px',
+                              borderRadius: '5px',
+                            }}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500">No experts match your search.</p>
+                  )}
+                </Paper>
+              </div>
+            </div>
+
           </div>
         )}
 
