@@ -179,6 +179,7 @@ const ScholarshipProgramDetail = () => {
           );
           await fetchApplicants(Number(id));
           await fetchReviewMilestones(Number(id));
+          await fetchExperts();
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
               if (
@@ -1257,9 +1258,9 @@ const ScholarshipProgramDetail = () => {
                     }}
                   >
                     <div style={{ flex: 0.5 }}>#</div>
-                    <div style={{ flex: 1 }}>Avatar</div>
+                    <div style={{ flex: 0.5 }}>Avatar</div>
                     <div style={{ flex: 1 }}>Expert Name</div>
-                    <div style={{ flex: 1 }}>Major</div>
+                    <div style={{ flex: 1.5 }}>Major</div>
                     <div style={{ flex: 1 }}>Actions</div>
                   </div>
 
@@ -1284,7 +1285,7 @@ const ScholarshipProgramDetail = () => {
                         {/* Cột số thứ tự */}
                         <div style={{ flex: 0.5 }}>{index + 1}</div>
 
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 0.5 }}>
                           <img
                             src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
                             style={{
@@ -1303,7 +1304,7 @@ const ScholarshipProgramDetail = () => {
                         </div>
 
                         {/* Cột major */}
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 1.5 }}>
                           {expert.major || 'N/A'}
                         </div>
 
