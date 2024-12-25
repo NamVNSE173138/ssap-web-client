@@ -249,129 +249,142 @@ const RequestDetailTable = ({
 
   return (
     <Box>
-      <TableContainer
-        component={Paper}
+      <Paper
         elevation={3}
-        sx={{ borderRadius: "12px", marginTop: "20px", padding: "20px" }}
+        style={{
+          padding: '20px',
+          borderRadius: '10px',
+          backgroundColor: '#fafafa',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+        }}
       >
-        <Table sx={{ minWidth: 1000 }} aria-label="request details table">
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", color: "#4A90E2" }}
-                >
-                  Id
-                </Typography>
-              </TableCell>
-              <TableCell>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", color: "#4A90E2" }}
-                >
-                  Applicant Description
-                </Typography>
-              </TableCell>
-              <TableCell>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", color: "#4A90E2" }}
-                >
-                  Request File
-                </Typography>
-              </TableCell>
-              <TableCell sx={{ color: "#FF6347" }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  Provider Updated File
-                </Typography>
-              </TableCell>
-              <TableCell sx={{ color: "#FF6347" }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  Provider Notes
-                </Typography>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {requestDetails.map((detail: any) => (
-              <TableRow
-                key={detail.id}
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  "&:hover": { backgroundColor: "#f9f9f9" },
-                }}
-              >
-                <TableCell>
-                  <Typography variant="body1" sx={{ color: "#333" }}>
-                    {detail.requestId}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body1" sx={{ color: "#333" }}>
-                    {request.description || "No description provided"}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {detail.requestDetailFiles.filter(
-                    (a: any) => a.uploadedBy == "Applicant"
-                  ).length > 0 ? (
-                    detail.requestDetailFiles
-                      .filter((a: any) => a.uploadedBy == "Applicant")
-                      .map((fileUrl: any, index: any) => {
-                        if (fileUrl.fileUrl.startsWith("https://")) {
-                          return (
-                            <StyledLink
-                              className="block"
-                              target="_blank"
-                              to={fileUrl.fileUrl}
-                            >
-                              File {index + 1}
-                            </StyledLink>
-                          );
-                        }
-                        return null;
-                      })
-                  ) : (
-                    <Typography variant="body2" color="textSecondary">
-                      No file uploaded yet
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {detail.requestDetailFiles.filter(
-                    (a: any) => a.uploadedBy == "Provider"
-                  ).length > 0 ? (
-                    detail.requestDetailFiles
-                      .filter((a: any) => a.uploadedBy == "Provider")
-                      .map((fileUrl: any, index: any) => {
-                        if (fileUrl.fileUrl.startsWith("https://")) {
-                          return (
-                            <div key={index}>
-                              <StyledLink target="_blank" to={fileUrl.fileUrl}>
-                                File {index + 1}
-                              </StyledLink>
-                            </div>
-                          );
-                        }
-                        return null;
-                      })
-                  ) : (
-                    <Typography variant="body2" color="textSecondary">
-                      No file uploaded yet
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body1" sx={{ color: "#333" }}>
-                    {detail.comment || "No comment yet"}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        {/* Header */}
+        <div
+          style={{
+            display: 'flex',
+            fontWeight: 'bold',
+            backgroundColor: '#f1f1f1',
+            padding: '12px 20px',
+            borderRadius: '8px',
+            marginBottom: '15px',
+            color: '#4A90E2',
+            textTransform: 'uppercase',
+          }}
+        >
+          <div style={{ flex: '0.5', marginLeft: '20px' }}>#</div>
+          <div style={{ flex: '2', textAlign: 'left' }}>Applicant Description</div>
+          <div style={{ flex: '2', textAlign: 'left' }}>Request File</div>
+          <div style={{ flex: '2', color: "#FF6347", textAlign: 'left' }}>Provider Updated File</div>
+          <div style={{ flex: '2', color: "#FF6347", textAlign: 'left' }}>Provider Notes</div>
+        </div>
+
+        {/* Loop through requestDetails to display each row */}
+        {requestDetails.map((detail: any, index: any) => (
+          <div
+            key={detail.id}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '15px 20px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              marginBottom: '15px',
+              transition: 'all 0.3s ease',
+              boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.05)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0px 4px 20px rgba(0, 0, 0, 0.2)')}
+            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = '0px 2px 10px rgba(0, 0, 0, 0.05)')}
+          >
+            {/* No. */}
+            <div style={{ flex: '0.5', marginLeft: '20px', color: '#333', fontWeight: '500' }}>
+              {index + 1}
+            </div>
+
+            {/* Applicant Description */}
+            <div style={{ flex: '2', color: '#333', fontWeight: '500', fontSize: '16px' }}>
+              <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>{detail.description || 'No description provided'}</div>
+            </div>
+
+            {/* Request File */}
+            <div style={{ flex: '2', color: '#555' }}>
+              {detail.requestDetailFiles.filter((a: any) => a.uploadedBy === 'Applicant').length > 0 ? (
+                detail.requestDetailFiles
+                  .filter((a: any) => a.uploadedBy === 'Applicant')
+                  .map((fileUrl: any, index: any) => {
+                    if (fileUrl.fileUrl.startsWith('https://')) {
+                      return (
+                        <div key={index} style={{ marginBottom: '5px' }}>
+                          <a
+                            className="block"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={fileUrl.fileUrl}
+                            style={{
+                              color: '#1E88E5',
+                              textDecoration: 'none',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                            }}
+                          >
+                            File {index + 1}
+                          </a>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })
+              ) : (
+                <div style={{ flex: '2', color: '#333', fontSize: '16px' }}>
+                  <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>No file uploaded yet</div>
+                </div>
+              )}
+            </div>
+
+            {/* Provider Updated File */}
+            <div style={{ flex: '2', color: '#555' }}>
+              {detail.requestDetailFiles.filter((a: any) => a.uploadedBy === 'Provider').length > 0 ? (
+                detail.requestDetailFiles
+                  .filter((a: any) => a.uploadedBy === 'Provider')
+                  .map((fileUrl: any, index: any) => {
+                    if (fileUrl.fileUrl.startsWith('https://')) {
+                      return (
+                        <div key={index} style={{ marginBottom: '5px' }}>
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={fileUrl.fileUrl}
+                            style={{
+                              color: '#1E88E5',
+                              textDecoration: 'none',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                            }}
+                          >
+                            File {index + 1}
+                          </a>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })
+              ) : (
+                <div style={{ flex: '2', color: '#333', fontSize: '16px' }}>
+                  <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>No file uploaded yet</div>
+                </div>
+              )}
+            </div>
+
+            {/* Provider Notes */}
+            <div style={{ flex: '2', color: '#333', fontSize: '16px' }}>
+              <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>No comment yet</div>
+            </div>
+          </div>
+        ))}
+      </Paper>
+
+
 
       {user.role === "Applicant" && (
         <>
@@ -383,39 +396,61 @@ const RequestDetailTable = ({
                 disabled={isFinished}
                 onClick={handleChatClick}
                 sx={{
-                  borderRadius: "25px",
-                  padding: "12px 24px",
-                  fontSize: "16px",
-                  marginRight: "10px",
-                  boxShadow: 3,
-                  "&:hover": { boxShadow: 6 },
-                  backgroundColor: "#4A90E2",
-                  color: "#fff",
-                  "&:disabled": { backgroundColor: "#C5CAE9" },
+                  borderRadius: "50px",  // Bo góc mạnh mẽ hơn, tạo hình tròn mượt mà
+                  padding: "12px 28px",  // Tăng khoảng cách giữa các chữ và viền
+                  fontSize: "18px",       // Chữ lớn hơn một chút để dễ đọc
+                  fontWeight: "600",      // Chữ đậm hơn để làm nổi bật
+                  marginRight: "12px",    // Khoảng cách với các nút khác
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",  // Bóng đổ nhẹ, không quá mạnh
+                  transition: "all 0.3s ease",  // Thêm hiệu ứng chuyển động mượt mà
+                  backgroundColor: "#4A90E2",   // Màu nền chính
+                  color: "#fff",          // Màu chữ trắng
+                  "&:hover": {
+                    boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)",  // Bóng đổ khi hover mạnh hơn
+                    backgroundColor: "#0066cc",  // Thay đổi màu khi hover
+                    transform: "scale(1.05)",  // Phóng to nút một chút khi hover
+                  },
+                  "&:disabled": {
+                    backgroundColor: "#C5CAE9",  // Màu nền khi bị vô hiệu hóa
+                    color: "#888",   // Màu chữ khi vô hiệu hóa
+                    boxShadow: "none",  // Không bóng đổ khi vô hiệu hóa
+                  },
                 }}
                 startIcon={<ChatIcon />}
               >
                 Chat
               </Button>
+
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleFinish}
                 disabled={isFinished}
                 sx={{
-                  borderRadius: "25px",
-                  padding: "12px 24px",
-                  fontSize: "16px",
-                  boxShadow: 3,
-                  "&:hover": { boxShadow: 6 },
-                  backgroundColor: "#4A90E2",
-                  color: "#fff",
-                  "&:disabled": { backgroundColor: "#C5CAE9" },
+                  borderRadius: "50px",  // Bo góc mạnh mẽ hơn
+                  padding: "12px 28px",  // Tăng khoảng cách để nút rộng hơn và dễ nhìn
+                  fontSize: "18px",       // Tăng kích thước chữ để dễ đọc
+                  fontWeight: "600",      // Chữ đậm hơn
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",  // Bóng đổ nhẹ
+                  transition: "all 0.3s ease",  // Hiệu ứng chuyển động mượt mà
+                  backgroundColor: "#4A90E2",   // Màu nền chính
+                  color: "#fff",          // Chữ trắng
+                  "&:hover": {
+                    boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)",  // Bóng đổ đậm khi hover
+                    backgroundColor: "#0066cc",  // Màu nền thay đổi khi hover
+                    transform: "scale(1.05)",  // Tăng kích thước khi hover
+                  },
+                  "&:disabled": {
+                    backgroundColor: "#C5CAE9",  // Màu nền khi disabled
+                    color: "#888",   // Màu chữ khi disabled
+                    boxShadow: "none",  // Không bóng đổ khi disabled
+                  },
                 }}
                 startIcon={<CheckCircleOutlineIcon />}
               >
                 Finish
               </Button>
+
               {isFinished && (
                 <Button
                   variant="contained"
@@ -431,20 +466,30 @@ const RequestDetailTable = ({
                   }}
                   disabled={hasFeedback || !canProvideFeedback}
                   sx={{
-                    borderRadius: "25px",
-                    padding: "12px 24px",
-                    fontSize: "16px",
-                    marginLeft: "10px",
-                    boxShadow: 3,
-                    "&:hover": { boxShadow: 6 },
-                    backgroundColor: "#FF9800",
-                    color: "#fff",
-                    "&:disabled": { backgroundColor: "#F5CBE1" },
+                    borderRadius: "50px", // Bo góc mềm mại hơn
+                    padding: "12px 28px", // Tăng khoảng cách cho nút rộng hơn
+                    fontSize: "18px", // Tăng kích thước chữ để dễ nhìn hơn
+                    fontWeight: "600", // Chữ đậm hơn
+                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // Bóng đổ nhẹ
+                    transition: "all 0.3s ease", // Hiệu ứng chuyển động mượt mà
+                    backgroundColor: "#FF9800", // Màu nền chính
+                    color: "#fff", // Chữ trắng
+                    "&:hover": {
+                      boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)", // Bóng đổ mạnh hơn khi hover
+                      backgroundColor: "#F57C00", // Màu nền thay đổi khi hover
+                      transform: "scale(1.05)", // Tăng kích thước khi hover
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#F5CBE1", // Màu nền khi disabled
+                      color: "#888", // Màu chữ khi disabled
+                      boxShadow: "none", // Không bóng đổ khi disabled
+                    },
                   }}
                   startIcon={<FeedbackIcon />}
                 >
                   Feedback
                 </Button>
+
               )}
               {hasFeedback && (
                 <Button

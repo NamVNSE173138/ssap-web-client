@@ -6,6 +6,7 @@ import { getServicesByProvider } from "@/services/ApiServices/serviceService";
 import ServiceSkeleton from "@/router/clientRoutes/Service/ServiceSkeleton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { Paper } from "@mui/material";
 
 const ServicesSection = () => {
     const [services, setServices] = useState<any[]>([]);
@@ -57,82 +58,77 @@ const ServicesSection = () => {
                     <p className="text-gray-700 text-lg">No active services found.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {services.map((service) => (
-                        <div
-                            key={service.id}
-                            className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-t-4 border-[#1eb2a6]"
-                        >
-                            {/* Header with Service Name */}
-                            <div className="bg-[#1eb2a6] text-white p-4 flex items-center space-x-3">
-                                <FaInfoCircle className="text-2xl" />
-                                <h2 className="text-xl font-bold overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[calc(100%)]" title={service.name}>
-                                    {service.name.length > 26 ? `${service.name.substring(0, 26)}...` : service.name}
-                                </h2>
-                            </div>
+                <Paper elevation={3} style={{ padding: '20px', borderRadius: '10px' }}>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#1eb2a6', color: 'white', textAlign: 'left' }}>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>#</th>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>Name</th>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>Description</th>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>Service Type</th>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>Price</th>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>Status</th>
+                                    <th style={{ padding: '12px', fontWeight: '600' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {services.map((service, index) => (
+                                    <tr
+                                        key={service.id}
+                                        style={{
+                                            backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff',
+                                            transition: 'background-color 0.3s ease',
+                                        }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#fff')}
+                                    >
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>{index + 1}</td>
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
+                                            {service.name.length > 26 ? `${service.name.substring(0, 20)}...` : service.name}
+                                        </td>
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
+                                            {service.description.length > 60
+                                                ? service.description.slice(0, 60) + '...'
+                                                : service.description}
+                                        </td>
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>{service.type}</td>
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>${service.price}</td>
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
+                                            <span
+                                                style={{
+                                                    color: service.status === 'Active' ? '#1eb2a6' : '#f44336',
+                                                    fontWeight: '600',
+                                                }}
+                                            >
+                                                {service.status}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => handleDetailsClick(service.id)}
+                                                style={{
+                                                    padding: '6px 12px',
+                                                    borderRadius: '5px',
+                                                    backgroundColor: '#1eb2a6',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    transition: 'background-color 0.3s ease',
+                                                }}
+                                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#007bff')}
+                                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1eb2a6')}
+                                            >
+                                                Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Paper>
 
-
-                            {/* Body Content */}
-                            <div className="p-6 space-y-6">
-                                {/* Service Type */}
-                                <div className="flex items-center space-x-4">
-                                    <FaCogs className="text-blue-400 text-2xl" />
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Service Type</p>
-                                        <p className="text-gray-700 font-semibold">{service.type}</p>
-                                    </div>
-                                </div>
-
-                                {/* Price */}
-                                <div className="flex items-center space-x-4">
-                                    <FaDollarSign className="text-green-500 text-2xl" />
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Price</p>
-                                        <p className="text-gray-700 font-semibold">${service.price}</p>
-                                    </div>
-                                </div>
-
-                                {/* Status */}
-                                <div className="flex items-center space-x-4">
-                                    <FaCheckCircle
-                                        className={`text-2xl ${service.status === "Active"
-                                            ? "text-teal-500"
-                                            : "text-red-500"
-                                            }`}
-                                    />
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Status</p>
-                                        <p className={`font-semibold ${service.status === "Active" ? "text-teal-600" : "text-red-600"}`}>
-                                            {service.status}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Description */}
-                                <div className="flex items-start space-x-4">
-                                    <FaClipboardList className="text-indigo-500 text-2xl" />
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">About This Service</p>
-                                        <p className="text-gray-600">
-                                            {service.description.length > 40 ? `${service.description.substring(0, 30)}...` : service.description}
-                                        </p>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            {/* Footer */}
-                            <div className="bg-gray-50 p-4 text-center">
-                                <button
-                                    onClick={() => handleDetailsClick(service.id)}
-                                    className="bg-[#1eb2a6] text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-600 transition"
-                                >
-                                    Details
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
             )}
         </Tabs.Content>
     );
