@@ -20,7 +20,7 @@ import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
-import { getAllExperts } from "@/services/ApiServices/expertService";
+import { getAllExperts, getExpertsByFunder } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewingApplicationDialog from "./expert-reviewing-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
@@ -240,8 +240,8 @@ const ScholarshipProgramDetail = () => {
 
   const fetchExperts = async () => {
     try {
-      const response = await getAllExperts();
-      //console.log(response);
+      const response = await getExpertsByFunder(Number(user.id));
+      console.log(response);
       if (response.statusCode == 200) {
         setExperts(response.data);
       } else {
