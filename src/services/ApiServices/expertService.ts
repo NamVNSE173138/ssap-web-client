@@ -17,6 +17,14 @@ export async function getExpertProfile(id: number) {
   return response.data;
 }
 
+export async function getExpertsByFunder(funderId: number) {
+  const response = await axios.get(
+    `${BASE_URL}/api/experts/funder/${funderId}`,
+    ngrokSkipWarning
+  );
+  return response.data;
+}
+
 export async function updateExpertProfile(id: number, request: any) {
   const response = await axios.put(
     `${BASE_URL}/api/experts/${id}`,
