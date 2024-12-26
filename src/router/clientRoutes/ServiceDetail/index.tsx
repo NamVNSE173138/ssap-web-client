@@ -15,21 +15,25 @@ import {
 } from "@/services/ApiServices/serviceService";
 import {
   createRequest,
+  getRequestById,
   getRequestsByService,
 } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { uploadFile } from "@/services/ApiServices/testService";
 import {
+  FaCalendarAlt,
   FaClipboardList,
   FaEdit,
   FaExclamationTriangle,
   FaEye,
   FaPlus,
   FaRedo,
+  FaServicestack,
   FaStar,
   FaTimes,
   FaTrash,
+  FaUsers,
   FaWallet,
 } from "react-icons/fa";
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
@@ -41,8 +45,8 @@ import {
   FaCheckCircle,
   FaUser,
 } from "react-icons/fa";
-import { Dialog, DialogTitle } from "@mui/material";
-import { IoIosPaper } from "react-icons/io";
+import { Button, Dialog, DialogTitle, Paper, Tab, Tabs } from "@mui/material";
+import { IoIosEye, IoIosPaper } from "react-icons/io";
 import {
   IoWalletOutline,
   IoCashOutline,
@@ -61,6 +65,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import EditServiceModal from "../Activity/UpdateServiceModal";
 import ServiceContractDialog from "./ServiceContractDialog";
 import { notification } from "antd";
+import { format } from "date-fns";
 
 interface ServiceType {
   id: string;
@@ -146,6 +151,25 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [isContractOpen, setContractOpen] = useState(false);
   const [_isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
+  const [requestapplicants, setRequestApplicants] = useState<any>({ pending: [], finished: [] });
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  useEffect(() => {
+    const fetchApplicants = async () => {
+      try {
+        const applications = await getRequestsByService(id);
+        const requestApplicant = applications.data;
+        console.log(applications)
+        setRequestApplicants({
+          pending: requestApplicant.filter((app: any) => app.status === "Pending"),
+          finished: requestApplicant.filter((app: any) => app.status === "Finished"),
+        });
+      } catch (error: any) {
+        console.log(error)
+      }
+    };
+    fetchApplicants();
+  }, [id]);
 
   const fetchService = async () => {
     try {
@@ -630,7 +654,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[40px] gap-[170px] z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[40px] gap-[80px] z-10">
           <div>
             <Breadcrumb>
               <BreadcrumbList className="text-[#000]">
@@ -830,67 +854,214 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
       <section className="bg-gradient-to-r from-gray-50 to-gray-100 py-10">
         <div className="container mx-auto px-6">
-          <h2 className="text-4xl font-bold text-blue-600 mb-8 text-center font-poppins">
-            Service Details
-          </h2>
-
           <div className="flex justify-center">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-3/5 bg-white shadow-xl rounded-2xl p-8">
-              {/* Service Type */}
-              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-blue-50">
-                <FaInfoCircle className="text-blue-500 text-3xl" />
-                <div>
-                  <p className="text-lg font-semibold text-gray-700">Service Type:</p>
-                  <p className="text-gray-600">{serviceData.type}</p>
+            <div className="w-11/12 md:w-4/5 bg-white shadow-xl rounded-2xl p-10 space-y-6">
+              <div className="relative flex items-center gap-3">
+                <div className="p-2 bg-[#1eb2a6] rounded-full">
+                  <FaServicestack className="w-6 h-6 text-white" />
                 </div>
+                <h2 className="text-3xl sm:text-3xl font-bold text-gray-800">Service Details</h2>
               </div>
+              <div className="h-1 w-16 bg-[#1eb2a6] rounded mt-2"></div>
+              <br />
 
-              {/* Price */}
-              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-green-50">
-                <FaDollarSign className="text-green-500 text-3xl" />
-                <div>
-                  <p className="text-lg font-semibold text-gray-700">Price:</p>
-                  <p className="text-gray-600">${serviceData.price}</p>
+              {/* Content Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-4">
+                  {/* Service Type */}
+                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-blue-50">
+                    <FaInfoCircle className="text-blue-500 text-3xl" />
+                    <div>
+                      <p className="text-lg font-semibold text-gray-700">Service Type:</p>
+                      <p className="text-gray-600">{serviceData.type}</p>
+                    </div>
+                  </div>
+
+                  {/* Provider Information */}
+                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-indigo-50">
+                    <FaUser className="text-indigo-500 text-3xl" />
+                    <div>
+                      <Link
+                        to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
+                        className="text-[#1eb2a6] hover:underline text-lg font-semibold"
+                      >
+                        Provider Information
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Provider Information */}
-              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-indigo-50">
-                <FaUser className="text-indigo-500 text-3xl" />
-                <div>
-                  <Link
-                    to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
-                    className="text-[#1eb2a6] hover:underline text-lg font-semibold"
-                  >
-                    Provider Information
-                  </Link>
-                </div>
-              </div>
+                {/* Right Column */}
+                <div className="space-y-4">
+                  {/* Price */}
+                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-green-50">
+                    <FaDollarSign className="text-green-500 text-3xl" />
+                    <div>
+                      <p className="text-lg font-semibold text-gray-700">Price:</p>
+                      <p className="text-gray-600">${serviceData.price}</p>
+                    </div>
+                  </div>
 
-              {/* Status */}
-              <div className="hidden flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-teal-50">
-                <FaCheckCircle className="text-teal-500 text-3xl" />
-                <div>
-                  <p className="text-lg font-semibold text-gray-700">Status:</p>
-                  <p className="text-gray-600">{serviceData.status}</p>
-                </div>
-              </div>
-
-              {/* About This Service */}
-              <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-yellow-50">
-                <FaClipboardList className="text-teal-500 text-3xl" />
-                <div>
-                  <p className="text-lg font-semibold text-gray-700">About This Service:</p>
-                  <p className="text-gray-600">{serviceData.description}</p>
+                  {/* About This Service */}
+                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-yellow-50">
+                    <FaClipboardList className="text-teal-500 text-3xl" />
+                    <div>
+                      <p className="text-lg font-semibold text-gray-700">About This Service:</p>
+                      <p className="text-gray-600">{serviceData.description}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+
           <br></br>
           <br></br>
+
+          {user.role == "Provider" && (
+            <div className="flex justify-center">
+              <div className="w-11/12 md:w-4/5 bg-white shadow-xl rounded-2xl p-10 space-y-6">
+                {/* Tiêu đề */}
+                <div>
+                  <div className="relative flex items-center gap-4">
+                    <div className="p-4 bg-gradient-to-r from-[#1eb2a6] to-[#0d9488] rounded-full">
+                      <FaUsers className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-800">Applicant's Requests</h2>
+                  </div>
+                  {/* Gạch dưới */}
+                  <div className="h-1 w-20 bg-gradient-to-r from-[#1eb2a6] to-[#0d9488] rounded mt-2"></div>
+                </div>
+
+
+                {/* Tabs */}
+                <Tabs
+                  value={selectedTab}
+                  onChange={(_, newValue) => setSelectedTab(newValue)}
+                  aria-label="Applications Tabs"
+                  centered
+                  className="bg-gray-100 rounded-lg shadow-sm p-2"
+                >
+                  <Tab
+                    label="Pending Request"
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      color: selectedTab === 0 ? "#0369a1" : "#6b7280",
+                    }}
+                  />
+                  <Tab
+                    label="Finished Request"
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      color: selectedTab === 1 ? "#16a34a" : "#6b7280",
+                    }}
+                  />
+                </Tabs>
+
+                {/* Bảng ứng viên */}
+                <Paper
+                  elevation={3}
+                  style={{
+                    padding: '20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#fafafa',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  {/* Table Header */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      fontWeight: 'bold',
+                      backgroundColor: '#f1f1f1',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      marginBottom: '10px',
+                    }}
+                  >
+                    <div style={{ flex: 0.5 }}>#</div>
+                    <div style={{ flex: 1 }}>Avatar</div>
+                    <div style={{ flex: 1 }}>Name</div>
+                    <div style={{ flex: 1 }}>Request Date</div>
+                    <div style={{ flex: 1 }}>Action</div>
+                  </div>
+
+                  {/* Applicants List */}
+                  {(selectedTab === 0 ? requestapplicants.pending : requestapplicants.finished)?.length > 0 ? (
+                    (selectedTab === 0 ? requestapplicants.pending : requestapplicants.finished).map((app: any, index: number) => (
+                      <div
+                        key={app.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          backgroundColor: '#f9f9f9',
+                          padding: '10px',
+                          borderRadius: '8px',
+                          marginBottom: '10px',
+                          transition: 'background-color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                      >
+                        {/* Index */}
+                        <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                        {/* Avatar */}
+                        <div style={{ flex: 1 }}>
+                          <img
+                            src={app.applicant.avatarUrl || '/path/to/default-avatar.jpg'}
+                            alt="Avatar"
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '2px solid #0369a1',
+                            }}
+                          />
+                        </div>
+
+                        {/* Name */}
+                        <div style={{ flex: 1 }}>{app.applicant.username}</div>
+
+                        {/* Applied At */}
+                        <div style={{ flex: 1 }}>
+                          {app.requestDate ? format(new Date(app.requestDate), 'MM/dd/yyyy') : 'N/A'}
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ flex: 1 }}>
+                          <Button
+                            onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
+                            style={{
+                              backgroundColor: '#1e88e5',
+                              color: '#fff',
+                              padding: '6px 12px',
+                              borderRadius: '5px',
+                            }}
+                          >
+                            <IoIosEye style={{ marginRight: '8px' }} />
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
+                  )}
+                </Paper>
+
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
-
 
       <AccountApplicantDialog
         open={applicantDialogOpen}
