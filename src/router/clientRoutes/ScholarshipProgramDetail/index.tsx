@@ -1224,18 +1224,28 @@ const ScholarshipProgramDetail = () => {
                     <div className="p-2 bg-[#1eb2a6] rounded-full">
                       <FaCalendarAlt className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Expert List</h2>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Expert List for this scholarship</h2>
                   </div>
                   <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
                 </div>
 
-                <button
+                <div className="flex justify-end mb-5">
+                  <button
                     // onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
-                    className="flex mb-5 mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
+                    className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
+                  >
+                    <IoIosAddCircleOutline className="text-2xl" />
+                    <span className="text-lg font-medium">Invite Expert</span>
+                  </button>
+
+                  <button
+                    // onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
+                    className="flex ml-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
                   >
                     <IoIosAddCircleOutline className="text-2xl" />
                     <span className="text-lg font-medium">Choose Application</span>
                   </button>
+                </div>
 
                 {/* Experts Section */}
                 <Paper
@@ -1319,6 +1329,7 @@ const ScholarshipProgramDetail = () => {
                               borderRadius: '5px',
                             }}
                           >
+                            <IoIosEye style={{ marginRight: '8px' }} />
                             View Details
                           </Button>
                         </div>
