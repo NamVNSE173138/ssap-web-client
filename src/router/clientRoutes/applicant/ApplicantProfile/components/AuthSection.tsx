@@ -1,16 +1,20 @@
 import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
 
-const AuthSection = (_props: any) => {
+const AuthSection = (props: any) => {
   return (
     <Tabs.Content value="password" className="pt-4">
-      <h2 className="text-3xl text-black font-bold mb-6">Password & Authentication</h2>
+      <h2 className="text-3xl text-black font-bold mb-6">
+        Password & Authentication
+      </h2>
       <form className="space-y-6">
         <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-
           {/* Old Password */}
           <div>
-            <label htmlFor="oldPassword" className="block text-gray-700 font-medium">
+            <label
+              htmlFor="oldPassword"
+              className="block text-gray-700 font-medium"
+            >
               Old Password
             </label>
             <input
@@ -23,10 +27,12 @@ const AuthSection = (_props: any) => {
 
           {/* New Password and Confirm Password - Flex layout */}
           <div className="flex space-x-6">
-
             {/* New Password */}
             <div className="flex-1 mt-5">
-              <label htmlFor="password" className="block text-gray-700 font-medium">
+              <label
+                htmlFor="password"
+                className="block text-gray-700 font-medium"
+              >
                 New Password
               </label>
               <input
@@ -39,7 +45,10 @@ const AuthSection = (_props: any) => {
 
             {/* Confirm Password */}
             <div className="flex-1 mt-5">
-              <label htmlFor="confirmPassword" className="block text-gray-700 font-medium">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-gray-700 font-medium"
+              >
                 Confirm Password
               </label>
               <input
