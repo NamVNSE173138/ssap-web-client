@@ -156,8 +156,8 @@ const ProviderInformation = () => {
               disabled={!user || user?.role !== "Applicant"}
               onClick={handleRequestForm}
               className={`flex justify-center items-center transition-all duration-300 gap-4 px-8 py-4 rounded-xl shadow-xl transform ${!user
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-white hover:bg-blue-600 hover:text-white hover:scale-105"
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-white hover:bg-blue-600 hover:text-white hover:scale-105"
                 }`}
             >
               <IoIosPaper

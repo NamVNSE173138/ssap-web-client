@@ -37,6 +37,9 @@ import { toast } from "react-toastify";
 import { notification } from "antd";
 import { Button, DialogActions } from '@mui/material';
 import { Cancel, Save, Close, Send } from '@mui/icons-material';
+import { IoIosAddCircleOutline, IoMdAddCircle } from "react-icons/io";
+import AccountApplicantDialog from "../ServiceDetail/applicantrequests-dialog";
+import AddCommentRequest from "../ServiceDetail/add-comment-request";
 
 const RequestDetailTable = ({
   showButtons,
@@ -66,6 +69,15 @@ const RequestDetailTable = ({
   const [finishDate, setFinishDate] = useState<Date | null>(null);
   const [canProvideFeedback, setCanProvideFeedback] = useState(true);
   const maxCharacters = 100;
+  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
+
+  const handleOpenCommentDialog = (requestId: number) => {
+    setSelectedRequestId(requestId);
+    console.log(setSelectedRequestId)
+  };
+
+  console.log(request)
+  console.log(requestDetails)
 
   if (!requestDetails || requestDetails.length === 0) {
     return (
@@ -79,14 +91,6 @@ const RequestDetailTable = ({
       </Paper>
     );
   }
-
-  const StyledLink = styled(Link)(() => ({
-    color: "#4A90E2",
-    textDecoration: "underline",
-    "&:hover": {
-      color: "#FF6347",
-    },
-  }));
 
   useEffect(() => {
     const fetchScholarships = async () => {
@@ -246,9 +250,19 @@ const RequestDetailTable = ({
     navigate(`/chat?id=${chatUserId}`);
   };
   console.log(requestDetails);
-
   return (
     <Box>
+      {requestDetails.map((detail: any) => (
+        <button
+          onClick={() => handleOpenCommentDialog(detail.requestId)}
+          className="flex mb-5 mr-2 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
+        >
+          <IoIosAddCircleOutline className="text-2xl" />
+          <span className="text-lg font-medium">Add comment</span>
+        </button>
+      ))}
+
+      <br></br>
       <Paper
         elevation={3}
         style={{
@@ -271,10 +285,10 @@ const RequestDetailTable = ({
             textTransform: 'uppercase',
           }}
         >
-          <div style={{ flex: '0.5', marginLeft: '20px' }}>#</div>
-          <div style={{ flex: '2', textAlign: 'left' }}>Applicant Description</div>
-          <div style={{ flex: '2', textAlign: 'left' }}>Request File</div>
-          <div style={{ flex: '2', color: "#FF6347", textAlign: 'left' }}>Provider Updated File</div>
+          <div style={{ flex: '0.5', marginLeft: '20px' }}>Id</div>
+          <div style={{ flex: '2.5', textAlign: 'left', marginRight: '20px' }}>Applicant Description</div>
+          <div style={{ flex: '1', textAlign: 'left' }}>Request File</div>
+          <div style={{ flex: '1', color: "#FF6347", textAlign: 'left' }}>Provider Updated File</div>
           <div style={{ flex: '2', color: "#FF6347", textAlign: 'left' }}>Provider Notes</div>
         </div>
 
@@ -303,12 +317,12 @@ const RequestDetailTable = ({
             </div>
 
             {/* Applicant Description */}
-            <div style={{ flex: '2', color: '#333', fontWeight: '500', fontSize: '16px' }}>
-              <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>{detail.description || 'No description provided'}</div>
+            <div style={{ flex: '2.5', color: '#333', fontWeight: '500', fontSize: '16px', marginRight: '20px' }}>
+              <div style={{ fontSize: '14px', color: '#999', fontWeight: '700' }}>{request.description || 'No description provided'}</div>
             </div>
 
             {/* Request File */}
-            <div style={{ flex: '2', color: '#555' }}>
+            <div style={{ flex: '1', color: '#555' }}>
               {detail.requestDetailFiles.filter((a: any) => a.uploadedBy === 'Applicant').length > 0 ? (
                 detail.requestDetailFiles
                   .filter((a: any) => a.uploadedBy === 'Applicant')
@@ -336,14 +350,14 @@ const RequestDetailTable = ({
                     return null;
                   })
               ) : (
-                <div style={{ flex: '2', color: '#333', fontSize: '16px' }}>
+                <div style={{ flex: '1', color: '#333', fontSize: '16px' }}>
                   <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>No file uploaded yet</div>
                 </div>
               )}
             </div>
 
             {/* Provider Updated File */}
-            <div style={{ flex: '2', color: '#555' }}>
+            <div style={{ flex: '1', color: '#555' }}>
               {detail.requestDetailFiles.filter((a: any) => a.uploadedBy === 'Provider').length > 0 ? (
                 detail.requestDetailFiles
                   .filter((a: any) => a.uploadedBy === 'Provider')
@@ -370,7 +384,7 @@ const RequestDetailTable = ({
                     return null;
                   })
               ) : (
-                <div style={{ flex: '2', color: '#333', fontSize: '16px' }}>
+                <div style={{ flex: '1', color: '#333', fontSize: '16px' }}>
                   <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>No file uploaded yet</div>
                 </div>
               )}
@@ -378,13 +392,11 @@ const RequestDetailTable = ({
 
             {/* Provider Notes */}
             <div style={{ flex: '2', color: '#333', fontSize: '16px' }}>
-              <div style={{ fontSize: '14px', color: '#999', fontWeight: '500' }}>No comment yet</div>
+              <div style={{ fontSize: '14px', color: '#999', fontWeight: '700' }}>{detail.comment || 'No description provided'}</div>
             </div>
           </div>
         ))}
       </Paper>
-
-
 
       {user.role === "Applicant" && (
         <>
@@ -709,6 +721,10 @@ const RequestDetailTable = ({
           )}
         </DialogActions>
       </Dialog>
+      <AddCommentRequest
+        selectedRequestId={selectedRequestId}
+        setSelectedRequestId={setSelectedRequestId}
+      />
     </Box>
   );
 };
