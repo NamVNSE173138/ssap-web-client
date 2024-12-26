@@ -20,7 +20,7 @@ import RoleNames from "@/constants/roleNames"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { transferMoney } from "@/services/ApiServices/paymentService"
 import PayAwardDialog from "./PayAwardDialog"
-import { FaBirthdayCake, FaCheckCircle, FaClock, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaQuestionCircle, FaStopCircle, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
+import { FaCheckCircle, FaClock, FaDollarSign, FaEnvelope, FaFileAlt, FaFlag, FaPaperPlane, FaQuestionCircle, FaStopCircle, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
 import { HiOutlinePlusCircle } from 'react-icons/hi';
 import { SendNeedExtendReason, SendNotificationAndEmail } from "@/services/ApiServices/notification"
 import { getMessaging, onMessage } from "firebase/messaging"
@@ -53,10 +53,7 @@ const FunderApplication = () => {
 
 
   const [rowId, setRowId] = useState<number>(0);
-  const [rows, setRows] = useState<any[]>([
-    //{ id: 1, name: 'CV', type: "PDF", file: null, isNew: false },
-    //{ id: 2, name: 'IELTS', type: "PDF", file: null, isNew: false }
-  ]);
+  const [rows, setRows] = useState<any[]>([]);
 
   const statusColor = {
     [ApplicationStatus.Submitted]: "blue",
@@ -68,10 +65,19 @@ const FunderApplication = () => {
   }
 
   const handleAddRow = () => {
-    setRowId(rowId + 1);
-    const newRow = { id: rowId + 1, name: "", type: "" }; // Blank row for user input
-    setRows([...rows, newRow]);
+    if (rows.length < requiredDocumentsCount) { 
+      const newRow = { id: rows.length + 1, name: "", type: "" }; 
+      setRows([...rows, newRow]); 
+    }
   };
+
+  const requiredDocuments = awardMilestones?.find(
+    (milestone: any) =>
+      new Date(milestone.fromDate) < new Date(application?.updatedAt) &&
+      new Date(application?.updatedAt) < new Date(milestone.toDate)
+  )?.awardMilestoneDocuments || [];  
+
+  const requiredDocumentsCount = requiredDocuments.length;
 
   const handleDeleteRow = (id: number) => {
     setRows(rows.filter((row) => row.id !== id));
@@ -82,6 +88,12 @@ const FunderApplication = () => {
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
   };
+
+  useEffect(() => {
+    if (application && application.awardMilestones) {
+      setAwardMilestones(application.awardMilestones);
+    }
+  }, [application]);
 
   const handleSubmit = async () => {
     if (!id) return;
@@ -105,8 +117,7 @@ const FunderApplication = () => {
           const currentAward = awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
             new Date(application.updatedAt) < new Date(milestone.toDate)
           )
-          //console.log(new Set(rows.map((row: any) => row.type)))
-          //console.log(new Set(new Set(currentAward.awardMilestoneDocuments.map((doc: any) => doc.type))))
+
           const areSetsEqual = (setA: Set<any>, setB: Set<any>): boolean =>
             setA.size === setB.size && [...setA].every(item => setB.has(item));
           if (currentAward.awardMilestoneDocuments.length != 0 && !areSetsEqual(new Set(rows.map((row: any) => row.type)), new Set(currentAward.awardMilestoneDocuments.map((doc: any) => doc.type)))) {
@@ -248,8 +259,7 @@ const FunderApplication = () => {
       const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
       const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
       const award = await getAwardMilestoneByScholarship(response.data.scholarshipProgramId);
-      //console.log(response);
-      //console.log(scholarship);
+
       if (response.statusCode == 200) {
         setApplication(response.data);
         setApplicant(response.data.applicant);
@@ -397,24 +407,40 @@ const FunderApplication = () => {
                 Documents
                 <span className="ml-2 block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
               </p>
-              {application.status === ApplicationStatus.NeedExtend && (user?.role === RoleNames.APPLICANT || user?.role === "Applicant") &&
-                awardMilestones.some((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) && new Date(application.updatedAt) < new Date(milestone.toDate)
-                ) &&
-                <div className="flex items-center gap-2">
-                  <p className="text-lg">Required Documents: </p>
-                  {awardMilestones.find((milestone: any) => new Date(milestone.fromDate) < new Date(application.updatedAt) &&
+
+              {application.status === ApplicationStatus.NeedExtend &&
+                (user?.role === RoleNames.APPLICANT || user?.role === "Applicant") &&
+                awardMilestones.some(
+                  (milestone: any) =>
+                    new Date(milestone.fromDate) < new Date(application.updatedAt) &&
                     new Date(application.updatedAt) < new Date(milestone.toDate)
-                  )?.awardMilestoneDocuments.map((doc: any) => (
-                    <div className="flex items-center gap-2" key={doc.id}>
-                      <Tag color="magenta">{doc.type}</Tag>
+                ) && (
+                  <div className="flex items-center gap-4 mt-3">
+                    {/* Title */}
+                    <p className="text-xl font-semibold text-gray-800">Required Documents:</p>
+
+                    {/* Documents List */}
+                    <div className="flex gap-2 flex-wrap">
+                      {requiredDocuments.map((doc: any) => (
+                        <div key={doc.id}>
+                          <Tag color="magenta">{doc.type}</Tag>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                  <Button onClick={handleAddRow} className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2">
-                    <HiOutlinePlusCircle className="text-lg" /> Add Extend Document
-                  </Button>
-                </div>
-              }
+
+                    {/* Add Document Button */}
+                    <Button
+                      onClick={handleAddRow}  
+                      className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                      disabled={rows.length >= requiredDocumentsCount}  
+                    >
+                      <HiOutlinePlusCircle className="text-lg" />
+                      <span className="text-lg font-bold">Add Extend Document</span>
+                    </Button>
+                  </div>
+                )}
             </div>
+
             <DocumentTable
               documents={documents}
               awardMilestones={awardMilestones}
@@ -498,6 +524,7 @@ const FunderApplication = () => {
 
         <br></br>
         <br></br>
+
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <p className="text-4xl mb-8 flex items-center">
@@ -529,8 +556,10 @@ const FunderApplication = () => {
               <div className="flex justify-end mt-[24px] gap-5">
                 <AlertDialog>
                   <AlertDialogTrigger disabled={applyLoading}>
-                    <Button onClick={() => {setIsPayAll(false) 
-                      setOpenPayDialog(true)}} disabled={applyLoading} className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2">
+                    <Button onClick={() => {
+                      setIsPayAll(false)
+                      setOpenPayDialog(true)
+                    }} disabled={applyLoading} className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2">
                       {applyLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin" aria-hidden="true"></div> : <FaDollarSign className="text-lg" />}
                       Pay for this award progress
                     </Button>

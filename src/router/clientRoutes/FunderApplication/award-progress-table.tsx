@@ -75,7 +75,6 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
           <div style={{ flex: 1 }}>{new Date(award.fromDate).toLocaleDateString('en-US')}</div>
           <div style={{ flex: 1 }}>{new Date(award.toDate).toLocaleDateString('en-US')}</div>
           <div style={{ flex: 1, color: "#388e3c", fontWeight: "bold" }}>${award.amount}</div>
-
           {/* Status Section */}
 
           <div style={{ flex: 1 }}>
@@ -84,10 +83,10 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                 {application.status === "Submitted" && (
                   <div className="flex gap-2 items-center">
                     <span className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                     </span>
-                    <span className="text-yellow-500 font-medium">Reviewing</span>
+                    <span className="text-green-500 font-medium">Submitted</span>
                   </div>
                 )}
 
@@ -98,6 +97,16 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
                       <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
                     </span>
                     <span className="text-sky-500 font-medium">Approved</span>
+                  </div>
+                )}
+
+                {application.status === "NeedExtend" && (
+                  <div className="flex gap-2 items-center">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                    </span>
+                    <span className="text-yellow-500 font-medium">Need Extend</span>
                   </div>
                 )}
 

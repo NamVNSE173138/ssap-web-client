@@ -313,6 +313,8 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
               </div>
             )}
           </>
+
+
         )}
 
         {/* Step 2: Select Applications */}
@@ -470,8 +472,6 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
       </div>
       {/* {loading && <ScreenSpinner/>} */}
     </Dialog>
-
-
   );
 };
 
