@@ -1,5 +1,5 @@
 import { IoIosAddCircleOutline } from "react-icons/io";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
@@ -8,9 +8,7 @@ import RouteNames from "@/constants/routeNames";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramSkeleton from "./ScholarshipProgramSkeleton";
 import * as Tabs from "@radix-ui/react-tabs";
-import CreatedCard from "./CreatedCard";
-import { Card } from "antd";
-import { Button, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { FaEye } from "react-icons/fa";
 
 const Activity = () => {
@@ -22,8 +20,6 @@ const Activity = () => {
     useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-
 
   const fetchData = async () => {
     setLoading(true);
@@ -66,19 +62,40 @@ const Activity = () => {
             )}
           </div>
 
-          <Paper elevation={3} style={{ padding: '20px', borderRadius: '10px' }}>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <Paper
+            elevation={3}
+            style={{ padding: "20px", borderRadius: "10px" }}
+          >
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#419f97', color: 'white', textAlign: 'left' }}>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>#</th>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Name</th>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Description</th>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Deadline</th>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Value of Award</th>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Number of Award Milestones</th> 
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Number of Scholarships</th>
-                    <th style={{ padding: '12px', fontWeight: '600' }}>Actions</th>
+                  <tr
+                    style={{
+                      backgroundColor: "#419f97",
+                      color: "white",
+                      textAlign: "left",
+                    }}
+                  >
+                    <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>Name</th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Description
+                    </th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Deadline
+                    </th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Value of Award
+                    </th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Number of Award Milestones
+                    </th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Number of Scholarships
+                    </th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -90,13 +107,29 @@ const Activity = () => {
                     </tr>
                   ) : error ? (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '20px', fontSize: '18px', color: '#888' }}>
+                      <td
+                        colSpan={8}
+                        style={{
+                          textAlign: "center",
+                          padding: "20px",
+                          fontSize: "18px",
+                          color: "#888",
+                        }}
+                      >
                         Error loading scholarship programs
                       </td>
                     </tr>
                   ) : data.length === 0 ? (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '20px', fontSize: '18px', color: '#888' }}>
+                      <td
+                        colSpan={8}
+                        style={{
+                          textAlign: "center",
+                          padding: "20px",
+                          fontSize: "18px",
+                          color: "#888",
+                        }}
+                      >
                         No scholarship programs found
                       </td>
                     </tr>
@@ -105,53 +138,109 @@ const Activity = () => {
                       <tr
                         key={item.id}
                         style={{
-                          backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff',
-                          transition: 'background-color 0.3s ease',
+                          backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff",
+                          transition: "background-color 0.3s ease",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#fff')}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#f1f1f1")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor =
+                            index % 2 === 0 ? "#f9f9f9" : "#fff")
+                        }
                       >
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>{index + 1}</td>
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>{item.name}</td>
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
-                          {item.description.length > 60 ? item.description.slice(0, 60) + '...' : item.description}
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {index + 1}
                         </td>
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
-                          {new Date(item.deadline).toLocaleDateString('en-US', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            year: 'numeric',
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {item.name}
+                        </td>
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {item.description.length > 60
+                            ? item.description.slice(0, 60) + "..."
+                            : item.description}
+                        </td>
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {new Date(item.deadline).toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
                           })}
                         </td>
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>${item.scholarshipAmount}</td>
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          ${item.scholarshipAmount}
+                        </td>
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
                           {item.numberOfAwardMilestones}
                         </td>
-                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
                           {item.numberOfScholarships}
                         </td>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <td style={{ padding: "12px", textAlign: "center" }}>
                           <Link
                             to={`/scholarship-program/${item.id}`}
                             style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '5px',
-                              fontSize: '14px',
-                              padding: '6px 12px',
-                              borderRadius: '5px',
-                              textDecoration: 'none',
-                              color: '#007bff',
-                              backgroundColor: '#f0f8ff',
-                              transition: 'background-color 0.3s ease, color 0.3s ease',
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "5px",
+                              fontSize: "14px",
+                              padding: "6px 12px",
+                              borderRadius: "5px",
+                              textDecoration: "none",
+                              color: "#007bff",
+                              backgroundColor: "#f0f8ff",
+                              transition:
+                                "background-color 0.3s ease, color 0.3s ease",
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = '#007bff';
-                              e.currentTarget.style.color = '#fff';
+                              e.currentTarget.style.backgroundColor = "#007bff";
+                              e.currentTarget.style.color = "#fff";
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = '#f0f8ff';
-                              e.currentTarget.style.color = '#007bff';
+                              e.currentTarget.style.backgroundColor = "#f0f8ff";
+                              e.currentTarget.style.color = "#007bff";
                             }}
                           >
                             <FaEye /> View
@@ -164,8 +253,6 @@ const Activity = () => {
               </table>
             </div>
           </Paper>
-
-
         </div>
       </div>
     </Tabs.Content>
