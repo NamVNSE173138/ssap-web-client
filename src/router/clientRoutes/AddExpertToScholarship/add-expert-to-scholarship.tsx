@@ -241,6 +241,7 @@ const AddExpertToScholarship = () => {
           </div>
           <div className="flex justify-end mt-5">
             <button
+              disabled={selectedExperts.length === 0}
               onClick={handleDone}
               className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
             >
