@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   NotifyFunderNewApplicant,
 
@@ -31,8 +31,8 @@ const ApplyScholarship = () => {
     receiveUpdates: false,
   });
 
-
   const [applyLoading, setApplyLoading] = useState<boolean>(false)
+  const [scholarship, setScholarship] = useState<any>(null)
 
   const [rowId, setRowId] = useState<number>(0);
   const [rows, setRows] = useState<any[]>([
@@ -41,16 +41,27 @@ const ApplyScholarship = () => {
   ]);
   const [isContractOpen, setContractOpen] = useState(false);
 
-  const fetchProfile = async () => {
+  const fetchData = async () => {
     if (!user) return;
-    const response = await getApplicantProfileById(user.id);
-    if (response.statusCode !== 200) return;
-    setFormData({ ...formData, first_name: response.data.firstName, last_name: response.data.lastName, email: response.data.applicant.email, phone_number: response.data.applicant.phoneNumber });
+    const [profile, scholarship] = await Promise.all([
+        getApplicantProfileById(user.id),
+        getScholarshipProgram(Number(id))]); 
+    
+    if (profile.statusCode !== 200) return;
+    setScholarship(scholarship.data);
+    let rowId = 0;
+    setRows(
+        scholarship.data.documents.map((item:any) => (
+            { id: ++rowId, name: item.type, type: item.type, file: null, isRequired: item.isRequired}
+        ))
+    )
+    setRowId(rowId+1);
+    setFormData({ ...formData, first_name: profile.data.firstName, last_name: profile.data.lastName, email: profile.data.email, phone_number: profile.data.phone });
   };
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
-    const newRow = { id: rowId + 1, name: "", type: "" }; // Blank row for user input
+    const newRow = { id: rowId + 1, name: "", type: "Other" }; // Blank row for user input
     setRows([...rows, newRow]);
   };
 
@@ -79,20 +90,20 @@ const ApplyScholarship = () => {
       setApplyLoading(false);
       return;
     }
-    if (rows.length == 0) {
+    /*if (rows.length == 0) {
       notification.error({ message: "You have to upload at least one document." });
       return;
-    }
+    }*/
 
     setApplyLoading(true);
-    const program = await getScholarshipProgram(Number(id));
+    //const program = await getScholarshipProgram(Number(id));
 
-    if (!program) {
+    if (!scholarship) {
       alert("Program not found");
       setApplyLoading(false);
       return;
     }
-    if (program.data.status == "FINISHED") {
+    if (scholarship.status == "FINISHED") {
       alert("Program is finished");
       setApplyLoading(false);
       return;
@@ -101,30 +112,40 @@ const ApplyScholarship = () => {
     setRows(
       rows.map((row) => ({
         ...row,
-        errors: {
+        errors: row.isRequired ? {
           name: !row.name,
           type: !row.type,
           file: !row.file,
-        },
+        } : {},
       }))
     );
+    const submitForm = new FormData();
+    for (const row of rows) {
+        submitForm.append("Files", row.file);
+    }
+    const name = await uploadFile(submitForm);
+    const files =name.urls;
+    //console.log(files)
 
     const applicationDocuments = [];
+        
+    let uploadedFileId = 0;
     for (const row of rows) {
-      if (!row.name || !row.type || !row.file) {
+      if (row.isRequired && (!row.name || !row.type || !row.file)) {
         setApplyLoading(false);
         return;
       }
-      const formData = new FormData();
-      formData.append("File", row.file);
-      const name = await uploadFile(formData);
-
-      const documentData = {
-        name: row.name,
-        type: row.type,
-        fileUrl: name.urls[0],
-      };
-      applicationDocuments.push(documentData);
+      if(row.file){
+          const documentData = {
+            name: row.name=="" ? row.type : row.name,
+            type: row.type,
+            fileUrl: files[uploadedFileId],
+          };
+          //console.log(files[0])
+          uploadedFileId++;
+          //console.log(uploadedFileId)
+          applicationDocuments.push(documentData);
+      }
     }
 
     const applicationData = {
@@ -155,7 +176,7 @@ const ApplyScholarship = () => {
   };
 
   useEffect(() => {
-    fetchProfile();
+    fetchData();
   }, []);
 
   return (
@@ -171,6 +192,11 @@ const ApplyScholarship = () => {
             experts so they can connect you to the right course, country,
             university – and even scholarships!
           </p>
+          {scholarship && <div className="mt-5">
+            <Link className="text-blue-500 underline" to={`/scholarship-program/${id}`}>
+                {`Go to ${scholarship.name} scholarship page`}
+            </Link>
+          </div>}
           <form
             className="grid gap-[24px] lg:grid-cols-2 mt-[24px] lg:mt-[32px]"
             onSubmit={handleSubmit}
@@ -249,6 +275,8 @@ const ApplyScholarship = () => {
               </div>
             </div>
 
+            
+
             {/* Add Document Button */}
             <div className="flex gap-[20px] lg:col-span-2">
               <div className="flex justify-between w-full">
@@ -263,15 +291,22 @@ const ApplyScholarship = () => {
               </div>
             </div>
 
+            <div>
+                The documents with the
+                <span style={{ color: 'red', marginLeft: 4, marginRight: 4 }}>*</span>
+                are required by this scholarship
+            </div>
+
             {/* Editable Table */}
-            <div className="flex gap-[20px] lg:col-span-2">
+            {scholarship && <div className="flex gap-[20px] lg:col-span-2">
               <EditableTable
+                documents={scholarship.documents}
                 rows={rows}
                 setRows={setRows}
                 handleDeleteRow={handleDeleteRow}
                 handleInputChange={handleDocumentInputChange}
               />
-            </div>
+            </div>}
 
             {/* Terms and Conditions */}
             <div className="flex gap-[12px] flex-col lg:col-span-2">
