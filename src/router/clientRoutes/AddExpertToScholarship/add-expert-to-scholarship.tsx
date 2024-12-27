@@ -11,7 +11,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { Checkbox, Paper } from "@mui/material";
 import { getExpertsByFunder } from "@/services/ApiServices/expertService";
 import { IoIosAddCircleOutline, IoIosDoneAll } from "react-icons/io";
-import { assignExpertsToScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { assignExpertsToScholarshipProgram, getAllScholarshipProgramExperts } from "@/services/ApiServices/scholarshipProgramService";
 import { message, notification } from "antd";
 
 const AddExpertToScholarship = () => {
@@ -23,6 +23,8 @@ const AddExpertToScholarship = () => {
   const user = useSelector((state: any) => state.token.user);
   const [_experts, setExperts] = useState<any[]>([]);
   const [selectedExperts, setSelectedExperts] = useState<any[]>([]);
+  const [expertsInScholarship, setExpertsInScholarship] = useState<any[]>([]);
+
 
   const fetchData = async () => {
     try {
@@ -64,9 +66,26 @@ const AddExpertToScholarship = () => {
     }
   };
 
+  const fetchExpertsInScholarship = async () => {
+    try {
+      const response = await getAllScholarshipProgramExperts(Number(id));
+      if (response.statusCode === 200) {
+        setExpertsInScholarship(response.data);
+      } else {
+        setError("Failed to get experts in scholarship");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     fetchData();
     fetchExperts();
+    fetchExpertsInScholarship();
   }, [id]);
 
   console.log(id)
@@ -163,73 +182,92 @@ const AddExpertToScholarship = () => {
             </div>
 
             {/* Expert Cards */}
-            {(_experts && Array.isArray(_experts) && _experts.filter((expert: any) => expert.isVisible !== false).length > 0) ? (
-              _experts.filter((expert: any) => expert.isVisible !== false).map((expert: any, index: any) => (
-                <div
-                  key={expert.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: '#f9f9f9',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    marginBottom: '10px',
-                    transition: 'background-color 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
-                >
+            {_experts &&
+              Array.isArray(_experts) &&
+              _experts.filter((expert: any) => expert.isVisible !== false).length > 0 ? (
+              _experts.filter((expert: any) => expert.isVisible !== false).map((expert: any, index: any) => {
+                const isAlreadyInScholarship = expertsInScholarship.some(
+                  (existingExpert) => existingExpert.expertId === expert.expertId
+                );
 
-                  <div style={{ flex: 0.25 }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedExperts.includes(expert.expertId)}
-                      onChange={() => {
-                        if (selectedExperts.includes(expert.expertId)) {
-                          setSelectedExperts(selectedExperts.filter((id) => id !== expert.expertId));
-                        } else {
-                          setSelectedExperts([...selectedExperts, expert.expertId]);
-                        }
-                      }}
-                    />
+                return (
+                  <div
+                    key={expert.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#f9f9f9',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      marginBottom: '10px',
+                      transition: 'background-color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                  >
+                    <div style={{ flex: 0.25 }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedExperts.includes(expert.expertId)}
+                        disabled={isAlreadyInScholarship}
+                        onClick={(e) => {
+                          if (isAlreadyInScholarship) {
+                            e.preventDefault();
+                            notification.error({
+                              message: `${expert.username} is already in scholarship.`,
+                            });
+                          }
+                        }}
+                        onChange={() => {
+                          if (selectedExperts.includes(expert.expertId)) {
+                            setSelectedExperts(
+                              selectedExperts.filter((id) => id !== expert.expertId)
+                            );
+                          } else {
+                            setSelectedExperts([...selectedExperts, expert.expertId]);
+                          }
+                        }}
+                      />
+                    </div>
+
+
+                    {/* Cột số thứ tự */}
+                    <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                    <div style={{ flex: 0.5 }}>
+                      <img
+                        src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '2px solid #0369a1',
+                        }}
+                      />
+                    </div>
+
+                    {/* Cột tên chuyên gia */}
+                    <div style={{ flex: 0.75 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
+                    </div>
+
+                    <div style={{ flex: 0.75 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
+                    </div>
+
+                    {/* Cột major */}
+                    <div style={{ flex: 1.5 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
+                    </div>
                   </div>
-
-                  {/* Cột số thứ tự */}
-                  <div style={{ flex: 0.5 }}>{index + 1}</div>
-
-                  <div style={{ flex: 0.5 }}>
-                    <img
-                      src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        border: '2px solid #0369a1',
-                      }}
-                    />
-                  </div>
-
-                  {/* Cột tên chuyên gia */}
-                  <div style={{ flex: 0.75 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
-                  </div>
-
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
-                  </div>
-
-                  <div style={{ flex: 0.75 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
-                  </div>
-
-                  {/* Cột major */}
-                  <div style={{ flex: 1.5 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-center text-gray-500">No experts match your search.</p>
             )}
