@@ -71,6 +71,7 @@ import {
   FaTag,
   FaTasks,
   FaTrash,
+  FaTrashAlt,
   FaTrophy,
   FaUniversity,
   FaUsers,
@@ -80,6 +81,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, notification } from "antd";
 import { IoIosAddCircleOutline, IoIosEye } from "react-icons/io";
 import { List, Paper, Tab, Tabs } from "@mui/material";
+import { getAllScholarshipProgramExperts, removeExpertsFromScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -179,7 +181,7 @@ const ScholarshipProgramDetail = () => {
           );
           await fetchApplicants(Number(id));
           await fetchReviewMilestones(Number(id));
-          await fetchExperts();
+          await fetchExpertsByScholarshipId();
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
               if (
@@ -238,9 +240,9 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
-  const fetchExperts = async () => {
+  const fetchExpertsByScholarshipId = async () => {
     try {
-      const response = await getExpertsByFunder(Number(user.id));
+      const response = await getAllScholarshipProgramExperts(Number(id));
       console.log(response);
       if (response.statusCode == 200) {
         setExperts(response.data);
@@ -279,7 +281,7 @@ const ScholarshipProgramDetail = () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
     if (!data) return;
-    await fetchExperts();
+    await fetchExpertsByScholarshipId();
     setLoading(false);
   };
 
@@ -326,6 +328,30 @@ const ScholarshipProgramDetail = () => {
       setLoading(false);
     }
   };
+
+  const handleRemoveExperts = async (expertId: string) => {
+    try {
+      const response = await removeExpertsFromScholarshipProgram(Number(id), [expertId]);
+
+      if (response.statusCode === 200) {
+        notification.success({
+          message: 'Success',
+          description: 'Remove expert successful',
+        });
+        fetchExpertsByScholarshipId();
+      } else {
+        throw new Error(`Unexpected status code: ${response.statusCode}`);
+      }
+    } catch (error) {
+      console.error(error);
+
+      notification.error({
+        message: 'Error',
+        description: 'Remove failed',
+      });
+    }
+  };
+
 
   console.log("IMAGE", data?.imageUrl);
 
@@ -1231,7 +1257,7 @@ const ScholarshipProgramDetail = () => {
 
                 <div className="flex justify-end mb-5">
                   <button
-                    // onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
+                    onClick={() => navigate(`/funder/add-expert-to-scholarship/${id}`)}
                     className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
                   >
                     <IoIosAddCircleOutline className="text-2xl" />
@@ -1269,9 +1295,11 @@ const ScholarshipProgramDetail = () => {
                   >
                     <div style={{ flex: 0.5 }}>#</div>
                     <div style={{ flex: 0.5 }}>Avatar</div>
-                    <div style={{ flex: 1 }}>Expert Name</div>
+                    <div style={{ flex: 0.75 }}>Name</div>
+                    <div style={{ flex: 1 }}>Email</div>
+                    <div style={{ flex: 0.75 }}>Phone</div>
                     <div style={{ flex: 1.5 }}>Major</div>
-                    <div style={{ flex: 1 }}>Actions</div>
+                    <div style={{ flex: 0.5 }}>Action</div>
                   </div>
 
                   {/* Expert Cards */}
@@ -1309,29 +1337,32 @@ const ScholarshipProgramDetail = () => {
                         </div>
 
                         {/* Cột tên chuyên gia */}
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 0.75 }}>
                           <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
+                        </div>
+
+                        <div style={{ flex: 0.75 }}>
+                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
                         </div>
 
                         {/* Cột major */}
                         <div style={{ flex: 1.5 }}>
-                          {expert.major || 'N/A'}
+                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
                         </div>
 
-                        {/* Cột actions */}
-                        <div style={{ flex: 1 }}>
-                          <Button
-                            // onClick={() => handleExpertSelection(expert)}
+                        <div style={{ flex: 0.5 }} >
+                          <FaTrashAlt
                             style={{
-                              backgroundColor: '#1e88e5',
-                              color: '#fff',
-                              padding: '6px 12px',
-                              borderRadius: '5px',
+                              cursor: 'pointer',
+                              color: '#e57373',
+                              fontSize: '1.5rem',
                             }}
-                          >
-                            <IoIosEye style={{ marginRight: '8px' }} />
-                            View Details
-                          </Button>
+                            onClick={() => handleRemoveExperts(expert.expertId)}
+                          />
                         </div>
                       </div>
                     ))

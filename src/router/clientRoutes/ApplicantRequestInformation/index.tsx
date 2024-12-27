@@ -136,7 +136,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
       <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
-            <p className="text-4xl mb-8">
+            <p className="text-4xl md:text-4xl font-semibold text-gray-800 mb-4">
               Request Details
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>

@@ -311,7 +311,7 @@ const FunderApplication = () => {
     <div>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px]  z-10">
+        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[110px]  z-10">
           <div>
             <Breadcrumb className="">
               <BreadcrumbList className="text-white">
