@@ -1,6 +1,9 @@
 import { InsertDriveFile as FileIcon } from "@mui/icons-material";
-import { Paper } from "@mui/material";
+import { Button, Paper } from "@mui/material";
+import { Tag, Typography } from "antd";
+import React, { useState } from "react";
 import { BsDashCircle } from "react-icons/bs";
+import { IoIosEye } from "react-icons/io";
 
 import { Link } from "react-router-dom";
 
@@ -16,6 +19,11 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
         {children}
       </Link>
     );
+  };
+  const [openSubmissionGuideIndex, setOpenSubmissionGuideIndex] = React.useState(null);
+
+  const handleOpenSubmissionGuide = (index: any) => {
+    setOpenSubmissionGuideIndex(index === openSubmissionGuideIndex ? null : index);
   };
 
   if (!awardMilestone || awardMilestone.length === 0)
@@ -48,10 +56,12 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
         <div style={{ flex: 1 }}>To Date</div>
         <div style={{ flex: 1 }}>Amount</div>
         <div style={{ flex: 1 }}>Status</div>
+        <div style={{ flex: 1 }}>Action</div>
       </div>
 
       {/* Award Milestone List */}
       {awardMilestone.map((award: any, index: any) => (
+
         <div
           key={award.id}
           style={{
@@ -67,6 +77,7 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
         >
+
           {/* Milestone Header */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px' }}>
             <FileIcon style={{ color: '#0d47a1' }} />
@@ -136,8 +147,60 @@ const AwardProgressTable = ({ awardMilestone, application }: any) => {
               </div>
             )}
           </div>
+          <div style={{ flex: 1, color: "#388e3c", fontWeight: "bold" }}>
+            <Button
+              onClick={() => handleOpenSubmissionGuide(index)}
+              style={{
+                backgroundColor: '#1e88e5',
+                color: '#fff',
+                borderRadius: '5px',
+              }}
+            >
+              <IoIosEye style={{ marginRight: '7px' }} />
+              Submission Guide
+            </Button>
+          </div>
         </div>
       ))}
+
+      {openSubmissionGuideIndex !== null && (
+        <Paper
+          elevation={2}
+          sx={{
+            marginTop: "20px",
+            padding: "20px",
+            borderRadius: "12px",
+            backgroundColor: "#f9f9f9",
+          }}
+        >
+          <h3 style={{ color: "#0d47a1", marginBottom: "15px", fontFamily: "Arial, sans-serif" }}>
+            Submission Guides for Progress {openSubmissionGuideIndex + 1}
+          </h3>
+
+          {/* Required Files */}
+          <div style={{ marginBottom: "15px" }}>
+            <h4 style={{ color: "#0d47a1" }}>Required Files</h4>
+            {awardMilestone[openSubmissionGuideIndex].awardMilestoneDocuments &&
+              awardMilestone[openSubmissionGuideIndex].awardMilestoneDocuments.length > 0 ? (
+              awardMilestone[openSubmissionGuideIndex].awardMilestoneDocuments.map((doc: any, idx: any) => (
+                <Tag key={idx} color="magenta" style={{ marginRight: "5px" }}>
+                  {doc.type}
+                </Tag>
+              ))
+            ) : (
+              <p>No required files</p>
+            )}
+          </div>
+
+          {/* Notes */}
+          <div>
+            <h4 style={{ color: "#0d47a1" }}>Notes</h4>
+            <Typography>
+              {awardMilestone[openSubmissionGuideIndex].note || "No notes for this award milestone"}
+            </Typography>
+          </div>
+        </Paper>
+      )}
 
     </Paper>
   );
