@@ -48,7 +48,8 @@ const RouteNames = {
   CATEGORY_MANAGEMENT: "/admin/category-management",
   EXPERT_PROFILE: "/expert/profile",
   ACCOUNT_AWAITING_APPROVAL: "/admin/account-awaiting-approval",
-  USER_GUIDE: "/user-guide"
+  USER_GUIDE: "/user-guide",
+  ADD_EXPERT_TO_SCHOLARSHIP:"/funder/add-expert-to-scholarship/:id"
 };
 
 export default RouteNames;

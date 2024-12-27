@@ -64,3 +64,37 @@ export async function searchScholarshipProgram(name: string, min: number, max: n
         throw error;
     }
 }
+
+export async function getAllScholarshipProgramExperts(programId:number) {
+  try {
+      const response = await axios.get(`${BASE_URL}/api/scholarship-programs/${programId}/experts`);
+      return response.data;
+  } catch (error: any) {
+      console.error('API error:', error?.response?.data || error.message);
+      throw error;
+  }
+}
+
+export async function assignExpertsToScholarshipProgram(programId:number, expertIds:any) {
+  try {
+      const response = await axios.post(`${BASE_URL}/api/scholarship-programs/${programId}/experts`, {
+          expertIds
+      });
+      return response.data;
+  } catch (error: any) {
+      console.error('API error:', error?.response?.data || error.message);
+      throw error;
+  }
+}
+
+export async function removeExpertsFromScholarshipProgram(programId:number, expertIds:any) {
+  try {
+      const response = await axios.put(`${BASE_URL}/api/scholarship-programs/${programId}/experts`, {
+           expertIds 
+      });
+      return response.data;
+  } catch (error: any) {
+      console.error('API error:', error?.response?.data || error.message);
+      throw error;
+  }
+}

@@ -1,8 +1,8 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, IconButton, Tooltip, Select, MenuItem } from '@mui/material';
 import { CloudUploadIcon, TrashIcon } from 'lucide-react';
 
-function EditableTable({ rows, setRows, handleDeleteRow, handleInputChange }: any) {
-const typeOptions = [
+function EditableTable({ documents ,rows, setRows, handleDeleteRow, handleInputChange }: any) {
+/*const typeOptions = [
     { value: 'Academic Transcript', label: 'Academic Transcript' },
     { value: 'Recommendation Letter', label: 'Recommendation Letter' },
     { value: 'Personal Statement', label: 'Personal Statement' },
@@ -12,6 +12,11 @@ const typeOptions = [
     { value: 'Certification', label: 'Certification' },
     { value: 'Exam Scores', label: 'Exam Scores' },
     { value: 'Financial Report', label: 'Financial Report' },
+];*/
+const typeOptions = /*documents?.map((document:any) => 
+({ value: document.type, label: document.type, isRequired: document.isRequired })) ||*/
+[
+    { value: 'Other', label: 'Other', isRequired: false },
 ];
     return (
         <TableContainer component={Paper}>
@@ -37,7 +42,23 @@ const typeOptions = [
                                     />
                             </TableCell>
                             <TableCell>
-                                <Select
+                                {row.isRequired && 
+                                    <div>
+                                        {row.type}
+                                        {<span style={{ color: 'red', marginLeft: 4 }}>*</span>}
+                                    </div>
+                                }
+                                {!row.isRequired && 
+                                    <div>
+                                        {row.type}
+                                    </div>
+                                }
+                                {/*row.isRequired == null && 
+                                    <div>
+                                        {row.type}
+                                    </div>
+                                }*/}
+                                {/*<Select
                                     value={row.type || ''}
                                     error={row.errors?.type}
                                     onChange={(e) => handleInputChange(row.id, 'type', e.target.value)}
@@ -47,12 +68,12 @@ const typeOptions = [
                                     <MenuItem value="" disabled>
                                         Select Type
                                     </MenuItem>
-                                    {typeOptions.map((option) => (
+                                    {typeOptions.map((option:any) => (
                                         <MenuItem key={option.value} value={option.value}>
                                             {option.label}
                                         </MenuItem>
                                     ))}
-                                </Select>
+                                </Select>*/}
                                     {/*<TextField
                                         error={row.errors?.type}
                                         value={row.type}
@@ -74,7 +95,7 @@ const typeOptions = [
                                   tabIndex={-1}
                                   startIcon={<CloudUploadIcon />}
                                 >
-                                  {row.fileName || "Upload file*" }
+                                  {row.fileName || "Upload file" }
                                   <input
                                     hidden
                                     type="file"
@@ -89,9 +110,9 @@ const typeOptions = [
                                     />
                                 </Button>
                             </TableCell>
-                            <TableCell>
+                             <TableCell>
                                 <Tooltip title="Delete row">
-                                    <IconButton onClick={() => handleDeleteRow(row.id)} aria-label="delete" color="error">
+                                    <IconButton disabled={row.isRequired != null} onClick={() => handleDeleteRow(row.id)} aria-label="delete" color="error">
                                         <TrashIcon />
                                     </IconButton>
                                 </Tooltip>

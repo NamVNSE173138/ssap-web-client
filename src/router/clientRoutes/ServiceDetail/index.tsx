@@ -819,12 +819,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         >
                           <FaEdit className="mr-2" /> Edit
                         </button>
-                        <button
+                        {/* <button
                           onClick={handleOpenApplicantDialog}
                           className="flex items-center justify-center w-full bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
                         >
                           <FaEye className="mr-2" /> View Request
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => setConfirmationDialogOpen(true)}
                           className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
