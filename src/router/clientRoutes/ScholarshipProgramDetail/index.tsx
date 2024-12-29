@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
-import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
+import { getAccountById, getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { getAllExperts, getExpertsByFunder } from "@/services/ApiServices/expertService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewingApplicationDialog from "./expert-reviewing-dialog";
@@ -74,6 +74,7 @@ import {
   FaTrashAlt,
   FaTrophy,
   FaUniversity,
+  FaUserAlt,
   FaUsers,
   FaUserTie,
 } from "react-icons/fa";
@@ -127,6 +128,7 @@ const ScholarshipProgramDetail = () => {
     useState<boolean>(false);
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
+  const [funderName, setFunderName] = useState<any>();
 
   const [selectedTab, setSelectedTab] = useState(0);
   const submittingApplications = applicants?.filter(
@@ -168,6 +170,8 @@ const ScholarshipProgramDetail = () => {
       if (response.data.statusCode === 200) {
         setData(response.data.data);
         console.log(response.data.data);
+        const nameOfFunder = await getAccountById(response.data.data.funderId);
+        setFunderName(nameOfFunder.username);
 
         setAuthorized(response.data.message);
         if (user) {
@@ -571,11 +575,11 @@ const ScholarshipProgramDetail = () => {
         <section className="w-full max-w-none flex justify-between items-center mx-auto py-6 lg:py-10 px-4 lg:px-0">
           <div className="flex w-full justify-around gap-12">
             <div className="flex items-center gap-3">
-              <FaMapMarkerAlt className="text-[#1eb2a6] text-xl" />
+              <FaUserAlt className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Location</p>
+                <p className="text-sm font-semibold text-gray-500">Funder</p>
                 <p className="text-lg font-semibold text-gray-800">
-                  {"VietNam"}
+                  {funderName}
                 </p>
               </div>
             </div>
