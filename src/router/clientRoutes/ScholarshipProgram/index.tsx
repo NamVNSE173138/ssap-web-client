@@ -138,8 +138,6 @@ const ScholarshipProgram = () => {
               )}
             </div>
           </div>
-
-
         </div>
       </div>
 
