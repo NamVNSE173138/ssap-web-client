@@ -1,30 +1,53 @@
+import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
+import { ApplicantExperience } from "../types/Applicant";
+import { addApplicantExperience } from "@/services/ApiServices/applicantProfileService";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { notification } from "antd";
 
-const ExperienceDialog = (props: any) => {
-  const { open, setOpen } = props;
+const AddExperienceDialog = (props: any) => {
+  const { open, setOpen, setRefresh } = props;
 
-  // State to hold the input values for experience details
-  const [experience, setExperience] = useState({
+  const user = useSelector((state: RootState) => state.token.user);
+
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [experience, setExperience] = useState<ApplicantExperience>({
+    id: 0,
     name: "",
-    startDate: "",
-    endDate: "",
+    fromYear: 0,
+    toYear: 0,
     description: "",
   });
 
-  // Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
     setExperience((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle saving changes (you can modify this to handle actual saving logic)
-  const handleSaveChanges = () => {
-    console.log("Saving experience: ", experience);
-    // Close dialog after saving changes
-    setOpen(false);
+  const handleSaveChanges = async () => {
+    setIsProcessing(true);
+    try {
+      const payload = {
+        name: experience.name,
+        fromYear: experience.fromYear,
+        toYear: experience.toYear,
+        description: experience.description,
+      };
+      console.log(payload);
+      await addApplicantExperience(Number(user?.id), payload);
+      notification.success({
+        message: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setOpen(false);
+      setIsProcessing(false);
+      setRefresh(true);
+    }
   };
 
   return (
@@ -54,7 +77,7 @@ const ExperienceDialog = (props: any) => {
                   </label>
                   <input
                     type="text"
-                    name="companyName"
+                    name="name"
                     value={experience.name}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
@@ -67,26 +90,42 @@ const ExperienceDialog = (props: any) => {
                     <label className="block text-sm font-medium text-gray-700">
                       Start Date
                     </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={experience.startDate}
+                    <select
+                      name="fromYear"
+                      value={experience.fromYear || 0}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    />
+                    >
+                      <option value="" disabled>
+                        Select Year
+                      </option>
+                      {getYearsToPresent(1973).map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="w-1/2">
                     <label className="block text-sm font-medium text-gray-700">
                       End Date
                     </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={experience.endDate}
+                    <select
+                      name="toYear"
+                      value={experience.toYear || 0}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    />
+                    >
+                      <option value="" disabled>
+                        Select Year
+                      </option>
+                      {getYearsToPresent(1973).map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -96,7 +135,7 @@ const ExperienceDialog = (props: any) => {
                   </label>
                   <textarea
                     name="description"
-                    value={experience.description}
+                    value={experience.description || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                     rows={4}
@@ -110,14 +149,7 @@ const ExperienceDialog = (props: any) => {
                   onClick={handleSaveChanges}
                   className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
                 >
-                  Save Changes
-                </button>
-
-                <button
-                  onClick={() => setOpen(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-red-600"
-                >
-                  Delete
+                  {isProcessing ? "Processing..." : "Save Changes"}
                 </button>
               </div>
             </div>
@@ -128,4 +160,4 @@ const ExperienceDialog = (props: any) => {
   );
 };
 
-export default ExperienceDialog;
+export default AddExperienceDialog;

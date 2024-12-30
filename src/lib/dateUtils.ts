@@ -36,3 +36,13 @@ export const calculateAge = (birthDate: string) => {
     return "N/A";
   }
 };
+
+export const getYearsToPresent = (startYear: number) => {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => 1973 + i,
+  );
+
+  return years;
+};

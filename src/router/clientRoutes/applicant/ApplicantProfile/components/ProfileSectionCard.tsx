@@ -1,11 +1,30 @@
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
-import ExperienceDialog from "./ExperienceDialog";
+import AddExperienceDialog from "./AddExperienceDialog";
+import UpdateExperienceDialog from "./UpdateExperienceDialog";
 
 const ProfileSectionCard = (props: any) => {
-  const { section, title, icon: Icon, items, placeholder, buttonText } = props;
+  const {
+    section,
+    setRefresh,
+    title,
+    icon: Icon,
+    items,
+    placeholder,
+    buttonText,
+  } = props;
 
   const [open, setOpen] = useState<boolean>(false);
+  const [dialogType, setDialogType] = useState<"add" | "update" | "delete">(
+    "add",
+  );
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  const handleOpenDialog = (type: "add" | "update", item?: any) => {
+    setDialogType(type);
+    setSelectedItem(item || null);
+    setOpen(true);
+  };
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
@@ -16,7 +35,7 @@ const ProfileSectionCard = (props: any) => {
             <div
               key={index}
               className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-green-600 hover:cursor-pointer"
-              onClick={() => setOpen(true)}
+              onClick={() => handleOpenDialog("update", item)}
             >
               {/* Left: Icon and Info */}
               <div className="flex items-center gap-4">
@@ -27,7 +46,7 @@ const ProfileSectionCard = (props: any) => {
                   <h4 className="text-sm font-medium text-gray-800">
                     {item.name}
                   </h4>
-                  <p className="text-xs text-gray-500">{item.detail}</p>
+                  <p className="text-xs text-gray-500">{item.description}</p>
                 </div>
               </div>
               {/* Right: Date and Duration */}
@@ -48,14 +67,27 @@ const ProfileSectionCard = (props: any) => {
       {/* Add Button */}
       <button
         className="w-full mt-4 flex items-center justify-center gap-2 p-2 text-green-600 border border-green-200 rounded-lg hover:bg-green-50"
-        onClick={() => setOpen(true)}
+        onClick={() => handleOpenDialog("add")}
       >
         <AiOutlinePlus />
         {buttonText}
       </button>
 
-      {section === "experience" && (
-        <ExperienceDialog open={open} setOpen={setOpen} />
+      {section === "experience" && dialogType === "add" && (
+        <AddExperienceDialog
+          open={open}
+          setRefresh={setRefresh}
+          setOpen={setOpen}
+        />
+      )}
+
+      {section === "experience" && dialogType === "update" && (
+        <UpdateExperienceDialog
+          setRefresh={setRefresh}
+          open={open}
+          setOpen={setOpen}
+          item={selectedItem}
+        />
       )}
     </div>
   );
