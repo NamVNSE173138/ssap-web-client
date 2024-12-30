@@ -29,18 +29,18 @@ const ScholarshipProgram = () => {
   const fetchData = async () => {
     try {
       const [
-    response,
-    /*countryDatas,
-    majorDatas,
-    categoriesDatas,
-    certificatesDatas*/
-  ] = await Promise.all([
-    getAllScholarshipProgram(),
-    /*getAllCountries(),
-    getAllMajors(),
-    getAllCategories(),
-    getAllCertificates()*/
-  ]);
+        response,
+        /*countryDatas,
+        majorDatas,
+        categoriesDatas,
+        certificatesDatas*/
+      ] = await Promise.all([
+        getAllScholarshipProgram(),
+        /*getAllCountries(),
+        getAllMajors(),
+        getAllCategories(),
+        getAllCertificates()*/
+      ]);
       if (response.data.statusCode === 200) {
         setData(response.data.data.items);
         setFullData(response.data.data.items);
@@ -65,7 +65,6 @@ const ScholarshipProgram = () => {
       const keywordLower = keyword.toLowerCase();
       return (
         scholarship.name.toLowerCase().includes(keywordLower) ||
-        (scholarship.university).name.toLowerCase().includes(keywordLower) ||
         (scholarship.major).name.toLowerCase().includes(keywordLower)
       );
     });
@@ -123,7 +122,7 @@ const ScholarshipProgram = () => {
             <div className="relative w-full">
               <input
                 className="w-2/3 h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 ease-in-out rounded-lg shadow-lg bg-gradient-to-r  text-lg placeholder-gray-500 text-gray-800"
-                placeholder="Search for scholarship, university, major..."
+                placeholder="Search for scholarship, major..."
                 value={keyword}
                 onChange={(e) => {
                   setKeyword(e.target.value);
@@ -139,8 +138,6 @@ const ScholarshipProgram = () => {
               )}
             </div>
           </div>
-
-
         </div>
       </div>
 

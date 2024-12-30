@@ -787,6 +787,7 @@
 
 // export default FormCreateScholarshipProgram;
 
+
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -882,6 +883,99 @@ const FormCreateScholarshipProgram = () => {
     }
   };
 
+
+  const handleCategoryChange = (selectedOption: OptionType | null) => {
+    setSelectedCategory(selectedOption ? selectedOption.value : "");
+    form.clearErrors("scholarshiptype");
+  };
+
+  const handleUniversityChange = (selectedOption: OptionType | null) => {
+    setSelectedUniversity(selectedOption);
+    form.clearErrors("university");
+  };
+
+  const handleCertificatesChange = (
+    selectedOptions: MultiValue<OptionType>
+  ) => {
+    setSelectedCertificates(Array.from(selectedOptions) || []);
+    form.clearErrors("certificate");
+  };
+
+  const handleMajorChange = (selectedOption: OptionType | null) => {
+    setSelectedMajor(selectedOption);
+    form.clearErrors("major");
+  };
+
+  useEffect(() => {
+    form.setValue("scholarshiptype", selectedCategory);
+  }, [selectedCategory, form]);
+
+  useEffect(() => {
+    form.setValue(
+      "university",
+      selectedUniversity ? selectedUniversity.value : ""
+    );
+  }, [selectedUniversity, form]);
+
+  useEffect(() => {
+    form.setValue(
+      "certificate",
+      selectedCertificates.map((certificate) => certificate.value)
+    );
+  }, [selectedCertificates, form]);
+
+  useEffect(() => {
+    form.setValue("major", selectedMajor ? selectedMajor.value : "");
+  }, [selectedMajor, form]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchUniversities();
+    fetchCertificates();
+    fetchMajors();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/categories`);
+      setCategories(
+        response.data.data.map((category: any) => ({
+          value: category.id.toString(),
+          label: category.name,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching categories", error);
+    }
+  };
+
+  const fetchUniversities = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/universities`);
+      setUniversities(
+        response.data.data.map((university: any) => ({
+          value: university.id.toString(),
+          label: university.name,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching universities", error);
+    }
+  };
+
+  const fetchCertificates = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/certificates`);
+      setCertificates(
+        response.data.data.map((certificate: any) => ({
+          value: certificate.id.toString(),
+          label: certificate.name,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching certificates", error);
+    }
+  };
 
 
   

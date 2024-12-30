@@ -19,6 +19,7 @@ import { formatDate } from "@/lib/date-formatter";
 import { notification } from "antd";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 import { GridCloseIcon } from "@mui/x-data-grid";
+import { format } from "date-fns";
 
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
@@ -101,7 +102,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
 
 
   const assignExpert = async () => {
-    
+
     if (!selectedApplications.length || !selectedExpert) {
       alert("Please select an expert and applications before assigning.");
       return;
@@ -180,7 +181,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="lg"
+      maxWidth="md"
       PaperProps={{
         style: {
           borderRadius: "16px",
@@ -213,12 +214,13 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                paddingBottom: "1rem",
+                backgroundColor: "#f0f4f8",
+                borderRadius: "8px",
               }}
             >
               <span>Select Expert for{" "}
-                <span className="text-sky-500">
-                  {selectedReviewMilestone?.description || ""}
-                </span>
+                <span className="text-sky-500">{selectedReviewMilestone?.description || ""}</span>
               </span>
               <IconButton
                 edge="end"
@@ -242,7 +244,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 <CircularProgress style={{ color: "#0ea5e9" }} />
               </div>
             ) : (
-              <>
+              <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
                 {/* Search Bar */}
                 <TextField
                   fullWidth
@@ -253,19 +255,20 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                     setExperts((prevExperts) =>
                       prevExperts.map((expert) => ({
                         ...expert,
-                        isVisible: expert.username
-                          .toLowerCase()
-                          .includes(searchValue),
+                        isVisible: expert.username.toLowerCase().includes(searchValue),
                       }))
                     );
                   }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon style={{ color: "#0ea5e9" }} />
-                      </InputAdornment>
-                    ),
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon style={{ color: "#0ea5e9" }} />
+                        </InputAdornment>
+                      ),
+                    },
                   }}
+                  className="w-2/3"
                   style={{
                     marginBottom: "1rem",
                     borderColor: "#0ea5e9",
@@ -288,17 +291,13 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                           marginBottom: "0.5rem",
                           padding: "0.8rem",
                           transition: "all 0.2s ease-in-out",
+                          backgroundColor: "#f9fafb",
                         }}
                         className="hover:bg-sky-100"
                       >
                         <ListItemText
                           primary={
-                            <span
-                              style={{
-                                fontWeight: "bold",
-                                color: "#0369a1",
-                              }}
-                            >
+                            <span style={{ fontWeight: "bold", color: "#0369a1" }}>
                               {expert.username}
                             </span>
                           }
@@ -308,14 +307,14 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                     ))}
 
                   {experts.every((expert) => expert.isVisible === false) && (
-                    <p className="text-center text-gray-500">
-                      No experts match your search.
-                    </p>
+                    <p className="text-center text-gray-500">No experts match your search.</p>
                   )}
                 </List>
-              </>
+              </div>
             )}
           </>
+
+
         )}
 
         {/* Step 2: Select Applications */}
@@ -325,39 +324,65 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
               style={{
                 fontWeight: 700,
                 fontSize: "1.5rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingBottom: "1rem",
+                backgroundColor: "#f0f4f8",
+                borderRadius: "8px",
               }}
             >
               Select Applications
             </DialogTitle>
-            <List>
-              {applications.map((application: any) => (
-                <ListItem
-                  key={application.id}
-                  style={{
-                    border: "1px solid #dbeafe",
-                    borderRadius: "8px",
-                    marginBottom: "0.5rem",
-                    padding: "0.8rem",
-                  }}
-                >
-                  <Checkbox
-                    checked={selectedApplications.includes(application.id)}
-                    onChange={() => handleApplicationSelection(application.id)}
-                    style={{ color: "#0369a1" }}
-                  />
-                  <ListItemText
-                    primary={
-                      <span style={{ color: "#0369a1", fontWeight: "bold" }}>
-                        {application.applicant.username}
-                      </span>
-                    }
-                    secondary={`Applied on: ${formatDate(application.appliedDate)}`}
-                  />
-                </ListItem>
-              ))}
-            </List>
+            <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
+              <List>
+                {applications.map((application: any) => (
+                  <ListItem
+                    key={application.id}
+                    style={{
+                      border: "1px solid #dbeafe",
+                      borderRadius: "8px",
+                      marginBottom: "0.5rem",
+                      padding: "0.8rem",
+                      transition: "all 0.2s ease-in-out",
+                      backgroundColor: "#f9fafb",
+                    }}
+                  >
+                    <Checkbox
+                      checked={selectedApplications.includes(application.id)}
+                      onChange={() => handleApplicationSelection(application.id)}
+                      style={{ color: "#0369a1" }}
+                    />
+                    <ListItemText
+                      primary={
+                        <span style={{ color: "#0369a1", fontWeight: "bold" }}>
+                          {application.applicant.username}
+                        </span>
+                      }
+                      secondary={
+                        <>
+                          Applied on{" "}
+                          {application.appliedDate
+                            ? format(new Date(application.appliedDate), "MM/dd/yyyy")
+                            : "Not specified"}
+                        </>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </div>
             <div className="flex justify-between mt-4">
-              <Button variant="outlined" onClick={() => setStep(1)}>
+              <Button
+                variant="outlined"
+                onClick={() => setStep(1)}
+                style={{
+                  borderColor: "#0369a1",
+                  color: "#0369a1",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                }}
+              >
                 Back
               </Button>
               <Button
@@ -365,6 +390,8 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 style={{
                   backgroundColor: "#0ea5e9",
                   color: "white",
+                  textTransform: "none",
+                  fontWeight: "bold",
                 }}
                 onClick={() => setStep(3)}
                 disabled={!selectedApplications.length}
@@ -382,23 +409,40 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
               style={{
                 fontWeight: 700,
                 fontSize: "1.5rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingBottom: "1rem",
+                backgroundColor: "#f0f4f8",
+                borderRadius: "8px",
               }}
             >
               Assign Expert
             </DialogTitle>
-            <div className="space-y-2">
-              <p>
-                <strong style={{ color: "#0369a1" }}>Expert:</strong>{" "}
-                {selectedExpert.username}
-              </p>
-              <p>
-                <strong style={{ color: "#0369a1" }}>Applications:</strong>{" "}
-                {selectedApplications.length} selected
-              </p>
+            <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
+              <div className="space-y-2">
+                <p>
+                  <strong style={{ color: "#0369a1" }}>Expert:</strong>{" "}
+                  {selectedExpert.username}
+                </p>
+                <p>
+                  <strong style={{ color: "#0369a1" }}>Applications:</strong>{" "}
+                  {selectedApplications.length} selected
+                </p>
+              </div>
             </div>
-            <br></br>
+            <br />
             <div className="flex justify-between mt-4">
-              <Button variant="outlined" onClick={() => setStep(2)}>
+              <Button
+                variant="outlined"
+                onClick={() => setStep(2)}
+                style={{
+                  borderColor: "#0369a1",
+                  color: "#0369a1",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                }}
+              >
                 Back
               </Button>
               <Button
@@ -406,24 +450,28 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 style={{
                   backgroundColor: "#0ea5e9",
                   color: "white",
+                  textTransform: "none",
+                  fontWeight: "bold",
                 }}
                 onClick={assignExpert}
                 disabled={assignLoading}
               >
-                {assignLoading ? (<div
-                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                  aria-hidden="true"
-                ></div>) :
-                  (<span>Assign</span>)}
+                {assignLoading ? (
+                  <div
+                    className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
+                    aria-hidden="true"
+                  ></div>
+                ) : (
+                  <span>Assign</span>
+                )}
               </Button>
             </div>
           </>
         )}
+
       </div>
       {/* {loading && <ScreenSpinner/>} */}
     </Dialog>
-
-
   );
 };
 

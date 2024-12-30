@@ -12,6 +12,11 @@ export type ScholarshipProgramType = {
   createdAt: Date;
   updatedAt: Date;
   status: string;
+  criteria:Array<{
+    id:string;
+    name:string;
+    description:string;
+  }>;
   category: {
     id: string;
     name: string;
