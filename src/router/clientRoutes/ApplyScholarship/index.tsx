@@ -360,13 +360,13 @@ const ApplyScholarship = () => {
           </form>
 
         </div>
-        <div className="order-1 lg:order-2 hidden lg:block lg:col-span-5 xl:col-span-6 h-[110vh] mt-[5%]">
+        {/*<div className="order-1 lg:order-2 hidden lg:block lg:col-span-5 xl:col-span-6 h-[110vh] mt-[5%]">
           <img
             src={Background}
             alt="abc"
-            className="h-full w-full object-cover object-right shadow-lg"
+            className="h-full w-full obect-cover object-right shadow-lg"
           />
-        </div>
+        </div>*/}
       </div>
     </section>
   );
