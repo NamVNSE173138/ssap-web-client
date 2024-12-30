@@ -4,9 +4,144 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { AiOutlineBulb, AiOutlineEnvironment } from "react-icons/ai";
 import ProfileSectionCard from "./ProfileSectionCard";
 import { FaGraduationCap, FaMedal, FaTools } from "react-icons/fa";
+import { FormEvent, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import Applicant from "../types/Applicant";
+import {
+  exportApplicantProfileToPdf,
+  getApplicantProfileById,
+} from "@/services/ApiServices/applicantProfileService";
+import { uploadFile } from "@/services/ApiServices/testService";
+import { setUser } from "@/reducers/tokenSlice";
+import Spinner from "@/components/Spinner";
+import { notification } from "antd";
 
-const ProfileSection = (props: any) => {
-  const { profile, handleExportPDF } = props;
+const ProfileSection = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.token.user);
+
+  const [avatar, setAvatar] = useState<File[]>([]);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const [profile, setProfile] = useState<Applicant>({
+    applicantId: 0,
+    avatar: "",
+    firstName: "",
+    lastName: "",
+    bio: "",
+    username: "",
+    email: "",
+    phone: "",
+    address: "",
+    gender: "",
+    birthDate: "",
+    nationality: "",
+    ethnicity: "",
+    applicantSkills: [],
+    applicantEducations: [],
+    applicantExperience: [],
+    applicantCertificates: [],
+  });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await getApplicantProfileById(Number(user?.id));
+        setProfile(response.data);
+      } catch (error) {
+        setError("Failed to get profile details");
+      } finally {
+        setIsLoading(false);
+        setRefresh(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user?.id, refresh]);
+
+  const handleSaveClick = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    console.log(profile);
+    try {
+      const uploadFileResponse = await uploadFile(avatar);
+      const fileUrls = uploadFileResponse.data;
+
+      const postData = {
+        avatarUrl: fileUrls[0],
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        username: profile.username,
+        phone: profile.phone,
+        bio: profile.bio,
+        address: profile.address,
+        gender: profile.gender,
+        birthdate: profile.birthDate,
+        nationality: profile.nationality,
+        ethnicity: profile.ethnicity,
+        skills: profile.applicantSkills,
+        experience: profile.applicantExperience,
+        certificates: profile.applicantCertificates,
+      };
+
+      console.log("Post data", postData);
+
+      dispatch(setUser({ ...user, avatar: profile.avatar }));
+      setRefresh(true);
+    } catch (error) {
+      setError("Update profile failed");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfile((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }));
+      setAvatar([file]);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    try {
+      const pdfBlob = await exportApplicantProfileToPdf(Number(user?.id));
+      console.log("PDF Blob:", pdfBlob);
+
+      const url = window.URL.createObjectURL(
+        new Blob([pdfBlob], { type: "application/pdf" }),
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${profile.firstName}_${profile.lastName}_CV.pdf`;
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      console.log("Exported PDF successfully!");
+    } catch (error) {
+      console.log("Failed to export PDF.");
+    }
+  };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    notification.error({
+      message: "Error",
+      description: error,
+    });
+  }
 
   return (
     <Tabs.Content value="profile" className="pt-4">
@@ -104,7 +239,8 @@ const ProfileSection = (props: any) => {
           {/* Experience Section */}
           <ProfileSectionCard
             section="experience"
-            title="Experience"
+            setRefresh={setRefresh}
+            title="Experiences"
             icon={AiOutlineBulb}
             items={profile.applicantExperience}
             placeholder="Do you have any current or past experience?"

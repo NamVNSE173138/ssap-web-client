@@ -4,9 +4,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 const AuthSection = (props: any) => {
   return (
     <Tabs.Content value="password" className="pt-4">
-      <h2 className="text-3xl text-black font-bold mb-6">
-        Password & Authentication
-      </h2>
+      <h2 className="text-3xl text-black font-bold mb-6">Change Password</h2>
       <form className="space-y-6">
         <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
           {/* Old Password */}

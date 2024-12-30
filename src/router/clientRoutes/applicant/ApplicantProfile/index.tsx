@@ -1,164 +1,21 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  AiOutlineUser,
   AiOutlineLock,
   AiOutlineProfile,
   AiOutlineClockCircle,
 } from "react-icons/ai";
-import { useDispatch, useSelector } from "react-redux";
 import ProfileSection from "./components/ProfileSection";
-import AccountSection from "./components/AccountSection";
 import AuthSection from "./components/AuthSection";
 import ApplicationHistorySection from "./components/ApplicationHistorySection";
-import {
-  exportApplicantProfileToPdf,
-  getApplicantProfileDetails,
-  updateApplicantProfileDetails,
-} from "@/services/ApiServices/applicantProfileService";
-import { RootState } from "@/store/store";
-import Spinner from "@/components/Spinner";
-import { uploadFile } from "@/services/ApiServices/fileUploadService";
-import { setUser } from "@/reducers/tokenSlice";
 
 const ApplicantProfile = () => {
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.token.user);
-
-  const [avatar, setAvatar] = useState<File[]>([]);
   const [activeTab, setActiveTab] = useState<string>("profile");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isProfileUpdated, setIsProfileUpdated] = useState<boolean>(false);
-  const [profile, setProfile] = useState({
-    applicantId: 0,
-    avatar: "",
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    phone: "",
-    address: "",
-    gender: "",
-    birthdate: "",
-    nationality: "",
-    ethnicity: "",
-    major: "",
-    gpa: "",
-    school: "",
-    applicantSkills: [],
-    applicantEducations: [],
-    applicantExperience: [],
-    applicantCertificates: [],
-  });
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await getApplicantProfileDetails(Number(user?.id));
-        setProfile(response.data);
-        console.log(profile);
-      } catch (error) {
-        setError("Failed to get profile details");
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-        setIsProfileUpdated(false);
-      }
-    };
-
-    fetchProfile();
-  }, [user?.id, isProfileUpdated]);
-
-  const handleSaveClick = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    console.log(profile);
-    try {
-      const uploadFileResponse = await uploadFile(avatar);
-      const fileUrls = uploadFileResponse.data;
-
-      const postData = {
-        avatarUrl: fileUrls[0],
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        username: profile.username,
-        phone: profile.phone,
-        address: profile.address,
-        gender: profile.gender,
-        birthdate: profile.birthdate,
-        nationality: profile.nationality,
-        ethnicity: profile.ethnicity,
-        major: profile.major,
-        gpa: Number(profile.gpa),
-        school: profile.school,
-        skills: profile.applicantSkills,
-        experience: profile.applicantExperience,
-        certificates: profile.applicantCertificates,
-      };
-
-      console.log("Post data", postData);
-
-      await updateApplicantProfileDetails(Number(user?.id), postData);
-      dispatch(setUser({ ...user, avatar: profile.avatar }));
-      setIsProfileUpdated(true);
-    } catch (error) {
-      setError("Update profile failed");
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfile((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }));
-      setAvatar([file]);
-    }
-    console.log("Profile after avatar change:", profile);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
-
-    console.log(profile);
-  };
-
-  const handleExportPDF = async () => {
-    try {
-      const pdfBlob = await exportApplicantProfileToPdf(Number(user?.id));
-      console.log("PDF Blob:", pdfBlob);
-
-      const url = window.URL.createObjectURL(
-        new Blob([pdfBlob], { type: "application/pdf" }),
-      );
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${profile.firstName}_${profile.lastName}_CV.pdf`;
-      document.body.appendChild(link);
-      link.click();
-
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      console.log("Exported PDF successfully!");
-    } catch (error) {
-      console.log("Failed to export PDF.");
-    }
-  };
-
-  if (isLoading) {
-    return <Spinner size="large" />;
-  }
 
   return (
-    <div className="w-full max-w-8xl mx-auto p-6 shadow-lg rounded-lg">
+    <div className="w-full max-w-8xl mx-auto my-0 p-6 shadow-lg rounded-lg">
       <Tabs.Root
-        defaultValue={activeTab}
+        defaultValue="profile"
         value={activeTab}
         onValueChange={setActiveTab}
         className="flex flex-row w-full"
@@ -193,14 +50,14 @@ const ApplicantProfile = () => {
             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-green-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-green-600"
           >
             <AiOutlineLock className="text-lg" />
-            Authentication
+            Account Password
           </Tabs.Trigger>
         </Tabs.List>
 
         {/* Tab Panels */}
 
-        <div className="w-3/4 pl-6">
-          <ProfileSection profile={profile} handleExportPDF={handleExportPDF} />
+        <div className="w-5/6 pl-6">
+          <ProfileSection />
 
           <ApplicationHistorySection />
 
