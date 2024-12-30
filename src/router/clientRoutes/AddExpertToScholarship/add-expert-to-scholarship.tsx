@@ -3,16 +3,19 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from 
 import { RootState } from "@/store/store";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 import { FaCalendarAlt } from "react-icons/fa";
 import { Checkbox, Paper } from "@mui/material";
 import { getExpertsByFunder } from "@/services/ApiServices/expertService";
-import { IoIosAddCircleOutline, IoIosDoneAll } from "react-icons/io";
-import { assignExpertsToScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { IoIosAddCircleOutline, IoIosDoneAll, IoMdClose } from "react-icons/io";
+import { assignExpertsToScholarshipProgram, getAllScholarshipProgramExperts } from "@/services/ApiServices/scholarshipProgramService";
 import { message, notification } from "antd";
+import { SearchIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 const AddExpertToScholarship = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +26,27 @@ const AddExpertToScholarship = () => {
   const user = useSelector((state: any) => state.token.user);
   const [_experts, setExperts] = useState<any[]>([]);
   const [selectedExperts, setSelectedExperts] = useState<any[]>([]);
+  const [expertsInScholarship, setExpertsInScholarship] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredExpert, setFilteredExpert] = useState<any[]>([]);
+  const [scholarshipMajor, setScholarshipMajor] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const filtered = _experts.filter((expert) => {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      return (
+        expert.username.toLowerCase().includes(lowerCaseSearchTerm) ||
+        (expert.major && expert.major.toLowerCase().includes(lowerCaseSearchTerm))
+      );
+    });
+    setFilteredExpert(filtered);
+  }, [searchTerm, _experts]);
+  
+
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
 
   const fetchData = async () => {
     try {
@@ -37,6 +61,7 @@ const AddExpertToScholarship = () => {
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
+        setScholarshipMajor(response.data.data.major.name)
         console.log(response.data.data);
       } else {
         setError("Failed to fetch data");
@@ -64,21 +89,62 @@ const AddExpertToScholarship = () => {
     }
   };
 
+  const fetchExpertsInScholarship = async () => {
+    try {
+      const response = await getAllScholarshipProgramExperts(Number(id));
+      if (response.statusCode === 200) {
+        setExpertsInScholarship(response.data);
+      } else {
+        setError("Failed to get experts in scholarship");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
     fetchExperts();
+    fetchExpertsInScholarship();
   }, [id]);
-
-  console.log(id)
 
   const handleDone = async () => {
     try {
+      if (!_experts || _experts.length === 0) {
+        notification.error({ message: "Experts data is not loaded. Please try again later." });
+        return;
+      }
+  
+      const invalidExperts = selectedExperts.filter((expertId) => {
+        const expert = _experts.find((e) => e.expertId === expertId);
+        return !expert || expert.major !== scholarshipMajor; 
+      });
+  
+      if (invalidExperts.length > 0) {
+        const invalidExpertNames = invalidExperts
+          .map((expertId) => _experts.find((e) => e.expertId === expertId)?.username || "Unknown")
+          .join(", ");
+        notification.error({
+          message: `The following experts do not match your scholarship major "(${scholarshipMajor})": ${invalidExpertNames}.`,
+        });
+  
+        return;
+      }
+  
       await assignExpertsToScholarshipProgram(Number(id), selectedExperts);
       notification.success({ message: "Experts assigned successfully!" });
+  
+      setSelectedExperts([]);
+      fetchExpertsInScholarship();
+  
+      navigate(`/scholarship-program/${id}`);
     } catch (err) {
       notification.error({ message: "Failed to assign experts." });
     }
   };
+  
 
   return (
     <div>
@@ -133,6 +199,7 @@ const AddExpertToScholarship = () => {
           </div>
 
           {/* Experts Section */}
+
           <Paper
             elevation={3}
             style={{
@@ -143,6 +210,23 @@ const AddExpertToScholarship = () => {
               overflow: 'auto',
             }}
           >
+            <div className="w-full mt-4 lg:mt-6">
+              <div className="relative w-full mb-10">
+                <input
+                  className="w-1/2 h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 ease-in-out rounded-lg shadow-lg bg-gradient-to-r  text-lg placeholder-gray-500 text-gray-800"
+                  placeholder="Search expert for name, major.."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <SearchIcon className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500 text-xl" />
+                {searchTerm && (
+                  <IoMdClose
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
+                    onClick={clearSearch}
+                  />
+                )}
+              </div>
+            </div>
             <div
               style={{
                 display: 'flex',
@@ -163,73 +247,90 @@ const AddExpertToScholarship = () => {
             </div>
 
             {/* Expert Cards */}
-            {(_experts && Array.isArray(_experts) && _experts.filter((expert: any) => expert.isVisible !== false).length > 0) ? (
-              _experts.filter((expert: any) => expert.isVisible !== false).map((expert: any, index: any) => (
-                <div
-                  key={expert.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: '#f9f9f9',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    marginBottom: '10px',
-                    transition: 'background-color 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
-                >
+            {filteredExpert.length > 0 ? (
+              filteredExpert.map((expert: any, index: any) => {
+                const isAlreadyInScholarship = expertsInScholarship.some(
+                  (existingExpert) => existingExpert.expertId === expert.expertId
+                );
 
-                  <div style={{ flex: 0.25 }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedExperts.includes(expert.expertId)}
-                      onChange={() => {
-                        if (selectedExperts.includes(expert.expertId)) {
-                          setSelectedExperts(selectedExperts.filter((id) => id !== expert.expertId));
-                        } else {
-                          setSelectedExperts([...selectedExperts, expert.expertId]);
-                        }
-                      }}
-                    />
+                return (
+                  <div
+                    key={expert.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#f9f9f9',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      marginBottom: '10px',
+                      transition: 'background-color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                  >
+                    <div style={{ flex: 0.25 }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedExperts.includes(expert.expertId)}
+                        disabled={isAlreadyInScholarship}
+                        onClick={(e) => {
+                          if (isAlreadyInScholarship) {
+                            e.preventDefault();
+                            notification.error({
+                              message: `${expert.username} is already in scholarship.`,
+                            });
+                          }
+                        }}
+                        onChange={() => {
+                          if (selectedExperts.includes(expert.expertId)) {
+                            setSelectedExperts(
+                              selectedExperts.filter((id) => id !== expert.expertId)
+                            );
+                          } else {
+                            setSelectedExperts([...selectedExperts, expert.expertId]);
+                          }
+                        }}
+                      />
+                    </div>
+
+
+                    {/* Cột số thứ tự */}
+                    <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                    <div style={{ flex: 0.5 }}>
+                      <img
+                        src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '2px solid #0369a1',
+                        }}
+                      />
+                    </div>
+
+                    {/* Cột tên chuyên gia */}
+                    <div style={{ flex: 0.75 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
+                    </div>
+
+                    <div style={{ flex: 0.75 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
+                    </div>
+
+                    {/* Cột major */}
+                    <div style={{ flex: 1.5 }}>
+                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
+                    </div>
                   </div>
-
-                  {/* Cột số thứ tự */}
-                  <div style={{ flex: 0.5 }}>{index + 1}</div>
-
-                  <div style={{ flex: 0.5 }}>
-                    <img
-                      src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        border: '2px solid #0369a1',
-                      }}
-                    />
-                  </div>
-
-                  {/* Cột tên chuyên gia */}
-                  <div style={{ flex: 0.75 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
-                  </div>
-
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
-                  </div>
-
-                  <div style={{ flex: 0.75 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
-                  </div>
-
-                  {/* Cột major */}
-                  <div style={{ flex: 1.5 }}>
-                    <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-center text-gray-500">No experts match your search.</p>
             )}
