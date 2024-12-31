@@ -144,7 +144,7 @@ const FormCreateScholarshipProgram = () => {
           ),
         })),
         documents: formData.documents.map((document) => ({
-          type: document.type || "abc",
+          type: document.type ,
           isRequired: true,
         })),
       };

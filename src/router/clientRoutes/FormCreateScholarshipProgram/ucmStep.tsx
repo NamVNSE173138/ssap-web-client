@@ -112,9 +112,15 @@ const UcmStep = ({
       console.error("Validation failed", errors);
       return;
     }
+    
+
     const data = getValues(); // Lấy dữ liệu từ form
     if (data) {
-      console.log("Form data: ", data);
+      // console.log("Form data: ", data);
+      const selectedDocuments = [...documentOptions].filter((doc) => (watch("documents") || []).includes(doc.id)).map((doc) => {return{type: doc.type, isRequired: true}})
+      data.documents = selectedDocuments
+      console.log("beforeSave", data);
+      
       onSave(data);
     }
   };
@@ -144,6 +150,8 @@ const UcmStep = ({
     const updatedDocuments = validDocuments.includes(id)
       ? validDocuments.filter((doc) => doc !== id)
       : [...validDocuments, id];
+
+      
     
     console.log("After update:", updatedDocuments);
     setValue("documents", updatedDocuments, { shouldValidate: true });
