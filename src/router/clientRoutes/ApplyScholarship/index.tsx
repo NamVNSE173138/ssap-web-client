@@ -134,7 +134,7 @@ const ApplyScholarship = () => {
     setApplyLoading(true);
 
     if (!scholarship) {
-      alert("Program not found");
+      notification.error({message:"Program not found"});
       setApplyLoading(false);
       return;
     }

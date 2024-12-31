@@ -42,9 +42,9 @@ export async function getAllScholarshipProgramByMajorId(id: number) {
   return response.data;
 }
 
-export async function updateScholarshipStatus(id: number, status: string) {
+export async function updateScholarshipStatus(id: number, status: any) {
   const response = await axios.put(
-    `${BASE_URL}/api/scholarship-programs/update-status/${id}`,
+    `${BASE_URL}/api/scholarship-programs/${id}/status`,
     status, {
       headers: {
         'Content-Type': 'application/json',
