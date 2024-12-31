@@ -17,6 +17,7 @@ import {
   Typography,
   Autocomplete,
   Chip,
+  Paper,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
@@ -30,6 +31,8 @@ import { FaUser } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { assignExpertsToApplicationApi, getReviewsOfApplications } from "@/services/ApiServices/applicationService";
+import { Input } from "@/components/ui/input";
+import React from "react";
 
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
@@ -221,13 +224,13 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         {/* Step Subtitles */}
       <div className="flex justify-center">
         <div className="text-center w-32">
-          <p className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"}`}>Step 1: Details</p>
+          <p className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"}`}>Step 1: Review Milestone</p>
         </div>
         <div className="text-center w-32">
-          <p className={`text-sm font-medium ${step === 2 ? "text-blue-600" : "text-gray-500"}`}>Step 2: Review</p>
+          <p className={`text-sm font-medium ${step === 2 ? "text-blue-600" : "text-gray-500"}`}>Step 2: Assign</p>
         </div>
         <div className="text-center w-32">
-          <p className={`text-sm font-medium ${step === 3 ? "text-blue-600" : "text-gray-500"}`}>Step 3: Confirm</p>
+          <p className={`text-sm font-medium ${step === 3 ? "text-blue-600" : "text-gray-500"}`}>Step 3: Choose Date &amp; Confirm</p>
         </div>
       </div>
 
@@ -320,7 +323,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         )}
 
         {/* Step 2: Assign Expert*/}
-        {step === 2 && reviewingExperts && (
+        {step === 2 && value && (
           <>
             <DialogTitle
               style={{
@@ -340,6 +343,9 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
             </DialogTitle>
             <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
               <List>
+                {applications.length === 0 && (
+                  <p className="text-center text-gray-500">No applications yet.</p>
+                )}
                 {applications.map((application: any) => (
                   <ListItem
                     key={application.id}
@@ -390,12 +396,14 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                            ...submit.filter((item: any) => item.applicationId !== application.id),
                           {
                             applicationId: application.id,
-                            reviewDate: "2024-12-29T17:30:50.283Z",
                             isFirstReview: selectedReviewMilestone.description === "Application Review",
-                            expertIds: changedValue.map((option) => option.expertId),
+                            expertIds: changedValue.map((option) =>({ 
+                                id: option.expertId,
+                                reviewDate: format(new Date().setDate(new Date().getDate() + 7), "yyyy-MM-dd"),
+                            })),
                           },
                         ]);
-                        console.log(submitAssignExperts);
+                        //console.log(submitAssignExperts);
                         setValue((prevValue:any) => {
                             prevValue[application.id] = [...changedValue, ...reviewingExperts[application.id]];
                             setChangedValue((cv:any) => {
@@ -490,9 +498,16 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 }}
                 onClick={() => { 
                     //Check if there is no changes
+                    //console.log(value)
                     if(Object.values(changedValue).every((value) => Array.isArray(value) && value.length === 0)){
                         notification.error({message: "You haven't made any changes."})
                         return;
+                    }
+                    if(selectedReviewMilestone.description === "Interview"){
+                        if(Object.values(value).every((value) => Array.isArray(value) && (value.length < 2 || value.length % 2 == 0))){
+                            notification.error({message: "You need to assign an odd number of experts (at least 3) for Interview round."})
+                            return;
+                        }
                     }
                     setStep(3) 
                 }}
@@ -530,9 +545,72 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                         <strong style={{ color: "#0369a1" }}>Application:</strong>{" "}
                           {application.applicant.username}
                         </p>
-                      <p>
+                      <p className="flex gap-3">
                         <strong style={{ color: "#0369a1" }}>Experts:</strong>{" "}
-                        {changedValue[application.id].map((expert:any) => expert.username).join(", ")}
+                        <Paper
+                          elevation={3}
+                          style={{
+                            padding: '10px',
+                            borderRadius: '10px',
+                            backgroundColor: '#fafafa',
+                            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                            width: '100%',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              fontWeight: 'bold',
+                              backgroundColor: '#f1f1f1',
+                              padding: '10px',
+                              borderRadius: '8px',
+                              marginBottom: '10px',
+                            }}
+                          >
+                            <div style={{ flex: 0.5 }}>Name</div>
+                            <div style={{ flex: 0.5 }}>Review Deadline Date</div>
+                          </div>
+
+                        {changedValue[application.id].map((expert:any) => (
+                            <span className="flex items-center mb-3" key={expert.expertId}>
+                                <span style={{flex: 0.5, paddingLeft: '10px'}}>{expert.username}</span>
+                                <Input
+                                    style={{flex: 0.5}}
+                                    type="date"
+                                    value={submitAssignExperts
+                                    .find((app:any) => app.applicationId == application.id)?.expertIds
+                                    .find((e:any) => e.id == expert.expertId).reviewDate}
+                                    
+                                    
+                                    onChange={(e) => {
+                                        const newReviewDate = e.target.value;
+
+                                        setSubmitAssignExperts((prevSubmit: any) => {
+                                          console.log(submitAssignExperts)
+                                          return prevSubmit.map((app: any) => {
+                                            if (app.applicationId === application.id) {
+                                              return {
+                                                ...app,
+                                                expertIds: app.expertIds.map((exp: any) => {
+                                                  if (exp.id === expert.expertId) {
+                                                    return {
+                                                      ...exp,
+                                                      reviewDate: newReviewDate,
+                                                    };
+                                                  }
+                                                  return exp;
+                                                }),
+                                              };
+                                            }
+                                            return app;
+                                          });
+                                        });
+                                      }
+                                    }
+                                  />
+                            </span>
+                        ))}
+                        </Paper>
                       </p>
                       <p>
                         <strong style={{ color: "#0369a1" }}>Review Milestone:</strong>{" "}
