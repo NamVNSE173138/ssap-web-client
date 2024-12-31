@@ -37,7 +37,7 @@ const FormCreateScholarshipProgram = () => {
     awardProgress: "",
     imageUrl: "",
     deadline: "",
-    status: "ACTIVE",
+    status: "Draft",
     university: "",
     certificate: [],
     major: "",

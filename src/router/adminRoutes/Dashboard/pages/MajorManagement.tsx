@@ -4,7 +4,7 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  
+
   Table,
   TableBody,
   TableCell,
@@ -13,15 +13,16 @@ import {
   TableRow,
   TableSortLabel,
   CircularProgress,
-  
+
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Collapse,
-  
+  Paper,
+
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import {  getMajors } from "@/services/ApiServices/majorService";
+import { getMajors } from "@/services/ApiServices/majorService";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
 import React from "react";
 import { ArrowDown } from "lucide-react";
@@ -57,19 +58,11 @@ const MajorManagement = () => {
     }));
   };
 
-  const TABLE_HEAD = [
-    "ID", "Name", "Description", "Actions"
-  ];
-
-  const SKILL_TABLE_HEAD = [
-    "ID", "Name", "Description", "Type"
-  ];
-
   const fetchMajors = async () => {
     setLoading(true);
     await getAllSkills()
       .then((data) => {
-          setSkills(data.data);
+        setSkills(data.data);
       })
     await getMajors()
       .then((data) => {
@@ -88,198 +81,175 @@ const MajorManagement = () => {
   }, []);
 
   const renderTable = () => (
-    <Card className="h-full w-full shadow-lg rounded-lg">
-      <Typography variant="h6" component="div" color="primary" sx={{ mt: 2, ml: 2, fontWeight: 'bold' }}>
+    <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
+      <div style={{ marginTop: 1, boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)', borderRadius: '8px' }}>
+        {/* Header Row */}
+        <div
+          style={{
+            display: 'flex',
+            fontWeight: 'bold',
+            backgroundColor: '#f1f1f1',
+            padding: '10px',
+            borderRadius: '8px',
+            marginBottom: '10px',
+          }}
+        >
+          <div style={{ flex: 0.5 }}>#</div>
+          <div style={{ flex: 2 }}>Name</div>
+          <div style={{ flex: 2 }}>Description</div>
+          <div style={{ flex: 1 }}>Actions</div>
+        </div>
 
-      </Typography>
+        {/* Data Rows */}
+        {majors.map((account) => (
+          <React.Fragment key={account.id}>
+            <div
+              onClick={() => handleToggle(account.id)}
+              style={{
+                display: 'flex',
+                padding: '10px',
+                cursor: 'pointer',
+                backgroundColor: '#fff',
+                borderBottom: '1px solid #ddd',
+                transition: 'background-color 0.3s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+            >
+              <div style={{ flex: 0.5 }}>{account.id}</div>
+              <div style={{ flex: 2 }}>{account.name}</div>
+              <div style={{ flex: 2 }}>{account.description}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Tooltip title="Edit Major">
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevents the row click event from firing
+                        setCurrentMajor(account);
+                        setOpenEditMajor(true);
+                      }}
+                      sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
 
-      <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-            <TableRow>
-              {TABLE_HEAD.map((head) => (
-                <TableCell key={head} sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                  <TableSortLabel className="font-semibold">{head}</TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+                  <Tooltip title="Expand">
+                    <IconButton sx={{ color: 'gray', '&:hover': { color: 'gray' } }}>
+                      <ArrowDown />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </div>
+            </div>
 
-          <TableBody>
-            {/*JSON.stringify(majors)*/}
-            {majors.map((account) => (
-              <React.Fragment key={account.id}>
-                <TableRow key={account.id} onClick={() => handleToggle(account.id)} className="cursor-pointer" sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                  {/*<TableCell>{index + 1}</TableCell>*/}
-                  <TableCell>{account.id}</TableCell>
-                  <TableCell>{account.name}</TableCell>
-                  <TableCell>{account.description}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Tooltip title="Edit Major">
-                        <IconButton
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevents the TableRow's onClick event from firing
-                                setCurrentMajor(account);
-                                setOpenEditMajor(true);
-                            }}
-                          sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Expand">
-                        <IconButton
-                          sx={{ color: 'gray', '&:hover': { color: 'gray' } }}
-                        >
-                          <ArrowDown />
-                        </IconButton>
-                      </Tooltip>
+            {/* Collapsible Content */}
+            <div style={{ paddingLeft: '40px' }}>
+              <Collapse in={openRows[account.id]} timeout={300} unmountOnExit>
+                <Accordion>
+                  <AccordionSummary expandIcon={<GridArrowDownwardIcon />} aria-controls="panel1-content">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <Typography className="font-semibold text-sky-500">Submajors</Typography>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setParentMajorId(account.id);
+                          setOpenAddMajor(true);
+                        }}
+                        className="bg-sky-500 hover:bg-sky-600 gap-2"
+                      >
+                        <IoMdAddCircle />
+                        Add Submajor
+                      </Button>
                     </div>
-                  </TableCell>
-
-                </TableRow>
-                {/* Collapsible content */}
-
-                <TableRow>
-                  <TableCell colSpan={5} style={{ paddingBottom: 0, paddingTop: 0 }}>
-                    <Collapse in={openRows[account.id]} timeout={300} 
-                        unmountOnExit 
-                        className="py-3"
-                        sx={{ transition: "all 0.3s ease-in-out" }}>
-                      <Accordion >
-                        <AccordionSummary
-                          expandIcon={<GridArrowDownwardIcon />}
-                          aria-controls="panel1-content"
-                          id="panel1-header"
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <div style={{ marginTop: 16 }}>
+                      {account.subMajors.map((submajor) => (
+                        <div
+                          key={submajor.id}
+                          style={{
+                            display: 'flex',
+                            padding: '10px',
+                            backgroundColor: '#fff',
+                            borderBottom: '1px solid #ddd',
+                            marginBottom: '8px',
+                          }}
                         >
-                        <div className="flex w-full items-center justify-between">
-                          <Typography className="font-semibold text-sky-500 ">Submajors</Typography>
-                          <Button onClick={(e) => {
-                              e.stopPropagation(); // Prevents the TableRow's onClick event from firing
-                              setParentMajorId(account.id);
-                              setOpenAddMajor(true)
-                              }}
-                              className="bg-sky-500 hover:bg-sky-600 gap-2">
-                            <IoMdAddCircle />
-                            Add Submajor
-                          </Button>
+                          <div style={{ flex: 0.5, paddingRight: '20px' }}>{submajor.id}</div>
+                          <div style={{ flex: 2, paddingRight: '20px' }}>{submajor.name}</div>
+                          <div style={{ flex: 3, paddingRight: '20px' }}>{submajor.description}</div>
+                          <div style={{ flex: 1, paddingRight: '20px' }}>
+                            <Tooltip title="Edit Submajor">
+                              <IconButton
+                                onClick={() => {
+                                  setOpenEditMajor(true);
+                                  setCurrentMajor(submajor);
+                                }}
+                                sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
                         </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
-                            <Table>
-                              <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableRow>
-                                  {TABLE_HEAD.map((head) => (
-                                    <TableCell key={head} sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                                      <TableSortLabel className="font-semibold">{head}</TableSortLabel>
-                                    </TableCell>
-                                  ))}
-                                </TableRow>
-                              </TableHead>
+                      ))}
+                    </div>
+                  </AccordionDetails>
+                </Accordion>
 
-                              <TableBody>
-                                {/*JSON.stringify(majors)*/}
-                                {account.subMajors.map((submajor: any, _subIndex: number) => (
-                                  <TableRow key={submajor.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                                    <TableCell>{submajor.id}</TableCell>
-                                    <TableCell>{submajor.name}</TableCell>
-                                    <TableCell>{submajor.description}</TableCell>
-                                    <TableCell>
-                                      <div className="flex items-center gap-2">
-                                        <Tooltip title="Edit Major">
-                                          <IconButton
-                                            onClick={() => {
-                                                setOpenEditMajor(true)
-                                                setCurrentMajor(submajor)
-                                                }}
-                                            sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                                          >
-                                            <EditIcon />
-                                          </IconButton>
-                                        </Tooltip>
-
-                                      </div>
-                                    </TableCell>
-
-
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-
-                        </AccordionDetails>
-                      </Accordion>
-                      <Accordion>
-                        <AccordionSummary
-                          expandIcon={<GridArrowDownwardIcon />}
-                          aria-controls="panel1-content"
-                          id="panel1-header"
+                <Accordion>
+                  <AccordionSummary expandIcon={<GridArrowDownwardIcon />} aria-controls="panel1-content">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <Typography className="font-semibold text-sky-500">Skills</Typography>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentMajor(account);
+                          setOpenEditMajorSkill(true);
+                        }}
+                        className="bg-sky-500 hover:bg-sky-600 gap-2"
+                      >
+                        <IoMdAddCircle />
+                        Edit Skills
+                      </Button>
+                    </div>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <div style={{ marginTop: 16 }}>
+                      {account.skills.map((skills) => (
+                        <div
+                          key={skills.id}
+                          style={{
+                            display: 'flex',
+                            padding: '10px',
+                            backgroundColor: '#fff',
+                            borderBottom: '1px solid #ddd',
+                            marginBottom: '8px',
+                          }}
                         >
-
-                        <div className="flex w-full items-center justify-between">
-                          <Typography className="font-semibold text-sky-500 ">Skills</Typography>
-
-                          <Button onClick={(e) => {
-                                e.stopPropagation(); // Prevents the TableRow's onClick event from firing
-                                setCurrentMajor(account);
-                                setOpenEditMajorSkill(true);
-                            }}
-                              className="bg-sky-500 hover:bg-sky-600 gap-2">
-                            <IoMdAddCircle />
-                            Edit Skills
-                          </Button>
+                          <div style={{ flex: 1, paddingRight: '20px' }}>{skills.id}</div>
+                          <div style={{ flex: 2, paddingRight: '20px' }}>{skills.name}</div>
+                          <div style={{ flex: 3, paddingRight: '20px' }}>{skills.description}</div>
+                          <div style={{ flex: 1, paddingRight: '20px' }}>{skills.type}</div>
                         </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
-                            <Table>
-                              <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableRow>
-                                  {SKILL_TABLE_HEAD.map((head) => (
-                                    <TableCell key={head} sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                                      <TableSortLabel className="font-semibold">{head}</TableSortLabel>
-                                    </TableCell>
-                                  ))}
-                                </TableRow>
-                              </TableHead>
-
-                              <TableBody>
-                                {/*JSON.stringify(majors)*/}
-                                {account.skills.map((skills: any, _subIndex: number) => (
-                                  <TableRow key={skills.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                                    <TableCell>{skills.id}</TableCell>
-                                    <TableCell>{skills.name}</TableCell>
-                                    <TableCell>{skills.description}</TableCell>
-                                    <TableCell>{skills.type}</TableCell>
-
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-
-                        </AccordionDetails>
-                      </Accordion>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Card>
+                      ))}
+                    </div>
+                  </AccordionDetails>
+                </Accordion>
+              </Collapse>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+    </Paper>
   );
 
   return (
     <>
       <div className="flex justify-between">
         <Typography variant="h4" component="div" color="primary" sx={{ ml: 2, mb: 3 }}>
-            Major Management
+          Major Management
         </Typography>
 
         <Button onClick={() => setOpenAddMajor(true)} className="bg-sky-500 hover:bg-sky-600 gap-2">
@@ -300,7 +270,7 @@ const MajorManagement = () => {
           isOpen={openAddMajor}
           setIsOpen={(open: boolean) => setOpenAddMajor(open)}
           parentMajorId={parentMajorId}
-          setParentMajorId={(parentMajorId: number|null) => setParentMajorId(parentMajorId)}
+          setParentMajorId={(parentMajorId: number | null) => setParentMajorId(parentMajorId)}
           fetchMajor={async () => {
             fetchMajors();
           }}
@@ -323,7 +293,7 @@ const MajorManagement = () => {
           isOpen={openEditMajorSkill}
           setIsOpen={(open: boolean) => setOpenEditMajorSkill(open)}
           major={currentMajor}
-          skillOptions={skills.map((skill: any) => ({label: skill.name, value: skill.id}))}
+          skillOptions={skills.map((skill: any) => ({ label: skill.name, value: skill.id }))}
           fetchMajor={async () => {
             fetchMajors();
           }}
@@ -331,7 +301,7 @@ const MajorManagement = () => {
       )}
 
 
-      </>
+    </>
   );
 };
 

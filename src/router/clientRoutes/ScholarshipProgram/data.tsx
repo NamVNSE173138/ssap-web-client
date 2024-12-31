@@ -5,6 +5,7 @@ export type ScholarshipProgramType = {
   description: string;
   scholarshipAmount: number;
   numberOfScholarships: number;
+  educationLevel:string;
   deadline: string;
   // numberOfRenewals: number;
   funderId: number;
