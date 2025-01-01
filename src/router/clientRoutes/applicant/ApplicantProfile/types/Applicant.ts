@@ -22,6 +22,8 @@ export interface ApplicantSkill {
   id: number;
   name: string;
   type: string;
+  fromYear: number;
+  toYear: number;
   description: string;
 }
 

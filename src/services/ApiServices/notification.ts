@@ -94,6 +94,21 @@ export async function SendNotificationAndEmailReject(email: string, content: str
   return response.data;
 }
 
+export async function NotifyFunderScholarshipRejection(scholarshipId: number, rejectionReason: string) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/notify-funder-scholarship-rejection?scholarshipId=${scholarshipId}&rejectionReason=${encodeURIComponent(rejectionReason)}`
+  );
+  return response.data;
+}
+
+export async function NotifyFunderScholarshipAcceptance(scholarshipId: number) {
+  const response = await axios.post(
+    `${BASE_URL}/api/notifications/notify-funder-scholarship-acceptance`,
+    { scholarshipId }
+  );
+  return response.data;
+}
+
 export async function AccountActiveEmail(userId: number) {
   const response = await axios.post(
     `${BASE_URL}/api/notifications/account-active/${userId}`

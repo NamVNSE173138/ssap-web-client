@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllTransactions } from "@/services/ApiServices/paymentService";
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert,TablePagination, Typography } from "@mui/material";
-import { FaTimesCircle, FaCheckCircle, FaPiggyBank} from "react-icons/fa";
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert, TablePagination, Typography } from "@mui/material";
+import { FaTimesCircle, FaCheckCircle, FaPiggyBank } from "react-icons/fa";
 import { getAllWallets } from "@/services/ApiServices/accountService";
 
 const WalletAndTransactionManagement = () => {
@@ -40,12 +40,6 @@ const WalletAndTransactionManagement = () => {
     fetchWalletsAndTransactions();
   }, []);
 
-  // const handleRequestSort = (property: string) => {
-  //   const isAsc = orderBy === property && sortDirection === "asc";
-  //   setSortDirection(isAsc ? "desc" : "asc");
-  //   setOrderBy(property);
-  // };
-
   const handleChangePage = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -81,9 +75,11 @@ const WalletAndTransactionManagement = () => {
 
   return (
     <Box sx={{ backgroundColor: "#f4f7fb", borderRadius: 2 }}>
-      <Typography variant="h4" component="div" color="primary" sx={{ ml: 2, mb: 3 }}>
-        Wallets Management
-      </Typography>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+        <h2 style={{ marginLeft: "16px", marginBottom: "15px", color: "#3f51b5", fontWeight: "bold" }}>
+          Wallets Management
+        </h2>
+      </div>
 
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
@@ -105,115 +101,151 @@ const WalletAndTransactionManagement = () => {
 
       {!loading && !error && wallets.length > 0 && (
         <Paper sx={{ borderRadius: 2, boxShadow: 3, padding: 2, marginBottom: 4 }}>
-          <TableContainer component={Paper} sx={{ borderRadius: "8px", boxShadow: 3 }}>
-            <Table sx={{ minWidth: 750 }} aria-label="wallets table">
-              <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                    No.</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Wallet ID</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
-                      <FaPiggyBank style={{ marginRight: 5 }} />
-                      Bank Account Name
-                    </Box>
-                  </TableCell>
+          {/* Header Row */}
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#f5f5f5',
+              fontWeight: 'bold',
+              padding: '10px',
+              borderRadius: '8px',
+              marginBottom: '10px',
+            }}
+          >
+            <div style={{ flex: 0.5 }}>No.</div>
+            <div style={{ flex: 1 }}>Wallet ID</div>
+            <div style={{ flex: 2, display: 'inline-flex', alignItems: 'center' }}>
+              <FaPiggyBank style={{ marginRight: 5 }} />
+              Bank Account Name
+            </div>
+            <div style={{ flex: 1 }}>Bank Account Number</div>
+            <div style={{ flex: 1 }}>Account ID</div>
+          </div>
 
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Bank Account Number</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Account ID</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedWallets.map((wallet, index) => (
-                  <TableRow hover key={wallet.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                    <TableCell>{wallet.id}</TableCell>
-                    <TableCell>{wallet.bankAccountName}</TableCell>
-                    <TableCell>{wallet.bankAccountNumber}</TableCell>
-                    <TableCell>{wallet.accountId}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {/* Data Rows */}
+          {sortedWallets.map((wallet, index) => (
+            <div
+              key={wallet.id}
+              style={{
+                display: 'flex',
+                padding: '10px',
+                cursor: 'pointer',
+                backgroundColor: '#fff',
+                borderBottom: '1px solid #ddd',
+                transition: 'background-color 0.3s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+            >
+              <div style={{ flex: 0.5 }}>{page * rowsPerPage + index + 1}</div>
+              <div style={{ flex: 1 }}>{wallet.id}</div>
+              <div style={{ flex: 2 }}>{wallet.bankAccountName}</div>
+              <div style={{ flex: 1 }}>{wallet.bankAccountNumber}</div>
+              <div style={{ flex: 1 }}>{wallet.accountId}</div>
+            </div>
+          ))}
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={wallets.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            sx={{ color: "#1976d2" }}
-          />
+          {/* Pagination */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={wallets.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{ color: '#1976d2' }}
+            />
+          </div>
         </Paper>
+
       )}
 
       {/* Transactions Management */}
-      <Typography variant="h4" component="div" color="primary" sx={{ ml: 2, mb: 3 }}>
-        Transactions Management
-      </Typography>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+        <h2 style={{ marginLeft: "16px", marginTop:'10px',  marginBottom: "15px", color: "#3f51b5", fontWeight: "bold" }}>
+          Transactions Management
+        </h2>
+      </div>
 
       {!loading && !error && transactions.length > 0 && (
         <Paper sx={{ borderRadius: 2, boxShadow: 3, padding: 2 }}>
-          <TableContainer component={Paper} sx={{ borderRadius: "8px", boxShadow: 3 }}>
-            <Table sx={{ minWidth: 750 }} aria-label="transactions table">
-              <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>No.</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                    <Box sx={{ display: "flex" }}>
-                      <span>Transaction ID</span>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Wallet Sender ID</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Wallet Receiver ID</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Payment Method</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Amount</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Transaction Date</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>Description</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedTransactions.map((transaction, index) => (
-                  <TableRow hover key={transaction.transactionId} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                    <TableCell>{transaction.transactionId}</TableCell>
-                    <TableCell>{transaction.walletSenderId}</TableCell>
-                    <TableCell>{transaction.walletReceiverId}</TableCell>
-                    <TableCell>{transaction.paymentMethod}</TableCell>
-                    <TableCell>{transaction.amount}$</TableCell>
-                    <TableCell>{new Date(transaction.transactionDate).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {transaction.status === "Successful" ? (
-                          <FaCheckCircle className="text-green-500" />
-                        ) : (
-                          <FaTimesCircle className="text-red-500" />
-                        )}
-                        {transaction.status || "N/A"}
-                      </div>
-                    </TableCell>
-                    <TableCell>{transaction.description}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {/* Header Row */}
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#f5f5f5',
+              fontWeight: 'bold',
+              padding: '10px',
+              borderRadius: '8px',
+              marginBottom: '10px',
+            }}
+          >
+            <div style={{ flex: 0.5 }}>No.</div>
+            <div style={{ flex: 4, marginRight: '20px' }}>Transaction ID</div>
+            <div style={{ flex: 1.25, marginRight: '20px' }}>Sender ID</div>
+            <div style={{ flex: 1.35, marginRight: '20px' }}>Receiver ID</div>
+            <div style={{ flex: 1.25, marginRight: '20px' }}>Payment Method</div>
+            <div style={{ flex: 1, marginRight: '20px' }}>Amount</div>
+            <div style={{ flex: 1.5, marginRight: '20px' }}>Transaction Date</div>
+            <div style={{ flex: 1.5, marginRight: '20px' }}>Status</div>
+            <div style={{ flex: 2.5, marginRight: '20px' }}>Description</div>
+          </div>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={transactions.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            sx={{ color: "#1976d2" }}
-          />
+          {/* Data Rows */}
+          {sortedTransactions.map((transaction, index) => (
+            <div
+              key={transaction.transactionId}
+              style={{
+                display: 'flex',
+                padding: '10px',
+                cursor: 'pointer',
+                backgroundColor: '#fff',
+                borderBottom: '1px solid #ddd',
+                transition: 'background-color 0.3s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+            >
+              <div style={{ flex: 0.5 }}>{page * rowsPerPage + index + 1}</div>
+              <div style={{ flex: 4, marginRight: '20px' }}>{transaction.transactionId}</div>
+              <div style={{ flex: 1.25, marginRight: '20px' }}>{transaction.walletSenderId}</div>
+              <div style={{ flex: 1.35, marginRight: '20px' }}>{transaction.walletReceiverId}</div>
+              <div style={{ flex: 1.25, marginRight: '20px' }}>{transaction.paymentMethod}</div>
+              <div style={{ flex: 1, marginRight: '20px' }}>{transaction.amount}$</div>
+              <div style={{ flex: 1.5, marginRight: '20px' }}>
+                {new Date(transaction.transactionDate).toLocaleDateString()}
+              </div>
+              <div style={{ flex: 1.5, marginRight: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  {transaction.status === 'Successful' ? (
+                    <FaCheckCircle className="text-green-500" />
+                  ) : (
+                    <FaTimesCircle className="text-red-500" />
+                  )}
+                  {transaction.status || 'N/A'}
+                </div>
+              </div>
+              <div style={{ flex: 2.5, marginRight: '20px' }}>{transaction.description}</div>
+            </div>
+          ))}
+
+          {/* Pagination */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={transactions.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{ color: '#1976d2' }}
+            />
+          </div>
         </Paper>
+
       )}
     </Box>
   );

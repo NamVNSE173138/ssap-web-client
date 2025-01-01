@@ -1,28 +1,31 @@
-import { calculateAge, formatNaturalDate } from "@/lib/dateUtils";
 import { getFullName } from "@/lib/stringUtils";
 import * as Tabs from "@radix-ui/react-tabs";
 import { AiOutlineBulb, AiOutlineEnvironment } from "react-icons/ai";
-import ProfileSectionCard from "./ProfileSectionCard";
 import { FaGraduationCap, FaMedal, FaTools } from "react-icons/fa";
 import { FormEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import Applicant from "../types/Applicant";
 import {
   exportApplicantProfileToPdf,
   getApplicantProfileById,
 } from "@/services/ApiServices/applicantProfileService";
-import { uploadFile } from "@/services/ApiServices/testService";
 import { setUser } from "@/reducers/tokenSlice";
 import Spinner from "@/components/Spinner";
 import { notification } from "antd";
+import EducationSectionCard from "./EducationSection/EducationSectionCard";
+import CertificateSectionCard from "./CertificateSection/CertificateSectionCard";
+import SkillSectionCard from "./SkillSection/SkillSectionCard";
+import ExperienceSectionCard from "./ExperienceSection/ExperienceSectionCard";
+import Applicant from "../../types/Applicant";
+import AvatarSection from "./AvatarSection/AvatarSection";
+import GeneralInfoSection from "./GeneralInfoSection/GeneralInfoSection";
 
-const ProfileSection = () => {
+const ProfileSection = (props: any) => {
+  const { activeTab } = props;
+
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.token.user);
 
-  const [avatar, setAvatar] = useState<File[]>([]);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<boolean>(false);
@@ -69,11 +72,7 @@ const ProfileSection = () => {
     setIsLoading(true);
     console.log(profile);
     try {
-      const uploadFileResponse = await uploadFile(avatar);
-      const fileUrls = uploadFileResponse.data;
-
       const postData = {
-        avatarUrl: fileUrls[0],
         firstName: profile.firstName,
         lastName: profile.lastName,
         username: profile.username,
@@ -98,14 +97,6 @@ const ProfileSection = () => {
       console.log(error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfile((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }));
-      setAvatar([file]);
     }
   };
 
@@ -149,13 +140,7 @@ const ProfileSection = () => {
         {/* Left Column - General Information */}
         <div className="w-full lg:w-1/3 flex flex-col items-center bg-gray-50 p-4 rounded-lg border border-gray-200 self-start">
           {/* Avatar */}
-          <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-            <img
-              src={profile.avatar || "https://github.com/shadcn.png"}
-              alt="User Avatar"
-              className="rounded-full border-2 border-gray-300 object-cover"
-            />
-          </div>
+          <AvatarSection originalAvatar={profile.avatar} />
 
           {/* Name */}
           <h2 className="mt-4 text-lg font-semibold">
@@ -175,40 +160,34 @@ const ProfileSection = () => {
 
           {/* Additional Information */}
           <div className="mt-4 w-full text-sm space-y-2">
-            <p>
-              <strong>Birthdate:</strong>{" "}
-              {formatNaturalDate(profile.birthDate) || "N/A"}
-            </p>
-            <p>
-              <strong>Age:</strong> {calculateAge(profile.birthDate) || "N/A"}
-            </p>
-            <p>
-              <strong>Gender:</strong> {profile.gender || "N/A"}
-            </p>
-            <p>
-              <strong>Nationality:</strong> {profile.nationality || "N/A"}
-            </p>
-            <p>
-              <strong>Ethnicity:</strong> {profile.ethnicity || "N/A"}
-            </p>
+            {/* <p> */}
+            {/*   <strong>Birthdate:</strong>{" "} */}
+            {/*   {formatNaturalDate(profile.birthDate) || "N/A"} */}
+            {/* </p> */}
+            {/* <p> */}
+            {/*   <strong>Age:</strong> {calculateAge(profile.birthDate) || "N/A"} */}
+            {/* </p> */}
+            {/* <p> */}
+            {/*   <strong>Gender:</strong> {profile.gender || "N/A"} */}
+            {/* </p> */}
+            {/* <p> */}
+            {/*   <strong>Nationality:</strong> {profile.nationality || "N/A"} */}
+            {/* </p> */}
+            {/* <p> */}
+            {/*   <strong>Ethnicity:</strong> {profile.ethnicity || "N/A"} */}
+            {/* </p> */}
+            {/* <p> */}
+            {/*   <strong>Bio:</strong> {profile.bio || "N/A"} */}
+            {/* </p> */}
+
+            <GeneralInfoSection profile={profile} />
           </div>
         </div>
 
         {/* Right Column - Additional Information */}
         <div className="w-full lg:w-2/3 space-y-6">
-          {/* Bio Section */}
-          <ProfileSectionCard
-            section="bio"
-            title="Bio"
-            icon={AiOutlineBulb}
-            items={profile.bio}
-            placeholder="Share your background, interests, and experiences to stand out from other applicants."
-            buttonText="Add bio"
-          />
-
           {/* Education Section */}
-          <ProfileSectionCard
-            section="education"
+          <EducationSectionCard
             title="Education"
             icon={FaGraduationCap}
             items={profile.applicantEducations}
@@ -217,8 +196,7 @@ const ProfileSection = () => {
           />
 
           {/* Certificates Section */}
-          <ProfileSectionCard
-            section="certificate"
+          <CertificateSectionCard
             title="Certificates"
             icon={FaMedal}
             items={profile.applicantCertificates}
@@ -227,8 +205,7 @@ const ProfileSection = () => {
           />
 
           {/* Skills Section */}
-          <ProfileSectionCard
-            section="skill"
+          <SkillSectionCard
             title="Skills"
             icon={FaTools}
             items={profile.applicantSkills}
@@ -237,8 +214,7 @@ const ProfileSection = () => {
           />
 
           {/* Experience Section */}
-          <ProfileSectionCard
-            section="experience"
+          <ExperienceSectionCard
             setRefresh={setRefresh}
             title="Experiences"
             icon={AiOutlineBulb}

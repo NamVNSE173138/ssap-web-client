@@ -12,6 +12,7 @@ import {
   TableRow,
   TableSortLabel,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 
@@ -37,13 +38,6 @@ const UniversityManagement = () => {
   const [currentUniversity, setCurrentUniversity] = useState<University | null>(
     null
   );
-
-  // const handleToggle = (rowId: any) => {
-  //   setOpenRows((prevState: any) => ({
-  //     ...prevState,
-  //     [rowId]: !prevState[rowId],
-  //   }));
-  // };
 
   const TABLE_HEAD = [
     "ID",
@@ -75,123 +69,65 @@ const UniversityManagement = () => {
     fetchUniversities();
   }, []);
 
-  /*const handleEditAccount = (account: AccountWithRole) => {
-    setCurrentAccount(account);
-    setStatus(account.status || "");
-    setOpenEditDialog(true);
-  };*/
-
-  /*const handleDeleteAccount = async (id: string) => {
-    setLoading(true);
-    try {
-      const account = accounts.find((acc) => acc.id === id);
-      if (account) {
-        await updateAccount({
-          id: account.id,
-          username: account.username,
-          phoneNumber: account.phoneNumber,
-          email: account.email,
-          hashedPassword: account.hashedPassword,
-          roleId: account.roleId,
-          address: account.address,
-          avatarUrl: account.avatarUrl || "https://github.com/shadcn.png",
-          status: "Inactive", 
-          roleName: account.roleName,
-        });
-        fetchAccounts(); 
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      setLoading(false);
-    }
-  };*/
-
-  /*const handleUpdateStatus = async () => {
-    if (currentAccount) {
-      setLoading(true);
-      try {
-        await updateAccount({
-          ...currentAccount,await 
-          status, 
-        });
-        fetchAccounts(); 
-        setOpenEditDialog(false); 
-      } catch (error) {
-        console.error("Error updating account status:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };*/
-
   const renderTable = () => (
-    <Card className="h-full w-full shadow-lg rounded-lg">
-      <Typography
-        variant="h6"
-        component="div"
-        color="primary"
-        sx={{ mt: 2, ml: 2, fontWeight: "bold" }}
-      ></Typography>
+    <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
+      <div
+        style={{
+          display: 'flex',
+          fontWeight: 'bold',
+          backgroundColor: '#f1f1f1',
+          padding: '10px',
+          borderRadius: '8px',
+          marginBottom: '10px',
+        }}
+      >
+        <div style={{ flex: 0.5 }}>ID</div>
+        <div style={{ flex: 2 }}>Name</div>
+        <div style={{ flex: 2 }}>Description</div>
+        <div style={{ flex: 2 }}>City</div>
+        <div style={{ flex: 2 }}>Country</div>
+        <div style={{ flex: 1 }}>Actions</div>
+      </div>
 
-      <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-            <TableRow>
-              {TABLE_HEAD.map((head) => (
-                <TableCell
-                  key={head}
-                  sx={{ fontWeight: "bold", color: "#1c1c1c" }}
-                >
-                  <TableSortLabel className="font-semibold">
-                    {head}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {/*JSON.stringify(majors)*/}
-            {universities.map((account) => (
-              <React.Fragment key={account.id}>
-                <TableRow
-                  key={account.id}
-                  className="cursor-pointer"
-                  sx={{ "&:hover": { backgroundColor: "#f1f1f1" } }}
-                >
-                  {/*<TableCell>{index + 1}</TableCell>*/}
-                  <TableCell>{account.id}</TableCell>
-                  <TableCell>{account.name}</TableCell>
-                  <TableCell>{account.description}</TableCell>
-                  <TableCell>{account.city}</TableCell>
-                  <TableCell>{account.country.name}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Tooltip title="Edit University">
-                        <IconButton
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevents the TableRow's onClick event from firing
-                            setCurrentUniversity(account);
-                            setOpenEditUniversity(true);
-                          }}
-                          sx={{
-                            color: "blue",
-                            "&:hover": { color: "#1976d2" },
-                          }}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Card>
+      {universities.map((account) => (
+        <React.Fragment key={account.id}>
+          <div
+            style={{
+              display: 'flex',
+              padding: '10px',
+              cursor: 'pointer',
+              backgroundColor: '#fff',
+              borderBottom: '1px solid #ddd',
+              transition: 'background-color 0.3s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+          >
+            <div style={{ flex: 0.5 }}>{account.id}</div>
+            <div style={{ flex: 2 }}>{account.name}</div>
+            <div style={{ flex: 2 }}>{account.description}</div>
+            <div style={{ flex: 2 }}>{account.city}</div>
+            <div style={{ flex: 2 }}>{account.country.name}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Tooltip title="Edit University">
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevents the row click event from firing
+                      setCurrentUniversity(account);
+                      setOpenEditUniversity(true);
+                    }}
+                    sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </div>
+          </div>
+        </React.Fragment>
+      ))}
+    </Paper>
   );
 
   return (

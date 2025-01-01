@@ -1,14 +1,13 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
-import { ApplicantExperience } from "../types/Applicant";
 import { updateApplicantExperience } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
-import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 
-const UpdateExperienceDialog = (props: any) => {
+const UpdateCertificateDialog = (props: any) => {
   const { open, setOpen, item, setRefresh } = props;
 
   const user = useSelector((state: RootState) => state.token.user);
@@ -16,17 +15,16 @@ const UpdateExperienceDialog = (props: any) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
-  const [experience, setExperience] = useState<ApplicantExperience>({
+  const [experience, setExperience] = useState<any>({
     id: item.id,
     name: item.name,
-    fromYear: item.fromYear,
-    toYear: item.toYear,
+    achievedYear: 0,
     description: item.description,
   });
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    setExperience((prev) => ({ ...prev, [name]: value }));
+    setExperience((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
@@ -74,12 +72,12 @@ const UpdateExperienceDialog = (props: any) => {
               <div className="flex flex-col justify-between h-full">
                 <div>
                   <Dialog.Title className="text-2xl font-bold">
-                    Update Experience Information
+                    Update Certificate Information
                   </Dialog.Title>
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700">
-                      What experience do you have?
+                      What certificate do you have?
                     </label>
                     <input
                       type="text"
@@ -184,4 +182,4 @@ const UpdateExperienceDialog = (props: any) => {
   );
 };
 
-export default UpdateExperienceDialog;
+export default UpdateCertificateDialog;

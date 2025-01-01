@@ -134,7 +134,7 @@ const ApplyScholarship = () => {
     setApplyLoading(true);
 
     if (!scholarship) {
-      alert("Program not found");
+      notification.error({message:"Program not found"});
       setApplyLoading(false);
       return;
     }
@@ -242,6 +242,22 @@ const ApplyScholarship = () => {
             4
           </div>
         </div>
+
+        {/* Step Subtitles */}
+      <div className="flex justify-center">
+        <div className="text-center w-32">
+          <p className={`text-sm font-medium ${currentStep === 1 ? "text-blue-600" : "text-gray-500"}`}>Step 1: Basic Details</p>
+        </div>
+        <div className="text-center w-32">
+          <p className={`text-sm font-medium ${currentStep === 2 ? "text-blue-600" : "text-gray-500"}`}>Step 2: Required Documents</p>
+        </div>
+        <div className="text-center w-32">
+          <p className={`text-sm font-medium ${currentStep === 3 ? "text-blue-600" : "text-gray-500"}`}>Step 3: Optional Documents</p>
+        </div>
+        <div className="text-center w-32">
+          <p className={`text-sm font-medium ${currentStep === 4 ? "text-blue-600" : "text-gray-500"}`}>Step 4: Confirm Application</p>
+        </div>
+      </div>
 
         {/* Step 1: Personal Details */}
         {currentStep === 1 && (

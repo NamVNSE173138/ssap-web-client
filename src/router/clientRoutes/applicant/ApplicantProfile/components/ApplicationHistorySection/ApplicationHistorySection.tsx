@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import * as Tabs from "@radix-ui/react-tabs";
 import { getApplicationsByApplicant } from "@/services/ApiServices/applicantProfileService";
 import { notification } from "antd";
-import { formatNaturalDate } from "@/lib/dateUtils";
+import { compareDate, formatNaturalDate } from "@/lib/dateUtils";
 
 interface ApplicationDocument {
   id: number;
@@ -29,6 +29,8 @@ const ApplicationHistorySection = (_props: any) => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const applicant = useSelector((state: any) => state.token.user);
 
@@ -41,8 +43,21 @@ const ApplicationHistorySection = (_props: any) => {
           Number(applicant?.id),
         );
 
-        const data = await response.data;
-        setApplications(data);
+        const data = response.data.sort((a: any, b: any) =>
+          compareDate(a.appliedDate, b.appliedDate),
+        );
+
+        const filteredApplications = data.filter((application: any) => {
+          const matchesSearch = application.scholarshipProgram.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+          const matchesStatus =
+            statusFilter === "" || application.status === statusFilter;
+
+          return matchesSearch && matchesStatus;
+        });
+
+        setApplications(filteredApplications);
         // if (data && Array.isArray(data.data)) {
         //   setApplications(data.data);
         // } else {
@@ -56,7 +71,7 @@ const ApplicationHistorySection = (_props: any) => {
     };
 
     fetchApplications();
-  }, []);
+  }, [searchTerm, statusFilter]);
 
   // if (loading) return <Spinner />;
 
@@ -138,8 +153,34 @@ const ApplicationHistorySection = (_props: any) => {
       {/* </div> */}
 
       {/* New Section */}
+      {/* Search bar and filter */}
+
       <div>
         <h1 className="text-3xl font-bold text-black mb-3">My Applications</h1>
+
+        <div className="w-1/2 flex items-center gap-4 mb-6">
+          {/* Search bar */}
+          <input
+            type="text"
+            placeholder="Search by scholarship name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 border border-gray-300 rounded px-4 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
+          />
+
+          {/* Status filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-gray-300 rounded px-4 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
+          >
+            <option disabled>All Statuses</option>
+            <option value="">Any</option>
+
+            <option value="Pending">Submitted</option>
+            <option value="Approved">NeedExtend</option>
+          </select>
+        </div>
 
         <div className="w-full flex flex-col gap-6 p-6">
           {!applications ||
@@ -158,7 +199,7 @@ const ApplicationHistorySection = (_props: any) => {
                   <img
                     src={application.scholarshipProgram.imageUrl}
                     alt="Scholarship Logo"
-                    className="rounded-md border-2 border-gray-300 object-cover"
+                    className="rounded-md object-cover"
                   />
                 </div>
 
