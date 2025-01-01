@@ -1,19 +1,17 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
-import { ApplicantExperience } from "../types/Applicant";
-import { addApplicantExperience } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
 
-const AddExperienceDialog = (props: any) => {
+const AddEducationDialog = (props: any) => {
   const { open, setOpen, setRefresh } = props;
 
   const user = useSelector((state: RootState) => state.token.user);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [experience, setExperience] = useState<ApplicantExperience>({
+  const [experience, setExperience] = useState<any>({
     id: 0,
     name: "",
     fromYear: 0,
@@ -23,20 +21,12 @@ const AddExperienceDialog = (props: any) => {
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    setExperience((prev) => ({ ...prev, [name]: value }));
+    setExperience((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
     setIsProcessing(true);
     try {
-      const payload = {
-        name: experience.name,
-        fromYear: experience.fromYear,
-        toYear: experience.toYear,
-        description: experience.description,
-      };
-      console.log(payload);
-      await addApplicantExperience(Number(user?.id), payload);
       notification.success({
         message: "Success",
         description: "Profile updated successfully",
@@ -68,12 +58,12 @@ const AddExperienceDialog = (props: any) => {
             <div className="flex flex-col justify-between h-full">
               <div>
                 <Dialog.Title className="text-2xl font-bold">
-                  Add Experience Information
+                  Add Education Information
                 </Dialog.Title>
 
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700">
-                    What experience do you have?
+                    What school have you enrolled?
                   </label>
                   <input
                     type="text"
@@ -160,4 +150,4 @@ const AddExperienceDialog = (props: any) => {
   );
 };
 
-export default AddExperienceDialog;
+export default AddEducationDialog;

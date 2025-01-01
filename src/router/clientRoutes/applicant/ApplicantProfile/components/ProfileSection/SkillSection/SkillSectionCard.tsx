@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
-import AddExperienceDialog from "./AddExperienceDialog";
-import UpdateExperienceDialog from "./UpdateExperienceDialog";
+import AddSkillDialog from "./AddSkillDialog";
+import UpdateSkillDialog from "./UpdateSkillDialog";
 
-const ProfileSectionCard = (props: any) => {
+const SkillSectionCard = (props: any) => {
   const {
-    section,
     setRefresh,
     title,
     icon: Icon,
@@ -34,7 +33,7 @@ const ProfileSectionCard = (props: any) => {
           {items.map((item: any, index: any) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-green-600 hover:cursor-pointer"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:ring-2 hover:ring-green-500 hover:cursor-pointer"
               onClick={() => handleOpenDialog("update", item)}
             >
               {/* Left: Icon and Info */}
@@ -44,7 +43,7 @@ const ProfileSectionCard = (props: any) => {
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-800">
-                    {item.name}
+                    {item.name || item.school}
                   </h4>
                   <p className="text-xs text-gray-500">{item.description}</p>
                 </div>
@@ -73,16 +72,12 @@ const ProfileSectionCard = (props: any) => {
         {buttonText}
       </button>
 
-      {section === "experience" && dialogType === "add" && (
-        <AddExperienceDialog
-          open={open}
-          setRefresh={setRefresh}
-          setOpen={setOpen}
-        />
+      {dialogType === "add" && (
+        <AddSkillDialog open={open} setRefresh={setRefresh} setOpen={setOpen} />
       )}
 
-      {section === "experience" && dialogType === "update" && (
-        <UpdateExperienceDialog
+      {dialogType === "update" && (
+        <UpdateSkillDialog
           setRefresh={setRefresh}
           open={open}
           setOpen={setOpen}
@@ -93,4 +88,4 @@ const ProfileSectionCard = (props: any) => {
   );
 };
 
-export default ProfileSectionCard;
+export default SkillSectionCard;
