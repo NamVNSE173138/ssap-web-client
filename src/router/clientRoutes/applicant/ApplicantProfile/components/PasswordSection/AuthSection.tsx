@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
 
-const AuthSection = (props: any) => {
+const AuthSection = () => {
+  const handleClick = () => {};
+
   return (
     <Tabs.Content value="password" className="pt-4">
       <h2 className="text-3xl text-black font-bold mb-6">Change Password</h2>
@@ -60,7 +62,10 @@ const AuthSection = (props: any) => {
 
           {/* Save Button */}
           <div className="flex justify-end mt-8">
-            <Button className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]">
+            <Button
+              onClick={handleClick}
+              className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
+            >
               Save Changes
             </Button>
           </div>

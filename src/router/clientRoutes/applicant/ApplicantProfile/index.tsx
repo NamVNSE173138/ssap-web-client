@@ -5,12 +5,15 @@ import {
   AiOutlineProfile,
   AiOutlineClockCircle,
 } from "react-icons/ai";
-import ProfileSection from "./components/ProfileSection";
-import AuthSection from "./components/AuthSection";
-import ApplicationHistorySection from "./components/ApplicationHistorySection";
+import ProfileSection from "./components/ProfileSection/ProfileSection";
+import ApplicationHistorySection from "./components/ApplicationHistorySection/ApplicationHistorySection";
+import AuthSection from "./components/PasswordSection/AuthSection";
+import { useSearchParams } from "react-router-dom";
 
 const ApplicantProfile = () => {
-  const [activeTab, setActiveTab] = useState<string>("profile");
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<string>(tab || "profile");
 
   return (
     <div className="w-full max-w-8xl mx-auto my-0 p-6 shadow-lg rounded-lg">

@@ -46,3 +46,7 @@ export const getYearsToPresent = (startYear: number) => {
 
   return years;
 };
+
+export const compareDate = (a: string, b: string) => {
+  return new Date(b).getTime() - new Date(a).getTime();
+};
