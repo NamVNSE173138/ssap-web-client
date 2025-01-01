@@ -6,6 +6,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { getApplicationsByApplicant } from "@/services/ApiServices/applicantProfileService";
 import { notification } from "antd";
 import { compareDate, formatNaturalDate } from "@/lib/dateUtils";
+import formatCurrency from "@/lib/currency-formatter";
 
 interface ApplicationDocument {
   id: number;
@@ -177,8 +178,10 @@ const ApplicationHistorySection = (_props: any) => {
             <option disabled>All Statuses</option>
             <option value="">Any</option>
 
-            <option value="Pending">Submitted</option>
-            <option value="Approved">NeedExtend</option>
+            <option value="Submitted">Submitted</option>
+            <option value="NeedExtend">NeedExtend</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
           </select>
         </div>
 
@@ -226,8 +229,12 @@ const ApplicationHistorySection = (_props: any) => {
                     <div className="flex flex-col">
                       <h3 className="text-sm font-semibold">Award</h3>
                       <span className="text-sm text-black font-semibold">
-                        ${application.scholarshipProgram.scholarshipAmount} per
-                        winner
+                        $
+                        {formatCurrency(
+                          application.scholarshipProgram.scholarshipAmount,
+                          "USD",
+                        )}{" "}
+                        per winner
                       </span>
                     </div>
 
