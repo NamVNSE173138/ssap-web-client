@@ -278,7 +278,7 @@ const ScholarshipProgramDetail = () => {
 
   const handleAssignExpertDialog = async () => {
     if (!data) return;
-    if (new Date(data?.deadline) > new Date()) {
+    if (reviewMilestones.every((milestone: any) => milestone.toDate < new Date())) {
       notification.error({ message: "You can not assign before deadline" });
       return;
     }
@@ -454,7 +454,7 @@ const ScholarshipProgramDetail = () => {
                         )}
 
                       {/*JSON.stringify(awardMilestones)*/}
-                      {existingApplication[0].status ==
+                      {/*existingApplication[0].status ==
                         ApplicationStatus.Submitted &&
                         new Date(existingApplication[0].updatedAt) <
                         new Date(data.deadline) && (
@@ -489,7 +489,7 @@ const ScholarshipProgramDetail = () => {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        )}
+                        )*/}
                     </>
                   )}
                 </>

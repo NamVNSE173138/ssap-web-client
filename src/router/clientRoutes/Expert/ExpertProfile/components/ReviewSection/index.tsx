@@ -65,13 +65,13 @@ const ApprovalList: React.FC = () => {
             `${BASE_URL}/api/accounts/${app.applicantId}`
           );
           const scholarshipResponse = await axios.get(
-            `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgramId}`
+            `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgram.id}`
           );
 
           return {
             id: app.id,
             applicantName: applicantResponse.data.username,
-            scholarshipProgramId: app.scholarshipProgramId,
+            scholarshipProgramId: app.scholarshipProgram.id,
             scholarshipName: scholarshipResponse.data.data.name,
             university: scholarshipResponse.data.data.university.name,
             appliedDate: app.appliedDate,
