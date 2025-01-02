@@ -35,12 +35,25 @@ import React from "react";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
 import { ArrowDown } from "lucide-react";
 
+const ITEMS_PER_PAGE = 5;
+
 const AccountsManagement = () => {
   const [accounts, setAccounts] = useState<AccountWithRole[]>([]);
   const [loading, setLoading] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(null);
   const [status, setStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const totalPages = Math.ceil(accounts?.length / ITEMS_PER_PAGE);
+    const paginatedAccounts = accounts?.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -164,7 +177,7 @@ const AccountsManagement = () => {
       </div>
 
       {/* Data Rows */}
-      {filteredAccounts.map((account, index) => (
+      {filteredAccounts.map((account:any, index:any) => (
         <React.Fragment key={account.id}>
           <div
             style={{
@@ -273,15 +286,35 @@ const AccountsManagement = () => {
           )}
         </React.Fragment>
       ))}
+      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              style={{
+                margin: "0 5px",
+                padding: "5px 10px",
+                backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                color: currentPage === index + 1 ? "white" : "black",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
     </Paper>
+    
 
   );
 
   return (
     <>
-      <Typography variant="h4" component="div" color="primary" sx={{ ml: 2, mb: 3 }}>
-        Accounts Management
-      </Typography>
+      <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+                    Accounts Management
+                </h2>
       <Tabs
         value={selectedTab}
         onChange={handleTabChange}
