@@ -84,6 +84,8 @@ import { IoIosAddCircleOutline, IoIosEye } from "react-icons/io";
 import { List, Paper, Tab, Tabs } from "@mui/material";
 import { getAllScholarshipProgramExperts, removeExpertsFromScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 
+const ITEMS_PER_PAGE = 5;
+
 const ScholarshipProgramDetail = () => {
   const { id } = useParams<{ id: string }>();
   const token = useSelector((state: RootState) => state.token.token);
@@ -154,6 +156,57 @@ const ScholarshipProgramDetail = () => {
     Rejected: "red",
     NeedExtend: "yellow",
     Reviewing: "yellow",
+  };
+
+  // const [currentPageAppliedApplicants, setCurrentPageAppliedApplicants] = useState<number>(1);
+  // const totalAppliedApplicantsPages = Math.ceil(applicants?.length / ITEMS_PER_PAGE);
+  // const paginatedServices = applicants?.slice(
+  //   (currentPageAppliedApplicants - 1) * ITEMS_PER_PAGE,
+  //   currentPageAppliedApplicants * ITEMS_PER_PAGE
+  // );
+
+  // const handlePageAppliedApplicantsChange = (page: number) => {
+  //   setCurrentPageAppliedApplicants(page);
+  // };
+
+  const [currentTabPageForSubmitting, setCurrentTabPageForSubmitting] = useState(1);
+  const [currentTabPageForWinners, setCurrentTabPageForWinners] = useState(1);
+  const totalTabPagesForSubmitting = Math.ceil(
+    submittingApplications?.length / ITEMS_PER_PAGE
+  );
+  const totalTabPagesForWinners = Math.ceil(
+    winnersApplications?.length / ITEMS_PER_PAGE
+  );
+
+  const paginatedTabData =
+    selectedTab === 0
+      ? submittingApplications?.slice(
+        (currentTabPageForSubmitting - 1) * ITEMS_PER_PAGE,
+        currentTabPageForSubmitting * ITEMS_PER_PAGE
+      )
+      : winnersApplications?.slice(
+        (currentTabPageForWinners - 1) * ITEMS_PER_PAGE,
+        currentTabPageForWinners * ITEMS_PER_PAGE
+      );
+
+  const handleTabPageChange = (page: number) => {
+    if (selectedTab === 0) {
+      setCurrentTabPageForSubmitting(page);
+    } else {
+      setCurrentTabPageForWinners(page);
+    }
+  };
+
+
+  const [currentPageExpert, setCurrentPageExpert] = useState<number>(1);
+  const totalExpertPages = Math.ceil(_experts?.length / ITEMS_PER_PAGE);
+  const paginatedExpert = _experts?.slice(
+    (_experts - 1) * ITEMS_PER_PAGE,
+    _experts * ITEMS_PER_PAGE
+  );
+
+  const handlePageExpertsChange = (page: number) => {
+    setCurrentPageExpert(page);
   };
 
   const fetchData = async () => {
@@ -278,7 +331,7 @@ const ScholarshipProgramDetail = () => {
 
   const handleAssignExpertDialog = async () => {
     if (!data) return;
-    if (new Date(data?.deadline) > new Date()) {
+    if (reviewMilestones.every((milestone: any) => milestone.toDate < new Date())) {
       notification.error({ message: "You can not assign before deadline" });
       return;
     }
@@ -454,7 +507,7 @@ const ScholarshipProgramDetail = () => {
                         )}
 
                       {/*JSON.stringify(awardMilestones)*/}
-                      {existingApplication[0].status ==
+                      {/*existingApplication[0].status ==
                         ApplicationStatus.Submitted &&
                         new Date(existingApplication[0].updatedAt) <
                         new Date(data.deadline) && (
@@ -489,7 +542,7 @@ const ScholarshipProgramDetail = () => {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        )}
+                        )*/}
                     </>
                   )}
                 </>
@@ -1158,8 +1211,8 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Applicants List */}
-                  {(selectedTab === 0 ? submittingApplications : winnersApplications)?.length > 0 ? (
-                    (selectedTab === 0 ? submittingApplications : winnersApplications).map((app: any, index: number) => (
+                  {paginatedTabData?.length > 0 ? (
+                    paginatedTabData.map((app: any, index: number) => (
                       <div
                         key={app.id}
                         style={{
@@ -1240,6 +1293,43 @@ const ScholarshipProgramDetail = () => {
                   ) : (
                     <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
                   )}
+                  <div style={{ marginTop: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'end' }}>
+                    {selectedTab === 0
+                      ? Array.from({ length: totalTabPagesForSubmitting }, (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleTabPageChange(index + 1)}
+                          style={{
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            backgroundColor: currentTabPageForSubmitting === index + 1 ? '#419f97' : '#f1f1f1',
+                            color: currentTabPageForSubmitting === index + 1 ? 'white' : 'black',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {index + 1}
+                        </button>
+                      ))
+                      : Array.from({ length: totalTabPagesForWinners }, (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleTabPageChange(index + 1)}
+                          style={{
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            backgroundColor: currentTabPageForWinners === index + 1 ? '#419f97' : '#f1f1f1',
+                            color: currentTabPageForWinners === index + 1 ? 'white' : 'black',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                  </div>
                 </Paper>
               </div>
             </div>
@@ -1307,7 +1397,7 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Expert Cards */}
-                  {(_experts && Array.isArray(_experts) && _experts.filter((expert: any) => expert.isVisible !== false).length > 0) ? (
+                  {(paginatedExpert && Array.isArray(_experts) && _experts.filter((expert: any) => expert.isVisible !== false).length > 0) ? (
                     _experts.filter((expert: any) => expert.isVisible !== false).map((expert: any, index: any) => (
                       <div
                         key={expert.id}
@@ -1325,7 +1415,7 @@ const ScholarshipProgramDetail = () => {
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
                       >
                         {/* Cột số thứ tự */}
-                        <div style={{ flex: 0.5 }}>{index + 1}</div>
+                        <div style={{ flex: 0.5 }}>{(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}</div>
 
                         <div style={{ flex: 0.5 }}>
                           <img
@@ -1373,6 +1463,25 @@ const ScholarshipProgramDetail = () => {
                   ) : (
                     <p className="text-center text-gray-500">No experts match your search.</p>
                   )}
+                  <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+                    {Array.from({ length: totalExpertPages }, (_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handlePageExpertsChange(index + 1)}
+                        style={{
+                          margin: "0 5px",
+                          padding: "5px 10px",
+                          backgroundColor: currentPageExpert === index + 1 ? "#419f97" : "#f1f1f1",
+                          color: currentPageExpert === index + 1 ? "white" : "black",
+                          border: "none",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                  </div>
                 </Paper>
               </div>
             </div>

@@ -134,6 +134,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const user = useSelector((state: any) => state.token.user);
   const isProvider = user?.role === "Provider";
   const isFunder = user?.role === "Funder";
+  const isApplicant = user?.role === "Applicant";
   const [canEdit, setCanEdit] = useState<boolean>(true);
   const [_existingRequestId, setExistingRequestId] = useState<number | null>(
     null
@@ -786,7 +787,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               <div className="flex justify-between w-full gap-4">
                 {showButtons && (
                   <>
-                    {!isFunder && !isProvider ? (
+                    {isApplicant ? (
                       requestStatus === "Finished" ? (
                         <button
                           onClick={handleRequestNow}
