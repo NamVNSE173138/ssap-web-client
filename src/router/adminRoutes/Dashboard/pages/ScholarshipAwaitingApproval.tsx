@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import {
@@ -22,7 +22,7 @@ import { Edit as EditIcon } from "@mui/icons-material";
 import { ScholarshipProgramType } from "@/router/clientRoutes/ScholarshipProgram/data";
 import { getAllScholarshipProgram, updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
 import { AiOutlineCheckCircle } from "react-icons/ai";
-import { FaTimesCircle } from "react-icons/fa";
+import { FaEye, FaTimesCircle } from "react-icons/fa";
 import { notification } from "antd";
 import { NotifyFunderScholarshipAcceptance, NotifyFunderScholarshipRejection } from "@/services/ApiServices/notification";
 
@@ -147,15 +147,14 @@ const ScholarshipAwaitingApproval = () => {
             >
                 <div style={{ flex: 0.5, marginRight: '20px' }}>ID</div>
                 <div style={{ flex: 1, marginRight: '20px' }}>Name</div>
-                <div style={{ flex: 2, marginRight: '20px' }}>Description</div>
-                <div style={{ flex: 1, marginRight: '20px' }}>Education Level</div>
+                <div style={{ flex: 2.5, marginRight: '20px' }}>Description</div>
+                <div style={{ flex: 2, marginRight: '20px' }}>Education Level</div>
                 <div style={{ flex: 1, marginRight: '20px' }}>Status</div>
                 <div style={{ flex: 1, marginRight: '20px' }}>Amount</div>
-                <div style={{ flex: 1, marginRight: '20px' }}>Deadline</div>
-                <div style={{ flex: 1.5, marginRight: '20px' }}>University</div>
-                <div style={{ flex: 1.5, marginRight: '20px' }}>Major</div>
-                <div style={{ flex: 1.5, marginRight: '20px' }}>Certificates</div>
-                <div style={{ flex: 2 }}>Actions</div>
+                <div style={{ flex: 1.25, marginRight: '20px' }}>Deadline</div>
+                <div style={{ flex: 2.25, marginRight: '20px' }}>University</div>
+                <div style={{ flex: 2.5, marginRight: '20px' }}>Major</div>
+                <div style={{ flex: 2.5 }}>Actions</div>
             </div>
 
             {/* Data Rows */}
@@ -182,30 +181,46 @@ const ScholarshipAwaitingApproval = () => {
                         {/* Name */}
                         <div style={{ flex: 1, marginRight: '20px' }}>{scholarship.name}</div>
                         {/* Description */}
-                        <div style={{ flex: 2, marginRight: '20px' }}>{scholarship.description}</div>
+                        <div style={{ flex: 2.5, marginRight: '20px' }}>
+                            {scholarship.description.length > 12 ? scholarship.description.slice(0, 12) + '..' : scholarship.description}
+                        </div>
                         {/* Education Level */}
-                        <div style={{ flex: 1, marginRight: '20px' }}>{scholarship.educationLevel}</div>
+                        <div style={{ flex: 2, marginRight: '20px' }}>{scholarship.educationLevel}</div>
                         {/* Status */}
                         <div style={{ flex: 1, marginRight: '20px' }}>{scholarship.status}</div>
                         {/* Amount */}
                         <div style={{ flex: 1, marginRight: '20px' }}>${scholarship.scholarshipAmount}</div>
                         {/* Deadline */}
-                        <div style={{ flex: 1, marginRight: '20px' }}>
+                        <div style={{ flex: 1.25, marginRight: '20px' }}>
                             {new Date(scholarship.deadline).toLocaleDateString()}
                         </div>
                         {/* University */}
-                        <div style={{ flex: 1.5, marginRight: '20px' }}>{scholarship.university.name}</div>
+                        <div style={{ flex: 2.25, marginRight: '20px' }}>{scholarship.university.name}</div>
                         {/* Major */}
-                        <div style={{ flex: 1.5, marginRight: '20px' }}>{scholarship.major.name}</div>
-                        {/* Certificates */}
-                        <div style={{ flex: 1.5, marginRight: '20px' }}>
-                            {scholarship.certificates[0]?.name || 'N/a'}
-                        </div>
+                        <div style={{ flex: 2.5, marginRight: '20px' }}>{scholarship.major.name}</div>
                         {/* Actions */}
-                        <div style={{ flex: 2 }}>
+                        <div style={{ flex: 2.5 }}>
+                            <Button
+                                style={{ backgroundColor: '#007bff' }}
+                            >
+                                <Link
+                                    to={`/scholarship-program/${scholarship.id}`}
+                                    style={{
+                                        color: 'white',
+                                        borderRadius: '4px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        fontSize: '14px',
+                                    }}
+                                >
+                                    <FaEye style={{ marginRight: '8px' }} />
+                                    Details
+                                </Link>
+                            </Button>
                             <Button
                                 onClick={() => handleApprove(scholarship)}
                                 style={{
+                                    marginTop: '8px',
                                     backgroundColor: '#4caf50',
                                     color: 'white',
                                     marginRight: '20px',

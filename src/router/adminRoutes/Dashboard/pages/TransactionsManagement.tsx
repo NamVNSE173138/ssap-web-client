@@ -4,18 +4,54 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
 import { FaTimesCircle, FaCheckCircle, FaPiggyBank } from "react-icons/fa";
 import { getAllWallets } from "@/services/ApiServices/accountService";
 
+const ITEMS_PER_PAGE = 5;
+
 const WalletAndTransactionManagement = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [wallets, setWallets] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  // const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  // const [orderBy, setOrderBy] = useState<string>("transactionId");
+  const [walletsPage, setWalletsPage] = useState<number>(1);
+  const [transactionsPage, setTransactionsPage] = useState<number>(1);
+  const [expandedTransactionIds, setExpandedTransactionIds] = useState<Set<string>>(new Set());
 
-  const sortDirection: "asc" | "desc" = "asc"
-  const orderBy = "transactionId"
+  const totalTransactionsPages = Math.ceil(transactions?.length / ITEMS_PER_PAGE);
+  const paginatedTransactions = transactions?.slice(
+    (transactionsPage - 1) * ITEMS_PER_PAGE,
+    transactionsPage * ITEMS_PER_PAGE
+  );
+  const handleTransactionsPageChange = (page: number) => {
+    setTransactionsPage(page);
+  };
+
+  const totalWalletsPages = Math.ceil(wallets?.length / ITEMS_PER_PAGE);
+  const paginatedWallets = wallets.slice(
+    (walletsPage - 1) * ITEMS_PER_PAGE,
+    walletsPage * ITEMS_PER_PAGE
+  );
+  const handleWalletsPageChange = (page: number) => {
+    setWalletsPage(page);
+  };
+
+  const toggleExpand = (transactionId: string) => {
+    setExpandedTransactionIds((prevState) => {
+      const newState = new Set(prevState);
+      if (newState.has(transactionId)) {
+        newState.delete(transactionId);
+      } else {
+        newState.add(transactionId);
+      }
+      return newState;
+    });
+  };
+
+  const displayText = (transactionId: string) => {
+    if (expandedTransactionIds.has(transactionId)) {
+      return transactionId;
+    }
+    return `${transactionId.slice(0, 25)}...`;
+  };
+
 
   useEffect(() => {
     const fetchWalletsAndTransactions = async () => {
@@ -39,39 +75,6 @@ const WalletAndTransactionManagement = () => {
 
     fetchWalletsAndTransactions();
   }, []);
-
-  const handleChangePage = (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const sortedTransactions = transactions
-    .sort((a, b) => {
-      if (a[orderBy] < b[orderBy]) {
-        return sortDirection === "asc" ? -1 : 1;
-      }
-      if (a[orderBy] > b[orderBy]) {
-        return sortDirection === "asc" ? 1 : -1;
-      }
-      return 0;
-    })
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-  const sortedWallets = wallets
-    .sort((a, b) => {
-      if (a.id < b.id) {
-        return sortDirection === "asc" ? -1 : 1;
-      }
-      if (a.id > b.id) {
-        return sortDirection === "asc" ? 1 : -1;
-      }
-      return 0;
-    })
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Box sx={{ backgroundColor: "#f4f7fb", borderRadius: 2 }}>
@@ -123,7 +126,7 @@ const WalletAndTransactionManagement = () => {
           </div>
 
           {/* Data Rows */}
-          {sortedWallets.map((wallet, index) => (
+          {paginatedWallets.map((wallet, index) => (
             <div
               key={wallet.id}
               style={{
@@ -137,7 +140,7 @@ const WalletAndTransactionManagement = () => {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
             >
-              <div style={{ flex: 0.5 }}>{page * rowsPerPage + index + 1}</div>
+              <div style={{ flex: 0.5 }}>{(walletsPage - 1) * ITEMS_PER_PAGE + index + 1}</div>
               <div style={{ flex: 1 }}>{wallet.id}</div>
               <div style={{ flex: 2 }}>{wallet.bankAccountName}</div>
               <div style={{ flex: 1 }}>{wallet.bankAccountNumber}</div>
@@ -145,18 +148,24 @@ const WalletAndTransactionManagement = () => {
             </div>
           ))}
 
-          {/* Pagination */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={wallets.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              sx={{ color: '#1976d2' }}
-            />
+          <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+            {Array.from({ length: totalWalletsPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handleWalletsPageChange(index + 1)}
+                style={{
+                  margin: "0 5px",
+                  padding: "5px 10px",
+                  backgroundColor: walletsPage === index + 1 ? "#419f97" : "#f1f1f1",
+                  color: walletsPage === index + 1 ? "white" : "black",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                {index + 1}
+              </button>
+            ))}
           </div>
         </Paper>
 
@@ -164,7 +173,7 @@ const WalletAndTransactionManagement = () => {
 
       {/* Transactions Management */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-        <h2 style={{ marginLeft: "16px", marginTop:'10px',  marginBottom: "15px", color: "#3f51b5", fontWeight: "bold" }}>
+        <h2 style={{ marginLeft: "16px", marginTop: '10px', marginBottom: "15px", color: "#3f51b5", fontWeight: "bold" }}>
           Transactions Management
         </h2>
       </div>
@@ -194,7 +203,7 @@ const WalletAndTransactionManagement = () => {
           </div>
 
           {/* Data Rows */}
-          {sortedTransactions.map((transaction, index) => (
+          {paginatedTransactions.map((transaction, index) => (
             <div
               key={transaction.transactionId}
               style={{
@@ -208,8 +217,27 @@ const WalletAndTransactionManagement = () => {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
             >
-              <div style={{ flex: 0.5 }}>{page * rowsPerPage + index + 1}</div>
-              <div style={{ flex: 4, marginRight: '20px' }}>{transaction.transactionId}</div>
+              <div style={{ flex: 0.5 }}>{(transactionsPage - 1) * ITEMS_PER_PAGE + index + 1}</div>
+              <div key={index} style={{ flex: 4, marginBottom: '10px', marginRight: '20px' }}>
+                <span>{displayText(transaction.transactionId)}</span>
+                {transaction.transactionId.length > 25 && (
+                  <button
+                    style={{
+                      color: 'blue',
+                      cursor: 'pointer',
+                      marginLeft: '5px',
+                      background: 'transparent',
+                      border: 'none',
+                      padding: '0',
+                      fontSize: '14px',
+                      textDecoration: 'underline',
+                    }}
+                    onClick={() => toggleExpand(transaction.transactionId)}
+                  >
+                    {expandedTransactionIds.has(transaction.transactionId) ? 'Decrease' : 'Expand'}
+                  </button>
+                )}
+              </div>
               <div style={{ flex: 1.25, marginRight: '20px' }}>{transaction.walletSenderId}</div>
               <div style={{ flex: 1.35, marginRight: '20px' }}>{transaction.walletReceiverId}</div>
               <div style={{ flex: 1.25, marginRight: '20px' }}>{transaction.paymentMethod}</div>
@@ -231,18 +259,24 @@ const WalletAndTransactionManagement = () => {
             </div>
           ))}
 
-          {/* Pagination */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={transactions.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              sx={{ color: '#1976d2' }}
-            />
+          <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+            {Array.from({ length: totalTransactionsPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handleTransactionsPageChange(index + 1)}
+                style={{
+                  margin: "0 5px",
+                  padding: "5px 10px",
+                  backgroundColor: transactionsPage === index + 1 ? "#419f97" : "#f1f1f1",
+                  color: transactionsPage === index + 1 ? "white" : "black",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                {index + 1}
+              </button>
+            ))}
           </div>
         </Paper>
 

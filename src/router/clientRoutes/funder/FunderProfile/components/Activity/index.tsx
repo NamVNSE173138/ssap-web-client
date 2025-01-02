@@ -95,9 +95,6 @@ const Activity = () => {
                       Value of Award
                     </th>
                     <th style={{ padding: "12px", fontWeight: "600" }}>
-                      Number of Award Milestones
-                    </th>
-                    <th style={{ padding: "12px", fontWeight: "600" }}>
                       Number of Scholarships
                     </th>
                     <th style={{ padding: "12px", fontWeight: "600" }}>
@@ -184,8 +181,8 @@ const Activity = () => {
                             fontWeight: "500",
                           }}
                         >
-                          {item.description.length > 60
-                            ? item.description.slice(0, 60) + "..."
+                          {item.description.length > 30
+                            ? item.description.slice(0, 30) + "..."
                             : item.description}
                         </td>
                         <td
@@ -209,15 +206,6 @@ const Activity = () => {
                           }}
                         >
                           ${item.scholarshipAmount}
-                        </td>
-                        <td
-                          style={{
-                            padding: "12px",
-                            fontSize: "14px",
-                            fontWeight: "500",
-                          }}
-                        >
-                          {item.numberOfAwardMilestones}
                         </td>
                         <td
                           style={{
