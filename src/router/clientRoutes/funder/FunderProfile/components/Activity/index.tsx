@@ -10,6 +10,8 @@ import ScholarshipProgramSkeleton from "./ScholarshipProgramSkeleton";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Paper } from "@mui/material";
 import { FaEye } from "react-icons/fa";
+import { getApplicationsByApplicant } from "@/services/ApiServices/applicantProfileService";
+import { getAllApplications } from "@/services/ApiServices/applicationService";
 
 const Activity = () => {
   const user = useSelector((state: any) => state.token.user);
@@ -20,17 +22,22 @@ const Activity = () => {
     useState<ScholarshipProgramType[]>(scholarshipProgram);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [applications, setApplications] = useState<any[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const [response, applications] = await Promise.all([axios.get(
         `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`,
-      );
+      ),
+      getAllApplications()
+      ]);
+      
       console.log("SCP", response.data.data);
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
+        setApplications(applications);
       } else {
         setError("Failed to fetch scholarship programs");
       }
@@ -89,6 +96,9 @@ const Activity = () => {
                     </th>
                     <th style={{ padding: "12px", fontWeight: "600" }}>
                       Number of Scholarships
+                    </th>
+                    <th style={{ padding: "12px", fontWeight: "600" }}>
+                      Number of Applicants
                     </th>
                     <th style={{ padding: "12px", fontWeight: "600" }}>
                       Actions
@@ -205,6 +215,16 @@ const Activity = () => {
                           }}
                         >
                           {item.numberOfScholarships}
+                        </td>
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {applications && applications.filter((app:any) => 
+                            app.scholarshipProgramId == item.id).length}
                         </td>
                         <td style={{ padding: "12px", textAlign: "center" }}>
                           <Link

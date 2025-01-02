@@ -20,7 +20,7 @@ import {
   Paper,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { SearchIcon } from "lucide-react";
+import { ListIcon, SearchIcon } from "lucide-react";
 import { BASE_URL } from "@/constants/api";
 import { notification } from "antd";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
@@ -33,7 +33,7 @@ import { RootState } from "@/store/store";
 import { assignExpertsToApplicationApi, getReviewsOfApplications } from "@/services/ApiServices/applicationService";
 import { Input } from "@/components/ui/input";
 import React from "react";
-
+import ApplicationStatus from "@/constants/applicationStatus";
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const token = useSelector((state: RootState) => state.token.token);
@@ -77,15 +77,13 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const fetchExperts = async () => {
     setLoading(true);
     try {
-      const [response, reviewMilestones] = await Promise.all([axios.get(
+      const response = await axios.get(
         `${BASE_URL}/api/scholarship-programs/${scholarshipId}/experts`
-      ),
-      getAllReviewMilestonesByScholarship(scholarshipId),
-      ]);
+      );
 
       if (Array.isArray(response.data.data)) {
         setExperts(response.data.data);
-        setReviewMilestones(reviewMilestones.data);
+        
         
       } else {
         setExperts([]);
@@ -133,13 +131,59 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
 
   useEffect(() => {
     if (open) {
-      fetchExperts();
+      //fetchExperts();
+      fetchReviewingExperts();
     }
   }, [open]);
 
-  const fetchReviewingExperts = async (milestone:any) => {
-    const applications = await fetchApplications();
+  const fetchReviewingExperts = async () => {
+    let applications = await fetchApplications();
     const experts = await fetchExperts();
+    const reviewMilestones = await getAllReviewMilestonesByScholarship(scholarshipId);
+    let milestone = reviewMilestones.data
+      .filter((milestone: any) => new Date(milestone.fromDate) > new Date())
+      .sort((a: any, b: any) => 
+        new Date(a.fromDate).getTime() - new Date(b.fromDate).getTime()
+      )[0];
+    if(reviewMilestones.data.some((milestone: any) => 
+        new Date(milestone.fromDate) <= new Date() && 
+        new Date(milestone.toDate) >= new Date())
+    ){
+        const happeningReviewMilestone = reviewMilestones.data.find((milestone: any) => 
+            new Date(milestone.fromDate) <= new Date() && 
+            new Date(milestone.toDate) >= new Date())
+        notification.error({message:happeningReviewMilestone.description+" is happening, you can not assign now."});
+        setSelectedReviewMilestone(null);
+        setApplications([])
+        return;
+    }
+    else if(!milestone)
+    {
+        notification.error({message:"All review milestone is over."});
+        setSelectedReviewMilestone(null);
+        setApplications([])
+        return;
+    }
+    setSelectedReviewMilestone(milestone);
+    if(milestone.description == "Application Review")
+    {
+        /*applications = applications.filter((application: any) => 
+            application.status == ApplicationStatus.Reviewing ||
+            application.status == ApplicationStatus.Submitted)*/
+    }
+    else if(milestone.description == "Interview")
+    {
+        const reviewedApplications = applications.filter((application: any) => 
+            application.applicationReviews.find((review: any) => 
+            review.description == "Application Review"));
+        //console.log("passedApplications",reviewedApplications);
+        
+        applications = reviewedApplications.filter((application: any) => application.applicationReviews
+            .find((review: any) => review.status == "Approved") != null );
+    }
+    setApplications(applications)
+    //console.log("Applications",applications);
+    
 
     for(const application of applications) {
         const reviewingExpertIds = application.applicationReviews
@@ -157,11 +201,11 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
     } 
   }
 
-  const handleMilestoneSelection = (milestone: any) => {
+  /*const handleMilestoneSelection = (milestone: any) => {
     setSelectedReviewMilestone(milestone);
     fetchReviewingExperts(milestone);
     setStep(2);
-  };
+  };*/
 
   const assignExpertsToApplication = async () => {
     try{
@@ -207,6 +251,10 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
       <div className="p-6 space-y-4">
         {/* Step Indicator */}
         <div className="flex items-center justify-center mb-6">
+          {/*<div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"}`}>
+            1
+          </div>
+          <div className="h-1 w-20 bg-gray-300 mx-2"></div>*/}
           <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"}`}>
             1
           </div>
@@ -214,44 +262,44 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
           <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 2 ? "bg-blue-600" : "bg-gray-300"}`}>
             2
           </div>
-          <div className="h-1 w-20 bg-gray-300 mx-2"></div>
-          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 3 ? "bg-blue-600" : "bg-gray-300"}`}>
-            3
-          </div>
         </div>
 
 
         {/* Step Subtitles */}
       <div className="flex justify-center">
+        {/*<div className="text-center w-32">
+          <p className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"}`}>Review Milestone</p>
+        </div>*/}
         <div className="text-center w-32">
-          <p className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"}`}>Step 1: Review Milestone</p>
+          <p className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"}`}>Assign</p>
         </div>
         <div className="text-center w-32">
-          <p className={`text-sm font-medium ${step === 2 ? "text-blue-600" : "text-gray-500"}`}>Step 2: Assign</p>
-        </div>
-        <div className="text-center w-32">
-          <p className={`text-sm font-medium ${step === 3 ? "text-blue-600" : "text-gray-500"}`}>Step 3: Choose Date &amp; Confirm</p>
+          <p className={`text-sm font-medium ${step === 2 ? "text-blue-600" : "text-gray-500"}`}>Choose Date &amp; Confirm</p>
         </div>
       </div>
 
       
         {/* Step 1: Select Review Milestone */}
-        {step === 1 && (
+        
+
+        {/* Step 1: Assign Expert*/}
+        {step === 1 && value && (
           <>
             <DialogTitle
               style={{
                 fontWeight: 700,
                 fontSize: "1.5rem",
                 display: "flex",
-                justifyContent: "space-between",
+                //justifyContent: "space-between",
+                gap: 3,
                 alignItems: "center",
                 paddingBottom: "1rem",
                 backgroundColor: "#f0f4f8",
                 borderRadius: "8px",
               }}
             >
-              <span>Select Review Milestone{" "}
-              </span>
+              Assign Expert for
+              <span className="text-sky-500 ml-1">{selectedReviewMilestone?.description || ""}</span>
               <IconButton
                 edge="end"
                 color="inherit"
@@ -268,84 +316,17 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 <GridCloseIcon style={{ fontSize: "inherit" }} />
               </IconButton>
             </DialogTitle>
-
-            {loading ? (
-              <div className="flex justify-center items-center">
-                <CircularProgress style={{ color: "#0ea5e9" }} />
-              </div>
-            ) : (
-              <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-                <List>
-                  {reviewMilestone
-                    //.filter((expert) => expert.isVisible !== false)
-                    .map((review: any) => (
-                      <ListItemButton
-                        key={review.id}
-                        component="div"
-                        onClick={() => handleMilestoneSelection(review)}
-                        disabled={new Date(review.toDate) < new Date()}
-                        style={{
-                          cursor: "pointer",
-                          border: "1px solid #dbeafe",
-                          borderRadius: "8px",
-                          marginBottom: "0.5rem",
-                          padding: "0.8rem",
-                          transition: "all 0.2s ease-in-out",
-                          backgroundColor: "#f9fafb",
-                        }}
-                        className="hover:bg-sky-100"
-                      >
-                        <ListItemText
-                          primary={
-                            <span style={{ fontWeight: "bold", color: "#0369a1" }}>
-                              {review.description}
-                            </span>
-                          }
-                          secondary={
-                            <span>
-                              From Date: {format(review.fromDate, "MM/dd/yyyy")}
-                              <br />
-                              To Date: {format(review.toDate, "MM/dd/yyyy")}
-                            </span>
-                          }
-                          
-                        />
-                      </ListItemButton>
-                    ))}
-
-                  {/*experts.every((expert) => expert.isVisible === false) && (
-                    <p className="text-center text-gray-500">No experts match your search.</p>
-                  )*/}
-                </List>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Step 2: Assign Expert*/}
-        {step === 2 && value && (
-          <>
-            <DialogTitle
-              style={{
-                fontWeight: 700,
-                fontSize: "1.5rem",
-                display: "flex",
-                //justifyContent: "space-between",
-                gap: 3,
-                alignItems: "center",
-                paddingBottom: "1rem",
-                backgroundColor: "#f0f4f8",
-                borderRadius: "8px",
-              }}
-            >
-              Assign Expert for 
-              <span className="text-sky-500">{selectedReviewMilestone?.description || ""}</span>
-            </DialogTitle>
-            <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-              <List>
-                {applications.length === 0 && (
+              {selectedReviewMilestone && selectedReviewMilestone.description == "Application Review" && <div>You can only assign 1 expert for this review</div>}
+              {applications.length === 0 && selectedReviewMilestone.description == "Application Review" && (
                   <p className="text-center text-gray-500">No applications yet.</p>
                 )}
+              {applications.length === 0 && selectedReviewMilestone.description == "Interview" && (
+                  <p className="text-center text-gray-500">No applications passed Application Review yet.</p>
+                )}
+                {applications.length === 0 && !selectedReviewMilestone && (
+                  <p className="text-center text-gray-500">You can not assign expert now.</p>
+                )}  
+              {selectedReviewMilestone && <List>
                 {applications.map((application: any) => (
                   <ListItem
                     key={application.id}
@@ -399,7 +380,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                             isFirstReview: selectedReviewMilestone.description === "Application Review",
                             expertIds: changedValue.map((option) =>({ 
                                 id: option.expertId,
-                                reviewDate: format(new Date().setDate(new Date().getDate() + 7), "yyyy-MM-dd"),
+                                deadlineDate: format(new Date().setDate(new Date().getDate() + 7), "yyyy-MM-dd"),
                             })),
                           },
                         ]);
@@ -413,7 +394,11 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                             return prevValue;
                         })
                       }}
-                      options={experts.filter((expert) => !value[application.id].map((item: any) => item.expertId)
+                      options={selectedReviewMilestone.description == "Application Review" ?
+                        (value[application.id].length === 0 ?
+                        experts.filter((expert) => !value[application.id].map((item: any) => item.expertId)
+                        ?.includes(expert.expertId)) : []) : 
+                        experts.filter((expert) => !value[application.id].map((item: any) => item.expertId)
                         ?.includes(expert.expertId))}
                       getOptionLabel={(option) => option.username}
                       renderOption={(props, option, { selected }) => {
@@ -463,31 +448,29 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                         <TextField {...params} label="Assign Expert" placeholder="Search" />
                       )}
                     />
-                    <Link
-                      target="_blank"
-                      to={`/funder/application/${application.id}`}
-                      className="flex my-auto items-center gap-2 text-sky-500 underline hover:text-sky-600 transition-all mt-4"
-                    >
-                      <FaUser className="text-sky-500" />
-                      <span className="text-sm">View Profile</span>
-                    </Link>
+                    <div>
+                        <Link
+                          target="_blank"
+                          to={`/funder/application/${application.id}`}
+                          className="flex my-auto items-center gap-2 text-sky-500 underline hover:text-sky-600 transition-all mt-4"
+                        >
+                          <FaUser className="text-sky-500" />
+                          <span className="text-sm">View Detail</span>
+                        </Link>
+                        <Link
+                          target="_blank"
+                          to={`/funder/choose-winners/${scholarshipId}`}
+                          className="flex my-auto items-center gap-2 text-sky-500 underline hover:text-sky-600 transition-all mt-4"
+                        >
+                          <ListIcon className="text-sky-500" />
+                          <span className="text-sm">View Result</span>
+                        </Link>
+                    </div>
                   </ListItem>
                 ))}
-              </List>
-            </div>
-            <div className="flex justify-between mt-4">
-              <Button
-                variant="outlined"
-                onClick={() => setStep(1)}
-                style={{
-                  borderColor: "#0369a1",
-                  color: "#0369a1",
-                  textTransform: "none",
-                  fontWeight: "bold",
-                }}
-              >
-                Back
-              </Button>
+              </List>}
+            {applications.length > 0 && selectedReviewMilestone && <div className="flex justify-between mt-4">
+              <div></div>
               <Button
                 variant="contained"
                 style={{
@@ -509,40 +492,41 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                             return;
                         }
                     }
-                    setStep(3) 
+                    setStep(2) 
                 }}
                 //disabled={!selectedApplications.length}
               >
                 Next
               </Button>
-            </div>
+            </div>}
           </>
         )}
 
         {/* Step 3: Confirm Assignment */}
-        {step === 3 && (
+        {step === 2 && (
           <>
             <DialogTitle
               style={{
                 fontWeight: 700,
                 fontSize: "1.5rem",
                 display: "flex",
-                justifyContent: "space-between",
+                //justifyContent: "space-between",
                 alignItems: "center",
                 paddingBottom: "1rem",
                 backgroundColor: "#f0f4f8",
                 borderRadius: "8px",
               }}
             >
-              Assign Expert
+              Assign Expert for
+              <span className="text-sky-500 ml-1">{selectedReviewMilestone?.description || ""}</span>
             </DialogTitle>
-            <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-              {applications.map((application) => (
+              {applications.map((application:any, index: number) => (
               <div key={application.id}>
                  {changedValue[application.id].length > 0 && 
-                  <><div className="space-y-2">
-                      <p>
-                        <strong style={{ color: "#0369a1" }}>Application:</strong>{" "}
+                  <>
+                  <div className="space-y-2">
+                      <p style={{fontSize: "20px"}}>
+                        <strong style={{ color: "#0369a1" }}>{index+1 + ". " + "Application"}:</strong>{" "}
                           {application.applicant.username}
                         </p>
                       <p className="flex gap-3">
@@ -579,7 +563,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                                     type="date"
                                     value={submitAssignExperts
                                     .find((app:any) => app.applicationId == application.id)?.expertIds
-                                    .find((e:any) => e.id == expert.expertId).reviewDate}
+                                    .find((e:any) => e.id == expert.expertId).deadlineDate}
                                     
                                     
                                     onChange={(e) => {
@@ -595,7 +579,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                                                   if (exp.id === expert.expertId) {
                                                     return {
                                                       ...exp,
-                                                      reviewDate: newReviewDate,
+                                                      deadlineDate: newReviewDate,
                                                     };
                                                   }
                                                   return exp;
@@ -612,21 +596,16 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                         ))}
                         </Paper>
                       </p>
-                      <p>
-                        <strong style={{ color: "#0369a1" }}>Review Milestone:</strong>{" "}
-                        {selectedReviewMilestone.description}
-                      </p>
                   </div>
                   <div className="h-px bg-gray-200 my-4"></div></>
                   }
               </div>
               ))}
-              </div>
             <br />
             <div className="flex justify-between mt-4">
               <Button
                 variant="outlined"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(1)}
                 style={{
                   borderColor: "#0369a1",
                   color: "#0369a1",
