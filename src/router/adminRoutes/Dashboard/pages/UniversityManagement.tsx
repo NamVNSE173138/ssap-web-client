@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  Card,
-  Typography,
   IconButton,
   Tooltip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
   CircularProgress,
   Paper,
 } from "@mui/material";
@@ -27,6 +18,8 @@ import AddUniversityModal from "./UniversityManagement/AddUniversityForm";
 import { getAllCountries } from "@/services/ApiServices/countryService";
 import EditUniversityModal from "./UniversityManagement/EditUniversityForm";
 
+const ITEMS_PER_PAGE = 5;
+
 const UniversityManagement = () => {
   const [universities, setUniversities] = useState<University[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
@@ -38,15 +31,17 @@ const UniversityManagement = () => {
   const [currentUniversity, setCurrentUniversity] = useState<University | null>(
     null
   );
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(universities?.length / ITEMS_PER_PAGE);
+  const paginatedUniversities = universities?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-  const TABLE_HEAD = [
-    "ID",
-    "Name",
-    "Description",
-    "City",
-    "Country",
-    "Actions",
-  ];
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
 
   const fetchUniversities = async () => {
     setLoading(true);
@@ -81,15 +76,15 @@ const UniversityManagement = () => {
           marginBottom: '10px',
         }}
       >
-        <div style={{ flex: 0.5 }}>ID</div>
-        <div style={{ flex: 2 }}>Name</div>
-        <div style={{ flex: 2 }}>Description</div>
-        <div style={{ flex: 2 }}>City</div>
-        <div style={{ flex: 2 }}>Country</div>
-        <div style={{ flex: 1 }}>Actions</div>
+        <div style={{ flex: 0.5, marginRight: '20px' }}>ID</div>
+        <div style={{ flex: 2, marginRight: '20px' }}>Name</div>
+        <div style={{ flex: 2, marginRight: '20px' }}>Description</div>
+        <div style={{ flex: 2, marginRight: '20px' }}>City</div>
+        <div style={{ flex: 2, marginRight: '20px' }}>Country</div>
+        <div style={{ flex: 1, marginRight: '20px' }}>Actions</div>
       </div>
 
-      {universities.map((account) => (
+      {paginatedUniversities.map((account) => (
         <React.Fragment key={account.id}>
           <div
             style={{
@@ -103,12 +98,12 @@ const UniversityManagement = () => {
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
           >
-            <div style={{ flex: 0.5 }}>{account.id}</div>
-            <div style={{ flex: 2 }}>{account.name}</div>
-            <div style={{ flex: 2 }}>{account.description}</div>
-            <div style={{ flex: 2 }}>{account.city}</div>
-            <div style={{ flex: 2 }}>{account.country.name}</div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 0.5, marginRight: '20px' }}>{account.id}</div>
+            <div style={{ flex: 2, marginRight: '20px' }}>{account.name}</div>
+            <div style={{ flex: 2, marginRight: '20px' }}>{account.description}</div>
+            <div style={{ flex: 2, marginRight: '20px' }}>{account.city}</div>
+            <div style={{ flex: 2, marginRight: '20px' }}>{account.country.name}</div>
+            <div style={{ flex: 1, marginRight: '20px' }}>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <Tooltip title="Edit University">
                   <IconButton
@@ -127,20 +122,35 @@ const UniversityManagement = () => {
           </div>
         </React.Fragment>
       ))}
+      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => handlePageChange(index + 1)}
+            style={{
+              margin: "0 5px",
+              padding: "5px 10px",
+              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+              color: currentPage === index + 1 ? "white" : "black",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </Paper>
+
   );
 
   return (
     <>
       <div className="flex justify-between">
-        <Typography
-          variant="h4"
-          component="div"
-          color="primary"
-          sx={{ ml: 2, mb: 3 }}
-        >
+        <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
           University Management
-        </Typography>
+        </h2>
 
         <Button onClick={() => setOpenAddUniversity(true)} className="gap-2">
           <IoMdAddCircle />
@@ -177,21 +187,6 @@ const UniversityManagement = () => {
           }}
         />
       )}
-
-      {/* Edit Account Status Dialog */}
-      {/*<Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} fullWidth>
-        <DialogTitle>Edit Account Status</DialogTitle>
-        <DialogContent>
-          <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)} fullWidth>
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Inactive">Inactive</MenuItem>
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} color="secondary">Cancel</Button>
-          <Button onClick={handleUpdateStatus} color="primary">Update</Button>
-        </DialogActions>
-      </Dialog>*/}
     </>
   );
 };

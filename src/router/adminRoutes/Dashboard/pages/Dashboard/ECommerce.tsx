@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
-import ChatCard from '../../components/Chat/ChatCard';
+import ChatCard from '../../components/ListAccounts/ListProvidersCard';
 import TableOne from '../../components/Tables/TableOne';
 import { getAllAccounts } from '@/services/ApiServices/accountService';
 import ScreenSpinner from '@/components/ScreenSpinner';
@@ -11,45 +11,51 @@ import formatCurrency from '@/lib/currency-formatter';
 import { countScholarshipProgram } from '@/services/ApiServices/scholarshipProgramService';
 import { countServices } from '@/services/ApiServices/serviceService';
 import { getRevenue } from '@/services/ApiServices/subscriptionService';
+import TableThree from '../../components/Tables/TableThree';
+import ListProvidersCard from '../../components/ListAccounts/ListProvidersCard';
+import ListFundersCard from '../../components/ListAccounts/ListFundersCard';
 
 const ECommerce: React.FC = () => {
-    
-    const [accounts, setAccounts] = useState<any>(null);
-    const [scholarshipCount, setScholarshipCount] = useState<number>(0);
-    const [serviceCount, setServiceCount] = useState<number>(0);
-    const [revenue, setRevenue] = useState<number>(0);
 
-    const [error, setError] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<any>(null);
+  const [scholarshipCount, setScholarshipCount] = useState<number>(0);
+  const [serviceCount, setServiceCount] = useState<number>(0);
+  const [revenue, setRevenue] = useState<number>(0);
 
-   const fetchAccounts = async () => {
-        try {
-            const response = await getAllAccounts();
-            const scholarship = await countScholarshipProgram();
-            const services = await countServices();
-            //const wallet = await getAccountWallet(1)
-            const wallet = await getRevenue()
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-            //console.log(response);
-            setScholarshipCount(scholarship.data);
-            setServiceCount(services.data);
-            setAccounts(response);
-            setRevenue(wallet.data);
-        } catch (error) {
-            setError((error as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    }; 
+  const fetchAccounts = async () => {
+    try {
+      const response = await getAllAccounts();
+      const scholarship = await countScholarshipProgram();
+      const services = await countServices();
+      //const wallet = await getAccountWallet(1)
+      const wallet = await getRevenue()
 
-    useEffect(() => {
-        fetchAccounts();
-    }, []);
+      //console.log(response);
+      setScholarshipCount(scholarship.data);
+      setServiceCount(services.data);
+      setAccounts(response);
+      setRevenue(wallet.data);
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
 
   return (
     <>
+      <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+        Dashboard
+      </h2>
       {error && <p className="text-red-500">{error}</p>}
-      {loading && <ScreenSpinner/>}
+      {loading && <ScreenSpinner />}
       <div className="grid mb-5 grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         {accounts && <CardDataStats title="Total Users" total={(accounts.length - 1).toString()} rate="" levelDown={false} >
           <svg
@@ -84,17 +90,25 @@ const ECommerce: React.FC = () => {
           <CurrencyDollarIcon />
         </CardDataStats>}
       </div>
-      
 
+      <ChartOne />
 
-
-      <ChartOne/>
+      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
+        <div className="col-span-12 xl:col-span-8">
+          <TableThree />
+        </div>
+        <div className="col-span-12 xl:col-span-4">
+        <ListFundersCard />
+        </div>
+      </div>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <div className="col-span-12 xl:col-span-8">
           <TableOne />
         </div>
-        <ChatCard />
+        <div className="col-span-12 xl:col-span-4">
+        <ListProvidersCard />
+        </div>
       </div>
     </>
   );
