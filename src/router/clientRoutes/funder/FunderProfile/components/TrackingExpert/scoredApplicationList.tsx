@@ -32,9 +32,9 @@ const ScoredList = () => {
         // Step 2: Fetch Assigned Applications for Each Expert
         const applicationsPromises = fetchedExperts.map((expert: any) =>
           axios
-            .get(`${BASE_URL}/api/experts/${expert.id}/assigned-applications`)
+            .get(`${BASE_URL}/api/experts/${expert.expertId}/assigned-applications`)
             .then((res) => ({
-              expertId: expert.id,
+              expertId: expert.expertId,
               data: res.data.data,
             }))
         );
@@ -111,7 +111,7 @@ const ScoredList = () => {
 
             {/* Render sorted applications */}
             {experts.map((expert) =>
-              applications[expert.id]?.map((application) => (
+              applications[expert.expertId]?.map((application) => (
                 <React.Fragment key={application.id}>
                   <div className="p-2 border-b">{application.id}</div>
                   <div className="p-2 border-b">
