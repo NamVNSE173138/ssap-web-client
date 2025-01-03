@@ -81,6 +81,9 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         `${BASE_URL}/api/scholarship-programs/${scholarshipId}/experts`
       );
 
+      console.log("EXXXXXXXXXX", response.data);
+      
+
       if (Array.isArray(response.data.data)) {
         setExperts(response.data.data);
         
