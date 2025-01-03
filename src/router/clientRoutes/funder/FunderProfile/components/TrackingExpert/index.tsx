@@ -68,7 +68,7 @@ const TrackingExpert = () => {
 
   useEffect(() => {
     fetchExperts();
-  }, []); 
+  }, []);
 
   // const handleFormSubmit = async (formData: any) => {
   //   setError(null);
@@ -98,35 +98,32 @@ const TrackingExpert = () => {
   // };
 
   const handleFormSubmit = async (formData: any) => {
-    setError(null); 
+    setError(null);
     try {
       const imageUrl = imageFile ? await uploadFile(imageFile) : null;
       if (imageUrl && imageUrl.data) {
         formData.avatarUrl = imageUrl.data.toString();
       }
-  
+
       console.log("EXPERT", formData);
-  
+
       const response = await axios.post(`${BASE_URL}/api/experts`, formData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-  
+
       console.log("Response:", response.data);
-  
-      notification.success({ message: "Expert is created successfully!" }); 
-  
-      fetchExperts(); 
+      fetchExperts();
     } catch (err: any) {
       console.error("Error:", err.response?.data || err.message);
       const errorMessage = err.response?.data?.message || "An error occurred";
-      setError(errorMessage); 
-      notification.error({ message: errorMessage }); 
-      throw new Error(errorMessage); 
+      setError(errorMessage);
+      notification.error({ message: errorMessage });
+      throw new Error(errorMessage);
     }
   };
-  
+
   return (
     <Tabs.Content value="expert" className="pt-4 w-full">
       <div className="grid grid-cols-12">
@@ -166,7 +163,7 @@ const TrackingExpert = () => {
                     onSubmit={handleFormSubmit}
                     initialData={initialFormData}
                     handelUploadFile={handleFileChange}
-                    // success = {success}
+                  // success = {success}
                   />
                 </Card>
               </Tabs.Content>
@@ -179,7 +176,7 @@ const TrackingExpert = () => {
                 <AssigningExpert />
               </Tabs.Content>
               <Tabs.Content value="scored">
-                <ScoredList/>
+                <ScoredList />
               </Tabs.Content>
             </div>
           </Tabs.Root>

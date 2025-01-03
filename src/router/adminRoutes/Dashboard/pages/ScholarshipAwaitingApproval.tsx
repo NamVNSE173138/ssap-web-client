@@ -189,7 +189,7 @@ const ScholarshipAwaitingApproval = () => {
                         {/* Status */}
                         <div style={{ flex: 1, marginRight: '20px' }}>{scholarship.status}</div>
                         {/* Amount */}
-                        <div style={{ flex: 1, marginRight: '20px' }}>${scholarship.scholarshipAmount}</div>
+                        <div style={{ flex: 1, marginRight: '20px' }}>${(scholarship.scholarshipAmount).toLocaleString("en-US")}</div>
                         {/* Deadline */}
                         <div style={{ flex: 1.25, marginRight: '20px' }}>
                             {new Date(scholarship.deadline).toLocaleDateString()}

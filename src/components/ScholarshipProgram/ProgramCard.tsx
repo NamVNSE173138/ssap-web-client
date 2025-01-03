@@ -87,7 +87,7 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
             <div className="flex justify-start items-center gap-2 mb-4">
               <FaDollarSign color="#1eb2a6" size={24} />
               <p className="text-black">
-                {scholarshipProgram?.scholarshipAmount}
+                ${(scholarshipProgram?.scholarshipAmount).toLocaleString("en-US")}
               </p>
             </div>
 
