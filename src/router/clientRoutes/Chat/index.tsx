@@ -123,12 +123,20 @@ const Chat: React.FC = () => {
         }
       });
 
-      onMessage(messaging, (payload: any) => {
+      const unsubscribe = onMessage(messaging, (payload: any) => {
         if (!payload.notification && payload.data.messageType !== "push-received" && window.location.pathname.includes("/chat")) {
           fetchChatHistory();
         }
       });
 
+      return () => {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (!event.data.notification && event.data.messageType != "push-received" && window.location.pathname.includes("/chat")) {
+            fetchChatHistory();
+          }
+        });
+        unsubscribe();
+      }
     }
 
   }, [selectedUser]);

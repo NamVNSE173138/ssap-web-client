@@ -2,116 +2,260 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Select from "react-select";
+import QuillEditor from "@/components/Quill/QuillEditor";
 
-interface Milestone {
-  id: number;
-  name: string;
-  date: string;
-  amount: string;
-}
+const awardFormSchema = z
+  .object({
+    awardMilestones: z.array(
+      z.object({
+        fromDate: z.string().nonempty("From date is required."),
+        toDate: z.string().nonempty("To date is required."),
+        amount: z
+          .number({ invalid_type_error: "Amount must be a number." })
+          .min(1, "Amount must be greater than 0."),
+        note: z.string().optional(),
+        awardMilestoneDocuments: z
+          .array(
+            z.object({
+              type: z.string().nonempty("Document type is required."),
+            })
+          )
+          .optional(),
+      })
+    ),
+  })
+  .refine(
+    (data) =>
+      data.awardMilestones.every(
+        (milestone) => new Date(milestone.fromDate) < new Date(milestone.toDate)
+      ),
+    {
+      message: "The 'From' date must be earlier than the 'To' date.",
+      path: ["awardMilestones"],
+    }
+  );
 
-const AwardMilestoneStep = () => {
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [nextId, setNextId] = useState(1);
+type AwardFormData = z.infer<typeof awardFormSchema>;
 
-  const addMilestone = () => {
-    setMilestones([...milestones, { id: nextId, name: "", date: "", amount: "" }]);
-    setNextId(nextId + 1);
+const AwardMilestoneStep = ({
+  formData,
+  onSave,
+}: {
+  formData: any;
+  onSave: (data: any) => void;
+}) => {
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+
+  const typeOptions = [
+    { value: "Academic Transcript", label: "Academic Transcript" },
+    { value: "Financial Report", label: "Financial Report" },
+  ];
+
+  const {
+    control,
+    setValue,
+    trigger,
+    watch,
+    formState: { errors },
+    getValues,
+    reset,
+  } = useForm<AwardFormData>({
+    resolver: zodResolver(awardFormSchema),
+    defaultValues: {
+      ...formData,
+      awardMilestones: [
+        {
+          fromDate: "",
+          toDate: "",
+          amount: 0,
+          note: "",
+          awardMilestoneDocuments: [{type: ""}],
+        },
+      ],
+    },
+  });
+
+  useEffect(() => {
+    if (formData) {
+      reset({
+        ...formData, // Gán dữ liệu mới từ formData
+      });
+    }
+  }, [formData, reset]);
+
+  const awardMilestones = watch("awardMilestones");
+
+  const updateAwardMilestone = (index: number, field: string, value: any) => {
+    const updatedMilestones = [...awardMilestones];
+    updatedMilestones[index] = {
+      ...updatedMilestones[index],
+      [field]: value,
+    };
+    setValue("awardMilestones", updatedMilestones);
   };
 
-  const updateMilestone = (id: number, field: keyof Milestone, value: string) => {
-    setMilestones(
-      milestones.map((milestone) =>
-        milestone.id === id ? { ...milestone, [field]: value } : milestone
-      )
-    );
-  };
-
-  const removeMilestone = (id: number) => {
-    setMilestones(milestones.filter((milestone) => milestone.id !== id));
+  const handleNext = async () => {
+    const isValid = await trigger();
+    if (!isValid) {
+      console.error("Validation failed", errors);
+      return;
+    }
+    setSubmitLoading(true);
+    const data = getValues();
+    console.log("Form data: ", data);
+    onSave(data);
+    setSubmitLoading(false);
   };
 
   return (
-    <Card>
-      <CardContent>
-        <h2 className="text-lg font-semibold mb-4">Scholarship Payment Milestones</h2>
+    <>
+      <Card>
+        <CardContent>
+          <h2 className="text-lg font-semibold mb-4">
+            Scholarship Payment Milestones
+          </h2>
 
-        {/* Danh sách các cột mốc */}
-        {milestones.map((milestone) => (
-          <div
-            key={milestone.id}
-            className="grid grid-cols-12 gap-4 items-center mb-4 border-b pb-4"
-          >
-            {/* Tên cột mốc */}
-            <div className="col-span-4">
-              <Label htmlFor={`milestone-name-${milestone.id}`} className="text-md">
-                Milestone Name
-              </Label>
-              <Input
-                id={`milestone-name-${milestone.id}`}
-                type="text"
-                placeholder="e.g., First Installment"
-                value={milestone.name}
-                onChange={(e) =>
-                  updateMilestone(milestone.id, "name", e.target.value)
-                }
-              />
-            </div>
+          <form className="flex flex-col gap-4 max-h-[500px] overflow-y-scroll">
+            {awardMilestones.map((milestone, index) => (
+              <div key={index}>
+                <div>
+                  <Label>From Date</Label>
+                  <Input
+                    type="date"
+                    placeholder="From Date"
+                    value={milestone.fromDate || ""}
+                    onChange={(e) =>
+                      updateAwardMilestone(index, "fromDate", e.target.value)
+                    }
+                  />
+                  {errors.awardMilestones?.[index]?.fromDate && (
+                    <p className="text-red-500 text-sm">
+                      {errors.awardMilestones[index].fromDate?.message}
+                    </p>
+                  )}
+                </div>
 
-            {/* Ngày chi trả */}
-            <div className="col-span-4">
-              <Label htmlFor={`milestone-date-${milestone.id}`} className="text-md">
-                Payment Date
-              </Label>
-              <Input
-                id={`milestone-date-${milestone.id}`}
-                type="date"
-                value={milestone.date}
-                onChange={(e) =>
-                  updateMilestone(milestone.id, "date", e.target.value)
-                }
-              />
-            </div>
+                <div>
+                  <Label>To Date</Label>
+                  <Input
+                    type="date"
+                    placeholder="To Date"
+                    value={milestone.toDate || ""}
+                    onChange={(e) =>
+                      updateAwardMilestone(index, "toDate", e.target.value)
+                    }
+                  />
+                  {errors.awardMilestones?.[index]?.toDate && (
+                    <p className="text-red-500 text-sm">
+                      {errors.awardMilestones[index].toDate?.message}
+                    </p>
+                  )}
+                </div>
 
-            {/* Số tiền */}
-            <div className="col-span-3">
-              <Label htmlFor={`milestone-amount-${milestone.id}`} className="text-md">
-                Amount (USD)
-              </Label>
-              <Input
-                id={`milestone-amount-${milestone.id}`}
-                type="number"
-                placeholder="e.g., 1000"
-                value={milestone.amount}
-                onChange={(e) =>
-                  updateMilestone(milestone.id, "amount", e.target.value)
-                }
-              />
-            </div>
+                <div>
+                  <Label>Required File Types</Label>
+                  <Controller
+                    control={control}
+                    name={`awardMilestones.${index}.awardMilestoneDocuments`}
+                    render={({ field }) => (
+                      <Select
+                        isMulti
+                        options={typeOptions}
+                        value={field.value?.map((doc) =>
+                          typeOptions.find((option) => option.value === doc.type)
+                        )}
+                        onChange={(selected) =>
+                          field.onChange(
+                            selected.map((item: any) => ({ type: item.value }))
+                          )
+                        }
+                        className="col-span-2"
+                      />
+                    )}
+                  />
+                </div>
 
-            {/* Nút xoá */}
-            <div className="col-span-1">
-              <Button
-                variant="destructive"
-                className="mt-6"
-                onClick={() => removeMilestone(milestone.id)}
-              >
-                Remove
-              </Button>
-            </div>
-          </div>
-        ))}
+                <div>
+                  <Label>Amount</Label>
+                  <div className="flex items-center">
+                    <span className="text-md text-green-500 bg-gray-100 border border-gray-200 p-2 rounded-sm">
+                      $
+                    </span>
+                    <Input
+                      type="number"
+                      placeholder="Amount"
+                      value={milestone.amount || ""}
+                      onChange={(e) =>
+                        updateAwardMilestone(
+                          index,
+                          "amount",
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
+                      className="ml-2 flex-1"
+                    />
+                  </div>
+                  {errors.awardMilestones?.[index]?.amount && (
+                    <p className="text-red-500 text-sm">
+                      {errors.awardMilestones[index].amount?.message}
+                    </p>
+                  )}
+                </div>
 
-        {/* Nút thêm cột mốc */}
-        <div className="mt-4">
-          <Button variant="default" onClick={addMilestone}>
-            Add Milestone
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+                <div>
+                  <Label>Submission Guide</Label>
+                  <QuillEditor
+                    value={milestone.note || ""}
+                    onChange={(value: string) =>
+                      updateAwardMilestone(index, "note", value)
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+
+            <Button
+              className="bg-sky-500 hover:bg-sky-600 text-white w-full py-3 rounded-full mt-4"
+              type="button"
+              onClick={() => {
+                const newMilestone = {
+                  fromDate: "",
+                  toDate: "",
+                  amount: 0,
+                  note: "",
+                  awardMilestoneDocuments: [],
+                };
+                setValue("awardMilestones", [
+                  ...awardMilestones,
+                  newMilestone,
+                ]);
+              }}
+            >
+              Add Award Milestone
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end mt-4">
+        <Button
+          type="button"
+          className="bg-blue-500 text-white py-2 px-4 rounded"
+          onClick={handleNext}
+          disabled={submitLoading}
+        >
+          {submitLoading ? "Loading..." : "Next"}
+        </Button>
+      </div>
+    </>
   );
 };
 
 export default AwardMilestoneStep;
+
+

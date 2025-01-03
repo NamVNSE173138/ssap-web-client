@@ -5,13 +5,19 @@ export type ScholarshipProgramType = {
   description: string;
   scholarshipAmount: number;
   numberOfScholarships: number;
+  educationLevel:string;
   deadline: string;
   // numberOfRenewals: number;
   funderId: number;
   // providerId: number;
-  createAt: Date;
-  updateAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   status: string;
+  criteria:Array<{
+    id:string;
+    name:string;
+    description:string;
+  }>;
   category: {
     id: string;
     name: string;

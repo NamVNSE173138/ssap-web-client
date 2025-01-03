@@ -25,14 +25,17 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Paper,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
 import { TrashIcon } from "@heroicons/react/24/solid";
-import { FaCheckCircle, FaEnvelope, FaExclamationCircle, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle} from "react-icons/fa";
+import { FaCheckCircle, FaEnvelope, FaExclamationCircle, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle } from "react-icons/fa";
 import React from "react";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
 import { ArrowDown } from "lucide-react";
+
+const ITEMS_PER_PAGE = 5;
 
 const AccountsManagement = () => {
   const [accounts, setAccounts] = useState<AccountWithRole[]>([]);
@@ -40,6 +43,17 @@ const AccountsManagement = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(null);
   const [status, setStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const totalPages = Math.ceil(accounts?.length / ITEMS_PER_PAGE);
+    const paginatedAccounts = accounts?.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -54,20 +68,15 @@ const AccountsManagement = () => {
       [rowId]: !prevState[rowId],
     }));
   };
-  const TABLE_HEAD = [
-    "No.", "ID", "Username", "Phone Number", "Email", "Address", "Avatar", "Status", "Actions"
-  ];
 
   const fetchAccounts = () => {
     setLoading(true);
     getAllAccounts()
       .then((data) => {
-          if(selectedTab == 0)
-            setAccounts(data.filter((account:any) => account.status == "Pending"));
-          else if(selectedTab == 1)
-            setAccounts(data.filter((account:any) => account.status == "Active"));
-          else
-            setAccounts(data.filter((account:any) => account.status == "Inactive"));
+        if (selectedTab == 0)
+          setAccounts(data.filter((account: any) => account.status == "Active"));
+        else
+          setAccounts(data.filter((account: any) => account.status == "Inactive"));
       })
       .catch((error) => {
         console.error("Error fetching accounts:", error);
@@ -101,10 +110,10 @@ const AccountsManagement = () => {
           roleId: account.roleId,
           address: account.address,
           avatarUrl: account.avatarUrl || "https://github.com/shadcn.png",
-          status: "Inactive", 
+          status: "Inactive",
           roleName: account.roleName,
         });
-        fetchAccounts(); 
+        fetchAccounts();
       }
       setLoading(false);
     } catch (error) {
@@ -119,10 +128,10 @@ const AccountsManagement = () => {
       try {
         await updateAccount({
           ...currentAccount,
-          status, 
+          status,
         });
-        fetchAccounts(); 
-        setOpenEditDialog(false); 
+        fetchAccounts();
+        setOpenEditDialog(false);
       } catch (error) {
         console.error("Error updating account status:", error);
       } finally {
@@ -132,163 +141,199 @@ const AccountsManagement = () => {
   };
 
   const renderTable = (roleName: string, filteredAccounts: AccountWithRole[]) => (
-    <Card className="h-full w-full shadow-lg rounded-lg">
-      <Typography variant="h6" component="div" color="primary" sx={{ mt: 2, ml: 2, fontWeight: 'bold' }}>
-        {roleName} Accounts
-      </Typography>
+    <Paper sx={{ borderRadius: 2, boxShadow: 3, padding: 2, marginBottom: 4 }}>
+      {/* Header Row */}
+      <div
+        style={{
+          display: 'flex',
+          backgroundColor: '#f5f5f5',
+          fontWeight: 'bold',
+          padding: '10px',
+          borderRadius: '8px',
+          marginBottom: '10px',
+        }}
+      >
+        <div style={{ flex: 0.5, marginRight: '20px' }}>#.</div>
+        <div style={{ flex: 0.5, marginRight: '20px' }}>ID</div>
+        <div style={{ flex: 1.75, marginRight: '20px' }}>Username</div>
+        <div style={{ flex: 1.5, marginRight: '20px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+            Phone
+          </div>
+        </div>
+        <div style={{ flex: 2.5, marginRight: '20px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+            Email
+          </div>
+        </div>
+        <div style={{ flex: 2.5, marginRight: '20px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+            Address
+          </div>
+        </div>
+        <div style={{ flex: 1, marginRight: '20px' }}>Avatar</div>
+        <div style={{ flex: 1, marginRight: '20px' }}>Status</div>
+        <div style={{ flex: 1, marginRight: '20px' }}>Actions</div>
+      </div>
 
-      <TableContainer sx={{ marginTop: 2, boxShadow: 3, borderRadius: 2 }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-            <TableRow>
-              {TABLE_HEAD.map((head) => (
-                <TableCell key={head} sx={{ fontWeight: 'bold', color: '#1c1c1c' }}>
-                  <TableSortLabel className="font-semibold">{head}</TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+      {/* Data Rows */}
+      {filteredAccounts.map((account:any, index:any) => (
+        <React.Fragment key={account.id}>
+          <div
+            style={{
+              display: 'flex',
+              padding: '10px',
+              cursor: 'pointer',
+              backgroundColor: '#fff',
+              borderBottom: '1px solid #ddd',
+              transition: 'background-color 0.3s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+            onClick={() => handleToggle(account.id)} // for handle toggle action
+          >
+            <div style={{ flex: 0.5, marginRight: '20px' }}>{index + 1}</div>
+            <div style={{ flex: 0.5, marginRight: '20px' }}>{account.id}</div>
+            <div style={{ flex: 1.75, marginRight: '20px' }}>{account.username}</div>
+            <div style={{ flex: 1.5, marginRight: '20px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {account.phoneNumber || "N/A"}
+              </div>
+            </div>
+            <div style={{ flex: 2.5, marginRight: '20px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {account.email || "N/A"}
+              </div>
+            </div>
+            <div style={{ flex: 2.5, marginRight: '20px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {account.address || "N/A"}
+              </div>
+            </div>
+            <div style={{ flex: 1, marginRight: '20px' }}>
+              <img
+                src={account.avatarUrl || "https://github.com/shadcn.png"}
+                alt="Avatar"
+                style={{
+                  height: 40,
+                  width: 40,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+            <div style={{ flex: 1, marginRight: '20px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {account.status === "Active" ? (
+                  <FaCheckCircle className="text-green-500" />
+                ) : account.status === "Inactive" ? (
+                  <FaTimesCircle className="text-red-500" />
+                ) : (
+                  <FaExclamationCircle className="text-yellow-500" />
+                )}
+                {account.status || "N/A"}
+              </div>
+            </div>
+            <div style={{ flex: 1, marginRight: '20px' }}>
+              <div style={{ display: 'inline-flex', gap: '10px' }}>
+                <Tooltip title="Edit Account">
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent the row click
+                      handleEditAccount(account);
+                    }}
+                    sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Account">
+                  <IconButton
+                    onClick={() => handleDeleteAccount(account.id)}
+                    sx={{ color: 'red', '&:hover': { color: '#d32f2f' } }}
+                  >
+                    <TrashIcon />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </div>
+          </div>
 
-          <TableBody>
-            {filteredAccounts.map((account, index) => (
-              <React.Fragment key={account.id}>
-              <TableRow className="cursor-pointer" onClick={() => handleToggle(account.id)} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{account.id}</TableCell>
-                <TableCell>{account.username}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <FaPhoneAlt className="text-sky-500" />
-                    {account.phoneNumber || "N/A"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <FaEnvelope className="text-gray-500" />
-                    {account.email || "N/A"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <FaMapMarkerAlt className="text-green-500" />
-                    {account.address || "N/A"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <img 
-                    src={account.avatarUrl || "https://github.com/shadcn.png"} 
-                    alt="Avatar" 
-                    style={{
-                      height: 40, 
-                      width: 40, 
-                      borderRadius: "50%", 
-                      objectFit: "cover",
-                    }} 
-                  />
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {account.status === "Active" ? (
-                      <FaCheckCircle className="text-green-500" />
-                    ) : account.status === "Inactive" ? (
-                      <FaTimesCircle className="text-red-500" />
-                    ): (
-                      <FaExclamationCircle className="text-yellow-500" />  
-                    )}
-                    {account.status || "N/A"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Tooltip title="Edit Account">
-                      <IconButton 
-                        onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditAccount(account)
-                        }}
-                        sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Expand">
-                        <IconButton
-                          sx={{ color: 'gray', '&:hover': { color: 'gray' } }}
-                        >
-                          <ArrowDown />
-                        </IconButton>
-                      </Tooltip>
-                    <Tooltip title="Delete Account">
-                      <IconButton 
-                        onClick={() => handleDeleteAccount(account.id)} 
-                        sx={{ color: 'red', '&:hover': { color: '#d32f2f' } }}
-                      >
-                        <TrashIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-              </TableRow>
-              {/* Collapsible content */}
+          {/* Collapsible content */}
+          {(account.roleName == "Provider" || account.roleName == "Funder") && (
+            <div style={{ paddingLeft: '10px', paddingTop: '10px', paddingBottom: '10px' }}>
+              <Collapse in={openRows[account.id]} timeout={300} unmountOnExit>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<GridArrowDownwardIcon />}
+                    aria-controls="panel1-content"
+                    id="panel1-header"
+                  >
+                    <div className="flex w-full items-center justify-between">
+                      <Typography className="font-semibold text-sky-500">
+                        {account.roleName + " Profile"}
+                      </Typography>
+                    </div>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {/* Additional profile details go here */}
+                  </AccordionDetails>
+                </Accordion>
+              </Collapse>
+            </div>
+          )}
+        </React.Fragment>
+      ))}
+      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              style={{
+                margin: "0 5px",
+                padding: "5px 10px",
+                backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                color: currentPage === index + 1 ? "white" : "black",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+    </Paper>
+    
 
-                {(account.roleName == "Provider" || account.roleName == "Funder") && <TableRow>
-                  <TableCell colSpan={10} style={{ paddingBottom: 0, paddingTop: 0 }}>
-                    <Collapse in={openRows[account.id]} timeout={300} 
-                        unmountOnExit 
-                        className="py-3"
-                        sx={{ transition: "all 0.3s ease-in-out" }}>
-                      <Accordion >
-                        <AccordionSummary
-                          expandIcon={<GridArrowDownwardIcon />}
-                          aria-controls="panel1-content"
-                          id="panel1-header"
-                        >
-                        <div className="flex w-full items-center justify-between">
-                          <Typography className="font-semibold text-sky-500 ">{account.roleName+ " Profile"}</Typography>
-                        </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                        </AccordionDetails>
-                      </Accordion>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>}
-
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Card>
   );
 
   return (
     <>
-      <Typography variant="h4" component="div" color="primary" sx={{ ml: 2, mb: 3 }}>
-        Accounts Management
-      </Typography>
+      <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+                    Accounts Management
+                </h2>
       <Tabs
-          value={selectedTab}
-          onChange={handleTabChange}
-          aria-label="Applications Tabs"
-          className="bg-white shadow-sm"
-          indicatorColor="primary"
-          textColor="inherit"
-          centered
-        >
-          <Tab
-            label="Pending Accounts"
-            sx={{ textTransform: "none", color: "gold", fontWeight: "bold" }}
-          />
-          <Tab
-            label="Active Accounts"
-            sx={{ textTransform: "none", color: "green", fontWeight: "bold" }}
-          />
-          <Tab
-            label="Inactive Accounts"
-            sx={{ textTransform: "none", color: "red", fontWeight: "bold" }}
-          />
-        </Tabs>
+        value={selectedTab}
+        onChange={handleTabChange}
+        aria-label="Applications Tabs"
+        className="bg-white shadow-sm"
+        indicatorColor="primary"
+        textColor="inherit"
+        centered
+      >
+
+        <Tab
+          label="Active Accounts"
+          sx={{ textTransform: "none", color: "green", fontWeight: "bold" }}
+        />
+        <Tab
+          label="Inactive Accounts"
+          sx={{ textTransform: "none", color: "red", fontWeight: "bold" }}
+        />
+      </Tabs>
 
       {loading ? (
         <CircularProgress />
