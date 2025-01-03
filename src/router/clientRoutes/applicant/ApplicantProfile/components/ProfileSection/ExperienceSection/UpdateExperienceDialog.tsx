@@ -1,7 +1,10 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
-import { updateApplicantExperience } from "@/services/ApiServices/applicantProfileService";
+import { useEffect, useState } from "react";
+import {
+  deleteApplicantExperience,
+  updateApplicantExperience,
+} from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
@@ -17,12 +20,16 @@ const UpdateExperienceDialog = (props: any) => {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
   const [experience, setExperience] = useState<ApplicantExperience>({
-    id: item.id,
-    name: item.name,
-    fromYear: item.fromYear,
-    toYear: item.toYear,
-    description: item.description,
+    id: 0,
+    name: "",
+    fromYear: 0,
+    toYear: 0,
+    description: "",
   });
+
+  useEffect(() => {
+    setExperience(item);
+  }, [item, open]);
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
@@ -179,6 +186,7 @@ const UpdateExperienceDialog = (props: any) => {
         setOpen={setOpen}
         setRefresh={setRefresh}
         itemId={item.id}
+        handleDelete={deleteApplicantExperience}
       />
     </div>
   );
