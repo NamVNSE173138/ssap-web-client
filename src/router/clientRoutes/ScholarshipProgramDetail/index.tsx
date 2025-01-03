@@ -30,20 +30,6 @@ import {
   deleteApplication,
   getApplicationByApplicantIdAndScholarshipId,
 } from "@/services/ApiServices/applicationService";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../../../components/ui/alert-dialog";
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
-
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate } from "@/lib/date-formatter";
@@ -54,22 +40,16 @@ import {
   FaBook,
   FaCalendarAlt,
   FaCertificate,
-  FaCheckCircle,
   FaClipboardList,
   FaCode,
   FaCreditCard,
   FaDollarSign,
   FaExclamationCircle,
-  FaEye,
   FaGraduationCap,
   FaInfoCircle,
   FaMapMarkerAlt,
-  FaMoneyCheck,
-  FaMoneyCheckAlt,
   FaRegListAlt,
-  FaRocket,
   FaTag,
-  FaTasks,
   FaTrash,
   FaTrashAlt,
   FaTrophy,
@@ -79,7 +59,7 @@ import {
   FaUserTie,
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Avatar, notification } from "antd";
+import { notification } from "antd";
 import { IoIosAddCircleOutline, IoIosEye } from "react-icons/io";
 import { List, Paper, Tab, Tabs } from "@mui/material";
 import { getAllScholarshipProgramExperts, removeExpertsFromScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
@@ -98,8 +78,6 @@ const ScholarshipProgramDetail = () => {
   const isApplicant = user?.role;
 
   const [applicants, setApplicants] = useState<any>(null);
-  const [applicantDialogOpen, setApplicantDialogOpen] =
-    useState<boolean>(false);
 
   const [_experts, setExperts] = useState<any>(null);
   const [assignExpertDialogOpen, setAssignExpertDialogOpen] =
@@ -111,12 +89,6 @@ const ScholarshipProgramDetail = () => {
   const selectedExpert: any = null;
 
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
-  const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] =
-    useState<boolean>(false);
-
-  const [winningApplications, setWinningApplications] = useState<any>(null);
-  const [awardDialogOpen, setAwardDialogOpen] = useState<boolean>(false);
-  // const [reviewingDialogOpen, setReviewingDialogOpen] = useState<boolean>(false);
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
@@ -124,9 +96,6 @@ const ScholarshipProgramDetail = () => {
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [awardMilestoneDialogOpen, setAwardMilestoneDialogOpen] =
-    useState<boolean>(false);
-
-  const [accelaratePhaseDialogOpen, setAccelaratePhaseDialogOpen] =
     useState<boolean>(false);
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
@@ -157,17 +126,6 @@ const ScholarshipProgramDetail = () => {
     NeedExtend: "yellow",
     Reviewing: "yellow",
   };
-
-  // const [currentPageAppliedApplicants, setCurrentPageAppliedApplicants] = useState<number>(1);
-  // const totalAppliedApplicantsPages = Math.ceil(applicants?.length / ITEMS_PER_PAGE);
-  // const paginatedServices = applicants?.slice(
-  //   (currentPageAppliedApplicants - 1) * ITEMS_PER_PAGE,
-  //   currentPageAppliedApplicants * ITEMS_PER_PAGE
-  // );
-
-  // const handlePageAppliedApplicantsChange = (page: number) => {
-  //   setCurrentPageAppliedApplicants(page);
-  // };
 
   const [currentTabPageForSubmitting, setCurrentTabPageForSubmitting] = useState(1);
   const [currentTabPageForWinners, setCurrentTabPageForWinners] = useState(1);
@@ -638,18 +596,6 @@ const ScholarshipProgramDetail = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <FaGraduationCap className="text-[#1eb2a6] text-xl" />
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">
-                  Qualification
-                </p>
-                <p className="text-lg font-semibold text-gray-800">
-                  {data.category.description || "Not specified"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
               <FaCreditCard className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
                 <p className="text-sm font-semibold text-gray-500">
@@ -692,7 +638,7 @@ const ScholarshipProgramDetail = () => {
                   Value of Award
                 </p>
                 <p className="text-lg font-semibold text-gray-800">
-                  {data.scholarshipAmount || "Not specified"}$
+                  ${(data.scholarshipAmount).toLocaleString("en-US") || "Not specified"}
                 </p>
               </div>
             </div>
@@ -774,7 +720,7 @@ const ScholarshipProgramDetail = () => {
                               <FaDollarSign className="text-gray-500" />
                               Value of Award:
                             </p>
-                            <span>{data.scholarshipAmount}$</span>
+                            <span>{(data.scholarshipAmount).toLocaleString("en-US")}$</span>
                           </div>
                           <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
                             <p className="text-gray-700 font-bold flex items-center gap-2">
