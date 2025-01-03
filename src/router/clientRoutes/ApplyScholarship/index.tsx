@@ -134,12 +134,12 @@ const ApplyScholarship = () => {
     setApplyLoading(true);
 
     if (!scholarship) {
-      notification.error({message:"Program not found"});
+      notification.error({ message: "Program not found" });
       setApplyLoading(false);
       return;
     }
     if (scholarship.status == "FINISHED") {
-      notification.error({ message: "Program is finished"});
+      notification.error({ message: "Program is finished" });
       setApplyLoading(false);
       return;
     }
@@ -197,7 +197,7 @@ const ApplyScholarship = () => {
       } else {
         console.error("Failed to submit application");
       }
-      navigate("/");
+      navigate("/applicant/profile?tab=application-history");
       if (id) await NotifyFunderNewApplicant(isApplicant, parseInt(id));
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -222,7 +222,7 @@ const ApplyScholarship = () => {
             </Link>
           </div>}
           <h3 className="text-3xl mb-7 md:mb-7 md:text-4xl text-black font-bold text-center">
-            APPLY FOR SCHOLARSHIP
+            SCHOLARSHIP APPLICATION
           </h3>
         </div>
         <div className="flex items-center justify-center mb-6">
@@ -244,20 +244,20 @@ const ApplyScholarship = () => {
         </div>
 
         {/* Step Subtitles */}
-      <div className="flex justify-center">
-        <div className="text-center w-32">
-          <p className={`text-sm font-medium ${currentStep === 1 ? "text-blue-600" : "text-gray-500"}`}>Step 1: Basic Details</p>
+        <div className="flex justify-center">
+          <div className="text-center w-32">
+            <p className={`text-sm font-medium ${currentStep === 1 ? "text-blue-600" : "text-gray-500"}`}>Basic Details</p>
+          </div>
+          <div className="text-center w-32">
+            <p className={`text-sm font-medium ${currentStep === 2 ? "text-blue-600" : "text-gray-500"}`}>Required Documents</p>
+          </div>
+          <div className="text-center w-32">
+            <p className={`text-sm font-medium ${currentStep === 3 ? "text-blue-600" : "text-gray-500"}`}>Optional Documents</p>
+          </div>
+          <div className="text-center w-32">
+            <p className={`text-sm font-medium ${currentStep === 4 ? "text-blue-600" : "text-gray-500"}`}>Confirm Application</p>
+          </div>
         </div>
-        <div className="text-center w-32">
-          <p className={`text-sm font-medium ${currentStep === 2 ? "text-blue-600" : "text-gray-500"}`}>Step 2: Required Documents</p>
-        </div>
-        <div className="text-center w-32">
-          <p className={`text-sm font-medium ${currentStep === 3 ? "text-blue-600" : "text-gray-500"}`}>Step 3: Optional Documents</p>
-        </div>
-        <div className="text-center w-32">
-          <p className={`text-sm font-medium ${currentStep === 4 ? "text-blue-600" : "text-gray-500"}`}>Step 4: Confirm Application</p>
-        </div>
-      </div>
 
         {/* Step 1: Personal Details */}
         {currentStep === 1 && (
@@ -544,35 +544,35 @@ const ApplyScholarship = () => {
               </div>
 
               <div className="flex gap-[12px] flex-col lg:col-span-2">
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  name="agreeTerms"
-                  id="agreeTerms"
-                  className="sr-only peer"
-                  checked={formData.agreeTerms}
-                  onChange={handleChange}
-                  required
-                />
-                <label
-                  htmlFor="agreeTerms"
-                  className="relative cursor-pointer flex items-center text-sm text-gray-700 before:content-[''] before:block before:min-w-[20px] before:h-[20px] before:mr-[12px] before:rounded-[4px] before:bg-white before:border before:border-gray-500 peer-checked:before:bg-blue-500 peer-checked:before:border-blue-500 after:content-[''] after:absolute after:top-[50%] after:left-[4px] after:translate-y-[-50%] after:w-[12px] after:h-[12px] after:border-r-2 after:border-b-2 after:border-transparent peer-checked:after:border-white peer-checked:after:rotate-45"
-                />
-                <span className="text-gray-700">
-                  I agree to SSAP{" "}
-                  <a
-                    href="#"
-                    className="mx-[4px] underline text-blue-600 hover:no-underline"
-                    onClick={() => setContractOpen(true)}
-                  >
-                    Terms and Privacy
-                  </a>
-                  {" "}and proceed to read the scholarship contract.
-                </span>
-              </div>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    name="agreeTerms"
+                    id="agreeTerms"
+                    className="sr-only peer"
+                    checked={formData.agreeTerms}
+                    onChange={handleChange}
+                    required
+                  />
+                  <label
+                    htmlFor="agreeTerms"
+                    className="relative cursor-pointer flex items-center text-sm text-gray-700 before:content-[''] before:block before:min-w-[20px] before:h-[20px] before:mr-[12px] before:rounded-[4px] before:bg-white before:border before:border-gray-500 peer-checked:before:bg-blue-500 peer-checked:before:border-blue-500 after:content-[''] after:absolute after:top-[50%] after:left-[4px] after:translate-y-[-50%] after:w-[12px] after:h-[12px] after:border-r-2 after:border-b-2 after:border-transparent peer-checked:after:border-white peer-checked:after:rotate-45"
+                  />
+                  <span className="text-gray-700">
+                    I agree to SSAP{" "}
+                    <a
+                      href="#"
+                      className="mx-[4px] underline text-blue-600 hover:no-underline"
+                      onClick={() => setContractOpen(true)}
+                    >
+                      Terms and Privacy
+                    </a>
+                    {" "}and proceed to read the scholarship contract.
+                  </span>
+                </div>
 
-              <ScholarshipContractDialog isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
-            </div>
+                <ScholarshipContractDialog isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
+              </div>
 
               {/* Navigation Buttons */}
               <div className="mt-8 flex justify-between">

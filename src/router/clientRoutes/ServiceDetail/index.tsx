@@ -42,7 +42,6 @@ import { transferMoney } from "@/services/ApiServices/paymentService";
 import {
   FaInfoCircle,
   FaDollarSign,
-  FaCheckCircle,
   FaUser,
 } from "react-icons/fa";
 import { Button, Dialog, DialogTitle, Paper, Tab, Tabs } from "@mui/material";
@@ -54,10 +53,7 @@ import {
   IoClose,
   IoText,
   IoCard,
-  IoCloseCircleOutline,
   IoInformationCircle,
-  IoAlbums,
-  IoBandage,
   IoList,
 } from "react-icons/io5";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
@@ -66,6 +62,8 @@ import EditServiceModal from "../Activity/UpdateServiceModal";
 import ServiceContractDialog from "./ServiceContractDialog";
 import { notification } from "antd";
 import { format } from "date-fns";
+
+const ITEMS_PER_PAGE = 5;
 
 interface ServiceType {
   id: string;
@@ -154,6 +152,31 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [showSuggest, setShowSuggest] = useState(false);
   const [requestapplicants, setRequestApplicants] = useState<any>({ pending: [], finished: [] });
   const [selectedTab, setSelectedTab] = useState(0);
+  const [currentTabPageForPending, setCurrentTabPageForPending] = useState(1);
+  const [currentTabPageForFinished, setCurrentTabPageForFinished] = useState(1);
+
+  const totalTabPagesForPending = Math.ceil(applicants?.pending?.length / ITEMS_PER_PAGE);
+  const totalTabPagesForFinished = Math.ceil(applicants?.finished?.length / ITEMS_PER_PAGE);
+
+  const paginatedTabData =
+    selectedTab === 0
+      ? applicants?.pending?.slice(
+        (currentTabPageForPending - 1) * ITEMS_PER_PAGE,
+        currentTabPageForPending * ITEMS_PER_PAGE
+      )
+      : applicants?.finished?.slice(
+        (currentTabPageForFinished - 1) * ITEMS_PER_PAGE,
+        currentTabPageForFinished * ITEMS_PER_PAGE
+      );
+
+  const handleTabPageChange = (page: number) => {
+    if (selectedTab === 0) {
+      setCurrentTabPageForPending(page);
+    } else {
+      setCurrentTabPageForFinished(page);
+    }
+  };
+
 
   useEffect(() => {
     const fetchApplicants = async () => {
@@ -448,8 +471,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
           <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 transform transition-all scale-95 hover:scale-100">
             <div className="mb-5 flex justify-between items-center">
               <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
-                <IoIosPaper className="text-3xl text-blue-500" />
-                <span className="font-bold">CREATE REQUEST</span>
+                <IoIosPaper className="text-3xl text-blue-500 mr-3" />
+                <span className="font-bold">Request for {serviceData.name}</span>
               </DialogTitle>
               <span
                 className="text-xl cursor-pointer text-gray-600 hover:text-red-500 transition-all"
@@ -992,8 +1015,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </div>
 
                   {/* Applicants List */}
-                  {(selectedTab === 0 ? requestapplicants.pending : requestapplicants.finished)?.length > 0 ? (
-                    (selectedTab === 0 ? requestapplicants.pending : requestapplicants.finished).map((app: any, index: number) => (
+                  {paginatedTabData?.length > 0 ? (
+                    paginatedTabData?.map((app: any, index: number) => (
                       <div
                         key={app.id}
                         style={{
@@ -1055,6 +1078,38 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   ) : (
                     <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
                   )}
+                  <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+                    {Array.from(
+                      { length: selectedTab === 0 ? totalTabPagesForPending : totalTabPagesForFinished },
+                      (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleTabPageChange(index + 1)}
+                          style={{
+                            margin: "0 5px",
+                            padding: "5px 10px",
+                            backgroundColor:
+                              (selectedTab === 0
+                                ? currentTabPageForPending
+                                : currentTabPageForFinished) === index + 1
+                                ? "#419f97"
+                                : "#f1f1f1",
+                            color:
+                              (selectedTab === 0
+                                ? currentTabPageForPending
+                                : currentTabPageForFinished) === index + 1
+                                ? "white"
+                                : "black",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {index + 1}
+                        </button>
+                      )
+                    )}
+                  </div>
                 </Paper>
 
               </div>
