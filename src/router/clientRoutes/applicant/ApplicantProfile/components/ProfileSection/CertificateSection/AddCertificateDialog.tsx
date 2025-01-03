@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
 import { ApplicantCertificate } from "../../../types/Applicant";
+import { addApplicantCertificate } from "@/services/ApiServices/applicantProfileService";
 
 const AddCertificateDialog = (props: any) => {
   const { open, setOpen, setRefresh } = props;
@@ -12,7 +13,7 @@ const AddCertificateDialog = (props: any) => {
   const user = useSelector((state: RootState) => state.token.user);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [experience, setExperience] = useState<ApplicantCertificate>({
+  const [certificate, setCertificate] = useState<ApplicantCertificate>({
     id: 0,
     name: "",
     achievedYear: 0,
@@ -22,12 +23,21 @@ const AddCertificateDialog = (props: any) => {
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    setExperience((prev) => ({ ...prev, [name]: value }));
+    setCertificate((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
     setIsProcessing(true);
     try {
+      const payload = {
+        name: certificate.name,
+        url: certificate.url,
+        achievedYear: certificate.achievedYear,
+        description: certificate.description,
+      };
+      console.log(payload);
+      await addApplicantCertificate(Number(user?.id), payload);
+
       notification.success({
         message: "Success",
         description: "Profile updated successfully",
@@ -69,10 +79,24 @@ const AddCertificateDialog = (props: any) => {
                   <input
                     type="text"
                     name="name"
-                    value={experience.name}
+                    value={certificate.name}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    placeholder="Enter your experience"
+                    placeholder="Enter your certificate"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    What is the reference to your certificate?
+                  </label>
+                  <input
+                    type="text"
+                    name="url"
+                    value={certificate.url}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
+                    placeholder="Provide reference/link to your certificate"
                   />
                 </div>
 
@@ -82,8 +106,8 @@ const AddCertificateDialog = (props: any) => {
                       Achieved Date
                     </label>
                     <select
-                      name="fromYear"
-                      value={experience.achievedYear || 0}
+                      name="achievedYear"
+                      value={certificate.achievedYear || 0}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                     >
@@ -105,11 +129,11 @@ const AddCertificateDialog = (props: any) => {
                   </label>
                   <textarea
                     name="description"
-                    value={experience.description || ""}
+                    value={certificate.description || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                     rows={4}
-                    placeholder="Provide brief description for your experience"
+                    placeholder="Provide brief description for your certificate"
                   />
                 </div>
               </div>
