@@ -44,16 +44,21 @@ const AccountsManagement = () => {
   const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(null);
   const [status, setStatus] = useState("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPageApplicant, setCurrentPageApplicant] = useState(1);
+  const [currentPageFunder, setCurrentPageFunder] = useState(1);
+  const [currentPageProvider, setCurrentPageProvider] = useState(1);
+  const [currentPageExpert, setCurrentPageExpert] = useState(1);
+
 
   const totalPages = Math.ceil(accounts?.length / ITEMS_PER_PAGE);
-    const paginatedAccounts = accounts?.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+  const paginatedAccounts = accounts?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -140,153 +145,184 @@ const AccountsManagement = () => {
     }
   };
 
-  const renderTable = (roleName: string, filteredAccounts: AccountWithRole[]) => (
-    <Paper sx={{ borderRadius: 2, boxShadow: 3, padding: 2, marginBottom: 4 }}>
-      {/* Header Row */}
-      <div
-        style={{
-          display: 'flex',
-          backgroundColor: '#f5f5f5',
-          fontWeight: 'bold',
-          padding: '10px',
-          borderRadius: '8px',
-          marginBottom: '10px',
-        }}
-      >
-        <div style={{ flex: 0.5, marginRight: '20px' }}>#.</div>
-        <div style={{ flex: 0.5, marginRight: '20px' }}>ID</div>
-        <div style={{ flex: 1.75, marginRight: '20px' }}>Username</div>
-        <div style={{ flex: 1.5, marginRight: '20px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-            Phone
-          </div>
-        </div>
-        <div style={{ flex: 2.5, marginRight: '20px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-            Email
-          </div>
-        </div>
-        <div style={{ flex: 2.5, marginRight: '20px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-            Address
-          </div>
-        </div>
-        <div style={{ flex: 1, marginRight: '20px' }}>Avatar</div>
-        <div style={{ flex: 1, marginRight: '20px' }}>Status</div>
-        <div style={{ flex: 1, marginRight: '20px' }}>Actions</div>
-      </div>
+  const renderTable = (roleName: string, filteredAccounts: AccountWithRole[], currentPage: number, setCurrentPage: (page: number) => void) => {
+    const totalPages = Math.ceil(filteredAccounts.length / ITEMS_PER_PAGE);
+    const paginatedAccounts = filteredAccounts.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
 
-      {/* Data Rows */}
-      {filteredAccounts.map((account:any, index:any) => (
-        <React.Fragment key={account.id}>
-          <div
-            style={{
-              display: 'flex',
-              padding: '10px',
-              cursor: 'pointer',
-              backgroundColor: '#fff',
-              borderBottom: '1px solid #ddd',
-              transition: 'background-color 0.3s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
-            onClick={() => handleToggle(account.id)} // for handle toggle action
-          >
-            <div style={{ flex: 0.5, marginRight: '20px' }}>{index + 1}</div>
-            <div style={{ flex: 0.5, marginRight: '20px' }}>{account.id}</div>
-            <div style={{ flex: 1.75, marginRight: '20px' }}>{account.username}</div>
-            <div style={{ flex: 1.5, marginRight: '20px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {account.phoneNumber || "N/A"}
-              </div>
-            </div>
-            <div style={{ flex: 2.5, marginRight: '20px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {account.email || "N/A"}
-              </div>
-            </div>
-            <div style={{ flex: 2.5, marginRight: '20px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {account.address || "N/A"}
-              </div>
-            </div>
-            <div style={{ flex: 1, marginRight: '20px' }}>
-              <img
-                src={account.avatarUrl || "https://github.com/shadcn.png"}
-                alt="Avatar"
-                style={{
-                  height: 40,
-                  width: 40,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                }}
-              />
-            </div>
-            <div style={{ flex: 1, marginRight: '20px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {account.status === "Active" ? (
-                  <FaCheckCircle className="text-green-500" />
-                ) : account.status === "Inactive" ? (
-                  <FaTimesCircle className="text-red-500" />
-                ) : (
-                  <FaExclamationCircle className="text-yellow-500" />
-                )}
-                {account.status || "N/A"}
-              </div>
-            </div>
-            <div style={{ flex: 1, marginRight: '20px' }}>
-              <div style={{ display: 'inline-flex', gap: '10px' }}>
-                <Tooltip title="Edit Account">
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevent the row click
-                      handleEditAccount(account);
-                    }}
-                    sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete Account">
-                  <IconButton
-                    onClick={() => handleDeleteAccount(account.id)}
-                    sx={{ color: 'red', '&:hover': { color: '#d32f2f' } }}
-                  >
-                    <TrashIcon />
-                  </IconButton>
-                </Tooltip>
-              </div>
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
+
+    return (
+      <Paper sx={{ borderRadius: 2, boxShadow: 3, padding: 2, marginBottom: 4 }}>
+        {/* Header Row */}
+        {roleName === "Applicant" && (
+          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+            Applicant Account
+          </h2>
+        )}
+        {roleName === "Funder" && (
+          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+            Funder Account
+          </h2>
+        )}
+        {roleName === "Provider" && (
+          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+            Provider Account
+          </h2>
+        )}
+        {roleName === "Expert" && (
+          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+            Expert Account
+          </h2>
+        )}
+        <div
+          style={{
+            display: 'flex',
+            backgroundColor: '#f5f5f5',
+            fontWeight: 'bold',
+            padding: '10px',
+            borderRadius: '8px',
+            marginBottom: '10px',
+          }}
+        >
+          <div style={{ flex: 0.5, marginRight: '20px' }}>#.</div>
+          <div style={{ flex: 0.5, marginRight: '20px' }}>ID</div>
+          <div style={{ flex: 1.75, marginRight: '20px' }}>Username</div>
+          <div style={{ flex: 1.5, marginRight: '20px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              Phone
             </div>
           </div>
-
-          {/* Collapsible content */}
-          {(account.roleName == "Provider" || account.roleName == "Funder") && (
-            <div style={{ paddingLeft: '10px', paddingTop: '10px', paddingBottom: '10px' }}>
-              <Collapse in={openRows[account.id]} timeout={300} unmountOnExit>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<GridArrowDownwardIcon />}
-                    aria-controls="panel1-content"
-                    id="panel1-header"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <Typography className="font-semibold text-sky-500">
-                        {account.roleName + " Profile"}
-                      </Typography>
-                    </div>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {/* Additional profile details go here */}
-                  </AccordionDetails>
-                </Accordion>
-              </Collapse>
+          <div style={{ flex: 2.5, marginRight: '20px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              Email
             </div>
-          )}
-        </React.Fragment>
-      ))}
-      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+          </div>
+          <div style={{ flex: 2.5, marginRight: '20px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              Address
+            </div>
+          </div>
+          <div style={{ flex: 1, marginRight: '20px' }}>Avatar</div>
+          <div style={{ flex: 1, marginRight: '20px' }}>Status</div>
+          <div style={{ flex: 1, marginRight: '20px' }}>Actions</div>
+        </div>
+
+        {/* Data Rows */}
+        {paginatedAccounts.map((account: any, index: any) => (
+          <React.Fragment key={account.id}>
+            <div
+              style={{
+                display: 'flex',
+                padding: '10px',
+                cursor: 'pointer',
+                backgroundColor: '#fff',
+                borderBottom: '1px solid #ddd',
+                transition: 'background-color 0.3s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+              onClick={() => handleToggle(account.id)} // for handle toggle action
+            >
+              <div style={{ flex: 0.5, marginRight: '20px' }}>{index + 1}</div>
+              <div style={{ flex: 0.5, marginRight: '20px' }}>{account.id}</div>
+              <div style={{ flex: 1.75, marginRight: '20px' }}>{account.username}</div>
+              <div style={{ flex: 1.5, marginRight: '20px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {account.phoneNumber || "N/A"}
+                </div>
+              </div>
+              <div style={{ flex: 2.5, marginRight: '20px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {account.email || "N/A"}
+                </div>
+              </div>
+              <div style={{ flex: 2.5, marginRight: '20px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {account.address || "N/A"}
+                </div>
+              </div>
+              <div style={{ flex: 1, marginRight: '20px' }}>
+                <img
+                  src={account.avatarUrl || "https://github.com/shadcn.png"}
+                  alt="Avatar"
+                  style={{
+                    height: 40,
+                    width: 40,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+              <div style={{ flex: 1, marginRight: '20px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {account.status === "Active" ? (
+                    <FaCheckCircle className="text-green-500 mr-1" />
+                  ) : account.status === "Inactive" ? (
+                    <FaTimesCircle className="text-red-500 mr-1" />
+                  ) : (
+                    <FaExclamationCircle className="text-yellow-500 mr-1" />
+                  )}
+                  {account.status || "N/A"}
+                </div>
+              </div>
+              <div style={{ flex: 1, marginRight: '20px' }}>
+                <div style={{ display: 'inline-flex', gap: '10px' }}>
+                  <Tooltip title="Edit Account">
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation(); // prevent the row click
+                        handleEditAccount(account);
+                      }}
+                      sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete Account">
+                    <IconButton
+                      onClick={() => handleDeleteAccount(account.id)}
+                      sx={{ color: 'red', '&:hover': { color: '#d32f2f' } }}
+                    >
+                      <TrashIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </div>
+            </div>
+
+            {/* Collapsible content */}
+            {(account.roleName == "Provider" || account.roleName == "Funder") && (
+              <div style={{ paddingLeft: '10px', paddingTop: '10px', paddingBottom: '10px' }}>
+                <Collapse in={openRows[account.id]} timeout={300} unmountOnExit>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<GridArrowDownwardIcon />}
+                      aria-controls="panel1-content"
+                      id="panel1-header"
+                    >
+                      <div className="flex w-full items-center justify-between">
+                        <Typography className="font-semibold text-sky-500">
+                          {account.roleName + " Profile"}
+                        </Typography>
+                      </div>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {/* Additional profile details go here */}
+                    </AccordionDetails>
+                  </Accordion>
+                </Collapse>
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+        <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
           {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index}
@@ -305,16 +341,15 @@ const AccountsManagement = () => {
             </button>
           ))}
         </div>
-    </Paper>
-    
-
-  );
+      </Paper>
+    );
+  };
 
   return (
     <>
       <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
-                    Accounts Management
-                </h2>
+        Accounts Management
+      </h2>
       <Tabs
         value={selectedTab}
         onChange={handleTabChange}
@@ -339,13 +374,15 @@ const AccountsManagement = () => {
         <CircularProgress />
       ) : (
         <>
-          {renderTable("Applicant", accounts.filter(account => account.roleName === "Applicant"))}
-          <br />
-          {renderTable("Funder", accounts.filter(account => account.roleName === "Funder"))}
-          <br />
-          {renderTable("Provider", accounts.filter(account => account.roleName === "Provider"))}
-          <br />
-          {renderTable("Expert", accounts.filter(account => account.roleName === "Expert"))}
+          <div className="mt-7">
+            {renderTable("Applicant", accounts.filter(account => account.roleName === "Applicant"), currentPageApplicant, setCurrentPageApplicant)}
+            <br />
+            {renderTable("Funder", accounts.filter(account => account.roleName === "Funder"), currentPageFunder, setCurrentPageFunder)}
+            <br />
+            {renderTable("Provider", accounts.filter(account => account.roleName === "Provider"), currentPageProvider, setCurrentPageProvider)}
+            <br />
+            {renderTable("Expert", accounts.filter(account => account.roleName === "Expert"), currentPageExpert, setCurrentPageExpert)}
+          </div>
         </>
       )}
 
