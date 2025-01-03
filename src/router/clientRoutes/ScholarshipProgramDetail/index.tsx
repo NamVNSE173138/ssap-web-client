@@ -1343,7 +1343,7 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Expert Cards */}
-                  {(paginatedExpert.map((expert: any, index: any) => (
+                  {(paginatedExpert?.map((expert: any, index: any) => (
                     <div
                       key={expert.id}
                       style={{

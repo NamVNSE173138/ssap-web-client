@@ -39,11 +39,12 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
-              <th style={{ padding: "12px", fontWeight: "600" }}>ID</th>
+              <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Applicant Name</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Score</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Review Date</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Review Status</th>
+              <th style={{ padding: "12px", fontWeight: "600" }}>Review By</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
             </tr>
           </thead>
@@ -57,9 +58,9 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
             ) : (
               data.map((row, index) => (
                 <tr key={row.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
-                  <td style={{ padding: "12px" }}>{row.id}</td>
+                  <td style={{ padding: "12px" }}>{index + 1}</td>
                   <td style={{ padding: "12px" }}>{row.applicantName}</td>
-                  <td style={{ padding: "12px", textAlign: "center" }}>{row.score}</td>
+                  <td style={{ padding: "12px" }}>{row.score}</td>
                   <td style={{ padding: "12px" }}>
                     {new Date(row.reviewDate).toLocaleDateString('en-US', {
                       month: '2-digit',
@@ -68,6 +69,7 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                     })}
                   </td>
                   <td style={{ padding: "12px" }}>{row.status}</td>
+                  <td style={{ padding: "12px" }}>{row.expertId}</td>
                   <td style={{ padding: "12px", textAlign: "center" }}>
                     <Button
                       variant="outlined"
