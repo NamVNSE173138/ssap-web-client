@@ -159,8 +159,8 @@ const ScholarshipProgramDetail = () => {
   const [currentPageExpert, setCurrentPageExpert] = useState<number>(1);
   const totalExpertPages = Math.ceil(_experts?.length / ITEMS_PER_PAGE);
   const paginatedExpert = _experts?.slice(
-    (_experts - 1) * ITEMS_PER_PAGE,
-    _experts * ITEMS_PER_PAGE
+    (currentPageExpert - 1) * ITEMS_PER_PAGE,
+    currentPageExpert * ITEMS_PER_PAGE
   );
 
   const handlePageExpertsChange = (page: number) => {
@@ -720,7 +720,7 @@ const ScholarshipProgramDetail = () => {
                               <FaDollarSign className="text-gray-500" />
                               Value of Award:
                             </p>
-                            <span>{(data.scholarshipAmount).toLocaleString("en-US")}$</span>
+                            <span>${(data.scholarshipAmount).toLocaleString("en-US")}</span>
                           </div>
                           <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
                             <p className="text-gray-700 font-bold flex items-center gap-2">
@@ -1343,71 +1343,68 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Expert Cards */}
-                  {(paginatedExpert && Array.isArray(_experts) && _experts.filter((expert: any) => expert.isVisible !== false).length > 0) ? (
-                    _experts.filter((expert: any) => expert.isVisible !== false).map((expert: any, index: any) => (
-                      <div
-                        key={expert.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          backgroundColor: '#f9f9f9',
-                          padding: '10px',
-                          borderRadius: '8px',
-                          marginBottom: '10px',
-                          transition: 'background-color 0.3s ease',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
-                      >
-                        {/* Cột số thứ tự */}
-                        <div style={{ flex: 0.5 }}>{(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}</div>
+                  {(paginatedExpert.map((expert: any, index: any) => (
+                    <div
+                      key={expert.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: '#f9f9f9',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        marginBottom: '10px',
+                        transition: 'background-color 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                    >
+                      {/* Cột số thứ tự */}
+                      <div style={{ flex: 0.5 }}>{(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}</div>
 
-                        <div style={{ flex: 0.5 }}>
-                          <img
-                            src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
-                            style={{
-                              width: '40px',
-                              height: '40px',
-                              borderRadius: '50%',
-                              objectFit: 'cover',
-                              border: '2px solid #0369a1',
-                            }}
-                          />
-                        </div>
-
-                        {/* Cột tên chuyên gia */}
-                        <div style={{ flex: 0.75 }}>
-                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
-                        </div>
-
-                        <div style={{ flex: 1 }}>
-                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
-                        </div>
-
-                        <div style={{ flex: 0.75 }}>
-                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
-                        </div>
-
-                        {/* Cột major */}
-                        <div style={{ flex: 1.5 }}>
-                          <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
-                        </div>
-
-                        <div style={{ flex: 0.5 }} >
-                          <FaTrashAlt
-                            style={{
-                              cursor: 'pointer',
-                              color: '#e57373',
-                              fontSize: '1.5rem',
-                            }}
-                            onClick={() => handleRemoveExperts(expert.expertId)}
-                          />
-                        </div>
+                      <div style={{ flex: 0.5 }}>
+                        <img
+                          src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '2px solid #0369a1',
+                          }}
+                        />
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-center text-gray-500">No experts match your search.</p>
+
+                      {/* Cột tên chuyên gia */}
+                      <div style={{ flex: 0.75 }}>
+                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
+                      </div>
+
+                      <div style={{ flex: 0.75 }}>
+                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
+                      </div>
+
+                      {/* Cột major */}
+                      <div style={{ flex: 1.5 }}>
+                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
+                      </div>
+
+                      <div style={{ flex: 0.5 }} >
+                        <FaTrashAlt
+                          style={{
+                            cursor: 'pointer',
+                            color: '#e57373',
+                            fontSize: '1.5rem',
+                          }}
+                          onClick={() => handleRemoveExperts(expert.expertId)}
+                        />
+                      </div>
+                    </div>
+                  ))
                   )}
                   <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
                     {Array.from({ length: totalExpertPages }, (_, index) => (
