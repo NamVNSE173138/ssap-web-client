@@ -316,11 +316,11 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 <GridCloseIcon style={{ fontSize: "inherit" }} />
               </IconButton>
             </DialogTitle>
-              {selectedReviewMilestone && selectedReviewMilestone.description == "Application Review" && <div>You can only assign 1 expert for this review</div>}
-              {applications.length === 0 && selectedReviewMilestone.description == "Application Review" && (
+              {selectedReviewMilestone && selectedReviewMilestone?.description == "Application Review" && <div>You can only assign 1 expert for this review</div>}
+              {applications.length === 0 && selectedReviewMilestone?.description == "Application Review" && (
                   <p className="text-center text-gray-500">No applications yet.</p>
                 )}
-              {applications.length === 0 && selectedReviewMilestone.description == "Interview" && (
+              {applications.length === 0 && selectedReviewMilestone?.description == "Interview" && (
                   <p className="text-center text-gray-500">No applications passed Application Review yet.</p>
                 )}
                 {applications.length === 0 && !selectedReviewMilestone && (

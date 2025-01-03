@@ -30,20 +30,6 @@ import {
   deleteApplication,
   getApplicationByApplicantIdAndScholarshipId,
 } from "@/services/ApiServices/applicationService";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../../../components/ui/alert-dialog";
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
-
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate } from "@/lib/date-formatter";
@@ -111,12 +97,6 @@ const ScholarshipProgramDetail = () => {
   const selectedExpert: any = null;
 
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
-  const [reviewMilestoneDialogOpen, setReviewMilestoneDialogOpen] =
-    useState<boolean>(false);
-
-  const [winningApplications, setWinningApplications] = useState<any>(null);
-  const [awardDialogOpen, setAwardDialogOpen] = useState<boolean>(false);
-  // const [reviewingDialogOpen, setReviewingDialogOpen] = useState<boolean>(false);
 
   const [existingApplication, setExistingApplication] = useState<any>(null);
 
@@ -124,9 +104,6 @@ const ScholarshipProgramDetail = () => {
   const [extendBeforeDate, setExtendBeforeDate] = useState<string>("");
 
   const [awardMilestoneDialogOpen, setAwardMilestoneDialogOpen] =
-    useState<boolean>(false);
-
-  const [accelaratePhaseDialogOpen, setAccelaratePhaseDialogOpen] =
     useState<boolean>(false);
 
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
