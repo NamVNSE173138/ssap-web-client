@@ -166,78 +166,6 @@ const ChooseWinner = () => {
     }
   };
 
-
-  // const columns: GridColDef[] = [
-  //   { field: "id", headerName: "ID", width: 70 },
-  //   {
-  //     field: "avatarUrl",
-  //     headerName: "Avatar",
-  //     width: 130,
-  //     flex: 0.5,
-  //     renderCell: (params) => {
-  //       return (
-  //         <img
-  //           src={params.value}
-  //           alt="avatar"
-  //           style={{ width: 50, height: 50, borderRadius: 50 }}
-  //         />
-  //       );
-  //     },
-  //   },
-  //   { field: "username", headerName: "Username", width: 130, flex: 1 },
-  //   {
-  //     field: "status",
-  //     headerName: "Status",
-  //     width: 130,
-  //     flex: 0.5,
-  //     renderCell: (params) => {
-  //       console.log("PARAM", params)
-  //       return (
-  //         <span className="flex justify-end gap-2 items-center">
-  //           <span className="relative flex h-3 w-3">
-  //             <span
-  //               className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[params.row.status]
-  //                 }-500 opacity-75`}
-  //             ></span>
-  //             <span
-  //               className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[params.row.status]
-  //                 }-500`}
-  //             ></span>
-  //           </span>
-  //           <span
-  //             className={`text-${statusColor[params.value]}-500 font-medium`}
-  //           >
-  //             {params.value}
-  //           </span>
-  //         </span>
-  //       );
-  //     },
-  //   },
-  //   { field: "expertReview", headerName: "Reviewed by Expert", width: 130, flex: 1 },
-  //   {
-  //     field: "score", headerName: "Score", width: 130, flex: 1
-  //   },
-  //   {
-  //     field: "link",
-  //     headerName: "Action",
-  //     renderCell: (params) => {
-  //       return (
-  //         <Link
-  //           target="_blank"
-  //           className="text-sky-500 underline"
-  //           to={`/funder/application/${params.row.id}`}
-  //         >
-  //           View Profile
-  //         </Link>
-  //       );
-  //     },
-  //     flex: 1,
-  //     width: 130,
-  //   },
-  // ];
-
-
-
   const handleSelectionChange = (appId: number) => {
     // Check if the appId is already in selectedRows
     console.log(selectedRows);
@@ -260,8 +188,6 @@ const ChooseWinner = () => {
       setAvailableScholarships(newAvailableScholarships < 0 ? 0 : newAvailableScholarships);
     }
   };
-
-
 
   const filteredRows = applicants
     ? applicants.filter(
@@ -317,106 +243,87 @@ const ChooseWinner = () => {
               <span className="text-sky-500">{scholarshipWinners.length}</span>
             </p>
 
-            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {scholarshipWinners.map((winner) => (
-                <div key={winner.id} className="p-4 mb-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-all duration-300">
-                  <ListItem
-                    alignItems="flex-start"
-                    className="flex items-center gap-4"
-                  >
-                    <ListItemAvatar>
-                      <Avatar
-                        alt={winner.applicant.username}
-                        src={
-                          winner.applicant.avatarUrl ??
-                          "https://github.com/shadcn.png"
-                        }
-                        sx={{ width: 60, height: 60 }}
-                      />
-                    </ListItemAvatar>
-
-                    <ListItemText
-                      primary={
-                        <span className="font-bold text-sky-600">
-                          {winner.applicant.username}
-                        </span>
-                      }
-                      secondary={
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ color: "text.primary", display: "inline" }}
-                        >
-                          {winner.applicant.email}
-                        </Typography>
-                      }
-                    />
-                    <Link
-                      target="_blank"
-                      to={`/funder/application/${winner.id}`}
-                      className="flex items-center gap-2 text-sky-500 underline hover:text-sky-600 transition-all mt-4"
-                    >
-                      <FaUser className="text-sky-500" />
-                      <span className="text-sm">View Profile</span>
-                    </Link>
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
+            <Paper
+              sx={{
+                height: 300,
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: 3,
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              {scholarshipWinners.length > 0 ? (
+                <div style={{ overflowX: "auto", flex: 1 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
+                        <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
+                        <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
+                        <th style={{ padding: "12px", fontWeight: "600" }}>Username</th>
+                        <th style={{ padding: "12px", fontWeight: "600" }}>Email</th>
+                        <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {scholarshipWinners.map((winner, index) => (
+                        <tr key={winner.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
+                          <td style={{ padding: "12px" }}>{index + 1}</td>
+                          <td style={{ padding: "12px" }}>
+                            <img
+                              src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"}
+                              alt="Avatar"
+                              style={{ width: "40px", borderRadius: "50%" }}
+                            />
+                          </td>
+                          <td style={{ padding: "12px" }}>{winner.applicant.username}</td>
+                          <td style={{ padding: "12px" }}>{winner.applicant.email}</td>
+                          <td style={{ padding: "12px", textAlign: "center" }}>
+                            <Link
+                              target="_blank"
+                              to={`/funder/application/${winner.id}`}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                textDecoration: "none",
+                                color: "inherit",
+                              }}
+                            >
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                style={{
+                                  fontSize: "14px",
+                                  padding: "6px 12px",
+                                  borderRadius: "5px",
+                                }}
+                              >
+                                <FaEye className="mr-2" /> View Application
+                              </Button>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </List>
+              ) : (
+                <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+              )}
+            </Paper>
 
-            <p className="text-xl font-semibold my-5 text-gray-800 flex items-center gap-2 hover:text-sky-500 transition-all duration-300">
+
+            <p className="mt-20 text-xl font-semibold my-5 text-gray-800 flex items-center gap-2 hover:text-sky-500 transition-all duration-300">
               <FaGraduationCap className="text-sky-500 text-2xl" />
               <span className="text-gray-600">Number of scholarships left:</span>
               <span className="text-sky-500 text-2xl font-bold">
                 {availableScholarships}
               </span>
             </p>
-
-            <FormControl fullWidth sx={{ marginBottom: "20px" }}>
-              <InputLabel
-                htmlFor="outlined-adornment-search"
-                sx={{
-                  zIndex: 1,
-                  backgroundColor: "white",
-                  paddingLeft: "8px",
-                  paddingRight: "8px",
-                  top: "-8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "gray.700",
-                }}
-              >
-                Search Applicants
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-search"
-                startAdornment={
-                  <InputAdornment position="start">
-                    <FaSearch className="text-sky-500 transition-all duration-200 transform hover:scale-105" />
-                  </InputAdornment>
-                }
-                endAdornment={
-                  searchQuery && (
-                    <InputAdornment position="end">
-                      <FaTimes
-                        className="text-sky-500 cursor-pointer transition-all duration-200 transform hover:scale-105"
-                        onClick={() => setSearchQuery("")}
-                      />
-                    </InputAdornment>
-                  )
-                }
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search Applicants"
-                className="border-2 border-sky-500 rounded-md shadow-md transition-all duration-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 hover:shadow-lg"
-                sx={{
-                  paddingTop: "12px",
-                  paddingBottom: "12px",
-                  backgroundColor: "#F7FAFC",
-                  borderColor: "gray.300",
-                }}
-              />
-            </FormControl>
 
             <Tabs.Root defaultValue="firstReview" className="w-full">
               <Tabs.List className="flex justify-between border-b-2 my-5 bg-white shadow-md rounded-lg w-full h-full">
@@ -464,8 +371,7 @@ const ChooseWinner = () => {
                       <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
-                            <th style={{ padding: "12px", fontWeight: "600" }}></th>
-                            <th style={{ padding: "12px", fontWeight: "600" }}>ID</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Username</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Status</th>
@@ -485,7 +391,7 @@ const ChooseWinner = () => {
                                   onChange={() => handleSelectionChange(app.id)}
                                 />
                               </td>
-                              <td style={{ padding: "12px" }}>{app.id}</td>
+                              <td style={{ padding: "12px" }}>{index + 1}</td>
                               <td style={{ padding: "12px" }}>
                                 <img src={app.applicant.avatarUrl ?? "https://github.com/shadcn.png"} alt="Avatar" style={{ width: "40px", borderRadius: "50%" }} />
                               </td>
