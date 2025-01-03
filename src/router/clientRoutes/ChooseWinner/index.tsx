@@ -58,6 +58,7 @@ const ChooseWinner = () => {
           response.data.filter(
             (row: any) =>
             (row.status == "Submitted" ||
+            row.status == "Rejected" ||
               row.status == "Reviewing") /*&&
               new Date(row.updatedAt) < new Date(scholarship.data.deadline)*/
           )
@@ -525,7 +526,7 @@ const ChooseWinner = () => {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet </p>
                   )}
 
                   <div className="flex justify-end my-4 text-lg text-gray-700">

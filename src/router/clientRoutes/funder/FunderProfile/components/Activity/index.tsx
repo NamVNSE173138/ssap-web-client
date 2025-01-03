@@ -36,7 +36,7 @@ const Activity = () => {
       console.log("SCP", response.data.data);
 
       if (response.data.statusCode === 200) {
-        setData(response.data.data);
+        setData(response.data.data.items);
         setApplications(applications);
       } else {
         setError("Failed to fetch scholarship programs");

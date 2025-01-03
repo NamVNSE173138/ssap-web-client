@@ -331,10 +331,10 @@ const ScholarshipProgramDetail = () => {
 
   const handleAssignExpertDialog = async () => {
     if (!data) return;
-    if (reviewMilestones.every((milestone: any) => milestone.toDate < new Date())) {
+    /*if (reviewMilestones.every((milestone: any) => milestone.toDate < new Date())) {
       notification.error({ message: "You can not assign before deadline" });
       return;
-    }
+    }*/
     setAssignExpertDialogOpen(true);
     setLoading(true);
     if (!data) return;
