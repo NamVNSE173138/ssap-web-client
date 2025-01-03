@@ -1,7 +1,10 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
-import { updateApplicantExperience } from "@/services/ApiServices/applicantProfileService";
+import { useEffect, useState } from "react";
+import {
+  deleteApplicantEducation,
+  updateApplicantEducation,
+} from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
@@ -15,29 +18,40 @@ const UpdateEducationDialog = (props: any) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
-  const [experience, setExperience] = useState<any>({
-    id: item.id,
-    name: item.name,
-    fromYear: item.fromYear,
-    toYear: item.toYear,
-    description: item.description,
+  const [education, setEducation] = useState<any>({
+    id: 0,
+    school: "",
+    educationLevel: "",
+    major: "",
+    gpa: 0,
+    fromYear: 0,
+    toYear: 0,
+    description: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<any>) => {
+  useEffect(() => {
+    setEducation(item);
+  }, [item, open]);
+
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setExperience((prev: any) => ({ ...prev, [name]: value }));
+    setEducation((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
     setIsProcessing(true);
     try {
       const payload = {
-        name: experience.name,
-        fromYear: experience.fromYear,
-        toYear: experience.toYear,
-        description: experience.description,
+        school: education.school,
+        educationLevel: education.educationLevel,
+        major: education.major,
+        gpa: education.gpa,
+        fromYear: education.fromYear,
+        toYear: education.toYear,
+        description: education.description,
       };
-      await updateApplicantExperience(Number(user?.id), experience.id, payload);
+      await updateApplicantEducation(Number(user?.id), education.id, payload);
+
       notification.success({
         message: "Success",
         description: "Profile updated successfully",
@@ -78,15 +92,57 @@ const UpdateEducationDialog = (props: any) => {
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700">
-                      What school have you enrolled?
+                      What school have you enrolled in?
                     </label>
                     <input
                       type="text"
-                      name="name"
-                      value={experience.name}
+                      name="school"
+                      value={education.school}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                      placeholder="Enter your experience"
+                      placeholder="Enter your school"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      What education level have you enrolled in?
+                    </label>
+                    <input
+                      type="text"
+                      name="educationLevel"
+                      value={education.educationLevel}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
+                      placeholder="Enter your school"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      What major have you studied at school?
+                    </label>
+                    <input
+                      type="text"
+                      name="major"
+                      value={education.major}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
+                      placeholder="Enter your major"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      What is your GPA after finishing school?
+                    </label>
+                    <input
+                      type="text"
+                      name="gpa"
+                      value={education.gpa}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
+                      placeholder="Enter your GPA"
                     />
                   </div>
 
@@ -97,7 +153,7 @@ const UpdateEducationDialog = (props: any) => {
                       </label>
                       <select
                         name="fromYear"
-                        value={experience.fromYear || 0}
+                        value={item.fromYear || 0}
                         onChange={handleChange}
                         className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       >
@@ -118,7 +174,7 @@ const UpdateEducationDialog = (props: any) => {
                       </label>
                       <select
                         name="toYear"
-                        value={experience.toYear || 0}
+                        value={item.toYear || 0}
                         onChange={handleChange}
                         className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       >
@@ -140,7 +196,7 @@ const UpdateEducationDialog = (props: any) => {
                     </label>
                     <textarea
                       name="description"
-                      value={experience.description}
+                      value={item.description}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       rows={4}
@@ -178,6 +234,7 @@ const UpdateEducationDialog = (props: any) => {
         setOpen={setOpen}
         setRefresh={setRefresh}
         itemId={item.id}
+        handleDelete={deleteApplicantEducation}
       />
     </div>
   );

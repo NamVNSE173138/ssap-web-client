@@ -10,19 +10,31 @@ import ScholarshipProgramSkeleton from "./ScholarshipProgramSkeleton";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Paper } from "@mui/material";
 import { FaEye } from "react-icons/fa";
-import { getApplicationsByApplicant } from "@/services/ApiServices/applicantProfileService";
 import { getAllApplications } from "@/services/ApiServices/applicationService";
+
+const ITEMS_PER_PAGE = 5;
 
 const Activity = () => {
   const user = useSelector((state: any) => state.token.user);
   const role = user?.role;
   const funderId = user?.id;
 
-  const [data, setData] =
-    useState<ScholarshipProgramType[]>(scholarshipProgram);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [applications, setApplications] = useState<any[]>([]);
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(data?.length / ITEMS_PER_PAGE);
+  const paginated = data?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  // Page change handler
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -32,7 +44,7 @@ const Activity = () => {
       ),
       getAllApplications()
       ]);
-      
+
       console.log("SCP", response.data.data);
 
       if (response.data.statusCode === 200) {
@@ -141,7 +153,7 @@ const Activity = () => {
                       </td>
                     </tr>
                   ) : (
-                    data.map((item: any, index: any) => (
+                    paginated.map((item: any, index: any) => (
                       <tr
                         key={item.id}
                         style={{
@@ -152,8 +164,8 @@ const Activity = () => {
                           (e.currentTarget.style.backgroundColor = "#f1f1f1")
                         }
                         onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            index % 2 === 0 ? "#f9f9f9" : "#fff")
+                        (e.currentTarget.style.backgroundColor =
+                          index % 2 === 0 ? "#f9f9f9" : "#fff")
                         }
                       >
                         <td
@@ -163,7 +175,7 @@ const Activity = () => {
                             fontWeight: "500",
                           }}
                         >
-                          {index + 1}
+                          {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td
                           style={{
@@ -223,7 +235,7 @@ const Activity = () => {
                             fontWeight: "500",
                           }}
                         >
-                          {applications && applications.filter((app:any) => 
+                          {applications && applications.filter((app: any) =>
                             app.scholarshipProgramId == item.id).length}
                         </td>
                         <td style={{ padding: "12px", textAlign: "center" }}>
@@ -259,6 +271,25 @@ const Activity = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+            <div style={{ marginTop: "20px", display: "flex", justifyContent: "end" }}>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  style={{
+                    margin: "0 5px",
+                    padding: "5px 10px",
+                    backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                    color: currentPage === index + 1 ? "white" : "black",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
             </div>
           </Paper>
         </div>

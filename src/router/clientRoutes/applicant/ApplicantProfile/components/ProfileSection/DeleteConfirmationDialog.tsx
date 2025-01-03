@@ -1,4 +1,3 @@
-import { deleteApplicantExperience } from "@/services/ApiServices/applicantProfileService";
 import * as Dialog from "@radix-ui/react-dialog";
 import { notification } from "antd";
 import { useState } from "react";
@@ -10,14 +9,15 @@ const DeleteConfirmationDialog = (props: any) => {
     setOpen,
     setRefresh,
     itemId,
+    handleDelete,
   } = props;
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const handleDeleteItem = async (itemId: number) => {
+  const handleDeleteItem = async () => {
     setIsProcessing(true);
     try {
-      await deleteApplicantExperience(itemId);
+      await handleDelete(itemId);
       notification.success({
         message: "Success",
         description: "Profile updated successfully",
@@ -53,7 +53,7 @@ const DeleteConfirmationDialog = (props: any) => {
             <div className="mt-4 flex justify-center space-x-4">
               <button
                 disabled={isProcessing}
-                onClick={() => handleDeleteItem(itemId)}
+                onClick={handleDeleteItem}
                 className="px-8 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-red-600"
               >
                 {isProcessing ? "Processing..." : "Yes"}

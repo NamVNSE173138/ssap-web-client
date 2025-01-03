@@ -1,7 +1,7 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
-import { addApplicantExperience } from "@/services/ApiServices/applicantProfileService";
+import { addApplicantSkill } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
@@ -13,7 +13,7 @@ const AddSkillDialog = (props: any) => {
   const user = useSelector((state: RootState) => state.token.user);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [experience, setExperience] = useState<ApplicantSkill>({
+  const [skill, setSkill] = useState<ApplicantSkill>({
     id: 0,
     name: "",
     type: "",
@@ -24,20 +24,21 @@ const AddSkillDialog = (props: any) => {
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    setExperience((prev) => ({ ...prev, [name]: value }));
+    setSkill((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
     setIsProcessing(true);
     try {
       const payload = {
-        name: experience.name,
-        fromYear: experience.fromYear,
-        toYear: experience.toYear,
-        description: experience.description,
+        name: skill.name,
+        type: skill.type,
+        fromYear: skill.fromYear,
+        toYear: skill.toYear,
+        description: skill.description,
       };
       console.log(payload);
-      await addApplicantExperience(Number(user?.id), payload);
+      await addApplicantSkill(Number(user?.id), payload);
       notification.success({
         message: "Success",
         description: "Profile updated successfully",
@@ -79,11 +80,29 @@ const AddSkillDialog = (props: any) => {
                   <input
                     type="text"
                     name="name"
-                    value={experience.name}
+                    value={skill.name}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    placeholder="Enter your experience"
+                    placeholder="Enter your skill"
                   />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    What is the type of your skill?
+                  </label>
+                  <select
+                    name="type"
+                    value={skill.type || ""}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
+                  >
+                    <option value="" disabled>
+                      Select Type
+                    </option>
+                    <option value="Technical">Technical Skill</option>
+                    <option value="Soft">Soft Skill</option>
+                  </select>
                 </div>
 
                 <div className="mt-4 flex space-x-4">
@@ -93,7 +112,7 @@ const AddSkillDialog = (props: any) => {
                     </label>
                     <select
                       name="fromYear"
-                      value={experience.fromYear || 0}
+                      value={skill.fromYear || 0}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                     >
@@ -114,7 +133,7 @@ const AddSkillDialog = (props: any) => {
                     </label>
                     <select
                       name="toYear"
-                      value={experience.toYear || 0}
+                      value={skill.toYear || 0}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                     >
@@ -136,11 +155,11 @@ const AddSkillDialog = (props: any) => {
                   </label>
                   <textarea
                     name="description"
-                    value={experience.description || ""}
+                    value={skill.description || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                     rows={4}
-                    placeholder="Provide brief description for your experience"
+                    placeholder="Provide brief description for your skill"
                   />
                 </div>
               </div>

@@ -30,11 +30,11 @@ const AssigningExpert = () => {
         );
         const fetchedExperts = expertsResponse.data.data || [];
         setExperts(fetchedExperts);
-
+        
         const applicationsPromises = fetchedExperts.map((expert: any) =>
           axios
-            .get(`${BASE_URL}/api/experts/${expert.id}/assigned-applications`)
-            .then((res) => ({ expertId: expert.id, data: res.data.data }))
+            .get(`${BASE_URL}/api/experts/${expert.expertId}/assigned-applications`)
+            .then((res) => ({ expertId: expert.expertId, data: res.data.data }))
         );
 
         const results = await Promise.all(applicationsPromises);
@@ -65,7 +65,7 @@ const AssigningExpert = () => {
       ) : (
         <div className="space-y-4">
           {experts.map((expert, index) => (
-            <Accordion key={expert.id} defaultExpanded={index === 0}>
+            <Accordion key={expert.expertId} defaultExpanded={index === 0}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls={`panel-${expert.id}-content`}
