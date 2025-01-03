@@ -51,14 +51,12 @@ const Card = (scholarshipProgram: ScholarshipProgramType) => {
             </TooltipProvider>
           </div>
 
-
-          <Separator orientation="horizontal" />
-          <div className=" flex-row justify-between mt-5 ml-5">
-
+          <Separator className="my-4" />
+          <div className="flex-row justify-between mt-5 ml-5">
             {scholarshipProgram.university && (
-              <div className="flex items-center gap-2 mb-4">
-                <IoLocation color="#1eb2a6" size={24} />
-                <p className="text-black">
+              <div className="flex items-center gap-2 text-gray-700 mb-4">
+                <IoLocation color="#1eb2a6" size={20} />
+                <p className="text-sm text-gray-700 truncate">
                   {scholarshipProgram.university.name.length > 30
                     ? scholarshipProgram.university.name.substring(0, 30) + "..."
                     : scholarshipProgram.university.name}
