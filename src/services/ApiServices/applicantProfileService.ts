@@ -83,8 +83,20 @@ export async function exportApplicantProfileToPdf(id: number) {
   return response.data;
 }
 
-export async function addApplicantSkill(applicantId: number, payload: any) {
+export async function updateApplicantGeneralInformation(
+  applicantId: number,
+  payload: any,
+) {
   const response = await axios.put(
+    `${BASE_URL}/api/applicants/${applicantId}/general-info`,
+    payload,
+    ngrokSkipWarning,
+  );
+  return response.data;
+}
+
+export async function addApplicantSkill(applicantId: number, payload: any) {
+  const response = await axios.post(
     `${BASE_URL}/api/applicants/${applicantId}/profile-skill`,
     payload,
     ngrokSkipWarning,
@@ -121,7 +133,7 @@ export async function addApplicantCertificate(
   applicantId: number,
   payload: any,
 ) {
-  const response = await axios.put(
+  const response = await axios.post(
     `${BASE_URL}/api/applicants/${applicantId}/profile-certificate`,
     payload,
     ngrokSkipWarning,
