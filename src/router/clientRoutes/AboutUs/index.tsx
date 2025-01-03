@@ -6,8 +6,7 @@ import RouteNames from "@/constants/routeNames";
 const AboutUs = () => {
   const navigate = useNavigate();
   const handleApplyNowClick = () => {
-    // navigate(RouteNames.SCHOLARSHIP_PROGRAM);
-    navigate(`${RouteNames.APPLICANT_PROFILE}?tab=application-history`);
+    navigate(RouteNames.SCHOLARSHIP_PROGRAM);
   };
   return (
     <div
@@ -162,4 +161,3 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
-

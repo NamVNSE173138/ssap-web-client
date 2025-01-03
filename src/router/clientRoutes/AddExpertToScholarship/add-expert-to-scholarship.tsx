@@ -42,7 +42,7 @@ const AddExpertToScholarship = () => {
     });
     setFilteredExpert(filtered);
   }, [searchTerm, _experts]);
-  
+
 
   const clearSearch = () => {
     setSearchTerm("");
@@ -116,12 +116,12 @@ const AddExpertToScholarship = () => {
         notification.error({ message: "Experts data is not loaded. Please try again later." });
         return;
       }
-  
+
       const invalidExperts = selectedExperts.filter((expertId) => {
         const expert = _experts.find((e) => e.expertId === expertId);
-        return !expert || expert.major !== scholarshipMajor; 
+        return !expert || expert.major !== scholarshipMajor;
       });
-  
+
       if (invalidExperts.length > 0) {
         const invalidExpertNames = invalidExperts
           .map((expertId) => _experts.find((e) => e.expertId === expertId)?.username || "Unknown")
@@ -129,22 +129,22 @@ const AddExpertToScholarship = () => {
         notification.error({
           message: `The following experts do not match your scholarship major "(${scholarshipMajor})": ${invalidExpertNames}.`,
         });
-  
+
         return;
       }
-  
+
       await assignExpertsToScholarshipProgram(Number(id), selectedExperts);
       notification.success({ message: "Experts assigned successfully!" });
-  
+
       setSelectedExperts([]);
       fetchExpertsInScholarship();
-  
+
       navigate(`/scholarship-program/${id}`);
     } catch (err) {
       notification.error({ message: "Failed to assign experts." });
     }
   };
-  
+
 
   return (
     <div>

@@ -1,15 +1,23 @@
+import { setUser } from "@/reducers/tokenSlice";
+import { updateApplicantProfileDetails } from "@/services/ApiServices/applicantProfileService";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
+import { RootState } from "@/store/store";
 import * as Dialog from "@radix-ui/react-dialog";
 import { notification } from "antd";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useDispatch, useSelector } from "react-redux";
 
 const AvatarSection = (props: any) => {
-  const { originalAvatar } = props;
+  const { profile, originalAvatar } = props;
+
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.token.user);
 
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const onDrop = (acceptedFiles: File[]) => {
     const uploadedFile = acceptedFiles[0];
@@ -30,14 +38,36 @@ const AvatarSection = (props: any) => {
       try {
         const uploadFileResponse = await uploadFile([file]);
         const fileUrls = uploadFileResponse.data;
-        console.log(fileUrls[0]);
+
+        const payload = {
+          avatarUrl: fileUrls[0],
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          username: profile.username,
+          phone: profile.phone,
+          bio: profile.bio,
+          address: profile.address,
+          gender: profile.gender,
+          birthdate: profile.birthDate,
+          nationality: profile.nationality,
+          ethnicity: profile.ethnicity,
+          skills: profile.applicantSkills,
+          experience: profile.applicantExperience,
+          certificates: profile.applicantCertificates,
+        };
+        console.log("Change image payload: ", payload);
+        await updateApplicantProfileDetails(Number(user?.id), payload);
+
+        dispatch(setUser({ ...user, avatar: profile.avatar }));
       } catch (error) {
-        notification.success({
-          message: "Success",
-          description: "Profile updated successfully",
+        console.log("Error: ", error);
+        notification.error({
+          message: "Error",
+          description: "Profile updated failed",
         });
       } finally {
         setIsProcessing(false);
+        setOpen(false);
       }
     }
   };
@@ -47,7 +77,7 @@ const AvatarSection = (props: any) => {
   };
 
   return (
-    <Dialog.Root>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <button className="flex items-center justify-center w-24 h-24 bg-gray-200 rounded-full overflow-hidden hover:ring-2 hover:ring-green-500">
           {originalAvatar ? (
@@ -101,14 +131,14 @@ const AvatarSection = (props: any) => {
             <Dialog.Close asChild>
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 bg-gray-200 rounded-md"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
               >
                 Cancel
               </button>
             </Dialog.Close>
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md"
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md"
               disabled={!file}
             >
               Save Changes
