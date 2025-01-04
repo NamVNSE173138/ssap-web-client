@@ -192,7 +192,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                                 }}
                               />
                         </td>
-                      <td  style={{ padding: "12px" }}>{row.applicantName}</td>
+                      <td  style={{ padding: "12px", visibility: 'hidden' }}>{row.applicantName}</td>
                       <td style={{ padding: "12px" }}>{row.score}</td>
                       <td style={{ padding: "12px" }}>{row.comment}</td>
                       <td style={{ padding: "12px" }}>
