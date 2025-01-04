@@ -68,8 +68,8 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
             [row.expertId]: expertProfile.data.name,
           }));
         }
-        console.log(expertNamesData);
-        console.log(fetchedData);
+        //console.log(expertNamesData);
+        //console.log(fetchedData);
         // Group by applicationId and calculate average score
         const groupedData = fetchedData.reduce((acc: any, item: any) => {
           const { applicationId, applicantName, score, expertId, status } = item;
