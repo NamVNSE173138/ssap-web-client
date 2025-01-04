@@ -144,7 +144,7 @@ const FormCreateScholarshipProgram = () => {
           ),
         })),
         documents: formData.documents.map((document) => ({
-          type: document.type ,
+          type: document.type,
           isRequired: true,
         })),
       };
@@ -187,7 +187,7 @@ const FormCreateScholarshipProgram = () => {
         <div className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px] ml-12 mb-5"></div>
 
         <form className="space-y-6 ">
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center">
             <div
               className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
                 step === 1 ? "bg-blue-600" : "bg-gray-300"
@@ -228,9 +228,60 @@ const FormCreateScholarshipProgram = () => {
               5
             </div>
           </div>
+          <div className="flex justify-center gap-5">
+            <div className="text-center w-30">
+              <p
+                className={`text-sm font-medium ${
+                  step === 1 ? "text-blue-600" : "text-gray-500"
+                }`}
+              >
+                General Information
+              </p>
+            </div>
+            <div className="text-center w-32">
+              <p
+                className={`text-sm font-medium ${
+                  step === 2 ? "text-blue-600" : "text-gray-500"
+                }`}
+              >
+                {" "}
+                Required Documents
+              </p>
+            </div>
+            <div className="text-center w-28">
+              <p
+                className={`text-sm font-medium ${
+                  step === 3 ? "text-blue-600" : "text-gray-500"
+                }`}
+              >
+                {" "}
+                Review Milestones
+              </p>
+            </div>
+            <div className="text-center w-27">
+              <p
+                className={`text-sm font-medium ${
+                  step === 4 ? "text-blue-600" : "text-gray-500"
+                }`}
+              >
+                {" "}
+                Award Milestones
+              </p>
+            </div>
+            <div className="text-center w-32">
+              <p
+                className={`text-sm font-medium ${
+                  step === 4 ? "text-blue-600" : "text-gray-500"
+                }`}
+              >
+                {" "}
+                Preview 
+             </p>
+            </div>
+          </div>
           {step === 1 && (
             <>
-              <InformationStep formData={formData} onSave={handleNext} />
+              <InformationStep formData={formData} onSave={handleNext} handelUploadFile={handleFileChange}/>
             </>
           )}
 
