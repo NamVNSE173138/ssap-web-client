@@ -194,7 +194,7 @@ const ApplyScholarship = () => {
       if (response.statusCode === 200) {
         await response.data;
         notification.success({ message: "Application submitted successfully" });
-      } else {
+      } else {  
         console.error("Failed to submit application");
         notification.error({ message: "Failed to submit application" });
       }
