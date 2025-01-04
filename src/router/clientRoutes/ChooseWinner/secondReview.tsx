@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CircularProgress, Paper, Button, Accordion, AccordionSummary, Typography, AccordionDetails, Collapse, Box } from "@mui/material";
+import { CircularProgress, Paper, Button, Accordion, AccordionSummary, Typography, AccordionDetails, Collapse, Box, Modal, Fade } from "@mui/material";
 import { FaExpand, FaExpandAlt, FaEye } from "react-icons/fa";
 import { fetchSecondReviewData } from "@/services/ApiServices/applicationService";
 import { getExpertProfile } from "@/services/ApiServices/expertService";
@@ -26,6 +26,18 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
   const [expertNames, setExpertNames] = useState<any>({});
   const [expanded, setExpanded] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<any | null>(null);
+
+  const handleOpenModal = (application: any) => {
+    setSelectedApplication(application);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedApplication(null);
+  };
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => {
@@ -44,7 +56,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
         const fetchedData = await fetchSecondReviewData(scholarshipId, token);
         setData(fetchedData);
 
-        let expertNamesData:any = [];
+        let expertNamesData: any = [];
         for (let row of fetchedData) {
           const expertProfile = await getExpertProfile(row.expertId);
           expertNamesData = {
@@ -59,27 +71,29 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
         //console.log(expertNamesData);
         //console.log(fetchedData);
         // Group by applicationId and calculate average score
-        const groupedData = fetchedData.reduce((acc:any, item:any) => {
+        const groupedData = fetchedData.reduce((acc: any, item: any) => {
           const { applicationId, applicantName, score, expertId, status } = item;
 
           if (!acc[applicationId]) {
-            acc[applicationId] = { applicationId, totalScore: 0, count: 0, applicantName: "", expertReview: "", updatedAt: "",
-            status: 0};
+            acc[applicationId] = {
+              applicationId, totalScore: 0, count: 0, applicantName: "", expertReview: "", updatedAt: "",
+              status: 0
+            };
           }
 
           acc[applicationId].totalScore += score;
           acc[applicationId].count += 1;
           acc[applicationId].applicantName = applicantName
-          acc[applicationId].expertReview += expertNamesData[expertId]+", ";
+          acc[applicationId].expertReview += expertNamesData[expertId] + ", ";
           acc[applicationId].updatedAt = "...";
-          if(status == "Approved") acc[applicationId].status += 1;
+          if (status == "Approved") acc[applicationId].status += 1;
           else acc[applicationId].status -= 1;
 
           return acc;
         }, {});
 
         // Calculate the average score for each group
-        const result = Object.values(groupedData).map((group:any) => ({
+        const result = Object.values(groupedData).map((group: any) => ({
           applicationId: group.applicationId,
           score: (group.totalScore / group.count).toFixed(2),
           applicantName: group.applicantName,
@@ -89,7 +103,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
           status: group.status > 0 ? "Approved" : "Rejected"
         }));
         setApplications(result);
-        setExpanded(fetchedData.map((row: any) => ({id: row.applicationId, expanded: false})));
+        setExpanded(fetchedData.map((row: any) => ({ id: row.id, expanded: false })));
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -112,8 +126,6 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
               <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Applicant Name</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Score</th>
-              <th style={{ padding: "12px", fontWeight: "600" }}>Comment</th>
-              <th style={{ padding: "12px", fontWeight: "600" }}>Review Date</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Review Status</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Review By</th>
               <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
@@ -128,95 +140,37 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
               </tr>
             ) : (
               applications.map((row, index) => (
-              <React.Fragment key={row.applicationId}>
-                <tr style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
-                  <td style={{ padding: "12px" }}>{index + 1}</td>
-                  <td style={{ padding: "12px" }}>{row.applicantName}</td>
-                  <td style={{ padding: "12px" }}>{row.score}</td>
-                  <td style={{ padding: "12px" }}>{row.comment}</td>
-                  <td style={{ padding: "12px" }}>
-                    {row.updatedAt}
-                  </td>
-                  <td style={{ padding: "12px" }}><span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[row.status]}-500`}>
-                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[row.status]}-500 opacity-75`}></span>
-                  </span>
-                    <span className={`text-${statusColor[row.status]}-500 font-medium ml-2`}>
-                      {row.status}
-                    </span></td>
-                  <td style={{ padding: "12px" }}>{row.expertReview || 'N/a'}</td>
-                  <td style={{ padding: "12px", textAlign: "center" }}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        fontSize: "14px",
-                        padding: "6px 12px",
-                        borderRadius: "5px",
-                      }}
-                      onClick={() => toggleExpand(row.applicationId)}
-                    >
-                      <FaExpandAlt /> Expand
-                    </Button>
-                  </td>
-                  </tr>
-                  <tr>
-                  <td colSpan={7} className="w-full">
-                    {expanded && <Collapse in={expanded.find((item) => item.id == row.applicationId)?.expanded}>
+                <React.Fragment key={row.applicationId}>
+                  <tr style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
+                    <td style={{ padding: "12px" }}>{index + 1}</td>
+                    <td style={{ padding: "12px" }}>{row.applicantName}</td>
+                    <td style={{ padding: "12px" }}>{row.score}</td>
 
-                    <table className="w-full">
-                      <tbody>
-                    {data.filter((item) => item.applicationId == row.applicationId).map((row, index) => (
-                    <tr key={index}>
-                        <td style={{position: 'relative', padding: "16px"}}>
-                            <div
-                                style={{
-                                  position: 'absolute',
-                                  top: "-24px",
-                                  left: '10px',
-                                  height: '100%',
-                                  width: '1px',
-                                  backgroundColor: 'black',
-                                }}
-                              />
-                              {/* Horizontal Line for Subrow */}
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  top: '22px',  // Position it after the vertical line
-                                  left: '10px',
-                                  width: '20px',
-                                  height: '1px',
-                                  backgroundColor: 'black',
-                                }}
-                              />
-                        </td>
-                      <td  style={{ padding: "12px", visibility: 'hidden' }}>{row.applicantName}</td>
-                      <td style={{ padding: "12px" }}>{row.score}</td>
-                      <td style={{ padding: "12px" }}>{row.comment}</td>
-                      <td style={{ padding: "12px" }}>
-                        {new Date(row.updatedAt).toLocaleDateString('en-US', {
-                          month: '2-digit',
-                          day: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </td>
-                      <td style={{ padding: "12px" }}><span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[row.status]}-500`}>
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[row.status]}-500 opacity-75`}></span>
-                      </span>
-                        <span className={`text-${statusColor[row.status]}-500 font-medium ml-2`}>
-                          {row.status}
-                        </span></td>
-                      <td style={{ padding: "12px" }}>{expertNames[row.expertId] || 'N/a'}</td>
-                    </tr>
-                    ))}
-                    </tbody>
-                  </table>
-                  </Collapse>}
-                  </td>
+                    <td style={{ padding: "12px" }}><span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[row.status]}-500`}>
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[row.status]}-500 opacity-75`}></span>
+                    </span>
+                      <span className={`text-${statusColor[row.status]}-500 font-medium ml-2`}>
+                        {row.status}
+                      </span></td>
+                    <td style={{ padding: "12px" }}>{row.expertReview || 'N/a'}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          fontSize: "14px",
+                          padding: "6px 12px",
+                          borderRadius: "5px",
+                        }}
+                        onClick={() => handleOpenModal(row)}
+                      >
+                        <FaExpandAlt /> Expand
+                      </Button>
+                    </td>
                   </tr>
 
                 </React.Fragment>
@@ -224,6 +178,120 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
             )}
           </tbody>
         </table>
+
+        <Modal
+          open={openModal}
+          onClose={handleCloseModal}
+          closeAfterTransition
+
+        >
+          <Fade in={openModal}>
+            <div style={{
+              padding: '30px',
+              background: '#fff',
+              borderRadius: '10px',
+              maxWidth: '900px',
+              margin: 'auto',
+              position: 'relative',
+              top: '20%',
+              boxShadow: '0px 10px 15px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #51b8af'
+            }}>
+              {selectedApplication && (
+                <div>
+                  <h3 style={{
+                    textAlign: 'center',
+                    color: '#51b8af',
+                    fontSize: '24px',
+                    fontWeight: '600',
+                    marginBottom: '20px'
+                  }}>
+                    Review Details for {selectedApplication.applicantName}
+                  </h3>
+
+                  <table className="w-full">
+                    <thead>
+                      <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
+                        <th style={{
+                          padding: "12px",
+                          fontWeight: "600",
+                          backgroundColor: '#51b8af',
+                          color: 'white'
+                        }}>Score</th>
+                        <th style={{
+                          padding: "12px",
+                          fontWeight: "600",
+                          backgroundColor: '#51b8af',
+                          color: 'white'
+                        }}>Comment</th>
+                        <th style={{
+                          padding: "12px",
+                          fontWeight: "600",
+                          backgroundColor: '#51b8af',
+                          color: 'white'
+                        }}>Review Date</th>
+                        <th style={{
+                          padding: "12px",
+                          fontWeight: "600",
+                          backgroundColor: '#51b8af',
+                          color: 'white'
+                        }}>Review Status</th>
+                        <th style={{
+                          padding: "12px",
+                          fontWeight: "600",
+                          backgroundColor: '#51b8af',
+                          color: 'white'
+                        }}>Review By</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.filter((item) => item.applicationId == selectedApplication.applicationId).map((row, index) => (
+                        <tr key={index} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>{row.score}</td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>{row.comment}</td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>
+                            {new Date(row.updatedAt).toLocaleDateString('en-US', {
+                              month: '2-digit',
+                              day: '2-digit',
+                              year: 'numeric',
+                            })}
+                          </td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>
+                            <span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[row.status]}-500`}>
+                              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[row.status]}-500 opacity-75`}></span>
+                            </span>
+                            <span className={`text-${statusColor[row.status]}-500 font-medium ml-2`}>
+                              {row.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>{expertNames[row.expertId] || 'N/a'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                  style={{
+                    backgroundColor: '#51b8af',
+                    color: 'white',
+                    padding: '10px 20px',
+                    fontWeight: '600',
+                    borderRadius: '5px'
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </Fade>
+        </Modal>
+
       </div>
     </Paper>
   );

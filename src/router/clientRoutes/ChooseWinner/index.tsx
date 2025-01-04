@@ -6,16 +6,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { ScholarshipProgramType, } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
-import { Avatar, Button, Divider, FormControl, InputAdornment, InputLabel, List, ListItem, ListItemAvatar, ListItemText, OutlinedInput, Paper, Typography, } from "@mui/material";
+import { Avatar, Button, Divider, Fade, FormControl, InputAdornment, InputLabel, List, ListItem, ListItemAvatar, ListItemText, Modal, OutlinedInput, Paper, Typography, } from "@mui/material";
 import { getApplicationsByScholarship } from "@/services/ApiServices/accountService";
 import { SendNotification, sendWinnerEmail } from "@/services/ApiServices/notification";
 import {
   getScholarshipProgram, updateScholarshipStatus,
 } from "@/services/ApiServices/scholarshipProgramService";
 import {
-  FaCheckCircle, FaEye, FaGraduationCap, FaSearch, FaTimes, FaTrophy,
-  FaUser,
-  FaUserAlt,
+  FaCheckCircle, FaEye, FaGraduationCap, FaTrophy,
+  FaSortUp, FaSortDown
 } from "react-icons/fa";
 import { notification } from "antd";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -37,6 +36,16 @@ const ChooseWinner = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [availableScholarships, setAvailableScholarships] = useState(0);
   const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
+  const [isApproved, setIsApproved] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [winnerName, setWinnerName] = useState<string>("");
+  const handleCloseModal = () => setOpenModal(false);
+  const handleOpenModal = (winnerName: string) => {
+    setWinnerName(winnerName);
+    setOpenModal(true);
+  };
 
   const statusColor: any = {
     Submitted: "blue",
@@ -45,6 +54,8 @@ const ChooseWinner = () => {
     Failed: "red",
     Reviewing: "yellow",
   };
+
+
 
   const fetchApplicants = async (scholarshipId: number, data: any) => {
     try {
@@ -60,13 +71,13 @@ const ChooseWinner = () => {
             const profileResponse = await getApplicantProfileById(applicantId);
             const fullName = profileResponse.data
               ? `${profileResponse.data.firstName} ${profileResponse.data.lastName}`
-              : "Unknown Name"; 
+              : "Unknown Name";
 
             return {
               ...application,
               applicant: {
                 ...application.applicant,
-                fullName, 
+                fullName,
               },
             };
           })
@@ -134,6 +145,8 @@ const ChooseWinner = () => {
           title: "Your application has been approved",
           body: `Your application for ${data?.name} has been approved.`,
         });
+      setIsApproved(true);
+      handleCloseModal();
     } catch (error) {
       console.error(error);
       setError("Failed to apply for selected winners.");
@@ -174,6 +187,31 @@ const ChooseWinner = () => {
         row.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
     : [];
+
+  const handleSort = () => {
+    // Chuyển đổi giữa ascending và descending
+    setSortOrder(prevSortOrder => {
+      if (prevSortOrder === 'asc') return 'desc';
+      return 'asc';
+    });
+  };
+
+  const sortedRows = filteredRows.sort((a: any, b: any) => {
+    const scoreA = a.applicationReviews.length
+      ? a.applicationReviews.reduce((sum: any, review: any) => sum + review.score, 0) / a.applicationReviews.length
+      : 0;
+    const scoreB = b.applicationReviews.length
+      ? b.applicationReviews.reduce((sum: any, review: any) => sum + review.score, 0) / b.applicationReviews.length
+      : 0;
+
+    if (sortOrder === 'asc') {
+      return scoreA - scoreB; // ascending
+    }
+    if (sortOrder === 'desc') {
+      return scoreB - scoreA; // descending
+    }
+    return 0; // no sorting
+  });
 
   const fetchData = async () => {
     try {
@@ -268,7 +306,7 @@ const ChooseWinner = () => {
                           </td>
                           <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#333", textAlign: "center" }}>
                             {winner.applicant.fullName}
-                            
+
                           </td>
                           <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#555", textAlign: "center" }}>
                             {winner.applicant.email}
@@ -279,7 +317,7 @@ const ChooseWinner = () => {
                                 display: "flex",
                                 justifyContent: "center",
                                 gap: "10px",
-                                flexWrap: "wrap", 
+                                flexWrap: "wrap",
                                 justifyItems: "center",
                               }}
                             >
@@ -318,42 +356,6 @@ const ChooseWinner = () => {
                                   View Application
                                 </Button>
                               </Link>
-
-                              {/* View Profile Button */}
-                              {/* <Link
-                    target="_blank"
-                    to={`/profile/${winner.applicant.id}`}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      textDecoration: "none",
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                      style={{
-                        fontSize: "14px",
-                        padding: "6px 12px", // Giảm padding
-                        borderRadius: "8px",
-                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                        transition: "transform 0.2s, box-shadow 0.2s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0px 4px 8px rgba(0, 0, 0, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0px 2px 4px rgba(0, 0, 0, 0.1)")
-                      }
-                    >
-                      <FaUserAlt className="mr-2" />
-                      View Profile
-                    </Button>
-                  </Link> */}
                             </div>
                           </td>
                         </tr>
@@ -422,17 +424,21 @@ const ChooseWinner = () => {
                       <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
-                            <th style={{ padding: "12px", fontWeight: "600" }}></th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>-</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Name</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Status</th>
-                            <th style={{ padding: "12px", fontWeight: "600" }}>Score</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Score
+                              <button onClick={handleSort} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>
+                                {sortOrder === 'asc' ? <FaSortUp /> : sortOrder === 'desc' ? <FaSortDown /> : <FaSortUp />}
+                              </button>
+                            </th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredRows.map((app: any, index: any) => (
+                          {sortedRows.map((app: any, index: any) => (
                             <tr key={app.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
                               <td style={{ padding: "12px" }}>
                                 {app.status == ApplicationStatus.Reviewing && <input
@@ -447,14 +453,12 @@ const ChooseWinner = () => {
                                 <img src={app.applicant.avatarUrl ?? "https://github.com/shadcn.png"} alt="Avatar" style={{ width: "40px", borderRadius: "50%" }} />
                               </td>
                               <td style={{ padding: "12px" }}>{app.applicant.fullName}</td>
-                              <td style={{ padding: "12px" }}><span className="relative flex h-3 w-3">
-                                <span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[app.status]}-500`}>
-                                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}></span>
-                                </span>
+                              <td style={{ padding: "12px" }}><span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[app.status]}-500`}>
+                                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}></span>
+                              </span>
                                 <span className={`text-${statusColor[app.status]}-500 font-medium ml-2`}>
                                   {app.status}
-                                </span>
-                              </span></td>
+                                </span></td>
                               <td style={{ padding: "12px" }}>{app.applicationReviews.length ? (app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length).toFixed(1) : "N/A"}</td>
                               <td style={{ padding: "12px", textAlign: "center" }}>
                                 <Link
@@ -478,7 +482,7 @@ const ChooseWinner = () => {
                                       borderRadius: "5px",
                                     }}
                                   >
-                                    <FaEye /> View Details
+                                    <FaEye /> View Application
                                   </Button>
                                 </Link>
                               </td>
@@ -503,7 +507,7 @@ const ChooseWinner = () => {
                       variant="contained"
                       color="primary"
                       disabled={loading}
-                      onClick={() => applyForSelectedWinners()}
+                      onClick={() => handleOpenModal(selectedRows[0]?.applicant.username)}
                       className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
                     >
                       {loading ? (
@@ -515,6 +519,85 @@ const ChooseWinner = () => {
                     </Button>
                   </div>
 
+                  <Modal
+                    open={openModal}
+                    onClose={handleCloseModal}
+                    closeAfterTransition
+                  >
+                    <Fade in={openModal}>
+                      <div
+                        style={{
+                          padding: "20px",
+                          background: "#fff",
+                          borderRadius: "10px",
+                          maxWidth: "500px",
+                          margin: "auto",
+                          position: "relative",
+                          top: "30%",
+                          boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.1)",
+                          border: "1px solid #51b8af",
+                        }}
+                      >
+                        <h3
+                          style={{
+                            textAlign: "center",
+                            color: "#555",
+                            fontSize: "20px",
+                            fontWeight: "600",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          You have selected {winnerName} for this scholarship.
+                        </h3>
+                        <p
+                          style={{
+                            textAlign: "center",
+                            marginBottom: "20px",
+                            fontSize: "16px",
+                            color: "#555",
+                          }}
+                        >
+                          If you click "Confirm", it means you have selected the winner and will
+                          not be able to change it further.
+                        </p>
+
+                        <div className="flex justify-between" style={{ marginTop: '60px' }}>
+                          <div style={{ textAlign: "start" }}>
+                            <Button
+                              variant="outlined"
+                              color="secondary"
+                              onClick={handleCloseModal}
+                              style={{
+                                padding: "10px 20px",
+                                borderRadius: "5px",
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+
+                          <div style={{ textAlign: "end" }}>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={applyForSelectedWinners}
+                              disabled={isApproved}
+                              style={{
+                                backgroundColor: "#51b8af",
+                                color: "white",
+                                padding: "10px 20px",
+                                fontWeight: "600",
+                                borderRadius: "5px",
+                              }}
+                            >
+                              Confirm
+                            </Button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </Fade>
+                  </Modal>
                 </Paper>
               </Tabs.Content>
             </Tabs.Root>
