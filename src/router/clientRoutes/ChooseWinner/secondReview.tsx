@@ -247,16 +247,16 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                     <tbody>
                       {data.filter((item) => item.applicationId == selectedApplication.applicationId).map((row, index) => (
                         <tr key={index} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
-                          <td style={{ padding: "12px" }}>{row.score}</td>
-                          <td style={{ padding: "12px" }}>{row.comment}</td>
-                          <td style={{ padding: "12px" }}>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>{row.score}</td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>{row.comment}</td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>
                             {new Date(row.updatedAt).toLocaleDateString('en-US', {
                               month: '2-digit',
                               day: '2-digit',
                               year: 'numeric',
                             })}
                           </td>
-                          <td style={{ padding: "12px" }}>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>
                             <span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[row.status]}-500`}>
                               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[row.status]}-500 opacity-75`}></span>
                             </span>
@@ -264,7 +264,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                               {row.status}
                             </span>
                           </td>
-                          <td style={{ padding: "12px" }}>{expertNames[row.expertId] || 'N/a'}</td>
+                          <td style={{ padding: "12px", fontWeight: "500" }}>{expertNames[row.expertId] || 'N/a'}</td>
                         </tr>
                       ))}
                     </tbody>
