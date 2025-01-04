@@ -23,6 +23,7 @@ import FirstReview from "./firstReview";
 import SecondReview from "./secondReview";
 import { updateApplication } from "@/services/ApiServices/applicationService";
 import ApplicationStatus from "@/constants/applicationStatus";
+import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,18 +53,36 @@ const ChooseWinner = () => {
       const scholarship = await getScholarshipProgram(parseInt(id));
 
       if (response.statusCode == 200) {
+        const applicantsWithFullName = await Promise.all(
+          response.data.map(async (application: any) => {
+            const applicantId = application.applicantId;
+
+            const profileResponse = await getApplicantProfileById(applicantId);
+            const fullName = profileResponse.data
+              ? `${profileResponse.data.firstName} ${profileResponse.data.lastName}`
+              : "Unknown Name"; 
+
+            return {
+              ...application,
+              applicant: {
+                ...application.applicant,
+                fullName, 
+              },
+            };
+          })
+        );
         setApplicants(
-          response.data.filter(
+          applicantsWithFullName.filter(
             (row: any) =>
             (row.status == "Submitted" ||
-            row.status == "Rejected" ||
+              row.status == "Rejected" ||
               row.status == "Reviewing") /*&&
               new Date(row.updatedAt) < new Date(scholarship.data.deadline)*/
           )
         );
         if (data) {
           setScholarshipWinners(
-            response.data.filter((row: any) => row.status == "Approved")
+            applicantsWithFullName.filter((row: any) => row.status == "Approved")
           );
           setAvailableScholarships(
             data?.numberOfScholarships -
@@ -108,13 +127,13 @@ const ChooseWinner = () => {
         message: "Approve successfully!",
       });
       await fetchData();
-      for(const row of selectedRows)
-          await SendNotification({
-              topic: row.applicantId.toString(),
-              link: `/funder/application/${row.id}`,
-              title: "Your application has been approved",
-              body: `Your application for ${data?.name} has been approved.`,
-            });
+      for (const row of selectedRows)
+        await SendNotification({
+          topic: row.applicantId.toString(),
+          link: `/funder/application/${row.id}`,
+          title: "Your application has been approved",
+          body: `Your application for ${data?.name} has been approved.`,
+        });
     } catch (error) {
       console.error(error);
       setError("Failed to apply for selected winners.");
@@ -201,106 +220,107 @@ const ChooseWinner = () => {
             </p>
 
             <Paper
-  sx={{
-    height: 300,
-    width: "100%",
-    borderRadius: "8px",
-    boxShadow: 3,
-    padding: "16px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  }}
->
-  {scholarshipWinners.length > 0 ? (
-    <div style={{ overflowX: "auto", flex: 1 }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
-            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>#</th>
-            <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
-            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>Name</th>
-            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>Email</th>
-            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {scholarshipWinners.map((winner, index) => (
-            <tr
-              key={winner.id}
-              style={{
-                backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff",
-                borderBottom: "1px solid #ddd",
+              sx={{
+                height: 300,
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: 3,
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
               }}
             >
-              <td style={{ padding: "12px", fontSize: "14px", color: "#333", textAlign:"center" }}>{index + 1}</td>
-              <td style={{ padding: "12px", textAlign: "center" }}>
-                <img
-                  src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"}
-                  alt="Avatar"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    border: "2px solid #ddd",
-                  }}
-                />
-              </td>
-              <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#333", textAlign:"center" }}>
-                {winner.applicant.username}
-              </td>
-              <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#555", textAlign:"center" }}>
-                {winner.applicant.email}
-              </td>
-              <td style={{ padding: "12px", textAlign: "center" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center", // Căn giữa
-                    gap: "10px", // Giảm khoảng cách giữa các nút
-                    flexWrap: "wrap", // Nếu cần thiết sẽ xuống dòng
-                    justifyItems: "center",
-                  }}
-                >
-                  {/* View Application Button */}
-                  <Link
-                    target="_blank"
-                    to={`/funder/application/${winner.id}`}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      textDecoration: "none",
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      style={{
-                        fontSize: "14px",
-                        padding: "6px 12px", // Giảm padding
-                        borderRadius: "8px",
-                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                        transition: "transform 0.2s, box-shadow 0.2s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0px 4px 8px rgba(0, 0, 0, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0px 2px 4px rgba(0, 0, 0, 0.1)")
-                      }
-                    >
-                      <FaEye className="mr-2" />
-                      View Application
-                    </Button>
-                  </Link>
+              {scholarshipWinners.length > 0 ? (
+                <div style={{ overflowX: "auto", flex: 1 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
+                        <th style={{ padding: "12px", fontWeight: "600", textAlign: "center" }}>#</th>
+                        <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
+                        <th style={{ padding: "12px", fontWeight: "600", textAlign: "center" }}>Name</th>
+                        <th style={{ padding: "12px", fontWeight: "600", textAlign: "center" }}>Email</th>
+                        <th style={{ padding: "12px", fontWeight: "600", textAlign: "center" }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {scholarshipWinners.map((winner, index) => (
+                        <tr
+                          key={winner.id}
+                          style={{
+                            backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff",
+                            borderBottom: "1px solid #ddd",
+                          }}
+                        >
+                          <td style={{ padding: "12px", fontSize: "14px", color: "#333", textAlign: "center" }}>{index + 1}</td>
+                          <td style={{ padding: "12px", textAlign: "center" }}>
+                            <img
+                              src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"}
+                              alt="Avatar"
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                objectFit: "cover",
+                                border: "2px solid #ddd",
+                              }}
+                            />
+                          </td>
+                          <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#333", textAlign: "center" }}>
+                            {winner.applicant.fullName}
+                            
+                          </td>
+                          <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#555", textAlign: "center" }}>
+                            {winner.applicant.email}
+                          </td>
+                          <td style={{ padding: "12px", textAlign: "center" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: "10px",
+                                flexWrap: "wrap", 
+                                justifyItems: "center",
+                              }}
+                            >
+                              {/* View Application Button */}
+                              <Link
+                                target="_blank"
+                                to={`/funder/application/${winner.id}`}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                <Button
+                                  variant="outlined"
+                                  color="primary"
+                                  size="small"
+                                  style={{
+                                    fontSize: "14px",
+                                    padding: "6px 12px",
+                                    borderRadius: "8px",
+                                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                                    transition: "transform 0.2s, box-shadow 0.2s",
+                                  }}
+                                  onMouseEnter={(e) =>
+                                  (e.currentTarget.style.boxShadow =
+                                    "0px 4px 8px rgba(0, 0, 0, 0.1)")
+                                  }
+                                  onMouseLeave={(e) =>
+                                  (e.currentTarget.style.boxShadow =
+                                    "0px 2px 4px rgba(0, 0, 0, 0.1)")
+                                  }
+                                >
+                                  <FaEye className="mr-2" />
+                                  View Application
+                                </Button>
+                              </Link>
 
-                  {/* View Profile Button */}
-                  {/* <Link
+                              {/* View Profile Button */}
+                              {/* <Link
                     target="_blank"
                     to={`/profile/${winner.applicant.id}`}
                     style={{
@@ -334,17 +354,17 @@ const ChooseWinner = () => {
                       View Profile
                     </Button>
                   </Link> */}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  ) : (
-    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
-  )}
-</Paper>
+              ) : (
+                <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+              )}
+            </Paper>
 
 
 
@@ -426,7 +446,7 @@ const ChooseWinner = () => {
                               <td style={{ padding: "12px" }}>
                                 <img src={app.applicant.avatarUrl ?? "https://github.com/shadcn.png"} alt="Avatar" style={{ width: "40px", borderRadius: "50%" }} />
                               </td>
-                              <td style={{ padding: "12px" }}>{app.applicant.username}</td>
+                              <td style={{ padding: "12px" }}>{app.applicant.fullName}</td>
                               <td style={{ padding: "12px" }}><span className="relative flex h-3 w-3">
                                 <span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[app.status]}-500`}>
                                   <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}></span>
