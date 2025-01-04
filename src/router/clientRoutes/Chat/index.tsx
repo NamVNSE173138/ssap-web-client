@@ -1,13 +1,15 @@
 import { getAllAccounts } from "@/services/ApiServices/accountService";
 import { getAllMessages, getChatHistory, sendMessage } from "@/services/ApiServices/chatService";
 import { RootState } from "@/store/store";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getMessaging, onMessage } from "firebase/messaging";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
 import { AiOutlineSend } from "react-icons/ai";
 import { FaComment, FaRegUser } from "react-icons/fa";
+import { getFirestore, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 interface Account {
   id: number;
@@ -28,14 +30,89 @@ const Chat: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedUser, setSelectedUser] = useState<Account | null>(null);
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
+  const [chatFirestore, setChatFirestore] = useState<any[]>([]);
   const [message, setMessage] = useState<string>("");
   const user = useSelector((state: RootState) => state.token.user);
   const messaging = getMessaging();
+  const firestore = getFirestore();
   const navigate = useNavigate();
   const location = useLocation();
   const [isChatEnabled, setIsChatEnabled] = useState<boolean>(false);
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
 
+    const chatCollection = useMemo(() => {
+      if(!user || !selectedUser) {
+        return null;
+      }
+      const chatId =
+        Number(user.id) < selectedUser.id
+          ? `${user.id}_${selectedUser.id}`
+          : `${selectedUser.id}_${user.id}`;
+
+      return collection(firestore, 'chats', chatId, 'messages');
+    }, [user?.id, selectedUser?.id]);
+
+    useEffect(() => {
+      if (!chatCollection || !user) return;
+
+      const messagesQuery = query(chatCollection, orderBy('createdAt', 'desc'));
+      
+      const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+        const fetchedMessages = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            _id: doc.id,
+            text: data.text,
+            createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+            user: {
+              _id: data.user._id,
+              name: data.user.name,
+              avatar: data.user.avatar,
+            },
+          };
+        });
+
+        // Update messages state
+        setChatFirestore(fetchedMessages.map((msg: any) => ({
+            senderId: msg.user._id == user?.id ? parseInt(user.id) : selectedUser?.id,
+            receiverId: msg.user._id == user?.id ? selectedUser?.id : parseInt(user.id),
+            message: msg.text,
+            timestamp: msg.createdAt,
+            isRead: msg.isRead ?? true
+        })));
+        console.log("fetchedMessages", fetchedMessages);
+        //setMessages((prev) => GiftedChat.append(prev, fetchedMessages));
+        //setLoading(false);
+      });
+
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+    }, [chatCollection, selectedUser]);
+
+    const onSend = async () => {
+        if (!message.length || !chatCollection || !user) return;
+
+        //const message = newMessages[0];
+        const messageData = {
+          text: message,
+          createdAt: serverTimestamp(), // Use Firebase Modular SDK's serverTimestamp
+          isRead: false,
+          user: {
+            _id: user.id,
+            name: user.username,
+            avatar: user.avatar,
+          },
+        };
+        console.log('Message data being sent:', messageData);
+        setMessage("");
+        try {
+          // Add the message to the Firestore collection
+          await addDoc(chatCollection, messageData);
+          console.log('Message sent successfully:', messageData);
+        } catch (error) {
+          console.error('Error sending message:', error);
+        }
+    };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -63,9 +140,9 @@ const Chat: React.FC = () => {
       return false;
     });
 
-    const allMessagesResponse = await getAllMessages(parseInt(user.id));
-    const allMessages = allMessagesResponse.data;
-
+    //const allMessagesResponse = await getAllMessages(parseInt(user.id));
+    //const allMessages = allMessagesResponse.data;
+    const allMessages = chatFirestore;
     const updatedAccounts = filteredAccounts.map((account: any) => {
       const unreadMessages = allMessages.filter((message: any) =>
         message.senderId === account.id && !message.isRead
@@ -101,12 +178,12 @@ const Chat: React.FC = () => {
         if (user == null) {
           return;
         }
-        const history = await getChatHistory(parseInt(user.id), selectedUser.id);
+        
+        //const history = await getChatHistory(parseInt(user.id), selectedUser.id);
+        const history = chatFirestore;
+        //console.log("history", history);
 
-        const messagesWithDate = history.data.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.sentDate),
-        }));
+        const messagesWithDate = history
 
         messagesWithDate.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
@@ -114,6 +191,7 @@ const Chat: React.FC = () => {
         if (endOfMessagesRef.current) {
           endOfMessagesRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
         }
+        //console.log("messagesWithDate", messagesWithDate);
       };
 
       fetchChatHistory();
@@ -139,9 +217,9 @@ const Chat: React.FC = () => {
       }
     }
 
-  }, [selectedUser]);
+  }, [selectedUser, chatFirestore]);
 
-  const handleSendMessage = async () => {
+  /*const handleSendMessage = async () => {
     if (selectedUser && message) {
       if (user == null) {
         return;
@@ -164,7 +242,7 @@ const Chat: React.FC = () => {
         endOfMessagesRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }
-  };
+  };*/
 
   const handleAccountClick = async (account: Account) => {
     const chatUserId = account.id;
@@ -194,7 +272,6 @@ const Chat: React.FC = () => {
   if (user == null) {
     return <></>;
   }
-
 
   return (
     <div className="flex h-screen bg-gray-100 p-8 gap-5">
@@ -287,7 +364,7 @@ const Chat: React.FC = () => {
               className="flex-1 p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none mr-3 shadow-sm"
             />
             <button
-              onClick={handleSendMessage}
+              onClick={onSend}
               disabled={!isChatEnabled}
               className={`px-6 py-2 rounded-full font-medium text-white transition-all duration-200 ${isChatEnabled
                 ? "bg-blue-600 hover:bg-blue-700"
