@@ -8,12 +8,25 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Paper } from "@mui/material";
 
+const ITEMS_PER_PAGE = 5;
+
 const ServicesSection = () => {
     const [services, setServices] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const user = useSelector((state: RootState) => state.token.user);
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const totalPages = Math.ceil(services?.length / ITEMS_PER_PAGE);
+    const paginated = services?.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    // Page change handler
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -73,7 +86,7 @@ const ServicesSection = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {services.map((service, index) => (
+                                {paginated.map((service, index) => (
                                     <tr
                                         key={service.id}
                                         style={{
@@ -83,7 +96,7 @@ const ServicesSection = () => {
                                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
                                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#fff')}
                                     >
-                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>{index + 1}</td>
+                                        <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
                                         <td style={{ padding: '12px', fontSize: '14px', fontWeight: '500' }}>
                                             {service.name.length > 26 ? `${service.name.substring(0, 20)}...` : service.name}
                                         </td>
@@ -126,6 +139,25 @@ const ServicesSection = () => {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                    <div style={{ marginTop: "20px", display: "flex", justifyContent: "end" }}>
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handlePageChange(index + 1)}
+                                style={{
+                                    margin: "0 5px",
+                                    padding: "5px 10px",
+                                    backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                                    color: currentPage === index + 1 ? "white" : "black",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
                     </div>
                 </Paper>
 

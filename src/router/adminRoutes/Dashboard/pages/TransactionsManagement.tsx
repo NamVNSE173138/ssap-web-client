@@ -118,7 +118,6 @@ const WalletAndTransactionManagement = () => {
             <div style={{ flex: 0.5 }}>No.</div>
             <div style={{ flex: 1 }}>Wallet ID</div>
             <div style={{ flex: 2, display: 'inline-flex', alignItems: 'center' }}>
-              <FaPiggyBank style={{ marginRight: 5 }} />
               Bank Account Name
             </div>
             <div style={{ flex: 1 }}>Bank Account Number</div>
@@ -241,9 +240,9 @@ const WalletAndTransactionManagement = () => {
               <div style={{ flex: 1.25, marginRight: '20px' }}>{transaction.walletSenderId}</div>
               <div style={{ flex: 1.35, marginRight: '20px' }}>{transaction.walletReceiverId}</div>
               <div style={{ flex: 1.25, marginRight: '20px' }}>{transaction.paymentMethod}</div>
-              <div style={{ flex: 1, marginRight: '20px' }}>{transaction.amount}$</div>
+              <div style={{ flex: 1, marginRight: '20px' }}>${(transaction.amount).toLocaleString("en-US")}</div>
               <div style={{ flex: 1.5, marginRight: '20px' }}>
-                {new Date(transaction.transactionDate).toLocaleDateString()}
+                {new Date(transaction.transactionDate).toLocaleDateString("en-US")}
               </div>
               <div style={{ flex: 1.5, marginRight: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>

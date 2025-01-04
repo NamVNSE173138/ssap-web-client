@@ -100,7 +100,7 @@ const ServiceCard = (service: ServiceType) => {
               {service.price === 0
                 ? "Free"
                 : service.price
-                  ? `$${service.price.toFixed(2)}`
+                  ? `$${(service.price).toLocaleString("en-US")}`
                   : "Price not available"}
             </p>
           </div>

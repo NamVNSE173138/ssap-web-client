@@ -15,17 +15,14 @@ import {
 import {
   FaCheckCircle, FaEye, FaGraduationCap, FaSearch, FaTimes, FaTrophy,
   FaUser,
+  FaUserAlt,
 } from "react-icons/fa";
 import { notification } from "antd";
 import * as Tabs from "@radix-ui/react-tabs";
 import FirstReview from "./firstReview";
 import SecondReview from "./secondReview";
 import { updateApplication } from "@/services/ApiServices/applicationService";
-import { getUploadedScholarshipContract } from "@/services/ApiServices/applicantService";
-import { getFunderProfile } from "@/services/ApiServices/funderService";
-import { IoCloudUpload, IoDocumentText } from "react-icons/io5";
-import Modal from "antd/es/modal/Modal";
-// import { uploadFile } from "@/services/ApiServices/testService";
+import ApplicationStatus from "@/constants/applicationStatus";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,25 +36,27 @@ const ChooseWinner = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [availableScholarships, setAvailableScholarships] = useState(0);
   const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [generateFile, setGenerateFile] = useState(null);
-  const [contractFiles, setContractFiles] = useState<File[]>([]);
 
-
+  const statusColor: any = {
+    Submitted: "blue",
+    Approved: "green",
+    Rejected: "red",
+    Failed: "red",
+    Reviewing: "yellow",
+  };
 
   const fetchApplicants = async (scholarshipId: number, data: any) => {
     try {
       const response = await getApplicationsByScholarship(scholarshipId);
       if (!id) return;
       const scholarship = await getScholarshipProgram(parseInt(id));
-      console.log("APPLICATION", response);
-      console.log("Scholarship", scholarship);
 
       if (response.statusCode == 200) {
         setApplicants(
           response.data.filter(
             (row: any) =>
             (row.status == "Submitted" ||
+            row.status == "Rejected" ||
               row.status == "Reviewing") /*&&
               new Date(row.updatedAt) < new Date(scholarship.data.deadline)*/
           )
@@ -82,48 +81,7 @@ const ChooseWinner = () => {
     }
   };
 
-  const handlePreviewTemplate = async () => {
-    try {
-      if (!data) {
-        notification.error({
-          message: "No data available for preview.",
-        });
-        return;
-      }
-
-      const funderProfile = await getFunderProfile(data?.funderId);
-      const generateForFile = {
-        applicantName: selectedRows[0].applicant.username,
-        scholarshipAmount: data?.scholarshipAmount + "",
-        scholarshipProviderName: funderProfile.data.username,
-        deadline: data?.deadline,
-      };
-
-      const file = await getUploadedScholarshipContract(generateForFile);
-      if (file) {
-        notification.success({
-          message: "Preview generated successfully!",
-        });
-        setGenerateFile(file.data);
-      } else {
-        notification.error({
-          message: "Failed to generate preview.",
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      notification.error({
-        message: "Error generating preview.",
-      });
-    }
-  };
-
-  const openApplyModal = () => {
-    setModalIsOpen(true);
-  };
-
   const applyForSelectedWinners = async () => {
-    setModalIsOpen(false);
     try {
       setLoading(true);
       const applyPromises = selectedRows.map(async (row) => {
@@ -138,14 +96,6 @@ const ChooseWinner = () => {
         };
 
         await updateApplication(row.id, payload);
-        await sendWinnerEmail(row.applicantId, contractFiles);
-
-        await SendNotification({
-          topic: row.applicantId.toString(),
-          link: `/funder/application/${row.id}`,
-          title: "Your application has been approved",
-          body: `Your application for ${data?.name} has been approved.`,
-        });
       });
 
       await Promise.all(applyPromises);
@@ -155,9 +105,16 @@ const ChooseWinner = () => {
       }
 
       notification.success({
-        message: "Selected applicants have been approved!",
+        message: "Approve successfully!",
       });
       await fetchData();
+      for(const row of selectedRows)
+          await SendNotification({
+              topic: row.applicantId.toString(),
+              link: `/funder/application/${row.id}`,
+              title: "Your application has been approved",
+              body: `Your application for ${data?.name} has been approved.`,
+            });
     } catch (error) {
       console.error(error);
       setError("Failed to apply for selected winners.");
@@ -165,78 +122,6 @@ const ChooseWinner = () => {
       setLoading(false);
     }
   };
-
-
-  // const columns: GridColDef[] = [
-  //   { field: "id", headerName: "ID", width: 70 },
-  //   {
-  //     field: "avatarUrl",
-  //     headerName: "Avatar",
-  //     width: 130,
-  //     flex: 0.5,
-  //     renderCell: (params) => {
-  //       return (
-  //         <img
-  //           src={params.value}
-  //           alt="avatar"
-  //           style={{ width: 50, height: 50, borderRadius: 50 }}
-  //         />
-  //       );
-  //     },
-  //   },
-  //   { field: "username", headerName: "Username", width: 130, flex: 1 },
-  //   {
-  //     field: "status",
-  //     headerName: "Status",
-  //     width: 130,
-  //     flex: 0.5,
-  //     renderCell: (params) => {
-  //       console.log("PARAM", params)
-  //       return (
-  //         <span className="flex justify-end gap-2 items-center">
-  //           <span className="relative flex h-3 w-3">
-  //             <span
-  //               className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[params.row.status]
-  //                 }-500 opacity-75`}
-  //             ></span>
-  //             <span
-  //               className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[params.row.status]
-  //                 }-500`}
-  //             ></span>
-  //           </span>
-  //           <span
-  //             className={`text-${statusColor[params.value]}-500 font-medium`}
-  //           >
-  //             {params.value}
-  //           </span>
-  //         </span>
-  //       );
-  //     },
-  //   },
-  //   { field: "expertReview", headerName: "Reviewed by Expert", width: 130, flex: 1 },
-  //   {
-  //     field: "score", headerName: "Score", width: 130, flex: 1
-  //   },
-  //   {
-  //     field: "link",
-  //     headerName: "Action",
-  //     renderCell: (params) => {
-  //       return (
-  //         <Link
-  //           target="_blank"
-  //           className="text-sky-500 underline"
-  //           to={`/funder/application/${params.row.id}`}
-  //         >
-  //           View Profile
-  //         </Link>
-  //       );
-  //     },
-  //     flex: 1,
-  //     width: 130,
-  //   },
-  // ];
-
-
 
   const handleSelectionChange = (appId: number) => {
     // Check if the appId is already in selectedRows
@@ -260,8 +145,6 @@ const ChooseWinner = () => {
       setAvailableScholarships(newAvailableScholarships < 0 ? 0 : newAvailableScholarships);
     }
   };
-
-
 
   const filteredRows = applicants
     ? applicants.filter(
@@ -317,106 +200,161 @@ const ChooseWinner = () => {
               <span className="text-sky-500">{scholarshipWinners.length}</span>
             </p>
 
-            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {scholarshipWinners.map((winner) => (
-                <div key={winner.id} className="p-4 mb-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-all duration-300">
-                  <ListItem
-                    alignItems="flex-start"
-                    className="flex items-center gap-4"
+            <Paper
+  sx={{
+    height: 300,
+    width: "100%",
+    borderRadius: "8px",
+    boxShadow: 3,
+    padding: "16px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  }}
+>
+  {scholarshipWinners.length > 0 ? (
+    <div style={{ overflowX: "auto", flex: 1 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
+            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>#</th>
+            <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
+            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>Name</th>
+            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>Email</th>
+            <th style={{ padding: "12px", fontWeight: "600", textAlign:"center" }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scholarshipWinners.map((winner, index) => (
+            <tr
+              key={winner.id}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff",
+                borderBottom: "1px solid #ddd",
+              }}
+            >
+              <td style={{ padding: "12px", fontSize: "14px", color: "#333", textAlign:"center" }}>{index + 1}</td>
+              <td style={{ padding: "12px", textAlign: "center" }}>
+                <img
+                  src={winner.applicant.avatarUrl ?? "https://github.com/shadcn.png"}
+                  alt="Avatar"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid #ddd",
+                  }}
+                />
+              </td>
+              <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#333", textAlign:"center" }}>
+                {winner.applicant.username}
+              </td>
+              <td style={{ padding: "12px", fontSize: "14px", fontWeight: "500", color: "#555", textAlign:"center" }}>
+                {winner.applicant.email}
+              </td>
+              <td style={{ padding: "12px", textAlign: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center", // Căn giữa
+                    gap: "10px", // Giảm khoảng cách giữa các nút
+                    flexWrap: "wrap", // Nếu cần thiết sẽ xuống dòng
+                    justifyItems: "center",
+                  }}
+                >
+                  {/* View Application Button */}
+                  <Link
+                    target="_blank"
+                    to={`/funder/application/${winner.id}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      textDecoration: "none",
+                    }}
                   >
-                    <ListItemAvatar>
-                      <Avatar
-                        alt={winner.applicant.username}
-                        src={
-                          winner.applicant.avatarUrl ??
-                          "https://github.com/shadcn.png"
-                        }
-                        sx={{ width: 60, height: 60 }}
-                      />
-                    </ListItemAvatar>
-
-                    <ListItemText
-                      primary={
-                        <span className="font-bold text-sky-600">
-                          {winner.applicant.username}
-                        </span>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      style={{
+                        fontSize: "14px",
+                        padding: "6px 12px", // Giảm padding
+                        borderRadius: "8px",
+                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                        transition: "transform 0.2s, box-shadow 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.boxShadow =
+                          "0px 4px 8px rgba(0, 0, 0, 0.1)")
                       }
-                      secondary={
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ color: "text.primary", display: "inline" }}
-                        >
-                          {winner.applicant.email}
-                        </Typography>
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.boxShadow =
+                          "0px 2px 4px rgba(0, 0, 0, 0.1)")
                       }
-                    />
-                    <Link
-                      target="_blank"
-                      to={`/funder/application/${winner.id}`}
-                      className="flex items-center gap-2 text-sky-500 underline hover:text-sky-600 transition-all mt-4"
                     >
-                      <FaUser className="text-sky-500" />
-                      <span className="text-sm">View Profile</span>
-                    </Link>
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
-                </div>
-              ))}
-            </List>
+                      <FaEye className="mr-2" />
+                      View Application
+                    </Button>
+                  </Link>
 
-            <p className="text-xl font-semibold my-5 text-gray-800 flex items-center gap-2 hover:text-sky-500 transition-all duration-300">
+                  {/* View Profile Button */}
+                  {/* <Link
+                    target="_blank"
+                    to={`/profile/${winner.applicant.id}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      style={{
+                        fontSize: "14px",
+                        padding: "6px 12px", // Giảm padding
+                        borderRadius: "8px",
+                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                        transition: "transform 0.2s, box-shadow 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.boxShadow =
+                          "0px 4px 8px rgba(0, 0, 0, 0.1)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.boxShadow =
+                          "0px 2px 4px rgba(0, 0, 0, 0.1)")
+                      }
+                    >
+                      <FaUserAlt className="mr-2" />
+                      View Profile
+                    </Button>
+                  </Link> */}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+  )}
+</Paper>
+
+
+
+            <p className="mt-20 text-xl font-semibold my-5 text-gray-800 flex items-center gap-2 hover:text-sky-500 transition-all duration-300">
               <FaGraduationCap className="text-sky-500 text-2xl" />
               <span className="text-gray-600">Number of scholarships left:</span>
               <span className="text-sky-500 text-2xl font-bold">
                 {availableScholarships}
               </span>
             </p>
-
-            <FormControl fullWidth sx={{ marginBottom: "20px" }}>
-              <InputLabel
-                htmlFor="outlined-adornment-search"
-                sx={{
-                  zIndex: 1,
-                  backgroundColor: "white",
-                  paddingLeft: "8px",
-                  paddingRight: "8px",
-                  top: "-8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "gray.700",
-                }}
-              >
-                Search Applicants
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-search"
-                startAdornment={
-                  <InputAdornment position="start">
-                    <FaSearch className="text-sky-500 transition-all duration-200 transform hover:scale-105" />
-                  </InputAdornment>
-                }
-                endAdornment={
-                  searchQuery && (
-                    <InputAdornment position="end">
-                      <FaTimes
-                        className="text-sky-500 cursor-pointer transition-all duration-200 transform hover:scale-105"
-                        onClick={() => setSearchQuery("")}
-                      />
-                    </InputAdornment>
-                  )
-                }
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search Applicants"
-                className="border-2 border-sky-500 rounded-md shadow-md transition-all duration-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 hover:shadow-lg"
-                sx={{
-                  paddingTop: "12px",
-                  paddingBottom: "12px",
-                  backgroundColor: "#F7FAFC",
-                  borderColor: "gray.300",
-                }}
-              />
-            </FormControl>
 
             <Tabs.Root defaultValue="firstReview" className="w-full">
               <Tabs.List className="flex justify-between border-b-2 my-5 bg-white shadow-md rounded-lg w-full h-full">
@@ -465,11 +403,11 @@ const ChooseWinner = () => {
                         <thead>
                           <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
                             <th style={{ padding: "12px", fontWeight: "600" }}></th>
-                            <th style={{ padding: "12px", fontWeight: "600" }}>ID</th>
+                            <th style={{ padding: "12px", fontWeight: "600" }}>#</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Avatar</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Username</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Status</th>
-                            {/* <th style={{ padding: "12px", fontWeight: "600" }}>Reviewed by Expert</th> */}
+                            <th style={{ padding: "12px", fontWeight: "600" }}>Reviewed by</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Score</th>
                             <th style={{ padding: "12px", fontWeight: "600" }}>Actions</th>
                           </tr>
@@ -478,20 +416,27 @@ const ChooseWinner = () => {
                           {filteredRows.map((app: any, index: any) => (
                             <tr key={app.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
                               <td style={{ padding: "12px" }}>
-                                <input
+                                {app.status == ApplicationStatus.Reviewing && <input
                                   type="checkbox"
-                                  disabled={availableScholarships === 0 && !selectedRows.includes(app)}
+                                  disabled={availableScholarships === 0 && !selectedRows.includes(app) || app.status === "Rejected"}
                                   checked={selectedRows.some((row) => row.id === app.id)}
                                   onChange={() => handleSelectionChange(app.id)}
-                                />
+                                />}
                               </td>
-                              <td style={{ padding: "12px" }}>{app.id}</td>
+                              <td style={{ padding: "12px" }}>{index + 1}</td>
                               <td style={{ padding: "12px" }}>
                                 <img src={app.applicant.avatarUrl ?? "https://github.com/shadcn.png"} alt="Avatar" style={{ width: "40px", borderRadius: "50%" }} />
                               </td>
                               <td style={{ padding: "12px" }}>{app.applicant.username}</td>
-                              <td style={{ padding: "12px" }}>{app.status}</td>
-                              {/* <td style={{ padding: "12px" }}>{app.expertReview ?? "Not reviewed"}</td> */}
+                              <td style={{ padding: "12px" }}><span className="relative flex h-3 w-3">
+                                <span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[app.status]}-500`}>
+                                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}></span>
+                                </span>
+                                <span className={`text-${statusColor[app.status]}-500 font-medium ml-2`}>
+                                  {app.status}
+                                </span>
+                              </span></td>
+                              <td style={{ padding: "12px" }}>{app.expertReview ?? "Not reviewed"}</td>
                               <td style={{ padding: "12px" }}>{app.applicationReviews.length ? (app.applicationReviews.reduce((a: any, b: any) => a + b.score, 0) / app.applicationReviews.length).toFixed(1) : "N/A"}</td>
                               <td style={{ padding: "12px", textAlign: "center" }}>
                                 <Link
@@ -515,7 +460,7 @@ const ChooseWinner = () => {
                                       borderRadius: "5px",
                                     }}
                                   >
-                                    <FaEye /> View Profile
+                                    <FaEye /> View Details
                                   </Button>
                                 </Link>
                               </td>
@@ -525,7 +470,7 @@ const ChooseWinner = () => {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet </p>
                   )}
 
                   <div className="flex justify-end my-4 text-lg text-gray-700">
@@ -540,7 +485,7 @@ const ChooseWinner = () => {
                       variant="contained"
                       color="primary"
                       disabled={loading}
-                      onClick={openApplyModal}
+                      onClick={() => applyForSelectedWinners()}
                       className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
                     >
                       {loading ? (
@@ -548,112 +493,13 @@ const ChooseWinner = () => {
                       ) : (
                         <FaCheckCircle className="text-white text-2xl mr-2" />
                       )}
-                      <span className="text-lg font-semibold">Apply</span>
+                      <span className="text-lg font-semibold">Approve</span>
                     </Button>
                   </div>
 
                 </Paper>
               </Tabs.Content>
             </Tabs.Root>
-
-            <Modal
-              open={modalIsOpen}
-              onCancel={() => setModalIsOpen(false)}
-              onOk={() => {
-                if (contractFiles.length === 0) {
-                  notification.error({
-                    message: "You need to provide a contract for the applicant!",
-                  });
-                  return;
-                }
-                applyForSelectedWinners();
-              }}
-            >
-              <div className="text-center p-6 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  Send Contract to Applicant
-                </h2>
-
-                <p className="text-sm text-gray-600 mb-6">
-                  Use this form to preview and upload the contract files before sending them to the applicant.
-                </p>
-                <p className="mb-4 text-sm text-yellow-600">
-                  If you use the auto-generated contract service, please note that only one contract will be generated. Or you can choose individual winners for this scholarship
-                </p>
-
-                <div className="flex justify-center">
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow transition-all duration-300"
-                    onClick={handlePreviewTemplate}
-                  >
-                    Preview Template
-                  </button>
-                </div>
-
-                {generateFile && (
-                  <div className="mt-6 w-full max-w-lg bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded shadow">
-                    <h3 className="text-lg font-medium mb-2">Generated File</h3>
-                    <p className="mb-4">
-                      Your contract has been successfully generated and is ready for review. Click the link below to view or download it.
-                    </p>
-                    <p className="mb-4 text-sm text-gray-600">
-                      If you use the auto-generated contract service, please note that only one contract will be generated.
-                    </p>
-                    <a
-                      href={generateFile}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 text-center rounded-md transition-all duration-300 shadow-md"
-                    >
-                      View Generated Contract
-                    </a>
-                  </div>
-                )}
-
-                <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Contract Files
-                  </label>
-                  <div className="border border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition-all">
-                    <input
-                      type="file"
-                      multiple
-                      className="w-full hidden"
-                      id="file-upload"
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        if (files) setContractFiles(Array.from(files));
-                      }}
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="cursor-pointer flex flex-col items-center justify-center text-blue-500 hover:underline"
-                    >
-                      <IoCloudUpload className="text-4xl text-gray-400 mb-2" />
-                      <span>Click to upload files</span>
-                    </label>
-                  </div>
-                </div>
-
-                {contractFiles.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-sm font-medium text-gray-700">Selected Files:</h3>
-                    <ul className="mt-2 space-y-2">
-                      {contractFiles.map((file: File, index: number) => (
-                        <li
-                          key={index}
-                          className="text-sm text-gray-600 flex items-center gap-2"
-                        >
-                          <IoDocumentText className="text-blue-500" />
-                          {file.name}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-            </Modal>
           </div>
         </div>
       </section>

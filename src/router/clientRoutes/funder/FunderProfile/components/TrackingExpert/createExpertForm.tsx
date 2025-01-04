@@ -92,15 +92,6 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
     if (!validateForm()) return;
 
     setIsLoading(true);
-
-    // await onSubmit(formData);
-    // setFormData(initialData);
-    // setIsLoading(false);
-    // if (success) {
-    //   notification.success({ message: "Expert is created successfully!" });
-    // } else {
-    //   notification.error({ message: "Fail to create expert!" });
-    // }
     try {
       await onSubmit(formData);
       notification.success({ message: "Expert is created successfully!" });
@@ -122,8 +113,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               <div className="w-5/6">
                 <label className="block font-semibold flex items-center">
                   <FaUser className="mr-2" />
-                  Name:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Name
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <Input
                   type="text"
@@ -140,8 +131,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               <div className="w-5/6">
                 <label className="block font-semibold flex items-center">
                   <FaGraduationCap className="mr-2" />
-                  Major:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Major
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <select
                   name="major"
@@ -168,10 +159,10 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               </div>
 
               <div className="w-5/6">
-                <label className="block font-semibold flex items-center">
+                <label className=" font-semibold flex items-center">
                   <FaEnvelope className="mr-2" />
-                  Email:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Email
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <Input
                   type="email"
@@ -188,8 +179,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               <div className="w-5/6">
                 <label className="block font-semibold flex items-center">
                   <FaImage className="mr-2" />
-                  Avatar URL:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Avatar URL
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <Input
                   type="file"
@@ -205,8 +196,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               <div className="w-5/6">
                 <label className="block font-semibold flex items-center">
                   <FaPhoneAlt className="mr-2" />
-                  Phone Number:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Phone Number
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <Input
                   type="text"
@@ -223,8 +214,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               <div className="w-5/6">
                 <label className="block font-semibold flex items-center">
                   <FaLock className="mr-2" />
-                  Password:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Password
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <Input
                   type="password"
@@ -241,8 +232,8 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
               <div className="w-5/6">
                 <label className="block font-semibold flex items-center">
                   <FaMapMarkerAlt className="mr-2" />
-                  Address:
-                  <span className="text-red-500 text-sm font-normal">(*)</span>
+                  Address
+                  <span className="text-red-500 text-sm font-normal">*</span>
                 </label>
                 <Input
                   type="text"
