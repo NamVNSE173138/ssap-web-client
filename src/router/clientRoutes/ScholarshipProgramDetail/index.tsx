@@ -1392,7 +1392,7 @@ const ScholarshipProgramDetail = () => {
 
                       {/* Cột tên chuyên gia */}
                       <div style={{ flex: 0.75 }}>
-                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.name}</span>
                       </div>
 
                       <div style={{ flex: 1 }}>
