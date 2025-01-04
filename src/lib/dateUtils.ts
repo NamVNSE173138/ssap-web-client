@@ -15,6 +15,10 @@ export const formatNaturalDate = (dateString: string) => {
   }
 };
 
+export const formatDateOnly = (dateString: string) => {
+  return new Date(dateString).toISOString().split("T")[0];
+};
+
 export const calculateAge = (birthDate: string) => {
   if (!birthDate) return "N/A";
 
