@@ -26,6 +26,7 @@ import { SendNeedExtendReason, SendNotificationAndEmail } from "@/services/ApiSe
 import { getMessaging, onMessage } from "firebase/messaging"
 import SendReasonDialog from "./send-email-more-doc"
 import AwardProgressTable from "./award-progress-table"
+import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService"
 
 const FunderApplication = () => {
   const { id } = useParams<{ id: string }>();
@@ -65,9 +66,9 @@ const FunderApplication = () => {
   }
 
   const handleAddRow = () => {
-    if (rows.length < requiredDocumentsCount) { 
-      const newRow = { id: rows.length + 1, name: "", type: "" }; 
-      setRows([...rows, newRow]); 
+    if (rows.length < requiredDocumentsCount) {
+      const newRow = { id: rows.length + 1, name: "", type: "" };
+      setRows([...rows, newRow]);
     }
   };
 
@@ -75,7 +76,7 @@ const FunderApplication = () => {
     (milestone: any) =>
       new Date(milestone.fromDate) < new Date(application?.updatedAt) &&
       new Date(application?.updatedAt) < new Date(milestone.toDate)
-  )?.awardMilestoneDocuments || [];  
+  )?.awardMilestoneDocuments || [];
 
   const requiredDocumentsCount = requiredDocuments.length;
 
@@ -252,21 +253,33 @@ const FunderApplication = () => {
     await fetchApplication();
   };
 
-
   const fetchApplication = async () => {
     try {
       if (!id) return;
       const response = await getApplicationWithDocumentsAndAccount(parseInt(id));
       const scholarship = await getScholarshipProgram(response.data.scholarshipProgramId);
       const award = await getAwardMilestoneByScholarship(response.data.scholarshipProgramId);
-
       if (response.statusCode == 200) {
-        setApplication(response.data);
-        setApplicant(response.data.applicant);
-        setApplicantProfile(response.data.applicant.applicantProfile);
-        setDocuments(response.data.applicationDocuments);
-        setScholarship(scholarship.data);
-        setAwardMilestones(award.data);
+        // Gọi API getApplicantProfileById để lấy profile của ứng viên
+        const applicantProfileResponse = await getApplicantProfileById(response.data.applicantId);
+
+        if (applicantProfileResponse.statusCode === 200) {
+          // Lấy fullName từ firstName và lastName trong applicantProfile
+          const fullName = `${applicantProfileResponse.data.firstName} ${applicantProfileResponse.data.lastName}`;
+
+          // Cập nhật applicant với fullName
+          setApplication(response.data);
+          setApplicant({
+            ...response.data.applicant,
+            fullName, // Thêm fullName vào applicant
+          });
+          setApplicantProfile(applicantProfileResponse.data);
+          setDocuments(response.data.applicationDocuments);
+          setScholarship(scholarship.data);
+          setAwardMilestones(award.data);
+        } else {
+          setError("Failed to get applicant profile");
+        }
       } else {
         setError("Failed to get applicants");
       }
@@ -365,7 +378,7 @@ const FunderApplication = () => {
               <div>
                 <p className="text-white text-4xl font-semibold hover:text-indigo-300 transition-colors duration-300">
                   <FaUserCircle className="inline-block mr-2 text-indigo-200" />
-                  {applicant.username}
+                  {applicant.fullName}
                 </p>
                 <p className="text-white text-xl mt-2 flex items-center space-x-2">
                   <FaEnvelope className="text-indigo-200" />
@@ -389,7 +402,7 @@ const FunderApplication = () => {
         <section className="max-w-container flex items-center justify-center mx-auto py-[24px] lg:py-[40px] px-4 lg:px-0">
           <div className="text-center">
             <h2 className="text-4xl md:text-4xl font-semibold text-gray-800 mb-4">
-              {applicant.username}'s Application
+              {applicant.fullName}'s Application
             </h2>
             <p className="text-xl md:text-2xl text-gray-600">
               Review application and award details here.
@@ -430,9 +443,9 @@ const FunderApplication = () => {
 
                     {/* Add Document Button */}
                     <Button
-                      onClick={handleAddRow}  
+                      onClick={handleAddRow}
                       className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
-                      disabled={rows.length >= requiredDocumentsCount}  
+                      disabled={rows.length >= requiredDocumentsCount}
                     >
                       <HiOutlinePlusCircle className="text-lg" />
                       <span className="text-lg font-bold">Add Extend Document</span>

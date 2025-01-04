@@ -190,14 +190,9 @@ const ApplyScholarship = () => {
 
     try {
       const response = await addApplication(applicationData);
-
-      if (response.statusCode === 200) {
-        await response.data;
-        notification.success({ message: "Application submitted successfully" });
-      } else {  
-        console.error("Failed to submit application");
-        notification.error({ message: "Failed to submit application" });
-      }
+      console.log(response)
+      await response.data;
+      notification.success({ message: "Application submitted successfully" });
       navigate("/applicant/profile?tab=application-history");
       if (id) await NotifyFunderNewApplicant(isApplicant, parseInt(id));
     } catch (error) {
