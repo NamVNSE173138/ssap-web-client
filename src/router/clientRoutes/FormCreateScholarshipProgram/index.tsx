@@ -271,7 +271,7 @@ const FormCreateScholarshipProgram = () => {
             <div className="text-center w-32">
               <p
                 className={`text-sm font-medium ${
-                  step === 4 ? "text-blue-600" : "text-gray-500"
+                  step === 5 ? "text-blue-600" : "text-gray-500"
                 }`}
               >
                 {" "}
@@ -314,7 +314,7 @@ const FormCreateScholarshipProgram = () => {
 
           {step === 5 && (
             <>
-              <ViewDataCreated />
+              <ViewDataCreated formData={formData}/>
               <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(4)}>Back</Button>
               </div>
