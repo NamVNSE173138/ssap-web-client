@@ -56,8 +56,8 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
             [row.expertId]: expertProfile.data.name,
           }));
         }
-        console.log(expertNamesData);
-        console.log(fetchedData);
+        //console.log(expertNamesData);
+        //console.log(fetchedData);
         // Group by applicationId and calculate average score
         const groupedData = fetchedData.reduce((acc:any, item:any) => {
           const { applicationId, applicantName, score, expertId, status } = item;
@@ -89,7 +89,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
           status: group.status > 0 ? "Approved" : "Rejected"
         }));
         setApplications(result);
-        setExpanded(fetchedData.map((row: any) => ({id: row.id, expanded: false})));
+        setExpanded(fetchedData.map((row: any) => ({id: row.applicationId, expanded: false})));
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -163,10 +163,12 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                     </Button>
                   </td>
                   </tr>
+                  <tr>
                   <td colSpan={7} className="w-full">
                     {expanded && <Collapse in={expanded.find((item) => item.id == row.applicationId)?.expanded}>
 
                     <table className="w-full">
+                      <tbody>
                     {data.filter((item) => item.applicationId == row.applicationId).map((row, index) => (
                     <tr key={index}>
                         <td style={{position: 'relative', padding: "16px"}}>
@@ -210,12 +212,12 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                         </span></td>
                       <td style={{ padding: "12px" }}>{expertNames[row.expertId] || 'N/a'}</td>
                     </tr>
-
                     ))}
-
+                    </tbody>
                   </table>
                   </Collapse>}
                   </td>
+                  </tr>
 
                 </React.Fragment>
               ))
