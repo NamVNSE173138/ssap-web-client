@@ -16,7 +16,7 @@ import { addApplication } from "@/services/ApiServices/applicationService";
 import ScholarshipContractDialog from "./ScholarshipContractDialog";
 import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 import { z } from 'zod';
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { FaEnvelope, FaFileAlt, FaPhoneAlt, FaUser } from "react-icons/fa";
 
 interface FormData {
@@ -196,6 +196,7 @@ const ApplyScholarship = () => {
         notification.success({ message: "Application submitted successfully" });
       } else {
         console.error("Failed to submit application");
+        notification.error({ message: "Failed to submit application" });
       }
       navigate("/applicant/profile?tab=application-history");
       if (id) await NotifyFunderNewApplicant(isApplicant, parseInt(id));
@@ -579,14 +580,20 @@ const ApplyScholarship = () => {
                 <button
                   onClick={handlePrevStep}
                   className="bg-gray-200 text-gray-700 p-4 rounded-md w-1/4 hover:bg-gray-300 transition-colors duration-300"
+                  disabled={applyLoading}
                 >
                   Back
                 </button>
                 <button
                   onClick={handleSubmit}
                   className="bg-blue-600 text-white p-4 rounded-md w-1/4 hover:bg-blue-700 transition-colors duration-300"
+                  disabled={applyLoading}
                 >
-                  Submit Application
+                  {applyLoading ? (
+                    <CircularProgress size={24} style={{ color: "white" }} />
+                  ) : (
+                    "Submit Application"
+                  )}
                 </button>
               </div>
             </div>

@@ -31,6 +31,17 @@ const AddExpertToScholarship = () => {
   const [filteredExpert, setFilteredExpert] = useState<any[]>([]);
   const [scholarshipMajor, setScholarshipMajor] = useState<any[]>([]);
   const navigate = useNavigate();
+  const ITEMS_PER_PAGE = 5;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(_experts?.length / ITEMS_PER_PAGE);
+  const paginatedmExperts = _experts?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     const filtered = _experts.filter((expert) => {
@@ -247,8 +258,8 @@ const AddExpertToScholarship = () => {
             </div>
 
             {/* Expert Cards */}
-            {filteredExpert.length > 0 ? (
-              filteredExpert.map((expert: any, index: any) => {
+            {paginatedmExperts.length > 0 ? (
+              paginatedmExperts.map((expert: any, index: any) => {
                 const isAlreadyInScholarship = expertsInScholarship.some(
                   (existingExpert) => existingExpert.expertId === expert.expertId
                 );
@@ -296,7 +307,7 @@ const AddExpertToScholarship = () => {
 
 
                     {/* Cột số thứ tự */}
-                    <div style={{ flex: 0.5 }}>{index + 1}</div>
+                    <div style={{ flex: 0.5 }}>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</div>
 
                     <div style={{ flex: 0.5 }}>
                       <img
@@ -334,8 +345,25 @@ const AddExpertToScholarship = () => {
             ) : (
               <p className="text-center text-gray-500">No experts match your search.</p>
             )}
-
-
+            <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  style={{
+                    margin: "0 5px",
+                    padding: "5px 10px",
+                    backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                    color: currentPage === index + 1 ? "white" : "black",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
           </Paper>
           <div className="flex mt-5 justify-end">
             <p>{selectedExperts.length} Selected</p>

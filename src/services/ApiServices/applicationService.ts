@@ -79,15 +79,15 @@ export async function fetchSecondReviewData(scholarshipId: string, token: string
   return response.data.data;
 }
 
-export async function assignExpertsToApplicationApi(data:any, token: string) {
+export async function assignExpertsToApplicationApi(data: any, token: string) {
   const response = await axios.post(`${BASE_URL}/api/applications/reviews/assign-experts-to-application`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 }
 
-export async function getReviewsOfApplications(applicationIds:any[], token: string) {
-  const response = await axios.get(`${BASE_URL}/api/applications/reviews/reviews-of-applications?`+
+export async function getReviewsOfApplications(applicationIds: any[], token: string) {
+  const response = await axios.get(`${BASE_URL}/api/applications/reviews/reviews-of-applications?` +
     `${applicationIds.map((id) => `applicationIds=${id}`).join('&')}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
