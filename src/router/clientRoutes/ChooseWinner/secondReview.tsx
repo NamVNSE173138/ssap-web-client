@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CircularProgress, Paper, Button, Accordion, AccordionSummary, Typography, AccordionDetails, Collapse, Box } from "@mui/material";
-import { FaEye } from "react-icons/fa";
+import { FaExpand, FaExpandAlt, FaEye } from "react-icons/fa";
 import { fetchSecondReviewData } from "@/services/ApiServices/applicationService";
 import { getExpertProfile } from "@/services/ApiServices/expertService";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
@@ -159,7 +159,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                       }}
                       onClick={() => toggleExpand(row.applicationId)}
                     >
-                      <FaEye /> View Details
+                      <FaExpandAlt /> Expand
                     </Button>
                   </td>
                   </tr>
