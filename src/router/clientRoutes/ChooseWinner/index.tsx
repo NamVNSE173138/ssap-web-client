@@ -25,6 +25,7 @@ import { getUploadedScholarshipContract } from "@/services/ApiServices/applicant
 import { getFunderProfile } from "@/services/ApiServices/funderService";
 import { IoCloudUpload, IoDocumentText } from "react-icons/io5";
 import Modal from "antd/es/modal/Modal";
+import ApplicationStatus from "@/constants/applicationStatus";
 // import { uploadFile } from "@/services/ApiServices/testService";
 
 const ChooseWinner = () => {
@@ -479,12 +480,12 @@ const ChooseWinner = () => {
                           {filteredRows.map((app: any, index: any) => (
                             <tr key={app.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
                               <td style={{ padding: "12px" }}>
-                                <input
+                                {app.status == ApplicationStatus.Reviewing && <input
                                   type="checkbox"
                                   disabled={availableScholarships === 0 && !selectedRows.includes(app)}
                                   checked={selectedRows.some((row) => row.id === app.id)}
                                   onChange={() => handleSelectionChange(app.id)}
-                                />
+                                />}
                               </td>
                               <td style={{ padding: "12px" }}>{app.id}</td>
                               <td style={{ padding: "12px" }}>
