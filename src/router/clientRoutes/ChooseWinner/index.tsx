@@ -22,6 +22,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import FirstReview from "./firstReview";
 import SecondReview from "./secondReview";
 import { updateApplication } from "@/services/ApiServices/applicationService";
+import ApplicationStatus from "@/constants/applicationStatus";
 
 const ChooseWinner = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +56,9 @@ const ChooseWinner = () => {
           response.data.filter(
             (row: any) =>
             (row.status == "Submitted" ||
-              row.status == "Reviewing")
+            row.status == "Rejected" ||
+              row.status == "Reviewing") /*&&
+              new Date(row.updatedAt) < new Date(scholarship.data.deadline)*/
           )
         );
         if (data) {
@@ -93,13 +96,6 @@ const ChooseWinner = () => {
         };
 
         await updateApplication(row.id, payload);
-
-        await SendNotification({
-          topic: row.applicantId.toString(),
-          link: `/funder/application/${row.id}`,
-          title: "Your application has been approved",
-          body: `Your application for ${data?.name} has been approved.`,
-        });
       });
 
       await Promise.all(applyPromises);
@@ -112,6 +108,13 @@ const ChooseWinner = () => {
         message: "Approve successfully!",
       });
       await fetchData();
+      for(const row of selectedRows)
+          await SendNotification({
+              topic: row.applicantId.toString(),
+              link: `/funder/application/${row.id}`,
+              title: "Your application has been approved",
+              body: `Your application for ${data?.name} has been approved.`,
+            });
     } catch (error) {
       console.error(error);
       setError("Failed to apply for selected winners.");
@@ -413,12 +416,12 @@ const ChooseWinner = () => {
                           {filteredRows.map((app: any, index: any) => (
                             <tr key={app.id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff" }}>
                               <td style={{ padding: "12px" }}>
-                                <input
+                                {app.status == ApplicationStatus.Reviewing && <input
                                   type="checkbox"
                                   disabled={availableScholarships === 0 && !selectedRows.includes(app) || app.status === "Rejected"}
                                   checked={selectedRows.some((row) => row.id === app.id)}
                                   onChange={() => handleSelectionChange(app.id)}
-                                />
+                                />}
                               </td>
                               <td style={{ padding: "12px" }}>{index + 1}</td>
                               <td style={{ padding: "12px" }}>
@@ -457,7 +460,7 @@ const ChooseWinner = () => {
                                       borderRadius: "5px",
                                     }}
                                   >
-                                    <FaEye /> View Profile
+                                    <FaEye /> View Details
                                   </Button>
                                 </Link>
                               </td>
@@ -467,7 +470,7 @@ const ChooseWinner = () => {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet</p>
+                    <p className="text-center text-gray-500 mt-4 text-xl">No scholarship applicants yet </p>
                   )}
 
                   <div className="flex justify-end my-4 text-lg text-gray-700">
