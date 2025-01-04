@@ -259,23 +259,6 @@
 
 // export default AwardMilestoneStep;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -286,6 +269,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
 import QuillEditor from "@/components/Quill/QuillEditor";
+import { Textarea } from "@/components/ui/textarea";
 
 const awardFormSchema = z
   .object({
@@ -351,21 +335,22 @@ const AwardMilestoneStep = ({
     }
   }, [formData, reset]);
 
-  
-
   useEffect(() => {
     if (formData && formData.awardProgress) {
       const progressCount = parseInt(formData.awardProgress, 10) || 0;
       const existingMilestones = formData.awardMilestones || [];
       const milestones = Array(progressCount)
         .fill(null)
-        .map((_, index) => existingMilestones[index] || {
-          fromDate: "",
-          toDate: "",
-          amount: 0,
-          note: "",
-          awardMilestoneDocuments: [],
-        });
+        .map(
+          (_, index) =>
+            existingMilestones[index] || {
+              fromDate: "",
+              toDate: "",
+              amount: 0,
+              note: "",
+              awardMilestoneDocuments: [],
+            }
+        );
 
       setValue("awardMilestones", milestones);
     }
@@ -445,13 +430,25 @@ const AwardMilestoneStep = ({
                       <Select
                         isMulti
                         options={[
-                          { value: "Academic Transcript", label: "Academic Transcript" },
-                          { value: "Financial Report", label: "Financial Report" },
+                          {
+                            value: "Academic Transcript",
+                            label: "Academic Transcript",
+                          },
+                          {
+                            value: "Financial Report",
+                            label: "Financial Report",
+                          },
                         ]}
                         value={field.value?.map((doc) =>
                           [
-                            { value: "Academic Transcript", label: "Academic Transcript" },
-                            { value: "Financial Report", label: "Financial Report" },
+                            {
+                              value: "Academic Transcript",
+                              label: "Academic Transcript",
+                            },
+                            {
+                              value: "Financial Report",
+                              label: "Financial Report",
+                            },
                           ].find((option) => option.value === doc.type)
                         )}
                         onChange={(selected) =>
@@ -493,11 +490,27 @@ const AwardMilestoneStep = ({
 
                 <div>
                   <Label>Submission Guide</Label>
-                  <QuillEditor
+                  {/* <QuillEditor
                     value={milestone.note || ""}
                     onChange={(value: string) =>
                       updateAwardMilestone(index, "note", value)
                     }
+                  /> */}
+                  <Textarea
+                    value={milestone.note || ""}
+                    onChange={(e) => {
+                      const updatedMilestones = [...awardMilestones];
+                      updatedMilestones[index] = {
+                        ...updatedMilestones[index],
+                        note: e.target.value,
+                      };
+                      setValue("awardMilestones", updatedMilestones, {
+                        shouldDirty: true,
+                      });
+                    }}
+                    rows={4}
+                    placeholder="Enter submission guide"
+                    className="w-full border border-gray-300 rounded-md p-2"
                   />
                 </div>
               </div>
