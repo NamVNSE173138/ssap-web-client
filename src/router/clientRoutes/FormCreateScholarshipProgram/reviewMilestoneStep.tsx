@@ -9,6 +9,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect } from "react";
+import AwardMilestoneStep from "./awardMilestoneStep";
 
 
 
@@ -176,6 +177,7 @@ const ReviewMilestoneStep = ({
               
             </div>
           </form>
+          {/* <AwardMilestoneStep formData={formData} onSave={handleNext}/> */}
         </CardContent>
       </Card>
       <div className="flex justify-end mt-4">

@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { notification } from "antd";
 
 interface OptionType {
   value: string;
@@ -35,9 +34,11 @@ const schema = z.object({
 const InformationStep = ({
   formData,
   onSave,
+  handelUploadFile,
 }: {
   formData: any;
   onSave: (data: any) => void;
+  handelUploadFile: any;
 }) => {
   const [categories, setCategories] = useState<OptionType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<OptionType | null>(
@@ -45,22 +46,21 @@ const InformationStep = ({
   );
   const [_imageFile, setImageFile] = useState<File[]>([]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null;
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        notification.error({
-          message: "Invalid File",
-          description: "Please upload an image file.",
-        });
-        return;
-      }
-      // Chuyển file thành URL tạm thời (data URL) để hiển thị
-      const fileUrl = URL.createObjectURL(file);
-      setImageFile([file]);
-      setValue("imageUrl", fileUrl, { shouldValidate: true }); // Truyền URL vào thay vì tệp gốc
-    }
-  };
+  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files ? event.target.files[0] : null;
+  //   if (file) {
+  //     if (!file.type.startsWith("image/")) {
+  //       notification.error({
+  //         message: "Invalid File",
+  //         description: "Please upload an image file.",
+  //       });
+  //       return;
+  //     }
+  //     const fileUrl = URL.createObjectURL(file);
+  //     setImageFile([file]);
+  //     setValue("imageUrl", fileUrl, { shouldValidate: true }); 
+  //   }
+  // };
 
   useEffect(() => {
     if (formData.imageUrl) {
@@ -255,7 +255,7 @@ const InformationStep = ({
                 <Input
                   type="file"
                   id="imageUrl"
-                  onChange={handleFileChange}
+                  onChange={handelUploadFile}
                   accept="image/*"
                   className="block w-full border p-2 rounded"
                 />

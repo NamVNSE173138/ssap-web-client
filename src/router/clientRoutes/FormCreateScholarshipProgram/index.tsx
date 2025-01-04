@@ -281,7 +281,7 @@ const FormCreateScholarshipProgram = () => {
           </div>
           {step === 1 && (
             <>
-              <InformationStep formData={formData} onSave={handleNext} />
+              <InformationStep formData={formData} onSave={handleNext} handelUploadFile={handleFileChange}/>
             </>
           )}
 

@@ -14,14 +14,12 @@ const CertificateSectionCard = (props: any) => {
   } = props;
 
   const [open, setOpen] = useState<boolean>(false);
-  const [dialogType, setDialogType] = useState<"add" | "update" | "delete">(
-    "add",
-  );
+  const [dialogType, setDialogType] = useState<"add" | "update">("add");
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
-  const handleOpenDialog = (type: "add" | "update", item?: any) => {
+  const handleOpenDialog = (type: "add" | "update", item: any) => {
     setDialogType(type);
-    setSelectedItem(item || null);
+    setSelectedItem(item);
     setOpen(true);
   };
 

@@ -20,9 +20,7 @@ import Applicant from "../../types/Applicant";
 import AvatarSection from "./AvatarSection/AvatarSection";
 import GeneralInfoSection from "./GeneralInfoSection/GeneralInfoSection";
 
-const ProfileSection = (props: any) => {
-  const { activeTab } = props;
-
+const ProfileSection = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.token.user);
 
@@ -140,7 +138,7 @@ const ProfileSection = (props: any) => {
         {/* Left Column - General Information */}
         <div className="w-full lg:w-1/3 flex flex-col items-center bg-gray-50 p-4 rounded-lg border border-gray-200 self-start">
           {/* Avatar */}
-          <AvatarSection originalAvatar={profile.avatar} />
+          <AvatarSection profile={profile} originalAvatar={profile.avatar} />
 
           {/* Name */}
           <h2 className="mt-4 text-lg font-semibold">
@@ -188,6 +186,7 @@ const ProfileSection = (props: any) => {
         <div className="w-full lg:w-2/3 space-y-6">
           {/* Education Section */}
           <EducationSectionCard
+            setRefresh={setRefresh}
             title="Education"
             icon={FaGraduationCap}
             items={profile.applicantEducations}
@@ -197,6 +196,7 @@ const ProfileSection = (props: any) => {
 
           {/* Certificates Section */}
           <CertificateSectionCard
+            setRefresh={setRefresh}
             title="Certificates"
             icon={FaMedal}
             items={profile.applicantCertificates}
@@ -206,6 +206,7 @@ const ProfileSection = (props: any) => {
 
           {/* Skills Section */}
           <SkillSectionCard
+            setRefresh={setRefresh}
             title="Skills"
             icon={FaTools}
             items={profile.applicantSkills}

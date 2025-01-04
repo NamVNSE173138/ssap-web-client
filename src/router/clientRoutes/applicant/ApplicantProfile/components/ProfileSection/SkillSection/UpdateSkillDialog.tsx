@@ -1,7 +1,10 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
-import { updateApplicantExperience } from "@/services/ApiServices/applicantProfileService";
+import { useEffect, useState } from "react";
+import {
+  deleteApplicantSkill,
+  updateApplicantSkill,
+} from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
@@ -16,30 +19,35 @@ const UpdateSkillDialog = (props: any) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
-  const [experience, setExperience] = useState<ApplicantSkill>({
-    id: item.id,
-    name: item.name,
-    fromYear: item.fromYear,
-    toYear: item.toYear,
-    type: item.type,
-    description: item.description,
+  const [skill, setSkill] = useState<ApplicantSkill>({
+    id: 0,
+    name: "",
+    fromYear: 0,
+    toYear: 0,
+    type: "",
+    description: "",
   });
+
+  useEffect(() => {
+    setSkill(item);
+  }, [item, open]);
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    setExperience((prev) => ({ ...prev, [name]: value }));
+    setSkill((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
     setIsProcessing(true);
     try {
       const payload = {
-        name: experience.name,
-        fromYear: experience.fromYear,
-        toYear: experience.toYear,
-        description: experience.description,
+        name: skill.name,
+        type: skill.type,
+        fromYear: skill.fromYear,
+        toYear: skill.toYear,
+        description: skill.description,
       };
-      await updateApplicantExperience(Number(user?.id), experience.id, payload);
+      await updateApplicantSkill(Number(user?.id), skill.id, payload);
       notification.success({
         message: "Success",
         description: "Profile updated successfully",
@@ -85,11 +93,29 @@ const UpdateSkillDialog = (props: any) => {
                     <input
                       type="text"
                       name="name"
-                      value={experience.name}
+                      value={skill.name}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                      placeholder="Enter your experience"
+                      placeholder="Enter your skill"
                     />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      What is the type of your skill?
+                    </label>
+                    <select
+                      name="type"
+                      value={skill.type || ""}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
+                    >
+                      <option value="" disabled>
+                        Select Type
+                      </option>
+                      <option value="Technical">Technical Skill</option>
+                      <option value="Soft">Soft Skill</option>
+                    </select>
                   </div>
 
                   <div className="mt-4 flex space-x-4">
@@ -99,7 +125,7 @@ const UpdateSkillDialog = (props: any) => {
                       </label>
                       <select
                         name="fromYear"
-                        value={experience.fromYear || 0}
+                        value={skill.fromYear || 0}
                         onChange={handleChange}
                         className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       >
@@ -120,7 +146,7 @@ const UpdateSkillDialog = (props: any) => {
                       </label>
                       <select
                         name="toYear"
-                        value={experience.toYear || 0}
+                        value={skill.toYear || 0}
                         onChange={handleChange}
                         className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       >
@@ -142,11 +168,11 @@ const UpdateSkillDialog = (props: any) => {
                     </label>
                     <textarea
                       name="description"
-                      value={experience.description}
+                      value={skill.description}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       rows={4}
-                      placeholder="Provide brief description for your experience"
+                      placeholder="Provide brief description for your skill"
                     />
                   </div>
                 </div>
@@ -180,6 +206,7 @@ const UpdateSkillDialog = (props: any) => {
         setOpen={setOpen}
         setRefresh={setRefresh}
         itemId={item.id}
+        handleDelete={deleteApplicantSkill}
       />
     </div>
   );
