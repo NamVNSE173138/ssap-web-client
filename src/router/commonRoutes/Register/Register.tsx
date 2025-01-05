@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "../../../assets/login-image.jpg";
-import { FaBook, FaBuilding, FaCalendarAlt, FaEnvelope, FaEye, FaEyeSlash, FaFileAlt, FaFlag, FaGraduationCap, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaUniversity, FaUser, FaUserAlt, FaUsers, FaUserTie, FaVenusMars } from "react-icons/fa";
+import { FaBook, FaBuilding, FaCalendarAlt, FaEnvelope, FaEye, FaEyeSlash, FaFileAlt, FaFlag, FaGraduationCap, FaImage, FaInfoCircle, FaKey, FaMapMarkedAlt, FaPhoneAlt, FaRegCalendarAlt, FaSchool, FaStar, FaUniversity, FaUser, FaUserAlt, FaUsers, FaUserTie, FaVenusMars } from "react-icons/fa";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -21,8 +21,9 @@ import DocumentRows from "./DocumentRows";
 import { Button } from "@/components/ui/button";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { sendOtp, verifyOtp } from "@/services/ApiServices/accountService";
-import { addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
+import { addApplicantEducation, addApplicantProfile } from "@/services/ApiServices/applicantProfileService";
 import { getAllUniversities } from "@/services/ApiServices/universityService";
+
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -73,11 +74,17 @@ const formSchema = z.object({
   lastName: z.string().optional(),
   birthDate: z.string().optional(),
   gender: z.string().optional(),
-  major: z.string().optional(),
-  gpa: z.number().optional(),
-  school: z.string().optional(),
   nationality: z.string().optional(),
-  ethnicity: z.string().optional()
+  ethnicity: z.string().optional(),
+  education: z.object({
+    school: z.string().optional(),
+    educationLevel: z.string().optional(),
+    major: z.string().optional(),
+    gpa: z.string().optional(),
+    fromYear: z.string().optional(),
+    toYear: z.string().optional(),
+    description: z.string().optional(),
+  })
 });
 
 
@@ -99,16 +106,13 @@ const Register = () => {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
-  const [schools, setSchools] = useState<string[]>([]);
-  const [customSchool, setCustomSchool] = useState<boolean>(false);
-  const [selectedSchool, setSelectedSchool] = useState<string>("");
+  const [showEducationForm, setShowEducationForm] = useState(false);
 
   const getSchool = async () => {
     try {
       const response = await getAllUniversities();
       const schoolNames = response.data.map((school: any) => school.name);
       console.log(schoolNames)
-      setSchools(schoolNames);
     } catch (error) {
       console.log("Error fetching universities:", error);
     }
@@ -117,17 +121,6 @@ const Register = () => {
   useEffect(() => {
     getSchool();
   }, []);
-
-  const handleSelectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value === "Other") {
-      setCustomSchool(true);
-      setSelectedSchool("");
-    } else {
-      setCustomSchool(false);
-      setSelectedSchool(value);
-    }
-  };
 
   const handleAddRow = () => {
     setRowId(rowId + 1);
@@ -168,11 +161,17 @@ const Register = () => {
       lastName: selectedRole === 4 || selectedRole === 2 ? "" : "",
       birthDate: selectedRole === 4 || selectedRole === 2 ? "" : "",
       gender: selectedRole === 4 || selectedRole === 2 ? "" : "",
-      major: selectedRole === 4 || selectedRole === 2 ? "" : "",
-      gpa: selectedRole === 4 || selectedRole === 2 ? "" : 0,
-      school: selectedRole === 4 || selectedRole === 2 ? "" : "",
       nationality: selectedRole === 4 || selectedRole === 2 ? "" : "",
       ethnicity: selectedRole === 4 || selectedRole === 2 ? "" : "",
+      education: {
+        school: selectedRole === 4 || selectedRole === 2 ? "" : "",
+        educationLevel: selectedRole === 4 || selectedRole === 2 ? "" : "",
+        major: selectedRole === 4 || selectedRole === 2 ? "" : "",
+        gpa: selectedRole === 4 || selectedRole === 2 ? "" : "",
+        fromYear: 0,
+        toYear: 0,
+        description: selectedRole === 4 || selectedRole === 2 ? "" : "",
+      },
     },
   });
 
@@ -206,9 +205,6 @@ const Register = () => {
       setValue("lastName", "");
       setValue("birthDate", "");
       setValue("gender", "");
-      setValue("major", "");
-      setValue("gpa", 0);
-      setValue("school", "");
       setValue("nationality", "");
       setValue("ethnicity", "");
     } else {
@@ -282,15 +278,25 @@ const Register = () => {
       lastName: data.lastName,
       birthDate: data.birthDate,
       gender: data.gender,
-      major: data.major,
-      gpa: data.gpa,
-      school: data.school,
       nationality: data.nationality,
       ethnicity: data.ethnicity,
     };
 
+    const education = {
+      school: data.education?.school || '',
+      educationLevel: data.education?.educationLevel || '',
+      major: data.education?.major || '',
+      gpa: data.education?.gpa || '',
+      fromYear: data.education?.fromYear || 0,
+      toYear: data.education?.toYear || 0,
+      description: data.education?.description || '',
+    };
+
     try {
       await addApplicantProfile(userId, applicantData);
+      await addApplicantEducation(userId, education);
+
+      setShowEducationForm(false);
     } catch (error: any) {
       console.log("Error adding Applicant data:", error);
       notification.error({
@@ -957,77 +963,6 @@ const Register = () => {
                               {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>}
                             </div>
 
-                            {/* Major */}
-                            <div>
-                              <label className="block text-gray-700 font-medium mb-2">Major</label>
-                              <input
-                                {...register("major")}
-                                placeholder="Enter your major"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                              {errors.major && <p className="text-red-500 text-sm mt-1">{errors.major.message}</p>}
-                            </div>
-
-                            {/* GPA */}
-                            <div>
-                              <label className="block text-gray-700 font-medium mb-2">GPA</label>
-                              <input
-                                {...register("gpa", {
-                                  setValueAs: (value) => (value === "" ? undefined : Number(value)),
-                                  onChange: (e) => {
-                                    setValue("gpa", Number(e.target.value), {
-                                      shouldValidate: true,
-                                    });
-                                  },
-                                })}
-                                type="number"
-                                placeholder="Enter your GPA"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                              {errors.gpa && <p className="text-red-500 text-sm mt-1">{errors.gpa.message}</p>}
-                            </div>
-
-                            {/* School */}
-                            <div>
-                              <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
-                                University
-                                <FaInfoCircle
-                                  className="text-gray-600 cursor-pointer"
-                                  title="Our system will filter the scholarship list based on the school. If you do not enter the school information here, you can still go to Profile to add."
-                                />
-                              </label>
-                              {customSchool ? (
-                                <input
-                                  {...register("school")}
-                                  placeholder="Enter your school"
-                                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                              ) : (
-                                <select
-                                  {...register("school")}
-                                  value={selectedSchool}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    handleSelectionChange(e);
-                                    setValue("school", value, { shouldValidate: true });
-                                    setSelectedSchool(value);
-                                  }}
-                                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                  <option value="">Select a school</option>
-                                  {schools.map((school: string, index: number) => (
-                                    <option key={index} value={school}>
-                                      {school}
-                                    </option>
-                                  ))}
-                                </select>
-                              )}
-                              {errors.school && (
-                                <p className="text-red-500 text-sm mt-1">{errors.school.message}</p>
-                              )}
-                            </div>
-
-
                             {/* Nationality */}
                             <div>
                               <label className="block text-gray-700 font-medium mb-2">Nationality</label>
@@ -1049,6 +984,112 @@ const Register = () => {
                               />
                               {errors.ethnicity && <p className="text-red-500 text-sm mt-1">{errors.ethnicity.message}</p>}
                             </div>
+                          </div>
+                        </div>
+
+                        <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                          <span className="text-black-600">🎓</span>
+                          <span className="text-black-600 text-2xl flex items-center gap-2">
+                            Education Information
+                            <FaInfoCircle
+                              className="text-gray-600 cursor-pointer"
+                              title="You must provide more education information for us"
+                            />
+                          </span>
+                        </h3>
+                        <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="mb-4">
+                              <label className="block text-gray-700 font-medium mb-2">School</label>
+                              <input
+                                {...register("education.school")}
+                                placeholder="Enter your school"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              {errors.education?.school && <p className="text-red-500 text-sm mt-1">{errors.education.school.message}</p>}
+                            </div>
+
+                            {/* Education Level */}
+                            <div className="mb-4">
+                              <label className="block text-gray-700 font-medium mb-2">Education Level</label>
+                              <input
+                                {...register("education.educationLevel")}
+                                placeholder="Enter your education level"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              {errors.education?.educationLevel && <p className="text-red-500 text-sm mt-1">{errors.education.educationLevel.message}</p>}
+                            </div>
+
+                            {/* Major */}
+                            <div className="mb-4">
+                              <label className="block text-gray-700 font-medium mb-2">Major</label>
+                              <input
+                                {...register("education.major")}
+                                placeholder="Enter your major"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              {errors.education?.major && <p className="text-red-500 text-sm mt-1">{errors.education.major.message}</p>}
+                            </div>
+
+                            {/* GPA */}
+                            <div className="mb-4">
+                              <label className="block text-gray-700 font-medium mb-2">GPA</label>
+                              <input
+                                {...register("education.gpa")}
+                                placeholder="Enter your GPA"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              {errors.education?.gpa && <p className="text-red-500 text-sm mt-1">{errors.education.gpa.message}</p>}
+                            </div>
+
+                            {/* Start Year */}
+                            <div className="mb-4">
+                              <label className="block text-gray-700 font-medium mb-2">Start Year</label>
+                              <select
+                                {...register("education.fromYear")}
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="">Select Year</option>
+
+                                {/* Add years dynamically */}
+                                {[...Array(50)].map((_, i) => (
+                                  <option key={i} value={i + 1975}>
+                                    {i + 1975}
+                                  </option>
+                                ))}
+                              </select>
+                              {errors.education?.fromYear && <p className="text-red-500 text-sm mt-1">{errors.education.fromYear.message}</p>}
+                            </div>
+
+                            {/* End Year */}
+                            <div className="mb-4">
+                              <label className="block text-gray-700 font-medium mb-2">End Year</label>
+                              <select
+                                {...register("education.toYear")}
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="">Select Year</option>
+                                {/* Add years dynamically */}
+                                {[...Array(50)].map((_, i) => (
+                                  <option key={i} value={i + 1975}>
+                                    {i + 1975}
+                                  </option>
+                                ))}
+                              </select>
+                              {errors.education?.toYear && <p className="text-red-500 text-sm mt-1">{errors.education.toYear.message}</p>}
+                            </div>
+
+                          </div>
+                          {/* Description */}
+                          <div className="mb-4">
+                            <label className="block text-gray-700 font-medium mb-2">Description</label>
+                            <textarea
+                              {...register("education.description")}
+                              placeholder="Provide brief description"
+                              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              rows={4}
+                            />
+                            {errors.education?.description && <p className="text-red-500 text-sm mt-1">{errors.education.description.message}</p>}
                           </div>
                         </div>
                       </>
@@ -1263,22 +1304,14 @@ const Register = () => {
                         </h3>
 
                         <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-                          <div className="flex space-x-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Left Section */}
-                            <div className="flex-1 space-y-4">
+                            <div className="space-y-4">
                               {/* First Name */}
                               <div className="flex items-center space-x-3">
                                 <FaUserAlt className="text-blue-600 text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>First Name:</strong> {watch("firstName") || "Not provided"}
-                                </p>
-                              </div>
-
-                              {/* GPA */}
-                              <div className="flex items-center space-x-3">
-                                <FaGraduationCap className="text-blue-600 text-2xl" />
-                                <p className="text-lg text-gray-800 font-medium">
-                                  <strong>GPA:</strong> {watch("gpa") !== undefined ? watch("gpa") : "Not provided"}
                                 </p>
                               </div>
 
@@ -1292,7 +1325,6 @@ const Register = () => {
                                 </p>
                               </div>
 
-
                               {/* Gender */}
                               <div className="flex items-center space-x-3">
                                 <FaVenusMars className="text-blue-600 text-2xl" />
@@ -1300,34 +1332,15 @@ const Register = () => {
                                   <strong>Gender:</strong> {watch("gender") || "Not provided"}
                                 </p>
                               </div>
-
-                              {/* Major */}
-                              <div className="flex items-center space-x-3">
-                                <FaBook className="text-blue-600 text-2xl" />
-                                <p className="text-lg text-gray-800 font-medium">
-                                  <strong>Major:</strong> {watch("major") || "Not provided"}
-                                </p>
-                              </div>
                             </div>
 
-                            {/* Vertical Divider */}
-                            <div className="border-l border-gray-400 h-full"></div>
-
                             {/* Right Section */}
-                            <div className="flex-1 space-y-4">
+                            <div className="space-y-4">
                               {/* Last Name */}
                               <div className="flex items-center space-x-3">
                                 <FaUserAlt className="text-blue-600 text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Last Name:</strong> {watch("lastName") || "Not provided"}
-                                </p>
-                              </div>
-
-                              {/* University */}
-                              <div className="flex items-center space-x-3">
-                                <FaUniversity className="text-blue-600 text-2xl" />
-                                <p className="text-lg text-gray-800 font-medium">
-                                  <strong>University:</strong> {watch("school") || "Not provided"}
                                 </p>
                               </div>
 
@@ -1348,7 +1361,80 @@ const Register = () => {
                               </div>
                             </div>
                           </div>
+
                         </div>
+
+                        <h3 className="text-xl mt-8 font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                          <span className="text-black-600">📋</span>
+                          <span className="text-black-600 text-2xl flex items-center gap-2">
+                            Education Information
+                          </span>
+                        </h3>
+
+                        <div className="max-w-4xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md mt-8">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              {/* School */}
+                              <div className="flex items-center space-x-3">
+                                <FaSchool className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>School:</strong> {watch("education.school") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* Education Level */}
+                              <div className="flex items-center space-x-3">
+                                <FaGraduationCap className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Education Level:</strong> {watch("education.educationLevel") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* Major */}
+                              <div className="flex items-center space-x-3">
+                                <FaBook className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Major:</strong> {watch("education.major") || "Not provided"}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              {/* GPA */}
+                              <div className="flex items-center space-x-3">
+                                <FaStar className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>GPA:</strong> {watch("education.gpa") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* Start Year */}
+                              <div className="flex items-center space-x-3">
+                                <FaCalendarAlt className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>Start Year:</strong> {watch("education.fromYear") || "Not provided"}
+                                </p>
+                              </div>
+
+                              {/* End Year */}
+                              <div className="flex items-center space-x-3">
+                                <FaRegCalendarAlt className="text-blue-600 text-2xl" />
+                                <p className="text-lg text-gray-800 font-medium">
+                                  <strong>End Year:</strong> {watch("education.toYear") || "Not provided"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <div className="flex items-center space-x-3 mt-4">
+                            <FaFileAlt className="text-blue-600 text-2xl" />
+                            <p className="text-lg text-gray-800 font-medium">
+                              <strong>Description:</strong> {watch("education.description") || "Not provided"}
+                            </p>
+                          </div>
+                        </div>
+
                       </>
                     )}
                     {(selectedRole === 4 || selectedRole === 2) && (

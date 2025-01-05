@@ -270,8 +270,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
 import QuillEditor from "@/components/Quill/QuillEditor";
 import { Textarea } from "@/components/ui/textarea";
+import { formatDate } from "@/lib/date-formatter";
 
-const awardFormSchema = z
+
+
+const AwardMilestoneStep = ({
+  formData,
+  onSave,
+}: {
+  formData: any;
+  onSave: (data: any) => void;
+}) => {
+
+  const awardFormSchema = z
   .object({
     awardMilestones: z.array(
       z.object({
@@ -298,19 +309,43 @@ const awardFormSchema = z
       ),
     {
       message: "The 'From' date must be earlier than the 'To' date.",
-      path: ["awardMilestones"],
+      path: ["toDate"],
     }
+  ).refine(
+    (data) => data.awardMilestones.every((milestone) =>
+      new Date(milestone.fromDate) > new Date(formData.deadline) &&
+      new Date(milestone.toDate) > new Date(formData.deadline),
+    ),
+    {
+      message: `The 'From' and 'To' date must be later than the scholarship deadline. which is ${formatDate(
+        formData.deadline
+      )}`,
+      path: ["toDate"], 
+    }
+  ).refine(
+    (data) => data.awardMilestones.every((milestone) =>
+      !formData.reviewMilestones ||
+      formData.reviewMilestones.length === 0 ||
+      formData.reviewMilestones.every(
+        (review: any) => new Date(review.toDate) < new Date(milestone.fromDate)
+      ),
+    {
+      message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${
+        formData.reviewMilestones.length > 0
+          ? formatDate(
+              formData.reviewMilestones.sort(
+                (a: any, b: any) =>
+                  new Date(a.toDate).getTime() - new Date(b.toDate).getTime()
+              )[formData.reviewMilestones.length - 1].toDate
+            )
+          : ""
+      }`,
+      path: ["toDate"], 
+    }
+  )
   );
 
 type AwardFormData = z.infer<typeof awardFormSchema>;
-
-const AwardMilestoneStep = ({
-  formData,
-  onSave,
-}: {
-  formData: any;
-  onSave: (data: any) => void;
-}) => {
   const {
     control,
     setValue,
@@ -326,6 +361,8 @@ const AwardMilestoneStep = ({
       awardMilestones: [],
     },
   });
+
+  
 
   const awardMilestones = watch("awardMilestones");
 
