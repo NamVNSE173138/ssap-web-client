@@ -2,14 +2,13 @@ import { getFullName } from "@/lib/stringUtils";
 import * as Tabs from "@radix-ui/react-tabs";
 import { AiOutlineBulb, AiOutlineEnvironment } from "react-icons/ai";
 import { FaGraduationCap, FaMedal, FaTools } from "react-icons/fa";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import {
   exportApplicantProfileToPdf,
   getApplicantProfileById,
 } from "@/services/ApiServices/applicantProfileService";
-import { setUser } from "@/reducers/tokenSlice";
 import Spinner from "@/components/Spinner";
 import { notification } from "antd";
 import EducationSectionCard from "./EducationSection/EducationSectionCard";
@@ -21,7 +20,6 @@ import AvatarSection from "./AvatarSection/AvatarSection";
 import GeneralInfoSection from "./GeneralInfoSection/GeneralInfoSection";
 
 const ProfileSection = () => {
-  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.token.user);
 
   const [error, setError] = useState<string | null>(null);
@@ -65,39 +63,6 @@ const ProfileSection = () => {
     fetchProfile();
   }, [user?.id, refresh]);
 
-  const handleSaveClick = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    console.log(profile);
-    try {
-      const postData = {
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        username: profile.username,
-        phone: profile.phone,
-        bio: profile.bio,
-        address: profile.address,
-        gender: profile.gender,
-        birthdate: profile.birthDate,
-        nationality: profile.nationality,
-        ethnicity: profile.ethnicity,
-        skills: profile.applicantSkills,
-        experience: profile.applicantExperience,
-        certificates: profile.applicantCertificates,
-      };
-
-      console.log("Post data", postData);
-
-      dispatch(setUser({ ...user, avatar: profile.avatar }));
-      setRefresh(true);
-    } catch (error) {
-      setError("Update profile failed");
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleExportPDF = async () => {
     try {
       const pdfBlob = await exportApplicantProfileToPdf(Number(user?.id));
@@ -138,7 +103,7 @@ const ProfileSection = () => {
         {/* Left Column - General Information */}
         <div className="w-full lg:w-1/3 flex flex-col items-center bg-gray-50 p-4 rounded-lg border border-gray-200 self-start">
           {/* Avatar */}
-          <AvatarSection profile={profile} originalAvatar={profile.avatar} />
+          <AvatarSection setRefresh={setRefresh} profile={profile} />
 
           {/* Name */}
           <h2 className="mt-4 text-lg font-semibold">
@@ -158,27 +123,7 @@ const ProfileSection = () => {
 
           {/* Additional Information */}
           <div className="mt-4 w-full text-sm space-y-2">
-            {/* <p> */}
-            {/*   <strong>Birthdate:</strong>{" "} */}
-            {/*   {formatNaturalDate(profile.birthDate) || "N/A"} */}
-            {/* </p> */}
-            {/* <p> */}
-            {/*   <strong>Age:</strong> {calculateAge(profile.birthDate) || "N/A"} */}
-            {/* </p> */}
-            {/* <p> */}
-            {/*   <strong>Gender:</strong> {profile.gender || "N/A"} */}
-            {/* </p> */}
-            {/* <p> */}
-            {/*   <strong>Nationality:</strong> {profile.nationality || "N/A"} */}
-            {/* </p> */}
-            {/* <p> */}
-            {/*   <strong>Ethnicity:</strong> {profile.ethnicity || "N/A"} */}
-            {/* </p> */}
-            {/* <p> */}
-            {/*   <strong>Bio:</strong> {profile.bio || "N/A"} */}
-            {/* </p> */}
-
-            <GeneralInfoSection profile={profile} />
+            <GeneralInfoSection setRefresh={setRefresh} profile={profile} />
           </div>
         </div>
 

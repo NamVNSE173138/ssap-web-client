@@ -1,5 +1,5 @@
 import { setUser } from "@/reducers/tokenSlice";
-import { updateApplicantProfileDetails } from "@/services/ApiServices/applicantProfileService";
+import { updateApplicantGeneralInformation } from "@/services/ApiServices/applicantProfileService";
 import { uploadFile } from "@/services/ApiServices/fileUploadService";
 import { RootState } from "@/store/store";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -9,7 +9,7 @@ import { useDropzone } from "react-dropzone";
 import { useDispatch, useSelector } from "react-redux";
 
 const AvatarSection = (props: any) => {
-  const { profile, originalAvatar } = props;
+  const { setRefresh, profile } = props;
 
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.token.user);
@@ -41,24 +41,16 @@ const AvatarSection = (props: any) => {
 
         const payload = {
           avatarUrl: fileUrls[0],
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          username: profile.username,
-          phone: profile.phone,
-          bio: profile.bio,
-          address: profile.address,
+          birthDate: profile.birthDate,
           gender: profile.gender,
-          birthdate: profile.birthDate,
           nationality: profile.nationality,
           ethnicity: profile.ethnicity,
-          skills: profile.applicantSkills,
-          experience: profile.applicantExperience,
-          certificates: profile.applicantCertificates,
+          bio: profile.bio,
         };
         console.log("Change image payload: ", payload);
-        await updateApplicantProfileDetails(Number(user?.id), payload);
+        await updateApplicantGeneralInformation(Number(user?.id), payload);
 
-        dispatch(setUser({ ...user, avatar: profile.avatar }));
+        dispatch(setUser({ ...user, avatar: fileUrls[0] }));
       } catch (error) {
         console.log("Error: ", error);
         notification.error({
@@ -68,11 +60,14 @@ const AvatarSection = (props: any) => {
       } finally {
         setIsProcessing(false);
         setOpen(false);
+        setPreview(null);
+        setRefresh(true);
       }
     }
   };
 
   const handleCancel = () => {
+    console.log(profile);
     setPreview(null);
   };
 
@@ -80,9 +75,9 @@ const AvatarSection = (props: any) => {
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <button className="flex items-center justify-center w-24 h-24 bg-gray-200 rounded-full overflow-hidden hover:ring-2 hover:ring-green-500">
-          {originalAvatar ? (
+          {profile.avatar ? (
             <img
-              src={originalAvatar}
+              src={profile.avatar}
               alt="Avatar Preview"
               className="object-cover w-full h-full"
             />
@@ -130,6 +125,7 @@ const AvatarSection = (props: any) => {
           <div className="mt-4 flex justify-end space-x-2">
             <Dialog.Close asChild>
               <button
+                disabled={isProcessing}
                 onClick={handleCancel}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
               >
@@ -139,9 +135,9 @@ const AvatarSection = (props: any) => {
             <button
               onClick={handleSave}
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md"
-              disabled={!file}
+              disabled={!file || isProcessing}
             >
-              Save Changes
+              {isProcessing ? "Processing..." : "Save Changes"}
             </button>
           </div>
         </Dialog.Content>
