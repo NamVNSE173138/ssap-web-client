@@ -1,11 +1,12 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addApplicantSkill } from "@/services/ApiServices/applicantProfileService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
 import { ApplicantSkill } from "../../../types/Applicant";
+import { getAllSkills } from "@/services/ApiServices/skillService";
 
 const AddSkillDialog = (props: any) => {
   const { open, setOpen, setRefresh } = props;
@@ -13,6 +14,7 @@ const AddSkillDialog = (props: any) => {
   const user = useSelector((state: RootState) => state.token.user);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [skills, setSkills] = useState<string[]>();
   const [skill, setSkill] = useState<ApplicantSkill>({
     id: 0,
     name: "",
@@ -21,6 +23,16 @@ const AddSkillDialog = (props: any) => {
     toYear: 0,
     description: "",
   });
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      const response = await getAllSkills();
+      const skillNames = response.data.map((skill: any) => skill.name);
+      setSkills(skillNames);
+    };
+
+    fetchSkills();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
@@ -77,14 +89,19 @@ const AddSkillDialog = (props: any) => {
                   <label className="block text-sm font-medium text-gray-700">
                     What skill do you have?
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="name"
-                    value={skill.name}
+                    value={skill.type || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    placeholder="Enter your skill"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select Skill
+                    </option>
+                    {skills?.map((skill) => (
+                      <option value={skill}>{skill}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="mt-4">

@@ -3,7 +3,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { AiOutlineBulb, AiOutlineEnvironment } from "react-icons/ai";
 import { FaGraduationCap, FaMedal, FaTools } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import {
   exportApplicantProfileToPdf,
@@ -81,8 +81,18 @@ const ProfileSection = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
       console.log("Exported PDF successfully!");
+      notification.success({
+        message: "Success",
+        description: "Export profile successfully",
+      });
     } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "Export profile failed",
+      });
       console.log("Failed to export PDF.");
+    } finally {
+      setRefresh(true);
     }
   };
 
@@ -125,6 +135,12 @@ const ProfileSection = () => {
           <div className="mt-4 w-full text-sm space-y-2">
             <GeneralInfoSection setRefresh={setRefresh} profile={profile} />
           </div>
+          <button
+            onClick={handleExportPDF}
+            className="self-start px-4 py-2 mt-4 bg-green-500 text-white rounded-md hover:bg-green-600"
+          >
+            Export Profile
+          </button>
         </div>
 
         {/* Right Column - Additional Information */}
