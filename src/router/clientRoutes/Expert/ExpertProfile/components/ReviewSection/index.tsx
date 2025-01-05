@@ -110,24 +110,24 @@ const ApprovalList: React.FC = () => {
     fetchApplicationReview();
   }, [user.id]);
 
-  const handleRowClick = (item: ApprovalItem, review: any) => {
-    if (review.expertId != user.id) return;
-    const isScored =
-      review.score !== null && review.score !== undefined && review.score > 0;
+  // const handleRowClick = (item: ApprovalItem, review: any) => {
+  //   if (review.expertId != user.id) return;
+  //   const isScored =
+  //     review.score !== null && review.score !== undefined && review.score > 0;
 
-    if (isScored) {
-      notification.info({
-        message:
-          "This application has already been scored. You cannot score it again.",
-      });
-      return; // Prevent opening dialog
-    }
-    setSelectedItem(item);
-    setSelectedReview(review);
-    setScore("");
-    setComment("");
-    window.open(item.documentUrl, "_blank");
-  };
+  //   if (isScored) {
+  //     notification.info({
+  //       message:
+  //         "This application has already been scored. You cannot score it again.",
+  //     });
+  //     return; 
+  //   }
+  //   setSelectedItem(item);
+  //   setSelectedReview(review);
+  //   setScore("");
+  //   setComment("");
+  //   window.open(item.documentUrl, "_blank");
+  // };
 
   // const handleApprove = async (id: number) => {
   //   try {
@@ -159,68 +159,68 @@ const ApprovalList: React.FC = () => {
   //   }
   // };
 
-  const handleScoreSubmit = async () => {
-    if (!selectedItem || !selectedReview || score === "") {
-      notification.error({ message: "Please input a score" });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      expertReviewSchema.parse({
-        score: score.toString(),
-        description: comment,
-      });
+  // const handleScoreSubmit = async () => {
+  //   if (!selectedItem || !selectedReview || score === "") {
+  //     notification.error({ message: "Please input a score" });
+  //     return;
+  //   }
+  //   setIsLoading(true);
+  //   try {
+  //     expertReviewSchema.parse({
+  //       score: score.toString(),
+  //       description: comment,
+  //     });
 
-      const reviewId = selectedReview.id;
-      if (!reviewId) {
-        console.error("Review ID not found.");
-        return;
-      }
+  //     const reviewId = selectedReview.id;
+  //     if (!reviewId) {
+  //       console.error("Review ID not found.");
+  //       return;
+  //     }
 
-      const reviewMilestone = await getAllReviewMilestonesByScholarship(
-        selectedItem.scholarshipProgramId
-      );
+  //     const reviewMilestone = await getAllReviewMilestonesByScholarship(
+  //       selectedItem.scholarshipProgramId
+  //     );
 
-      const currentDate = new Date();
-      let isReview = true;
-      reviewMilestone?.data.forEach((review: any) => {
-        if (
-          new Date(review.fromDate) < currentDate &&
-          new Date(review.toDate) > currentDate
-        ) {
-          if (review.description.toLowerCase() === "application review") {
-            isReview = true;
-          } else {
-            isReview = false;
-          }
-        }
-      });
+  //     const currentDate = new Date();
+  //     let isReview = true;
+  //     reviewMilestone?.data.forEach((review: any) => {
+  //       if (
+  //         new Date(review.fromDate) < currentDate &&
+  //         new Date(review.toDate) > currentDate
+  //       ) {
+  //         if (review.description.toLowerCase() === "application review") {
+  //           isReview = true;
+  //         } else {
+  //           isReview = false;
+  //         }
+  //       }
+  //     });
 
-      const numericScore = Number(score);
-      const payload = {
-        applicationReviewId: reviewId,
-        comment,
-        isPassed: numericScore >= 50,
-        score: numericScore,
-        isFirstReview: isReview,
-      };
-      await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
-      notification.success({ message: "Review submitted successfully" });
-      setIsLoading(false);
-      setSelectedItem(null);
-      fetchApplicationReview();
-      setScore("");
-      setComment("");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errorMessage = error.errors.map((err) => err.message).join(", ");
-        notification.error({ message: `Validation failed: ${errorMessage}` });
-      } else {
-        notification.error({ message: "Failed to submit review" });
-      }
-      setIsLoading(false);
-    }
-  };
+  //     const numericScore = Number(score);
+  //     const payload = {
+  //       applicationReviewId: reviewId,
+  //       comment,
+  //       isPassed: numericScore >= 50,
+  //       score: numericScore,
+  //       isFirstReview: isReview,
+  //     };
+  //     await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
+  //     notification.success({ message: "Review submitted successfully" });
+  //     setIsLoading(false);
+  //     setSelectedItem(null);
+  //     fetchApplicationReview();
+  //     setScore("");
+  //     setComment("");
+  //   } catch (error) {
+  //     if (error instanceof z.ZodError) {
+  //       const errorMessage = error.errors.map((err) => err.message).join(", ");
+  //       notification.error({ message: `Validation failed: ${errorMessage}` });
+  //     } else {
+  //       notification.error({ message: "Failed to submit review" });
+  //     }
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const filteredApplications = applications.filter((app) =>
     [app.applicantName, app.scholarshipName, app.university].some((field) =>
@@ -371,7 +371,7 @@ const ApprovalList: React.FC = () => {
                       />
 
                       <Button
-                        onClick={handleScoreSubmit}
+                        // onClick={handleScoreSubmit}
                         className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
                       >
                         Submit Review
