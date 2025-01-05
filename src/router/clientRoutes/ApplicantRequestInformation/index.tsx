@@ -10,6 +10,7 @@ import { getRequestWithApplicantAndRequestDetails } from "@/services/ApiServices
 import RequestDetailTable from "./request-detail-table"
 import { useSelector } from "react-redux"
 import { FaBirthdayCake, FaEnvelope, FaFlag, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
+import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService"
 
 const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => {
   const { id } = requestId ?? useParams<{ id: string }>();
@@ -31,7 +32,11 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
 
       if (request.statusCode == 200) {
         setRequest(request.data);
-        setApplicant(request.data.applicant);
+        
+        console.log(request.data.applicant)
+        const applicantProfileResponse = await getApplicantProfileById(request.data.applicant.id);
+        const fullName = `${applicantProfileResponse.data.firstName} ${applicantProfileResponse.data.lastName}`;
+        setApplicant({...request.data.applicant,fullName,});
         setApplicantProfile(request.data.applicant.applicantProfile);
         setRequestDetails(request.data.requestDetails);
         setService(request.data.requestDetails[0].service);
@@ -98,7 +103,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
                     to={user.role === 'Applicant' ? `/applicant/requestinformation/${request.id}` : `/provider/requestinformation/${request.id}`}
                     className="text-[#000] md:text-xl text-lg font-extrabold"
                   >
-                    {applicant.username}
+                    {applicant.fullName}
                   </Link>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -110,7 +115,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
               <div>
                 <p className="text-white text-4xl font-semibold hover:text-indigo-300 transition-colors duration-300">
                   <FaUserCircle className="inline-block mr-2 text-indigo-200" />
-                  {applicant.username}
+                  {applicant.fullName}
                 </p>
                 <p className="text-white text-xl mt-2 flex items-center space-x-2">
                   <FaEnvelope className="text-indigo-200" />
@@ -125,7 +130,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
         <section className="max-w-container flex items-center justify-center mx-auto py-[24px] lg:py-[40px] px-4 lg:px-0">
           <div className="text-center">
             <h2 className="text-4xl md:text-4xl font-semibold text-gray-800 mb-4">
-              {applicant.username}'s Request Details
+              {applicant.fullName}'s Request Details
             </h2>
             <p className="text-xl md:text-2xl text-gray-600">
               Review request details here.
@@ -137,7 +142,7 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
         <div className="max-w-[1216px] mx-auto">
           <div className="mb-[24px] px-[16px] xsm:px-[24px] 2xl:px-0">
             <p className="text-4xl md:text-4xl font-semibold text-gray-800 mb-4">
-              Request Details
+              Request Details for {service.name}
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
             <RequestDetailTable showButtons={showButtons} request={request} fetchRequest={fetchRequest} requestDetails={requestDetails} description={request.description} />

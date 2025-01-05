@@ -13,6 +13,8 @@ import RouteNames from "@/constants/routeNames";
 import { useSelector } from "react-redux";
 import { Dialog } from "@mui/material";
 
+const ITEMS_PER_PAGE = 8;
+
 const ProviderInformation = () => {
   const { id } = useParams();
   const [providerData, setProviderData] = useState<any>(null);
@@ -24,6 +26,17 @@ const ProviderInformation = () => {
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(services?.length / ITEMS_PER_PAGE);
+  const paginatedmServices = services?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
 
   useEffect(() => {
     const fetchProviderData = async () => {
@@ -175,7 +188,7 @@ const ProviderInformation = () => {
           </div>
 
           {/* Services Grid */}
-          {services.length > 0 ? (
+          {paginatedmServices.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {services.map((service: any) => (
                 <ServiceCard key={service.id} {...service} />
@@ -221,6 +234,25 @@ const ProviderInformation = () => {
           </div>
         </div>
       </Dialog>
+      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => handlePageChange(index + 1)}
+            style={{
+              margin: "0 5px",
+              padding: "5px 10px",
+              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+              color: currentPage === index + 1 ? "white" : "black",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </>
 
   );

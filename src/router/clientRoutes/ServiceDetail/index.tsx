@@ -155,16 +155,16 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [currentTabPageForPending, setCurrentTabPageForPending] = useState(1);
   const [currentTabPageForFinished, setCurrentTabPageForFinished] = useState(1);
 
-  const totalTabPagesForPending = Math.ceil(applicants?.pending?.length / ITEMS_PER_PAGE);
-  const totalTabPagesForFinished = Math.ceil(applicants?.finished?.length / ITEMS_PER_PAGE);
+  const totalTabPagesForPending = Math.ceil(requestapplicants?.pending?.length / ITEMS_PER_PAGE);
+  const totalTabPagesForFinished = Math.ceil(requestapplicants?.finished?.length / ITEMS_PER_PAGE);
 
   const paginatedTabData =
     selectedTab === 0
-      ? applicants?.pending?.slice(
+      ? requestapplicants?.pending?.slice(
         (currentTabPageForPending - 1) * ITEMS_PER_PAGE,
         currentTabPageForPending * ITEMS_PER_PAGE
       )
-      : applicants?.finished?.slice(
+      : requestapplicants?.finished?.slice(
         (currentTabPageForFinished - 1) * ITEMS_PER_PAGE,
         currentTabPageForFinished * ITEMS_PER_PAGE
       );
@@ -184,6 +184,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         const applications = await getRequestsByService(id);
         const requestApplicant = applications.data;
         console.log(applications)
+        console.log(requestApplicant)
         setRequestApplicants({
           pending: requestApplicant.filter((app: any) => app.status === "Pending"),
           finished: requestApplicant.filter((app: any) => app.status === "Finished"),
@@ -281,14 +282,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleOpenApplicantDialog = async () => {
-    setLoading(true);
-    if (!serviceData) return;
-    await fetchApplicants(parseInt(serviceData?.id));
-    setLoading(false);
-    setApplicantDialogOpen(true);
   };
 
   const handleDelete = async () => {
@@ -1078,7 +1071,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   ) : (
                     <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
                   )}
-                  <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+                  <div style={{ marginTop: "20px", display: "flex", justifyContent: "end" }}>
                     {Array.from(
                       { length: selectedTab === 0 ? totalTabPagesForPending : totalTabPagesForFinished },
                       (_, index) => (
