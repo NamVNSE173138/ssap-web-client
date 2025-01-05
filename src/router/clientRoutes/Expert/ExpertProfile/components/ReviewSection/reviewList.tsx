@@ -5,6 +5,15 @@ import { useSelector } from "react-redux";
 import { BASE_URL } from "@/constants/api";
 import axios from "axios";
 import { notification } from "antd";
+import * as Dialog from "@radix-ui/react-dialog";
+import { formatDate } from "@/lib/date-formatter";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import ScreenSpinner from "@/components/ScreenSpinner";
+import { z } from "zod";
+import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
+
+
 
 type ApprovalItem = {
   id: number;
@@ -30,6 +39,11 @@ type ApprovalItem = {
 };
 
 
+const expertReviewSchema = z.object({
+  score: z.string(),
+  description: z.string(),
+});
+
 
 const ReviewList: React.FC = () => {
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
@@ -37,19 +51,27 @@ const ReviewList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {id} = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
+  const [comment, setComment] = useState("");
+  const [score, setScore] = useState<number | string>("");
+  const [selectedReview, setSelectedReview] = useState<any>(null);
 
   const handleRowClick = (item: ApprovalItem, review: any) => {
-    if (review.expertId !== user.id) return;
+    if (review.expertId != user.id) return;
+
     const isScored =
       review.score !== null && review.score !== undefined && review.score > 0;
-
+    
     if (isScored) {
       notification.info({
         message:
           "This application has already been scored. You cannot score it again.",
       });
-      return; // Prevent opening dialog
+      return; 
+
     }
+    setSelectedItem(item)
     // onRowClick(item, review);
     window.open(item.documentUrl, "_blank");
   };
@@ -62,18 +84,18 @@ const ReviewList: React.FC = () => {
         `${BASE_URL}/api/experts/${user.id}/assigned-applications`
       );
       const expertAssign = response.data.data;
-      console.log("API response:", expertAssign);  
+      //console.log("API response:", expertAssign);  
       
       const scholarshipId = id;
-      console.log("scholarshipId:", scholarshipId);  
+      //console.log("scholarshipId:", scholarshipId);  
 
       const filteredApplications = expertAssign.filter((app: any) => {
-        console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
-        console.log("scholarshipId:", scholarshipId);
+        //console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
+        //console.log("scholarshipId:", scholarshipId);
         
         return Number(app.scholarshipProgramId) == Number(scholarshipId);
       });
-      console.log("filter",filteredApplications);
+      //console.log("filter",filteredApplications);
       
   
       const detailedApplications = await Promise.all(
@@ -104,7 +126,7 @@ const ReviewList: React.FC = () => {
           })
       );
       setApplications(detailedApplications);
-      console.log("detailapplication",detailedApplications);
+      //console.log("detailapplication",detailedApplications);
       
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
@@ -116,6 +138,69 @@ const ReviewList: React.FC = () => {
   useEffect(() => {
     fetchApplicationReview();
   }, [user.id]);
+
+  const handleScoreSubmit = async () => {
+    if (!selectedItem || !selectedReview || score === "") {
+      notification.error({ message: "Please input a score" });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      expertReviewSchema.parse({
+        score: score.toString(),
+        description: comment,
+      });
+
+      const reviewId = selectedReview.id;
+      if (!reviewId) {
+        console.error("Review ID not found.");
+        return;
+      }
+
+      const reviewMilestone = await getAllReviewMilestonesByScholarship(
+        selectedItem.scholarshipProgramId
+      );
+
+      const currentDate = new Date();
+      let isReview = true;
+      reviewMilestone?.data.forEach((review: any) => {
+        if (
+          new Date(review.fromDate) < currentDate &&
+          new Date(review.toDate) > currentDate
+        ) {
+          if (review.description.toLowerCase() === "application review") {
+            isReview = true;
+          } else {
+            isReview = false;
+          }
+        }
+      });
+
+      const numericScore = Number(score);
+      const payload = {
+        applicationReviewId: reviewId,
+        comment,
+        isPassed: numericScore >= 50,
+        score: numericScore,
+        isFirstReview: isReview,
+      };
+      await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
+      notification.success({ message: "Review submitted successfully" });
+      setIsLoading(false);
+      setSelectedItem(null);
+      fetchApplicationReview();
+      setScore("");
+      setComment("");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors.map((err) => err.message).join(", ");
+        notification.error({ message: `Validation failed: ${errorMessage}` });
+      } else {
+        notification.error({ message: "Failed to submit review" });
+      }
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="space-y-8">
       <div className="overflow-auto bg-white shadow rounded-lg">
@@ -177,7 +262,7 @@ const ReviewList: React.FC = () => {
                       return (
                         <tr
                           key={review.id}
-                          onClick={() => handleRowClick(item, review)}
+                          //onClick={() => handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
@@ -323,7 +408,8 @@ const ReviewList: React.FC = () => {
                       return (
                         <tr
                           key={review.id}
-                          onClick={() => handleRowClick(item, review)}
+                          onClick={(e) => e.stopPropagation()}
+                          //onClick={() =>  handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
@@ -406,11 +492,79 @@ const ReviewList: React.FC = () => {
                   No data available
                 </td>
               </tr>
+
             )}
           </tbody>
+
         </table>
       </div>
-      
+      <Dialog.Root
+            open={!!selectedItem}
+            onOpenChange={() => setSelectedItem(null)}
+          >
+            <Dialog.Portal>
+              <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+              <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md">
+                {selectedItem && (
+                  <div>
+                    <Dialog.Title className="text-2xl font-bold">
+                      {selectedItem.scholarshipName}
+                    </Dialog.Title>
+                    <Dialog.Description className="mt-2 text-sm text-gray-600">
+                      {selectedItem.details}
+                    </Dialog.Description>
+
+                    <div className="mt-4">
+                      <p>
+                        <strong>Applicant:</strong> {selectedItem.applicantName}
+                      </p>
+                      <p>
+                        <strong>University:</strong> {selectedItem.university}
+                      </p>
+                      <p>
+                        <strong>Applied On:</strong>{" "}
+                        {formatDate(selectedItem.appliedDate)}
+                      </p>
+                    </div>
+
+                    {/* Add form for scoring */}
+                    <div className="mt-4">
+                      <Label className="block text-sm font-medium text-gray-700">
+                        Score
+                      </Label>
+                      <Input
+                        type="number"
+                        value={score}
+                        onChange={(e) => setScore(e.target.value)}
+                        className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
+                        placeholder="Enter score (1-100)"
+                        min={1}
+                        max={100}
+                      />
+
+                      <Label className="block text-sm font-medium text-gray-700 mt-4">
+                        Comment
+                      </Label>
+                      <textarea
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+                        placeholder="Enter comment"
+                      />
+
+                      <Button
+                        onClick={handleScoreSubmit}
+                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
+                      >
+                        Submit Review
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </Dialog.Content>
+            </Dialog.Portal>
+            {isLoading && <ScreenSpinner />}
+          </Dialog.Root>
     </div>
   );
 };
