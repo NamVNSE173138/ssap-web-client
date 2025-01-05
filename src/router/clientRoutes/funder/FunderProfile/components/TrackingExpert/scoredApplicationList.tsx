@@ -18,6 +18,7 @@ const ScoredList = () => {
     Rejected: "red",
     Failed: "red",
     Reviewing: "yellow",
+    Passed:"green",
   };
 
   useEffect(() => {

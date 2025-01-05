@@ -32,6 +32,17 @@ const ApplicationHistorySection = (_props: any) => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const ITEMS_PER_PAGE = 5;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(applications?.length / ITEMS_PER_PAGE);
+  const paginatedmApplications = applications?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const applicant = useSelector((state: any) => state.token.user);
 
@@ -59,11 +70,6 @@ const ApplicationHistorySection = (_props: any) => {
         });
 
         setApplications(filteredApplications);
-        // if (data && Array.isArray(data.data)) {
-        //   setApplications(data.data);
-        // } else {
-        //   setApplications([]);
-        // }
       } catch (error) {
         setError((error as Error).message);
       } finally {
@@ -85,77 +91,6 @@ const ApplicationHistorySection = (_props: any) => {
 
   return (
     <Tabs.Content value="application-history" className="pt-4">
-      {/* <div className="grid grid-cols-12"> */}
-      {/*   <div className="col-span-12 p-10"> */}
-      {/*     <h2 className="text-3xl font-bold text-black mb-6 animate-slideIn"> */}
-      {/*       Application History */}
-      {/*     </h2> */}
-      {/*     {applications.length === 0 ? ( */}
-      {/*       <p className="text-gray-600">No applications found.</p> */}
-      {/*     ) : ( */}
-      {/*       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"> */}
-      {/*         {applications.map((application) => ( */}
-      {/*           <Link */}
-      {/*             to={`/scholarship-program/${application.scholarshipProgramId}`} */}
-      {/*             key={application.id} */}
-      {/*             className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn" */}
-      {/*           > */}
-      {/*             <p className="text-lg font-semibold text-gray-800 mb-1"></p> */}
-      {/*             <p className="text-sm text-gray-500 mb-2"> */}
-      {/*               <strong className="text-black">Applied Date:</strong>{" "} */}
-      {/*               {new Date(application.appliedDate).toLocaleDateString()} */}
-      {/*             </p> */}
-      {/*             <p */}
-      {/*               className={`text-sm font-semibold mb-4 ${ */}
-      {/*                 application.status === "APPROVED" || "Approved" */}
-      {/*                   ? "text-green-600" */}
-      {/*                   : application.status === "PENDING" */}
-      {/*                     ? "text-yellow-500" */}
-      {/*                     : "text-red-600" */}
-      {/*               }`} */}
-      {/*             > */}
-      {/*               {application.status === "APPROVED" && ( */}
-      {/*                 <FaCheckCircle className="text-green-600" /> */}
-      {/*               )} */}
-      {/*               {application.status === "PENDING" && ( */}
-      {/*                 <FaClock className="text-yellow-500" /> */}
-      {/*               )} */}
-      {/*               {application.status === "REJECTED" && ( */}
-      {/*                 <FaTimesCircle className="text-red-600" /> */}
-      {/*               )} */}
-      {/*               <strong className="text-black">Status:</strong>{" "} */}
-      {/*               {application.status} */}
-      {/*             </p> */}
-      {/**/}
-      {/*             <h4 className="text-sm font-semibold  mb-2 flex items-center gap-2"> */}
-      {/*               <FaFileAlt className="text-[#1eb2a6]" /> */}
-      {/*               <p className="text-black">Documents:</p> */}
-      {/*             </h4> */}
-      {/*             <ul className="space-y-1"> */}
-      {/*               {application.applicationDocuments.map((doc) => ( */}
-      {/*                 <li key={doc.id}> */}
-      {/*                   <a */}
-      {/*                     href={doc.fileUrl} */}
-      {/*                     target="_blank" */}
-      {/*                     rel="noopener noreferrer" */}
-      {/*                     className="text-blue-500 hover:text-blue-700 underline transition duration-200 ease-in-out hover:scale-105" */}
-      {/*                   > */}
-      {/*                     {doc.name}{" "} */}
-      {/*                     <span className="text-gray-400">({doc.type})</span> */}
-      {/*                   </a> */}
-      {/*                 </li> */}
-      {/*               ))} */}
-      {/*             </ul> */}
-      {/*           </Link> */}
-      {/*         ))} */}
-      {/*       </div> */}
-      {/*     )} */}
-      {/*   </div> */}
-      {/* </div> */}
-
-      {/* New Section */}
-      {/* Search bar and filter */}
-
       <div>
         <h1 className="text-3xl font-bold text-black mb-3">My Applications</h1>
 
@@ -186,12 +121,12 @@ const ApplicationHistorySection = (_props: any) => {
         </div>
 
         <div className="w-full flex flex-col gap-6 p-6">
-          {!applications ||
-            (applications.length === 0 && (
+          {!paginatedmApplications ||
+            (paginatedmApplications.length === 0 && (
               <p className="text-gray-600">No applications found.</p>
             ))}
 
-          {applications.map((application) => (
+          {paginatedmApplications.map((application) => (
             <Link
               key={application.id}
               to={`/scholarship-program/${application.scholarshipProgram.id}`}
@@ -268,9 +203,9 @@ const ApplicationHistorySection = (_props: any) => {
                                 </a>
                                 {index <
                                   application.applicationDocuments.length -
-                                    1 && (
-                                  <span className="text-blue-500">,&nbsp;</span>
-                                )}
+                                  1 && (
+                                    <span className="text-blue-500">,&nbsp;</span>
+                                  )}
                               </div>
                             ),
                           )}
@@ -289,6 +224,25 @@ const ApplicationHistorySection = (_props: any) => {
             </Link>
           ))}
         </div>
+      </div>
+      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "center" }}>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => handlePageChange(index + 1)}
+            style={{
+              margin: "0 5px",
+              padding: "5px 10px",
+              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+              color: currentPage === index + 1 ? "white" : "black",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
     </Tabs.Content>
   );
