@@ -44,7 +44,7 @@ const EducationSectionCard = (props: any) => {
                     {item.school}
                   </h4>
                   <p className="text-xs text-gray-500">
-                    {`Math: ${item.major} - Education Level: ${item.educationLevel} - GPA: ${item.gpa}`}
+                    {`Major: ${item.major} - Education Level: ${item.educationLevel} - GPA: ${item.gpa}`}
                   </p>
                 </div>
               </div>

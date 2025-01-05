@@ -1,11 +1,12 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
 import { ApplicantCertificate } from "../../../types/Applicant";
 import { addApplicantCertificate } from "@/services/ApiServices/applicantProfileService";
+import { getAllCertificates } from "@/services/ApiServices/certificateService";
 
 const AddCertificateDialog = (props: any) => {
   const { open, setOpen, setRefresh } = props;
@@ -13,6 +14,7 @@ const AddCertificateDialog = (props: any) => {
   const user = useSelector((state: RootState) => state.token.user);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [certificates, setCertificates] = useState<string[]>();
   const [certificate, setCertificate] = useState<ApplicantCertificate>({
     id: 0,
     name: "",
@@ -20,6 +22,18 @@ const AddCertificateDialog = (props: any) => {
     description: "",
     url: "",
   });
+
+  useEffect(() => {
+    const fetchCertificates = async () => {
+      const response = await getAllCertificates();
+      const certificateNames = response.data.map(
+        (certificate: any) => certificate.name,
+      );
+      setCertificates(certificateNames);
+    };
+
+    fetchCertificates();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
@@ -76,14 +90,19 @@ const AddCertificateDialog = (props: any) => {
                   <label className="block text-sm font-medium text-gray-700">
                     What certificate do you have?
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="name"
-                    value={certificate.name}
+                    value={certificate.name || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    placeholder="Enter your certificate"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select Certificate
+                    </option>
+                    {certificates?.map((certificate: any) => (
+                      <option value={certificate}>{certificate}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="mt-4">
