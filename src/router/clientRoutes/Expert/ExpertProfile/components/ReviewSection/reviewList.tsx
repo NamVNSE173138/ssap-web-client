@@ -21,6 +21,7 @@ type ApprovalItem = {
   documentUrl?: string;
   applicationReviews?: {
     id: number;
+    applicantName: string;
     description: string;
     score: number;
     expertId: number;
@@ -30,8 +31,7 @@ type ApprovalItem = {
 
 
 
-const ReviewList: React.FC = ({
-}) => {
+const ReviewList: React.FC = () => {
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const user = useSelector((state: any) => state.token.user);
   const [loading, setLoading] = useState(false);
@@ -71,15 +71,14 @@ const ReviewList: React.FC = ({
         console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
         console.log("scholarshipId:", scholarshipId);
         
-        // Chuyển tất cả về kiểu number trước khi so sánh
-        return Number(app.scholarshipProgramId) === Number(scholarshipId);
+        return Number(app.scholarshipProgramId) == Number(scholarshipId);
       });
       console.log("filter",filteredApplications);
       
   
       const detailedApplications = await Promise.all(
         expertAssign
-          .filter((app: any) => app.scholarshipProgramId === scholarshipId)  
+          .filter((app: any) => app.scholarshipProgramId == scholarshipId)  
           .map(async (app: any) => {
             const applicantResponse = await axios.get(
               `${BASE_URL}/api/accounts/${app.applicantId}`
@@ -105,6 +104,8 @@ const ReviewList: React.FC = ({
           })
       );
       setApplications(detailedApplications);
+      console.log("detailapplication",detailedApplications);
+      
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
       console.error(err);
@@ -128,7 +129,7 @@ const ReviewList: React.FC = ({
                 #
               </th>
               <th className="p-4 text-left text-sm font-semibold text-gray-600">
-                Applicant
+                Applicant Name
               </th>
               <th className="p-4 text-left text-sm font-semibold text-gray-600">
                 Scholarship Name
@@ -156,6 +157,7 @@ const ReviewList: React.FC = ({
                 <td colSpan={8} className="p-4 text-center text-gray-500">
                   No applicants to review
                 </td>
+
               </tr>
             ) : Array.isArray(applications) && applications.length > 0 ? (
               applications.map((item, index) => (
@@ -175,14 +177,14 @@ const ReviewList: React.FC = ({
                       return (
                         <tr
                           key={review.id}
-                          // onClick={() => onRowClick(item, review)}
+                          onClick={() => handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
                             {index + 1}
                           </td>
                           <td className="p-4 text-sm text-gray-800">
-                            {item.applicantName}
+                          {item.applicationReviews ? item.applicationReviews[0].applicantName : ""}
                           </td>
                           <td className="p-4 text-sm text-gray-800">
                             {item.scholarshipName}
@@ -217,13 +219,12 @@ const ReviewList: React.FC = ({
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  // if (!isScored) onRowClick(item, review);
+                                  if (!isScored) handleRowClick(item, review);
                                 }}
                                 disabled={isScored}
                               >
                                 <Link
-                                  // to={document}
-                                  to=""
+                                  to={item.documentUrl ?? " "}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-block rounded-lg"
@@ -239,7 +240,7 @@ const ReviewList: React.FC = ({
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  // if (!isScored) onRowClick(item, review);
+                                  if (!isScored) handleRowClick(item, review);
                                 }}
                                 disabled={isScored}
                               >
@@ -275,7 +276,7 @@ const ReviewList: React.FC = ({
               </th>
 
               <th className="p-4 text-left text-sm font-semibold text-gray-600">
-                Applicant
+                Applicant Name
               </th>
               <th className="p-4 text-left text-sm font-semibold text-gray-600">
                 Scholarship Name
@@ -322,7 +323,7 @@ const ReviewList: React.FC = ({
                       return (
                         <tr
                           key={review.id}
-                          // onClick={() => onRowClick(item, review)}
+                          onClick={() => handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
@@ -330,7 +331,7 @@ const ReviewList: React.FC = ({
                           </td>
 
                           <td className="p-4 text-sm text-gray-800">
-                            {item.applicantName}
+                            {item.applicationReviews ? item.applicationReviews[0].applicantName : ""}
                           </td>
                           <td className="p-4 text-sm text-gray-800">
                             {item.scholarshipName}
@@ -365,13 +366,12 @@ const ReviewList: React.FC = ({
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  // if (!isScored) onRowClick(item, review);
+                                  if (!isScored) handleRowClick(item, review);
                                 }}
                                 disabled={isScored}
                               >
                                 <Link
-                                  // to={document}
-                                  to=""
+                                  to={item?.documentUrl ?? " "}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-block rounded-lg"
@@ -387,7 +387,7 @@ const ReviewList: React.FC = ({
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  // if (!isScored) onRowClick(item, review);
+                                  if (!isScored) handleRowClick(item, review);
                                 }}
                                 disabled={isScored}
                               >
@@ -410,6 +410,7 @@ const ReviewList: React.FC = ({
           </tbody>
         </table>
       </div>
+      
     </div>
   );
 };

@@ -129,35 +129,35 @@ const ApprovalList: React.FC = () => {
     window.open(item.documentUrl, "_blank");
   };
 
-  const handleApprove = async (id: number) => {
-    try {
-      await axios.put(`${BASE_URL}/api/applications/${id}`, {
-        status: "Approved",
-      });
-      setApplications((prev) =>
-        prev.map((app) =>
-          app.id === id ? { ...app, status: "Approved" } : app
-        )
-      );
-    } catch (error) {
-      console.error("Failed to approve application:", error);
-    }
-  };
+  // const handleApprove = async (id: number) => {
+  //   try {
+  //     await axios.put(`${BASE_URL}/api/applications/${id}`, {
+  //       status: "Approved",
+  //     });
+  //     setApplications((prev) =>
+  //       prev.map((app) =>
+  //         app.id === id ? { ...app, status: "Approved" } : app
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to approve application:", error);
+  //   }
+  // };
 
-  const handleReject = async (id: number) => {
-    try {
-      await axios.put(`${BASE_URL}/api/applications/${id}`, {
-        status: "Rejected",
-      });
-      setApplications((prev) =>
-        prev.map((app) =>
-          app.id === id ? { ...app, status: "Rejected" } : app
-        )
-      );
-    } catch (error) {
-      console.error("Failed to reject application:", error);
-    }
-  };
+  // const handleReject = async (id: number) => {
+  //   try {
+  //     await axios.put(`${BASE_URL}/api/applications/${id}`, {
+  //       status: "Rejected",
+  //     });
+  //     setApplications((prev) =>
+  //       prev.map((app) =>
+  //         app.id === id ? { ...app, status: "Rejected" } : app
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to reject application:", error);
+  //   }
+  // };
 
   const handleScoreSubmit = async () => {
     if (!selectedItem || !selectedReview || score === "") {
