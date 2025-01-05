@@ -57,10 +57,9 @@ const ReviewList: React.FC = () => {
   const [score, setScore] = useState<number | string>("");
   const [selectedReview, setSelectedReview] = useState<any>(null);
 
-
-
   const handleRowClick = (item: ApprovalItem, review: any) => {
-    if (review.expertId !== user.id) return;
+    if (review.expertId != user.id) return;
+
     const isScored =
       review.score !== null && review.score !== undefined && review.score > 0;
     
@@ -85,18 +84,18 @@ const ReviewList: React.FC = () => {
         `${BASE_URL}/api/experts/${user.id}/assigned-applications`
       );
       const expertAssign = response.data.data;
-      console.log("API response:", expertAssign);  
+      //console.log("API response:", expertAssign);  
       
       const scholarshipId = id;
-      console.log("scholarshipId:", scholarshipId);  
+      //console.log("scholarshipId:", scholarshipId);  
 
       const filteredApplications = expertAssign.filter((app: any) => {
-        console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
-        console.log("scholarshipId:", scholarshipId);
+        //console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
+        //console.log("scholarshipId:", scholarshipId);
         
         return Number(app.scholarshipProgramId) == Number(scholarshipId);
       });
-      console.log("filter",filteredApplications);
+      //console.log("filter",filteredApplications);
       
   
       const detailedApplications = await Promise.all(
@@ -127,7 +126,7 @@ const ReviewList: React.FC = () => {
           })
       );
       setApplications(detailedApplications);
-      console.log("detailapplication",detailedApplications);
+      //console.log("detailapplication",detailedApplications);
       
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
@@ -205,7 +204,6 @@ const ReviewList: React.FC = () => {
   return (
     <div className="space-y-8">
       <div className="overflow-auto bg-white shadow rounded-lg">
-        {JSON.stringify(selectedItem)}
         <h1 className="text-lg p-4 text-green-700">
           Review Milestone: Application Review
         </h1>
@@ -264,7 +262,7 @@ const ReviewList: React.FC = () => {
                       return (
                         <tr
                           key={review.id}
-                          onClick={() => handleRowClick(item, review)}
+                          //onClick={() => handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
@@ -410,7 +408,8 @@ const ReviewList: React.FC = () => {
                       return (
                         <tr
                           key={review.id}
-                          onClick={() => handleRowClick(item, review)}
+                          onClick={(e) => e.stopPropagation()}
+                          //onClick={() =>  handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
@@ -493,8 +492,10 @@ const ReviewList: React.FC = () => {
                   No data available
                 </td>
               </tr>
+
             )}
           </tbody>
+
         </table>
       </div>
       <Dialog.Root
