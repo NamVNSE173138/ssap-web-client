@@ -362,13 +362,13 @@ const ChooseWinner = () => {
                   value="firstReview"
                   className="flex-1 px-6 py-3 text-lg font-medium focus:outline-none text-center transition-all duration-300 transform hover:scale-105 hover:text-sky-600 data-[state=active]:text-[#1eb2a6] data-[state=active]:border-b-2 border-transparent"
                 >
-                  First Review
+                  Application Review
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="secondReview"
                   className="flex-1 px-6 py-3 text-lg font-medium focus:outline-none text-center transition-all duration-300 transform hover:scale-105 hover:text-sky-600 data-[state=active]:text-[#1eb2a6] data-[state=active]:border-b-2 border-transparent"
                 >
-                  Second Review
+                  Interview
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="finalReview"

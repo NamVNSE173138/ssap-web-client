@@ -69,7 +69,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
                         <td className="p-4 text-sm text-gray-800">{item.university}</td>
                         <td className="p-4 text-sm text-gray-800">{new Date(item.appliedDate).toLocaleDateString("en-US")}</td>
                         <td className="p-4 text-sm text-gray-800">{score}</td>
-                        <td className={`p-4 text-sm font-medium ${review.status === "Passed" ? "text-green-600" : review.status === "Failed" ? "text-red-600" : "text-yellow-600"}`}>
+                        <td className={`p-4 text-sm font-medium ${review.status === "Approved" ? "text-green-600" : review.status === "Failed" ? "text-red-600" : "text-yellow-600"}`}>
                           {review.status}
                         </td>
                         <td className="p-4 text-sm">
@@ -129,7 +129,7 @@ const ReviewList: React.FC<ApprovalTableProps> = ({
                         <td className="p-4 text-sm text-gray-800">{item.university}</td>
                         <td className="p-4 text-sm text-gray-800">{new Date(item.appliedDate).toLocaleDateString("en-US")}</td>
                         <td className="p-4 text-sm text-gray-800">{score}</td>
-                        <td className={`p-4 text-sm font-medium ${review.status === "Passed" ? "text-green-600" : review.status === "Failed" ? "text-red-600" : "text-yellow-600"}`}>
+                        <td className={`p-4 text-sm font-medium ${review.status === "Approved" ? "text-green-600" : review.status === "Failed" ? "text-red-600" : "text-yellow-600"}`}>
                           {review.status}
                         </td>
                         <td className="p-4 text-sm">
