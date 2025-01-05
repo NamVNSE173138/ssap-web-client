@@ -9,6 +9,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
 import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
+import { getAllUniversities } from "@/services/ApiServices/universityService";
+
+const educationLevels = [
+  "Undergraduate",
+  "Graduate",
+  "Bachelor",
+  "Master",
+  "Doctoral",
+];
 
 const UpdateEducationDialog = (props: any) => {
   const { open, setOpen, item, setRefresh } = props;
@@ -18,6 +27,7 @@ const UpdateEducationDialog = (props: any) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
+  const [universities, setUniversities] = useState<string[]>();
   const [education, setEducation] = useState<any>({
     id: 0,
     school: "",
@@ -28,6 +38,18 @@ const UpdateEducationDialog = (props: any) => {
     toYear: 0,
     description: "",
   });
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      const response = await getAllUniversities();
+      const universityNames = response.data.map(
+        (university: any) => university.name,
+      );
+      setUniversities(universityNames);
+    };
+
+    fetchUniversities();
+  }, []);
 
   useEffect(() => {
     setEducation(item);
@@ -94,28 +116,38 @@ const UpdateEducationDialog = (props: any) => {
                     <label className="block text-sm font-medium text-gray-700">
                       What school have you enrolled in?
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="school"
-                      value={education.school}
+                      value={education.school || ""}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                      placeholder="Enter your school"
-                    />
+                    >
+                      <option value="" disabled>
+                        Select School
+                      </option>
+                      {universities?.map((university: any) => (
+                        <option value={university}>{university}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700">
                       What education level have you enrolled in?
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="educationLevel"
-                      value={education.educationLevel}
+                      value={education.educationLevel || ""}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                      placeholder="Enter your school"
-                    />
+                    >
+                      <option value="" disabled>
+                        Select Education Level
+                      </option>
+                      {educationLevels?.map((educationLevel: any) => (
+                        <option value={educationLevel}>{educationLevel}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="mt-4">
@@ -196,7 +228,7 @@ const UpdateEducationDialog = (props: any) => {
                     </label>
                     <textarea
                       name="description"
-                      value={item.description}
+                      value={education.description}
                       onChange={handleChange}
                       className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                       rows={4}
