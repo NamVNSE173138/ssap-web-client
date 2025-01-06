@@ -36,7 +36,6 @@ const ChooseWinner = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [availableScholarships, setAvailableScholarships] = useState(0);
   const [scholarshipWinners, setScholarshipWinners] = useState<any[]>([]);
-  const [isApproved, setIsApproved] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
 
   const [openModal, setOpenModal] = useState(false);
@@ -87,8 +86,7 @@ const ChooseWinner = () => {
             (row: any) =>
             (row.status == "Submitted" ||
               row.status == "Rejected" ||
-              row.status == "Reviewing") /*&&
-              new Date(row.updatedAt) < new Date(scholarship.data.deadline)*/
+              row.status == "Reviewing") 
           )
         );
         if (data) {
@@ -113,6 +111,7 @@ const ChooseWinner = () => {
 
   const applyForSelectedWinners = async () => {
     try {
+      console.log(filteredRows.filter((row:any) => !selectedRows.includes(row)))
       setLoading(true);
       const applyPromises = selectedRows.map(async (row) => {
         const payload = {
@@ -131,13 +130,12 @@ const ChooseWinner = () => {
       await Promise.all(applyPromises);
 
       if (availableScholarships === 0) {
-        await updateScholarshipStatus(Number(data?.id), "FINISHED");
+        await updateScholarshipStatus(Number(data?.id), "Finished");
       }
 
       notification.success({
         message: "Approve successfully!",
       });
-      await fetchData();
       for (const row of selectedRows)
         await SendNotification({
           topic: row.applicantId.toString(),
@@ -145,8 +143,21 @@ const ChooseWinner = () => {
           title: "Your application has been approved",
           body: `Your application for ${data?.name} has been approved.`,
         });
-      setIsApproved(true);
       handleCloseModal();
+      filteredRows.filter((row:any) => !selectedRows.includes(row)).map(async (row:any) => {
+        const payload = {
+          id: row.id,
+          appliedDate: new Date().toISOString(),
+          status: "Rejected",
+          applicantId: row.applicantId,
+          scholarshipProgramId: id,
+          applicationDocuments: [],
+          applicationReviews: [],
+        };
+
+        await updateApplication(row.id, payload);
+      })
+      await fetchData();
     } catch (error) {
       console.error(error);
       setError("Failed to apply for selected winners.");
@@ -156,21 +167,17 @@ const ChooseWinner = () => {
   };
 
   const handleSelectionChange = (appId: number) => {
-    // Check if the appId is already in selectedRows
     console.log(selectedRows);
     const isSelected = selectedRows.some((row) => row.id === appId);
     let fakeSelectedRows;
     if (isSelected) {
-      // If already selected, remove it from selectedRows
       fakeSelectedRows = selectedRows.filter((row) => row.id !== appId);
       setSelectedRows((prev) => prev.filter((row) => row.id !== appId));
     } else {
-      // If not selected, add it to selectedRows
       fakeSelectedRows = [...selectedRows, applicants.find((row: any) => row.id === appId)];
       setSelectedRows((prev) => [...prev, applicants.find((row: any) => row.id === appId)]);
     }
 
-    // Update available scholarships logic
     if (data) {
       const approvedCount = applicants.filter((row: any) => row.status === "Approved").length;
       const newAvailableScholarships = data.numberOfScholarships - approvedCount - fakeSelectedRows.length;
@@ -189,7 +196,6 @@ const ChooseWinner = () => {
     : [];
 
   const handleSort = () => {
-    // Chuyển đổi giữa ascending và descending
     setSortOrder(prevSortOrder => {
       if (prevSortOrder === 'asc') return 'desc';
       return 'asc';
@@ -506,7 +512,7 @@ const ChooseWinner = () => {
                     <Button
                       variant="contained"
                       color="primary"
-                      disabled={loading}
+                      disabled={loading || scholarshipWinners.length > 0}
                       onClick={() => handleOpenModal(selectedRows[0]?.applicant.username)}
                       className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
                     >
@@ -581,7 +587,6 @@ const ChooseWinner = () => {
                               variant="contained"
                               color="primary"
                               onClick={applyForSelectedWinners}
-                              disabled={isApproved}
                               style={{
                                 backgroundColor: "#51b8af",
                                 color: "white",
