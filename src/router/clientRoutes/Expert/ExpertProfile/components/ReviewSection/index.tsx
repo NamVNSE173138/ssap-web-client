@@ -556,10 +556,10 @@ const ApprovalList: React.FC = () => {
 
   // Grouping applications by scholarship name
   const groupedApplications = filteredApplications.reduce((acc, app) => {
-    if (!acc[app.scholarshipName]) {
-      acc[app.scholarshipName] = [];
+    if (!acc[app.scholarshipProgramId]) {
+      acc[app.scholarshipProgramId] = [];
     }
-    acc[app.scholarshipName].push(app);
+    acc[app.scholarshipProgramId].push(app);
     return acc;
   }, {} as Record<string, ApprovalItem[]>);
 
@@ -567,7 +567,7 @@ const ApprovalList: React.FC = () => {
     <Tabs.Content value="review" className="pt-4">
       <div className="grid grid-cols-12 gap-4 p-4">
         <div className="col-start-1 col-end-13 space-y-6">
-          <h1 className="text-3xl font-bold">Approval List</h1>
+          <h1 className="text-3xl font-bold">Awaiting Review List</h1>
 
           <Input
             type="text"
@@ -583,9 +583,9 @@ const ApprovalList: React.FC = () => {
             <p className="text-center text-lg">Loading...</p>
           ) : (
             Object.entries(groupedApplications).map(([scholarshipName, apps], index) => (
-              <Accordion key={scholarshipName} defaultExpanded = {index === 0}>
+              <Accordion key={scholarshipName} defaultExpanded = {index === 0} >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <h2 className="text-xl font-semibold">{scholarshipName}</h2>
+                  <h2 className="text-xl font-semibold">{apps.find((app: any) => app.scholarshipProgramId == scholarshipName)?.scholarshipName}</h2>
                 </AccordionSummary>
                 <AccordionDetails>
                   <ReviewList

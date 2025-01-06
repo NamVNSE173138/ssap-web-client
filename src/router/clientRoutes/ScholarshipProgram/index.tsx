@@ -42,8 +42,11 @@ const ScholarshipProgram = () => {
         getAllScholarshipProgram(),
       ]);
       if (response.data.statusCode === 200) {
-        setData(response.data.data.items);
-        setFullData(response.data.data.items);
+        const filteredData = response.data.data.items.filter(
+          (item: any) => item.status !== 'Draft'
+        );
+        setData(filteredData);
+        setFullData(filteredData);
       } else {
         setError("Failed to fetch data");
       }

@@ -62,6 +62,7 @@ import { notification } from "antd";
 import { IoIosAddCircleOutline, IoIosEye } from "react-icons/io";
 import { List, Paper, Tab, Tabs } from "@mui/material";
 import { getAllScholarshipProgramExperts, removeExpertsFromScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -75,6 +76,7 @@ const ScholarshipProgramDetail = () => {
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   const isApplicant = user?.role;
+  const [fullName, setFullName] = useState<any>();
 
   const [applicants, setApplicants] = useState<any>(null);
 
@@ -225,8 +227,29 @@ const ScholarshipProgramDetail = () => {
     try {
       const response = await getApplicationsByScholarship(scholarshipId);
       console.log("fetchApplicant", response);
-      if (response.statusCode == 200) {
-        setApplicants(response.data);
+      if (response.statusCode === 200) {
+        // Duyệt qua từng ứng viên và gọi API để lấy thông tin profile
+        const applicantsWithFullName = await Promise.all(
+          response.data.map(async (application: any) => {
+            const applicantId = application.applicantId;
+
+            // Gọi API getApplicantProfileById để lấy thông tin fullName
+            const profileResponse = await getApplicantProfileById(applicantId);
+            const fullName = profileResponse.data ?
+              `${profileResponse.data.firstName} ${profileResponse.data.lastName}` :
+              "Unknown Name";
+
+            return {
+              ...application, // Giữ nguyên các thuộc tính hiện có
+              applicant: {
+                ...application.applicant,
+                fullName, // Gán fullName từ API
+              },
+            };
+          })
+        );
+
+        setApplicants(applicantsWithFullName);
       } else {
         setError("Failed to get applicants");
       }
@@ -1183,7 +1206,7 @@ const ScholarshipProgramDetail = () => {
                         </div>
 
                         {/* Cột tên ứng viên */}
-                        <div style={{ flex: 1 }}>{app.applicant.username}</div>
+                        <div style={{ flex: 1 }}>{app.applicant.fullName}</div>
 
                         {/* Cột status */}
                         <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
@@ -1369,7 +1392,7 @@ const ScholarshipProgramDetail = () => {
 
                       {/* Cột tên chuyên gia */}
                       <div style={{ flex: 0.75 }}>
-                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.username}</span>
+                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.name}</span>
                       </div>
 
                       <div style={{ flex: 1 }}>
