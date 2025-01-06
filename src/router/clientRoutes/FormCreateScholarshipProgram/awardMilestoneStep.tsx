@@ -268,11 +268,8 @@ import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
-import QuillEditor from "@/components/Quill/QuillEditor";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/date-formatter";
-
-
 
 const AwardMilestoneStep = ({
   formData,
@@ -281,71 +278,168 @@ const AwardMilestoneStep = ({
   formData: any;
   onSave: (data: any) => void;
 }) => {
-
   const awardFormSchema = z
-  .object({
-    awardMilestones: z.array(
-      z.object({
-        fromDate: z.string().nonempty("From date is required."),
-        toDate: z.string().nonempty("To date is required."),
-        amount: z
-          .number({ invalid_type_error: "Amount must be a number." })
-          .min(1, "Amount must be greater than 0."),
-        note: z.string().optional(),
-        awardMilestoneDocuments: z
-          .array(
-            z.object({
-              type: z.string().nonempty("Document type is required."),
-            })
-          )
-          .optional(),
-      })
-    ),
-  })
-  .refine(
-    (data) =>
-      data.awardMilestones.every(
-        (milestone) => new Date(milestone.fromDate) < new Date(milestone.toDate)
-      ),
-    {
-      message: "The 'From' date must be earlier than the 'To' date.",
-      path: ["toDate"],
-    }
-  ).refine(
-    (data) => data.awardMilestones.every((milestone) =>
-      new Date(milestone.fromDate) > new Date(formData.deadline) &&
-      new Date(milestone.toDate) > new Date(formData.deadline),
-    ),
-    {
-      message: `The 'From' and 'To' date must be later than the scholarship deadline. which is ${formatDate(
-        formData.deadline
-      )}`,
-      path: ["toDate"], 
-    }
-  ).refine(
-    (data) => data.awardMilestones.every((milestone) =>
-      !formData.reviewMilestones ||
-      formData.reviewMilestones.length === 0 ||
-      formData.reviewMilestones.every(
-        (review: any) => new Date(review.toDate) < new Date(milestone.fromDate)
-      ),
-    {
-      message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${
-        formData.reviewMilestones.length > 0
-          ? formatDate(
-              formData.reviewMilestones.sort(
-                (a: any, b: any) =>
-                  new Date(a.toDate).getTime() - new Date(b.toDate).getTime()
-              )[formData.reviewMilestones.length - 1].toDate
+    .object({
+      awardMilestones: z.array(
+        z.object({
+          fromDate: z.string().min(1, { message: "From date is required." }),
+          toDate: z.string().min(1, { message: "To date is required." }),
+          amount: z
+            .number({ invalid_type_error: "Amount must be a number." })
+            .min(1, "Amount must be greater than 0."),
+          note: z.string().optional(),
+          awardMilestoneDocuments: z
+            .array(
+              z.object({
+                type: z
+                  .string()
+                  .min(1, { message: "Document type is required." }),
+              })
             )
-          : ""
-      }`,
-      path: ["toDate"], 
-    }
-  )
-  );
+            .optional(),
+        })
+      ),
+    })
+    .refine(
+      (data) =>
+        data.awardMilestones.every(
+          (milestone) =>
+            new Date(milestone.fromDate) < new Date(milestone.toDate)
+        ),
+      {
+        message: "The 'From' date must be earlier than the 'To' date.",
+        path: ["toDate"],
+      }
+    )
+    .refine(
+      (data) =>
+        data.awardMilestones.every(
+          (milestone) =>
+            new Date(milestone.fromDate) > new Date(formData.deadline) &&
+            new Date(milestone.toDate) > new Date(formData.deadline)
+        ),
+      {
+        message: `The 'From' and 'To' date must be later than the scholarship deadline. which is ${formatDate(
+          formData.deadline
+        )}`,
+        path: ["toDate"],
+      }
+    )
+    .refine((data) =>
+      data.awardMilestones.every(
+        (milestone) =>
+          !formData.reviewMilestones ||
+          formData.reviewMilestones.length === 0 ||
+          formData.reviewMilestones.every(
+            (review: any) =>
+              new Date(review.toDate) < new Date(milestone.fromDate)
+          ),
+        {
+          message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${
+            formData.reviewMilestones.length > 0
+              ? formatDate(
+                  formData.reviewMilestones.sort(
+                    (a: any, b: any) =>
+                      new Date(a.toDate).getTime() -
+                      new Date(b.toDate).getTime()
+                  )[formData.reviewMilestones.length - 1].toDate
+                )
+              : ""
+          }`,
+          path: ["toDate"],
+        }
+      )
+    )
+    .refine((data) =>
+      data.awardMilestones.every(
+        (milestone) =>
+          !formData.awardMilestones ||
+          formData.awardMilestones.length === 0 ||
+          formData.awardMilestones.every(
+            (award: any) =>
+              new Date(award.toDate) < new Date(milestone.fromDate)
+          ),
+        {
+          message: `The 'From' and 'To' date must be later than the all of award milestones before. which is ${
+            formData.awardMilestones.length > 0
+              ? formatDate(
+                  formData.awardMilestones.sort(
+                    (a: any, b: any) =>
+                      new Date(a.toDate).getTime() -
+                      new Date(b.toDate).getTime()
+                  )[formData.awardMilestones.length - 1].toDate
+                )
+              : ""
+          }`,
+          path: ["toDate"],
+        }
+      )
+    )
+    .refine((data) =>
+      data.awardMilestones.every(
+        (milestone) =>
+          Number(milestone.amount) <=
+          formData.value -
+            formData.awardMilestones.reduce(
+              (sum: number, award: any) => sum + award.amount,
+              0
+            ),
+        {
+          message: `The 'Amount' must be less than or equal to the remaining amount. which is ${
+            formData.value -
+            formData.awardMilestones.reduce(
+              (sum: number, award: any) => sum + award.amount,
+              0
+            )
+          }`,
+          path: ["amount"],
+        }
+      )
+    ).refine(
+      (data) => data.awardMilestones.every(
+        (milestone) =>
+        formData.awardMilestones.length == formData.awardProgress - 1 ||
+        Number(milestone.amount) <
+          formData.value -
+            formData.awardMilestones.reduce(
+              (sum: number, award: any) => sum + award.amount,
+              0
+            ),
+      {
+        message: `The 'Amount' of the not last award milestone must be less than the remaining amount. which is ${
+          formData.value -
+          formData.awardMilestones.reduce(
+            (sum: number, award: any) => sum + award.amount,
+            0
+          )
+        }`,
+        path: ["amount"], // This will add the error message to `toDate`
+      }
+    )
+    ).refine(
+      (data) => data.awardMilestones.every(
+        (milestone) =>
+        formData.awardMilestones.length != formData.awardProgress - 1 ||
+        Number(milestone.amount) ==
+          formData.value -
+            formData.awardMilestones.reduce(
+              (sum: number, award: any) => sum + award.amount,
+              0
+            ),
+      {
+        message: `The 'Amount' of the last award milestone must be equal to the remaining amount. which is ${
+          formData.value -
+          formData.awardMilestones.reduce(
+            (sum: number, award: any) => sum + award.amount,
+            0
+          )
+        }`,
+        path: ["amount"], // This will add the error message to `toDate`
+      }
+    )
+    );
 
-type AwardFormData = z.infer<typeof awardFormSchema>;
+  type AwardFormData = z.infer<typeof awardFormSchema>;
   const {
     control,
     setValue,
@@ -361,8 +455,6 @@ type AwardFormData = z.infer<typeof awardFormSchema>;
       awardMilestones: [],
     },
   });
-
-  
 
   const awardMilestones = watch("awardMilestones");
 
