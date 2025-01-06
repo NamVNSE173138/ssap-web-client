@@ -72,6 +72,7 @@ const ReviewList: React.FC = () => {
 
     }
     setSelectedItem(item)
+    setSelectedReview(review);
     // onRowClick(item, review);
     window.open(item.documentUrl, "_blank");
   };
