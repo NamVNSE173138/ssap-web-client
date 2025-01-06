@@ -46,9 +46,11 @@ const schema = z.object({
 const UcmStep = ({
   formData,
   onSave,
+  onBack,
 }: {
   formData: any;
   onSave: (data: any) => void;
+  onBack: (data: any) => void;
 }) => {
   const [certificates, setCertificates] = useState<OptionType[]>([]);
   const [universities, setUniversities] = useState<OptionType[]>([]);
@@ -332,7 +334,14 @@ const UcmStep = ({
                 </div>
               </div>
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-between mt-4">
+            <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={onBack}
+              >
+                Back
+              </Button>
               <Button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded"

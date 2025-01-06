@@ -1,5 +1,4 @@
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { Card, CardContent } from "@/components/ui/card";
 import SchoolLogo from "../ScholarshipProgramDetail/logo";
 import {
   FaAward,
@@ -24,10 +23,64 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { List, Paper } from "@mui/material";
+import axios from "axios";
+import { BASE_URL } from "@/constants/api";
+import { useEffect, useState } from "react";
 
-const ViewDataCreated = ({ formData }: { formData: any }) => {
+const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: any) => void; }) => {
   const user = useSelector((state: any) => state.token.user);
   const isApplicant = user?.role;
+  const [categories, setCategories] = useState<any>(null);
+  const [majors, setMajors] = useState<any>(null);
+  const [universities, setUniversities] = useState<any>(null);
+  const [certificates, setCertificates] = useState<any>(null);
+  const fetchCategories = async (categoryId : number) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/categories/${categoryId}`);
+      console.log("category", response.data.data);
+
+      setCategories(response.data.data);
+    } catch (error) {
+      console.error("Error fetching categories", error);
+    }
+  };
+  const fetchMajors = async (majorId : number) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/majors/${majorId}`);
+      console.log("major", response.data.data);
+
+      setMajors(response.data.data);
+    } catch (error) {
+      console.error("Error fetching majors", error);
+    }
+  };
+  const fetchUniversities = async (universityId : number) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/universities/${universityId}`);
+      console.log("university", response.data.data);
+
+      setUniversities(response.data.data);
+    } catch (error) {
+      console.error("Error fetching university", error);
+    }
+  };
+  const fetchCertificates = async (certificatesId : number) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/certificates/${certificatesId}`);
+      console.log("certificate", response.data.data);
+
+      setCertificates(response.data.data);
+    } catch (error) {
+      console.error("Error fetching university", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories(formData.scholarshipType);
+    fetchMajors(formData.major);
+    fetchUniversities(formData.university);
+    fetchCertificates(formData.certificate);
+  }, []);
   return (
     <div>
       <div>
@@ -284,6 +337,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                               <FaTag className="text-[#1eb2a6]" />
                               Scholarship Category
                             </h3>
+                          {/* {JSON.stringify(categories)} */}
                           </AccordionSummary>
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                             {/* Category Name */}
@@ -294,7 +348,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                   Category Name:
                                 </p>
                                 <p className="text-gray-600">
-                                  {formData.scholarshipType}
+                                  {categories ? categories.name : ""}
                                 </p>
                               </div>
                             </div>
@@ -307,7 +361,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                   Description:
                                 </p>
                                 <p className="text-gray-600">
-                                  {formData.scholarshipType}
+                                {categories ? categories.description : ""}
                                 </p>
                               </div>
                             </div>
@@ -332,6 +386,8 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                               <FaBook className="text-[#1eb2a6]" />
                               Applicable Majors & Skills
                             </h3>
+                            {/* {JSON.stringify(majors)} */}
+
                           </AccordionSummary>
 
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
@@ -345,7 +401,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                 >
                                   <h4 className="font-bold text-gray-700 flex items-center gap-2">
                                     <FaBook className="text-gray-500" />
-                                    {formData.major.name}
+                                    {majors ? majors.name : ""}
                                   </h4>
                                 </AccordionSummary>
                                 <AccordionDetails>
@@ -356,7 +412,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                         Description:
                                       </p>
                                       <p className="text-gray-600">
-                                        {formData.major.description}
+                                      {majors ? majors.description : ""}
                                       </p>
                                     </div>
                                   </div>
@@ -367,7 +423,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                       </h5>
 
                                       <div>
-                                        {formData.major.skills.map(
+                                        {majors.map(
                                           (skill: any) => (
                                             <Accordion key={skill.id}>
                                               <AccordionSummary
@@ -420,6 +476,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                               <FaUniversity className="text-[#1eb2a6]" />
                               Applicable University
                             </h3>
+                            {/* {JSON.stringify(universities)} */}
                           </AccordionSummary>
 
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
@@ -434,11 +491,11 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                   <div className="flex flex-col">
                                     <h4 className="font-bold text-gray-700 flex items-center gap-2">
                                       <FaUniversity className="text-gray-500" />
-                                      {formData.university.name}
+                                      {universities ? universities.name : ""}
                                     </h4>
                                     <span className="text-gray-600 flex items-center gap-1">
                                       <FaMapMarkerAlt className="text-gray-400" />
-                                      {formData.university.city}
+                                      {universities ? universities.city : ""}
                                     </span>
                                   </div>
                                 </AccordionSummary>
@@ -450,7 +507,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                         Description:
                                       </p>
                                       <p className="text-gray-600">
-                                        {formData.university.description}
+                                      {universities ? universities.description : ""}
                                       </p>
                                     </div>
                                   </div>
@@ -476,6 +533,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                               <FaCertificate className="text-[#1eb2a6]" />
                               Required Certificates
                             </h3>
+                            {/* {JSON.stringify(certificates)} */}
                           </AccordionSummary>
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                             {formData.certificates &&
@@ -495,7 +553,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                       <div className="flex items-center gap-2">
                                         <FaCertificate className="text-gray-500" />
                                         <span className="font-bold text-gray-700">
-                                          {certificate.name}
+                                        {certificates ? certificates.name : ""}
                                         </span>
                                       </div>
                                     </AccordionSummary>
@@ -508,7 +566,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                               Description:
                                             </p>
                                             <p className="text-gray-600">
-                                              {certificate.description}
+                                            {certificates ? certificates.description : ""}
                                             </p>
                                           </div>
                                         </div>
@@ -519,7 +577,7 @@ const ViewDataCreated = ({ formData }: { formData: any }) => {
                                               Type:
                                             </p>
                                             <p className="text-gray-600">
-                                              {certificate.type}
+                                            {certificates ? certificates.type : ""}
                                             </p>
                                           </div>
                                         </div>

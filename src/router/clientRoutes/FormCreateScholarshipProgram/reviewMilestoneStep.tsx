@@ -50,9 +50,11 @@ type MilestoneFormData = z.infer<typeof milestoneSchema>;
 const ReviewMilestoneStep = ({
   formData,
   onSave,
+  onBack,
 }: {
   formData: any;
   onSave: (data: any) => void;
+  onBack: (data: any) => void;
 }) => {
   const {
     control,
@@ -183,7 +185,14 @@ const ReviewMilestoneStep = ({
                 </div>
               ))}
             </div>
-            <div className="col-span-6 flex justify-end mt-4">
+            <div className="col-span-6 flex justify-between mt-4">
+            <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={onBack}
+              >
+                Back
+              </Button>
               <Button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded"

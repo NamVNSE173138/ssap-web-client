@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,11 @@ import { formatDate } from "@/lib/date-formatter";
 const AwardMilestoneStep = ({
   formData,
   onSave,
+  onBack,
 }: {
   formData: any;
   onSave: (data: any) => void;
+  onBack: (data: any) => void;
 }) => {
   const awardFormSchema = z
     .object({
@@ -89,94 +90,94 @@ const AwardMilestoneStep = ({
         }
       )
     )
-    .refine((data) =>
-      data.awardMilestones.every(
-        (milestone) =>
-          !formData.awardMilestones ||
-          formData.awardMilestones.length === 0 ||
-          formData.awardMilestones.every(
-            (award: any) =>
-              new Date(award.toDate) < new Date(milestone.fromDate)
-          ),
-        {
-          message: `The 'From' and 'To' date must be later than the all of award milestones before. which is ${
-            formData.awardMilestones.length > 0
-              ? formatDate(
-                  formData.awardMilestones.sort(
-                    (a: any, b: any) =>
-                      new Date(a.toDate).getTime() -
-                      new Date(b.toDate).getTime()
-                  )[formData.awardMilestones.length - 1].toDate
-                )
-              : ""
-          }`,
-          path: ["toDate"],
-        }
-      )
-    )
-    .refine((data) =>
-      data.awardMilestones.every(
-        (milestone) =>
-          Number(milestone.amount) <=
-          formData.value -
-            formData.awardMilestones.reduce(
-              (sum: number, award: any) => sum + award.amount,
-              0
-            ),
-        {
-          message: `The 'Amount' must be less than or equal to the remaining amount. which is ${
-            formData.value -
-            formData.awardMilestones.reduce(
-              (sum: number, award: any) => sum + award.amount,
-              0
-            )
-          }`,
-          path: ["amount"],
-        }
-      )
-    ).refine(
-      (data) => data.awardMilestones.every(
-        (milestone) =>
-        formData.awardMilestones.length == formData.awardProgress - 1 ||
-        Number(milestone.amount) <
-          formData.value -
-            formData.awardMilestones.reduce(
-              (sum: number, award: any) => sum + award.amount,
-              0
-            ),
-      {
-        message: `The 'Amount' of the not last award milestone must be less than the remaining amount. which is ${
-          formData.value -
-          formData.awardMilestones.reduce(
-            (sum: number, award: any) => sum + award.amount,
-            0
-          )
-        }`,
-        path: ["amount"], // This will add the error message to `toDate`
-      }
-    )
-    ).refine(
-      (data) => data.awardMilestones.every(
-        (milestone) =>
-        formData.awardMilestones.length != formData.awardProgress - 1 ||
-        Number(milestone.amount) ==
-          formData.value -
-            formData.awardMilestones.reduce(
-              (sum: number, award: any) => sum + award.amount,
-              0
-            ),
-      {
-        message: `The 'Amount' of the last award milestone must be equal to the remaining amount. which is ${
-          formData.value -
-          formData.awardMilestones.reduce(
-            (sum: number, award: any) => sum + award.amount,
-            0
-          )
-        }`,
-        path: ["amount"], // This will add the error message to `toDate`
-      }
-    )
-    );
+    // .refine((data) =>
+    //   data.awardMilestones.every(
+    //     (milestone) =>
+    //       !formData.awardMilestones ||
+    //       formData.awardMilestones.length === 0 ||
+    //       formData.awardMilestones.every(
+    //         (award: any) =>
+    //           new Date(award.toDate) < new Date(milestone.fromDate)
+    //       ),
+    //     {
+    //       message: `The 'From' and 'To' date must be later than the all of award milestones before. which is ${
+    //         formData.awardMilestones.length > 0
+    //           ? formatDate(
+    //               formData.awardMilestones.sort(
+    //                 (a: any, b: any) =>
+    //                   new Date(a.toDate).getTime() -
+    //                   new Date(b.toDate).getTime()
+    //               )[formData.awardMilestones.length - 1].toDate
+    //             )
+    //           : ""
+    //       }`,
+    //       path: ["toDate"],
+    //     }
+    //   )
+    // )
+    // .refine((data) =>
+    //   data.awardMilestones.every(
+    //     (milestone) =>
+    //       Number(milestone.amount) <=
+    //       formData.value -
+    //         formData.awardMilestones.reduce(
+    //           (sum: number, award: any) => sum + award.amount,
+    //           0
+    //         ),
+    //     {
+    //       message: `The 'Amount' must be less than or equal to the remaining amount. which is ${
+    //         formData.value -
+    //         formData.awardMilestones.reduce(
+    //           (sum: number, award: any) => sum + award.amount,
+    //           0
+    //         )
+    //       }`,
+    //       path: ["amount"],
+    //     }
+    //   )
+    // ).refine(
+    //   (data) => data.awardMilestones.every(
+    //     (milestone) =>
+    //     formData.awardMilestones.length == formData.awardProgress - 1 ||
+    //     Number(milestone.amount) <
+    //       formData.value -
+    //         formData.awardMilestones.reduce(
+    //           (sum: number, award: any) => sum + award.amount,
+    //           0
+    //         ),
+    //   {
+    //     message: `The 'Amount' of the not last award milestone must be less than the remaining amount. which is ${
+    //       formData.value -
+    //       formData.awardMilestones.reduce(
+    //         (sum: number, award: any) => sum + award.amount,
+    //         0
+    //       )
+    //     }`,
+    //     path: ["amount"], // This will add the error message to `toDate`
+    //   }
+    // )
+    // ).refine(
+    //   (data) => data.awardMilestones.every(
+    //     (milestone) =>
+    //     formData.awardMilestones.length != formData.awardProgress - 1 ||
+    //     Number(milestone.amount) ==
+    //       formData.value -
+    //         formData.awardMilestones.reduce(
+    //           (sum: number, award: any) => sum + award.amount,
+    //           0
+    //         ),
+    //   {
+    //     message: `The 'Amount' of the last award milestone must be equal to the remaining amount. which is ${
+    //       formData.value -
+    //       formData.awardMilestones.reduce(
+    //         (sum: number, award: any) => sum + award.amount,
+    //         0
+    //       )
+    //     }`,
+    //     path: ["amount"], // This will add the error message to `toDate`
+    //   }
+    // )
+    // );
 
   type AwardFormData = z.infer<typeof awardFormSchema>;
   const {
@@ -263,6 +264,7 @@ const AwardMilestoneStep = ({
                 </h3>
 
                 {/* Grid layout for fields */}
+                  <h2 className="text-md ml-16">TEST: {formData.value}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">
                   {/* From Date */}
                   <div className="max-w-sm w-full text-black-2">
@@ -374,8 +376,6 @@ const AwardMilestoneStep = ({
                   </div>
                 </div>
 
-                {/* Submission Guide */}
-                {/* Submission Guide */}
                 <div className="sm:col-span-2 mt-6 max-w-230 mx-auto text-black-2">
                   <Label htmlFor={`note-${index}`}>Submission Guide</Label>
                   <Textarea
@@ -399,7 +399,14 @@ const AwardMilestoneStep = ({
 
               </div>
             ))}
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-between mt-4">
+            <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                 onClick={onBack}
+              >
+                Back
+              </Button>
               <Button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded"
