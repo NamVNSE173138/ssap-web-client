@@ -72,6 +72,10 @@ const FormCreateScholarshipProgram = () => {
     setStep(step + 1);
   };
 
+  const handleBack = () => {
+    setStep(step - 1);
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
@@ -277,34 +281,34 @@ const FormCreateScholarshipProgram = () => {
 
           {step === 2 && (
             <>
-              <UcmStep formData={formData} onSave={handleNext} />
-              <div className="">
+              <UcmStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              {/* <div className="">
                 <Button onClick={() => setStep(1)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
 
           {step === 3 && (
             <>
-              <ReviewMilestoneStep formData={formData} onSave={handleNext} />
-              <div className="flex justify-between mt-4">
+              <ReviewMilestoneStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              {/* <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(2)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
 
           {step === 4 && (
             <>
-              <AwardMilestoneStep formData={formData} onSave={handleNext} />
-              <div className="flex justify-between mt-4">
+              <AwardMilestoneStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              {/* <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(3)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
 
           {step === 5 && (
             <>
-              <ViewDataCreated formData={formData}/>
+              <ViewDataCreated formData={formData} onBack={handleBack}/>
               
               <div className="flex flex-col items-start ml-10">
                 <span className="text-black">
@@ -332,9 +336,9 @@ const FormCreateScholarshipProgram = () => {
                   Create Program
                 </Button>
               </div>
-              <div className="flex justify-between mt-4">
+              {/* <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(4)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
         </form>

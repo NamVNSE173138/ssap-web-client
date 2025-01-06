@@ -15,7 +15,7 @@ interface ExpertFormProps {
 
 const expertFormSchema = z.object({
   name: z.string().min(1, { message: "Please enter name of expert" }),
-  major: z.string().nonempty({ message: "Major is required" }),
+  major: z.string().min(1, { message: "Major is required" }),
   email: z.string().email({ message: "Invalid email address" }),
   phoneNumber: z
     .string()
