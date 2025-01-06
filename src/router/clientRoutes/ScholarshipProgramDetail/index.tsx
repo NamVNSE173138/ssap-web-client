@@ -27,7 +27,6 @@ import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/revi
 
 import { format } from "date-fns";
 import {
-  deleteApplication,
   getApplicationByApplicantIdAndScholarshipId,
 } from "@/services/ApiServices/applicationService";
 import ApplicationStatus from "@/constants/applicationStatus";
@@ -329,24 +328,6 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
-  const cancelApplication = async () => {
-    try {
-      if (!existingApplication[0]) return;
-      setCancelLoading(true);
-      const response = await deleteApplication(existingApplication[0].id);
-      if (response) {
-        await fetchData();
-      } else {
-        setError("Failed to delete scholarship");
-      }
-    } catch (error) {
-      setError((error as Error).message);
-    } finally {
-      setLoading(false);
-      setCancelLoading(false);
-    }
-  };
-
   const deleteScholarship = async () => {
     try {
       const response = await axios.delete(
@@ -534,12 +515,6 @@ const ScholarshipProgramDetail = () => {
                       className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
                     >
                       <FaTrophy className="mr-2" /> Award Milestones
-                    </Button>
-                    <Button
-                      onClick={deleteScholarship}
-                      className="flex-1 text-lg bg-transparent text-red-700 border border-red-700 hover:bg-red-800 hover:text-white w-full h-full  flex items-center justify-center"
-                    >
-                      <FaTrash className="mr-2" /> Delete
                     </Button>
                   </div>
                 )
