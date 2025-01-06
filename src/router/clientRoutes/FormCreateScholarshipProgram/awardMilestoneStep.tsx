@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/date-formatter";
+import { format } from "date-fns";
 
 const AwardMilestoneStep = ({
   formData,
@@ -22,11 +23,12 @@ const AwardMilestoneStep = ({
     .object({
       awardMilestones: z.array(
         z.object({
-          fromDate: z.string().min(1, { message: "From date is required." }),
-          toDate: z.string().min(1, { message: "To date is required." }),
-          amount: z
+          fromDate: z.string(), // Allow empty string for initial validation
+          toDate: z.string(),
+          amount: z.number().optional(),
+          /*amount: z
             .number({ invalid_type_error: "Amount must be a number." })
-            .min(1, "Amount must be greater than 0."),
+            .min(1, "Amount must be greater than 0."),*/
           note: z.string().optional(),
           awardMilestoneDocuments: z
             .array(
@@ -40,7 +42,149 @@ const AwardMilestoneStep = ({
         })
       ),
     })
-    .refine(
+    //Date super refine
+    .superRefine((data, ctx) => {
+        data.awardMilestones.forEach((milestone, index) => {
+          if (!milestone.fromDate) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["awardMilestones", index, "fromDate"],
+              message: "From date is required.",
+            });
+          }
+          if (!milestone.toDate) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["awardMilestones", index, "toDate"],
+              message: "To date is required.",
+            });
+          }
+          else if (new Date(milestone.fromDate) >= new Date(milestone.toDate)) {
+            ctx.addIssue({
+              code: "custom", // Must specify the error type
+              path: ["awardMilestones", index, "toDate"], // Correct path structure
+              message: "The 'From' date must be earlier than the 'To' date.",
+            });
+          }
+          else if(new Date(milestone.fromDate) < new Date(formData.deadline) && new Date(milestone.toDate) < new Date(formData.deadline)) {
+            ctx.addIssue({
+              code: "custom", // Must specify the error type
+              path: ["awardMilestones", index, "toDate"], // Correct path structure
+              message: `The 'From' and 'To' date must be later than the scholarship deadline. which is ${format(formData.deadline, "dd/MM/yyyy")}`,
+            });
+          }
+          else if(formData.reviewMilestones &&
+              formData.reviewMilestones.length > 0 &&
+              formData.reviewMilestones.some(
+                (review: any) =>
+                  new Date(review.toDate) >= new Date(milestone.fromDate)
+          )){
+            ctx.addIssue({
+              code: "custom", // Must specify the error type
+              path: ["awardMilestones", index, "toDate"], // Correct path structure
+              message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${
+                formData.reviewMilestones.length > 0
+                  ? formatDate(
+                      formData.reviewMilestones.sort(
+                        (a: any, b: any) =>
+                          new Date(a.toDate).getTime() -
+                          new Date(b.toDate).getTime()
+                      )[formData.reviewMilestones.length - 1].toDate
+                    )
+                  : ""
+              }`,
+            });
+          }
+          else if(data.awardMilestones.filter((milestone, id) => id < index).some(
+          (otherMilestone) =>
+            new Date(otherMilestone.toDate) > new Date(milestone.fromDate)
+          )){
+              ctx.addIssue({
+                  code: "custom", // Must specify the error type
+                  path: ["awardMilestones", index, "toDate"], // Correct path structure
+                  message: `The 'From' and 'To' date must be later than the all of award milestones. which is ${
+                     formatDate(
+                          data.awardMilestones.filter((milestone, id) => id < index).sort(
+                            (a: any, b: any) =>
+                              new Date(a.toDate).getTime() -
+                              new Date(b.toDate).getTime()
+                          )[data.awardMilestones.filter((milestone, id) => id < index).length - 1]?.toDate
+                        )
+                  }`,
+                });
+          }
+        });
+    })
+    //Amount super refine
+    .superRefine((data:any, ctx) => {
+        data.awardMilestones.forEach((milestone:any, index:any) => {
+          const amount = milestone.amount; // Now `amount` is a number
+
+          // Check that amount is a valid number greater than 0
+          if (typeof amount !== 'number' || amount <= 0) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["awardMilestones", index, "amount"],
+              message: "Amount must be a valid number greater than 0.",
+            });
+          }
+          else if(
+            Number(formData.value) - data.awardMilestones.reduce(
+                (sum: number, award: any) => sum + award.amount,
+                0
+          ) != 0){
+            ctx.addIssue({
+              code: "custom",
+              path: ["awardMilestones", index, "amount"],
+              message: `The sum of all award 'Amount' must be equal to the total amount. which is ${
+                 Number(formData.value) 
+               }`,
+            });
+          }
+          /*else if(data.awardMilestones.length - 1 != index &&
+             Number(milestone.amount) >=
+               Number(formData.value) -
+                 data.awardMilestones.reduce(
+                   (sum: number, award: any) => sum + award.amount,
+                   0
+             )){
+            ctx.addIssue({
+              code: "custom",
+              path: ["awardMilestones", index, "amount"],
+              message: `The 'Amount' of the not last award milestone must be less than the remaining amount. which is ${
+                  JSON.stringify(data.awardMilestones)+(
+                   Number(formData.value) -
+                   data.awardMilestones.reduce(
+                     (sum: number, award: any) => sum + award.amount,
+                     0
+                   ))
+                 }`,
+            });
+          }
+          else if(data.awardMilestones.length -1 == index &&
+             Number(milestone.amount) !=
+               Number(formData.value) -
+                 data.awardMilestones.reduce(
+                   (sum: number, award: any) => sum + award.amount,
+                   0
+          )){
+            ctx.addIssue({
+              code: "custom",
+              path: ["awardMilestones", index, "amount"],
+              message: `The 'Amount' of the last award milestone must be equal to the remaining amount. which is ${
+                  JSON.stringify(formData)+(
+                   Number(formData.value) -
+                   data.awardMilestones.reduce(
+                     (sum: number, award: any) => sum + award.amount,
+                     0
+                   ))
+                 }`,
+            });
+          }*/
+        });
+    })
+     
+    /*.refine(
       (data) =>
         data.awardMilestones.every(
           (milestone) =>
@@ -48,7 +192,7 @@ const AwardMilestoneStep = ({
         ),
       {
         message: "The 'From' date must be earlier than the 'To' date.",
-        path: ["toDate"],
+        path: ["awardMilestones.0.toDate"],
       }
     )
     .refine(
@@ -89,7 +233,7 @@ const AwardMilestoneStep = ({
           path: ["toDate"],
         }
       )
-    )
+    )*/
     // .refine((data) =>
     //   data.awardMilestones.every(
     //     (milestone) =>
@@ -179,6 +323,7 @@ const AwardMilestoneStep = ({
     // )
     // );
 
+
   type AwardFormData = z.infer<typeof awardFormSchema>;
   const {
     control,
@@ -234,9 +379,21 @@ const AwardMilestoneStep = ({
     setValue("awardMilestones", updatedMilestones, { shouldDirty: true });
   };
 
+  const updateAwardMilestones = (values: any[]) => {
+    const updatedMilestones = [...awardMilestones];
+    for(const value of values) {
+        updatedMilestones[value.index] = {
+            ...updatedMilestones[value.index],
+            [value.field]: value.value,
+        };
+    }
+    setValue("awardMilestones", updatedMilestones, { shouldDirty: true });
+  };
+
   const handleNext = async () => {
-    const isValid = await trigger();
+    const isValid = await trigger(["awardMilestones"]);
     if (!isValid) {
+      console.log("data", getValues())
       console.error("Validation failed", errors);
       return;
     }
@@ -253,18 +410,18 @@ const AwardMilestoneStep = ({
             Payment Milestones
           </h2>
 
+          <h2 className="text-xl font-bold text-black mb-5">Value of Award: <span className="text-green-500">${Number(formData.value).toLocaleString('en-US')}</span></h2> {/* Ensuring the value of award is shown for each milestone */}
           <form className="space-y-8">
             {awardMilestones.map((milestone, index) => (
               <div
                 key={index}
                 className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm"
               >
-                <h3 className="text-md font-bold text-green-700 mb-4">
+                <h3 className="text-md font-bold text-blue-700 mb-4">
                   Milestone {index + 1}
                 </h3>
 
                 {/* Grid layout for fields */}
-                  <h2 className="text-md ml-16">TEST: {formData.value}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">
                   {/* From Date */}
                   <div className="max-w-sm w-full text-black-2">
@@ -358,13 +515,31 @@ const AwardMilestoneStep = ({
                         type="number"
                         placeholder="Enter amount"
                         value={milestone.amount || ""}
-                        onChange={(e) =>
-                          updateAwardMilestone(
-                            index,
-                            "amount",
-                            parseFloat(e.target.value) || 0
-                          )
-                        }
+                        disabled={index == awardMilestones.length - 1}
+                        onChange={(e) =>{
+                          if(index == awardMilestones.length - 1) {
+                              return
+                          }
+                          //console.log(awardMilestones);
+                          const remainingAmount = Number(formData.value) - awardMilestones
+                                .reduce((sum: number, award: any, id: number) => { 
+                                    if(id == awardMilestones.length - 1) return sum;
+                                    if(index == id) return sum + parseFloat(e.target.value);
+                                    return sum + Number(award.amount) 
+                                }, 0);
+                          updateAwardMilestones(
+                          [{
+                            index: index,
+                            field: "amount",
+                            value: parseFloat(e.target.value) || 0
+                          },
+                          {
+                            index: awardMilestones.length - 1,
+                            field: "amount",
+                            value: remainingAmount < 0 ? 0 : remainingAmount
+                          }
+                          ])
+                        }}
                         className="w-full rounded-r-md"
                       />
                     </div>
