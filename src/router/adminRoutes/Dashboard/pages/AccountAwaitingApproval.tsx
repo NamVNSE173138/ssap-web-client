@@ -160,14 +160,14 @@ const AccountAwaitingApproval = () => {
                 }}
             >
                 <div style={{ flex: 0.5 }}>No</div>
-                <div style={{ flex: 1 }}>ID</div>
+                <div style={{ flex: 0.5 }}>ID</div>
                 <div style={{ flex: 1 }}>Avatar</div>
-                <div style={{ flex: 2 }}>Email</div>
-                <div style={{ flex: 1.5 }}>Organization Name</div>
-                <div style={{ flex: 1 }}>Contact Person</div>
-                <div style={{ flex: 2 }}>Documents</div>
-                <div style={{ flex: 1 }}>Status</div>
-                <div style={{ flex: 2.5 }}>Actions</div>
+                <div style={{ flex: 2.5, marginRight:'20px' }}>Email</div>
+                <div style={{ flex: 1.5, marginRight:'20px' }}>Organization Name</div>
+                <div style={{ flex: 1, marginRight:'20px' }}>Contact Name</div>
+                <div style={{ flex: 2.5, marginRight:'20px' }}>Documents</div>
+                <div style={{ flex: 1, marginRight:'20px' }}>Status</div>
+                <div style={{ flex: 2.5, marginRight:'20px' }}>Actions</div>
             </div>
 
             {/* Data Rows */}
@@ -186,7 +186,7 @@ const AccountAwaitingApproval = () => {
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
                     >
                         <div style={{ flex: 0.5 }}>{index + 1}</div>
-                        <div style={{ flex: 1 }}>{user.accountId}</div>
+                        <div style={{ flex: 0.5 }}>{user.accountId}</div>
                         <div style={{ flex: 1 }}>
                             <img
                                 src={user.avatarUrl || 'https://github.com/shadcn.png'}
@@ -194,11 +194,11 @@ const AccountAwaitingApproval = () => {
                                 style={{ width: '48px', height: '48px', borderRadius: '50%' }}
                             />
                         </div>
-                        <div style={{ flex: 2 }}>{user.email}</div>
-                        <div style={{ flex: 1.5 }}>{user.organizationName}</div>
-                        <div style={{ flex: 1 }}>{user.contactPersonName}</div>
-                        <div style={{ flex: 2 }}>
-                            <ul style={{ paddingLeft: '20px', listStyleType: 'disc' }}>
+                        <div style={{ flex: 2.5, marginRight:'20px' }}>{user.email}</div>
+                        <div style={{ flex: 1.5, marginRight:'20px' }}>{user.organizationName}</div>
+                        <div style={{ flex: 1, marginRight:'20px' }}>{user.contactPersonName}</div>
+                        <div style={{ flex: 2.5, marginRight:'20px' }}>
+                            <ul>
                                 {(user.providerDocuments || user.funderDocuments)?.map((doc, idx) => (
                                     <li key={idx} style={{ fontSize: '14px' }}>
                                         <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
@@ -208,7 +208,7 @@ const AccountAwaitingApproval = () => {
                                 ))}
                             </ul>
                         </div>
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 1, marginRight:'20px' }}>
                             <span
                                 style={{
                                     display: 'inline-block',

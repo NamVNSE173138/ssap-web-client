@@ -168,8 +168,8 @@ const Register = () => {
         educationLevel: selectedRole === 4 || selectedRole === 2 ? "" : "",
         major: selectedRole === 4 || selectedRole === 2 ? "" : "",
         gpa: selectedRole === 4 || selectedRole === 2 ? "" : "",
-        fromYear: 0,
-        toYear: 0,
+        fromYear: selectedRole === 4 || selectedRole === 2 ? "" : "",
+        toYear: selectedRole === 4 || selectedRole === 2 ? "" : "",
         description: selectedRole === 4 || selectedRole === 2 ? "" : "",
       },
     },
@@ -207,6 +207,13 @@ const Register = () => {
       setValue("gender", "");
       setValue("nationality", "");
       setValue("ethnicity", "");
+      setValue("education.school","");
+      setValue("education.major","");
+      setValue("education.educationLevel","");
+      setValue("education.description","");
+      setValue("education.gpa","");
+      setValue("education.toYear","");
+      setValue("education.fromYear","");
     } else {
       setValue("organizationName", "");
       setValue("contactPersonName", "");
@@ -287,8 +294,8 @@ const Register = () => {
       educationLevel: data.education?.educationLevel || '',
       major: data.education?.major || '',
       gpa: data.education?.gpa || '',
-      fromYear: data.education?.fromYear || 0,
-      toYear: data.education?.toYear || 0,
+      fromYear: data.education?.fromYear.toString() || '',
+      toYear: data.education?.toYear.toString() || '',
       description: data.education?.description || '',
     };
 
@@ -1051,9 +1058,8 @@ const Register = () => {
                               >
                                 <option value="">Select Year</option>
 
-                                {/* Add years dynamically */}
                                 {[...Array(50)].map((_, i) => (
-                                  <option key={i} value={i + 1975}>
+                                  <option key={i} value={(i + 1975).toString()}>
                                     {i + 1975}
                                   </option>
                                 ))}
@@ -1069,9 +1075,8 @@ const Register = () => {
                                 className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="">Select Year</option>
-                                {/* Add years dynamically */}
                                 {[...Array(50)].map((_, i) => (
-                                  <option key={i} value={i + 1975}>
+                                  <option key={i} value={(i + 1975).toString()}>
                                     {i + 1975}
                                   </option>
                                 ))}
@@ -1094,6 +1099,7 @@ const Register = () => {
                         </div>
                       </>
                     )}
+
                     {(selectedRole === 4 || selectedRole === 2) && (
                       <>
                         <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">

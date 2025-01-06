@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaTrash } from "react-icons/fa";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,7 +32,7 @@ const milestoneSchema = z.object({
           reviewMilestone &&
           interviewMilestone &&
           new Date(interviewMilestone.fromDate) <=
-            new Date(reviewMilestone.toDate)
+          new Date(reviewMilestone.toDate)
         ) {
           return false;
         }
@@ -92,7 +92,7 @@ const ReviewMilestoneStep = ({
       console.error("Validation failed", errors);
       return;
     }
-    const data = getValues(); 
+    const data = getValues();
     if (data) {
       console.log("Form data: ", data);
       onSave(data);
@@ -104,90 +104,96 @@ const ReviewMilestoneStep = ({
     name: "reviewMilestones",
   });
 
-  
+
 
   return (
     <>
-      <Card>
-        <CardContent>
-          <form
-            className="grid grid-cols-6 gap-4 my-5"
-          >
-            <div className="space-y-2 col-start-1 col-end-7">
-              <Label
-                htmlFor="reviewMilestones"
-                className="text-md flex items-center gap-2"
-              >
-                Review Milestones
-                <FaInfoCircle
-                  className="text-gray-600 cursor-pointer"
-                  title="The start day must be after the deadline"
-                />
-              </Label>
+      <div>
+        <div>
+          <form className="grid grid-cols-6 gap-4 my-5 bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
+            <div className="col-span-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Review Milestones</h2>
+            </div>
 
+            <div className="col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((field, index) => (
-                <div key={field.id} className="space-y-2">
-                  <Input
-                    // value={field.name}
-                    value={watch(`reviewMilestones.${index}.description`)}
-                    disabled={index < 2}
-                    onChange={(e) =>
-                      setValue(`reviewMilestones.${index}.description`, e.target.value)
-                    }
-                    className={`${
-                      index < 2 ? "bg-gray-100 cursor-not-allowed" : ""
-                    }`}
-                  />
-                  <Input
-                    type="date"
-                    value={watch(`reviewMilestones.${index}.fromDate`)}
-                    onChange={(e) =>
-                      setValue(
-                        `reviewMilestones.${index}.fromDate`,
-                        e.target.value
-                      )
-                    }
-                    className="w-full"
-                  />
-                  {errors?.reviewMilestones?.[index]?.fromDate && (
-                    <span className="text-red-500">
-                      {errors.reviewMilestones[index].fromDate.message}
-                    </span>
-                  )}
+                <div key={field.id} className="space-y-2 border rounded-lg p-4 bg-gray-50 relative">
+                  {/* Description Input */}
+                  <div className="space-y-2">
+                    {/* Input with Data */}
+                    <p className="text-lg font-bold text-black-500 mb-6">
+                      {watch(`reviewMilestones.${index}.description`) || "No description provided."}
+                    </p>
+                    <Input
+                      id={`description-${index}`}
+                      value={watch(`reviewMilestones.${index}.description`)}
+                      disabled={index < 2}
+                      onChange={(e) =>
+                        setValue(`reviewMilestones.${index}.description`, e.target.value)
+                      }
+                      className={`${index < 2 ? "bg-gray-100 cursor-not-allowed hidden" : ""}`}
+                    />
 
-                  <Input
-                    type="date"
-                    value={watch(`reviewMilestones.${index}.toDate`)}
-                    onChange={(e) =>
-                      setValue(
-                        `reviewMilestones.${index}.toDate`,
-                        e.target.value
-                      )
-                    }
-                    className="w-full"
-                  />
-                  {errors?.reviewMilestones?.[index]?.toDate && (
-                    <span className="text-red-500">
-                      {errors.reviewMilestones[index].toDate.message}
-                    </span>
-                  )}
+                    {/* Display the data below the input */}
+
+                  </div>
+
+
+                  {/* From Date Input */}
+                  <div>
+                    <Label htmlFor={`fromDate-${index}`} className="text-sm font-medium">
+                      From Date
+                    </Label>
+                    <Input
+                      id={`fromDate-${index}`}
+                      type="date"
+                      value={watch(`reviewMilestones.${index}.fromDate`)}
+                      onChange={(e) =>
+                        setValue(`reviewMilestones.${index}.fromDate`, e.target.value)
+                      }
+                      className="w-full"
+                    />
+                    {errors?.reviewMilestones?.[index]?.fromDate && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.reviewMilestones[index].fromDate.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* To Date Input */}
+                  <div>
+                    <Label htmlFor={`toDate-${index}`} className="text-sm font-medium">
+                      To Date
+                    </Label>
+                    <Input
+                      id={`toDate-${index}`}
+                      type="date"
+                      value={watch(`reviewMilestones.${index}.toDate`)}
+                      onChange={(e) =>
+                        setValue(`reviewMilestones.${index}.toDate`, e.target.value)
+                      }
+                      className="w-full"
+                    />
+                    {errors?.reviewMilestones?.[index]?.toDate && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.reviewMilestones[index].toDate.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
-
-              
+            </div>
+            <div className="col-span-6 flex justify-end mt-4">
+              <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={handleNext}
+              >
+                Next
+              </Button>
             </div>
           </form>
-          {/* <AwardMilestoneStep formData={formData} onSave={handleNext}/> */}
-        </CardContent>
-      </Card>
-      <div className="flex justify-end mt-4">
-        <Button
-          type="button"
-          className="bg-blue-500 text-white py-2 px-4 rounded "
-          onClick={handleNext}
-        >
-          Next
-        </Button>
+        </div>
       </div>
     </>
   );

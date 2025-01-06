@@ -70,6 +70,7 @@ const RequestDetailTable = ({
   const [canProvideFeedback, setCanProvideFeedback] = useState(true);
   const maxCharacters = 100;
   const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
+  const isProvider = user?.role === "Provider";
 
   const handleOpenCommentDialog = (requestId: number) => {
     setSelectedRequestId(requestId);
@@ -252,7 +253,7 @@ const RequestDetailTable = ({
   console.log(requestDetails);
   return (
     <Box>
-      {requestDetails.map((detail: any) => (
+      {isProvider && requestDetails.map((detail: any) => (
         <button
           onClick={() => handleOpenCommentDialog(detail.requestId)}
           className="flex mb-5 mr-2 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"

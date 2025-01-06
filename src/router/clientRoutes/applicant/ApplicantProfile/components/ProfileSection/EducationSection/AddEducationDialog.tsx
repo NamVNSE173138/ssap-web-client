@@ -1,10 +1,19 @@
 import { getYearsToPresent } from "@/lib/dateUtils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { notification } from "antd";
 import { addApplicantEducation } from "@/services/ApiServices/applicantProfileService";
+import { getAllUniversities } from "@/services/ApiServices/universityService";
+
+const educationLevels = [
+  "Undergraduate",
+  "Graduate",
+  "Bachelor",
+  "Master",
+  "Doctoral",
+];
 
 const AddEducationDialog = (props: any) => {
   const { open, setOpen, setRefresh } = props;
@@ -12,6 +21,7 @@ const AddEducationDialog = (props: any) => {
   const user = useSelector((state: RootState) => state.token.user);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [universities, setUniversities] = useState<string[]>();
   const [education, setEducation] = useState<any>({
     id: 0,
     school: "",
@@ -22,6 +32,18 @@ const AddEducationDialog = (props: any) => {
     toYear: 0,
     description: "",
   });
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      const response = await getAllUniversities();
+      const universityNames = response.data.map(
+        (university: any) => university.name,
+      );
+      setUniversities(universityNames);
+    };
+
+    fetchUniversities();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
@@ -81,28 +103,38 @@ const AddEducationDialog = (props: any) => {
                   <label className="block text-sm font-medium text-gray-700">
                     What school have you enrolled in?
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="school"
-                    value={education.school}
+                    value={education.school || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    placeholder="Enter your school"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select School
+                    </option>
+                    {universities?.map((university: any) => (
+                      <option value={university}>{university}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700">
                     What education level have you enrolled in?
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="educationLevel"
-                    value={education.educationLevel}
+                    value={education.educationLevel || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
-                    placeholder="Enter education level"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select Education Level
+                    </option>
+                    {educationLevels?.map((educationLevel: any) => (
+                      <option value={educationLevel}>{educationLevel}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="mt-4">
