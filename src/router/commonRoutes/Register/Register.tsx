@@ -1099,9 +1099,6 @@ const Register = () => {
                         </div>
                       </>
                     )}
-                    {JSON.stringify(errors)}
-                    {JSON.stringify(watch("education.fromYear"))}
-                    {JSON.stringify(watch("education.toYear"))}
 
                     {(selectedRole === 4 || selectedRole === 2) && (
                       <>

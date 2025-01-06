@@ -46,22 +46,6 @@ const InformationStep = ({
   );
   const [_imageFile, setImageFile] = useState<File[]>([]);
 
-  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files ? event.target.files[0] : null;
-  //   if (file) {
-  //     if (!file.type.startsWith("image/")) {
-  //       notification.error({
-  //         message: "Invalid File",
-  //         description: "Please upload an image file.",
-  //       });
-  //       return;
-  //     }
-  //     const fileUrl = URL.createObjectURL(file);
-  //     setImageFile([file]);
-  //     setValue("imageUrl", fileUrl, { shouldValidate: true }); 
-  //   }
-  // };
-
   useEffect(() => {
     if (formData.imageUrl) {
       setImageFile([formData.imageUrl]);
@@ -114,17 +98,16 @@ const InformationStep = ({
       console.error("Validation failed", errors);
       return;
     }
-    const data = getValues(); // Lấy dữ liệu từ form
-    console.log("Form data: ", data); // Kiểm tra dữ liệu
-    onSave(data); // Lưu dữ liệu vào Parent Component
+    const data = getValues();
+    console.log("Form data: ", data);
+    onSave(data);
   };
 
   const handleCategoryChange = (option: OptionType | null) => {
     setSelectedCategory(option);
     setValue("scholarshipType", option?.value || "", { shouldValidate: true });
   };
-  
-  // Đảm bảo khớp giá trị trong useEffect
+
   useEffect(() => {
     if (formData.scholarshipType) {
       const matchingOption = categories.find(
@@ -136,162 +119,215 @@ const InformationStep = ({
 
   return (
     <>
-      <Card>
-        <CardContent>
-          <form>
-            <div className="grid grid-cols-6 gap-4 my-5">
-              <div className="col-span-6">
-                <h2 className="text-xl font-semibold">General Information</h2>
+      <div>
+        <div>
+          <form className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
+            {/* Tiêu đề */}
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+              General Information
+            </h2>
+
+            {/* Chia nhóm thông tin */}
+            <div className="space-y-8">
+              {/* Thông tin cơ bản */}
+              <div>
+                <div className="grid grid-cols-6 gap-4 mt-4">
+                  {/* Scholarship Type */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <Label htmlFor="scholarshipType" className="block text-sm font-medium text-gray-700">
+                      Scholarship Type <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      options={categories}
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      isSearchable
+                      className="mt-1"
+                    />
+                    {errors.scholarshipType?.message && (
+                      <p className="text-red-500">
+                        {String(errors.scholarshipType.message)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Educational Level */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700">
+                      Educational Level <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("educationalLevel")}
+                      className="mt-1 block w-full"
+                    />
+                    {errors.educationalLevel?.message && (
+                      <p className="text-sm text-red-500 mt-1">{errors.educationalLevel?.message && (
+                        <p className="text-red-500">
+                          {String(errors.educationalLevel.message)}
+                        </p>
+                      )}</p>
+                    )}
+                  </div>
+
+                  {/* Scholarship Name */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <Label htmlFor="scholarshipName" className="block text-sm font-medium text-gray-700">
+                      Scholarship Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("scholarshipName")}
+                      className="mt-1 block w-full"
+                    />
+                    {errors.scholarshipName?.message && (
+                      <p className="text-sm text-red-500 mt-1">{errors.scholarshipName?.message && (
+                        <p className="text-red-500">
+                          {String(errors.scholarshipName.message)}
+                        </p>
+                      )}</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Scholarship Type */}
-              <div className="space-y-2 col-start-1 col-end-2">
-                <Label htmlFor="scholarshipType" className="text-md">
-                  Scholarship Type
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Select
-                  options={categories}
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                  isSearchable
-                />
-
-                {errors.scholarshipType?.message && (
-                  <p className="text-red-500">
-                    {String(errors.scholarshipType.message)}
-                  </p>
-                )}
+              {/* Mô tả */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
+                  Scholarship Details
+                </h3>
+                <div className="mt-4">
+                  <Label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                    Scholarship Description <span className="text-red-500">*</span>
+                  </Label>
+                  <Textarea
+                    {...register("description")}
+                    rows={4}
+                    className="mt-1 block w-full"
+                  />
+                  {errors.description?.message && (
+                    <p className="text-sm text-red-500 mt-1">{errors.description?.message && (
+                      <p className="text-red-500">
+                        {String(errors.description.message)}
+                      </p>
+                    )}</p>
+                  )}
+                </div>
               </div>
 
-              {/* Educational Level */}
-              <div className="space-y-2 col-span-2">
-                <Label htmlFor="educationalLevel" className="text-md">
-                  Educational Level
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Input {...register("educationalLevel")} />
-                {errors.educationalLevel?.message && (
-                  <p className="text-red-500">
-                    {String(errors.educationalLevel.message)}
-                  </p>
-                )}
+              {/* Giá trị và số lượng */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
+                  Funding Details
+                </h3>
+                <div className="grid grid-cols-6 gap-4 mt-4">
+                  {/* Value */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <Label htmlFor="value" className="block text-sm font-medium text-gray-700">
+                      Scholarship Value <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("value")}
+                      className="mt-1 block w-full"
+                    />
+                    {errors.value?.message && (
+                      <p className="text-sm text-red-500 mt-1"> {errors.value?.message && (
+                        <p className="text-red-500">{String(errors.value.message)}</p>
+                      )}</p>
+                    )}
+                  </div>
+
+                  {/* Quantity */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <Label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
+                      Scholarship Quantity <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("quantity")}
+                      className="mt-1 block w-full"
+                    />
+                    {errors.quantity?.message && (
+                      <p className="text-sm text-red-500 mt-1"> {errors.quantity?.message && (
+                        <p className="text-red-500">
+                          {String(errors.quantity.message)}
+                        </p>
+                      )}</p>
+                    )}
+                  </div>
+
+                  {/* Award Progress */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <Label htmlFor="awardProgress" className="block text-sm font-medium text-gray-700">
+                      Award Progress <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("awardProgress")}
+                      className="mt-1 block w-full"
+                    />
+                    {errors.awardProgress?.message && (
+                      <p className="text-sm text-red-500 mt-1">{errors.awardProgress?.message && (
+                        <p className="text-red-500">
+                          {String(errors.awardProgress.message)}
+                        </p>
+                      )}</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Scholarship Name */}
-              <div className="space-y-2 col-end-7 col-span-3">
-                <Label htmlFor="scholarshipName" className="text-md">
-                  Scholarship Name
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Input {...register("scholarshipName")} />
-                {errors.scholarshipName?.message && (
-                  <p className="text-red-500">
-                    {String(errors.scholarshipName.message)}
-                  </p>
-                )}
-              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
+                  Attachments
+                </h3>
+                <div className="grid grid-cols-6 gap-4 mt-4">
+                  {/* Upload Image */}
+                  <div className="col-span-6 sm:col-span-3">
+                    <Label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
+                      Upload Image
+                    </Label>
+                    <Input
+                      type="file"
+                      id="imageUrl"
+                      onChange={handelUploadFile}
+                      accept="image/*"
+                      className="mt-1 block w-full"
+                    />
+                  </div>
 
-              {/* Description */}
-              <div className="space-y-2 col-span-6">
-                <Label htmlFor="description" className="text-md">
-                  Scholarship Description
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Textarea {...register("description")} />
-                {errors.description?.message && (
-                  <p className="text-red-500">
-                    {String(errors.description.message)}
-                  </p>
-                )}
-              </div>
-
-              {/* Value */}
-              <div className="space-y-2">
-                <Label htmlFor="value" className="text-md">
-                  Value of Scholarship
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Input {...register("value")} />
-                {errors.value?.message && (
-                  <p className="text-red-500">{String(errors.value.message)}</p>
-                )}
-              </div>
-
-              {/* Quantity */}
-              <div className="space-y-2">
-                <Label htmlFor="quantity" className="text-md">
-                  Quantity of Scholarship
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Input {...register("quantity")} />
-                {errors.quantity?.message && (
-                  <p className="text-red-500">
-                    {String(errors.quantity.message)}
-                  </p>
-                )}
-              </div>
-
-              {/* Award Progress */}
-              <div className="space-y-2">
-                <Label htmlFor="awardProgress" className="text-md">
-                  Quantity of Award Progress
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Input {...register("awardProgress")} />
-                {errors.awardProgress?.message && (
-                  <p className="text-red-500">
-                    {String(errors.awardProgress.message)}
-                  </p>
-                )}
-              </div>
-
-              {/* Image Upload */}
-              <div className="space-y-2 col-start-4 col-end-6">
-                <Label htmlFor="imageUrl" className="text-md">
-                  Upload Image
-                </Label>
-                {/* <Input {...register("imageUrl")} /> */}
-                <Input
-                  type="file"
-                  id="imageUrl"
-                  onChange={handelUploadFile}
-                  accept="image/*"
-                  className="block w-full border p-2 rounded"
-                />
-              </div>
-
-              {/* Deadline */}
-              <div className="space-y-2">
-                <Label htmlFor="deadline" className="text-md">
-                  Application Deadline
-                  <span className="text-red-700 text-lg"> *</span>
-                </Label>
-                <Input
-                  {...register("deadline")}
-                  type="date"
-                  id="deadline"
-                  placeholder="Enter deadline"
-                />
-                {errors.deadline?.message && (
-                  <p className="text-red-500">
-                    {String(errors.deadline.message)}
-                  </p>
-                )}
+                  {/* Deadline */}
+                  <div className="col-span-6 sm:col-span-3">
+                    <Label htmlFor="deadline" className="block text-sm font-medium text-gray-700">
+                      Application Deadline <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("deadline")}
+                      type="date"
+                      id="deadline"
+                      className="mt-1 block w-full"
+                    />
+                    {errors.deadline?.message && (
+                      <p className="text-sm text-red-500 mt-1">{errors.deadline?.message && (
+                        <p className="text-red-500">
+                          {String(errors.deadline.message)}
+                        </p>
+                      )}</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
+            <div className="flex justify-end mt-4">
+              <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={handleNext}
+              >
+                Next
+              </Button>
+            </div>
           </form>
-        </CardContent>
-      </Card>
-      <div className="flex justify-end mt-4">
-        <Button
-          type="button"
-          className="bg-blue-500 text-white py-2 px-4 rounded "
-          onClick={handleNext}
-        >
-          Next
-        </Button>
+
+        </div>
       </div>
+
     </>
   );
 };
