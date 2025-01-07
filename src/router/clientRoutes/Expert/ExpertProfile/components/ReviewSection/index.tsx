@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 
 type ApprovalItem = {
   id: number;
+  applicantId: number;
   applicantName: string;
   scholarshipProgramId: number;
   scholarshipName: string;
@@ -29,6 +30,12 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
+  applicationDocs?: {
+    applicationId:number;
+    type: string;
+    name: string;
+    fileUrl: string
+  }[];
   applicationReviews?: {
     id: number;
     description: string;
@@ -65,11 +72,6 @@ const ApprovalList: React.FC = () => {
       );
       const rawApplications = response.data.data;
 
-      // rawApplications = rawApplications.sort((a: any, b: any) => {
-      //   return (
-      //     new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      //   );
-      // });
 
       const detailedApplications = await Promise.all(
         rawApplications.map(async (app: any) => {
@@ -80,6 +82,11 @@ const ApprovalList: React.FC = () => {
             `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgram.id}`
           );
           console.log("Scholarship Program:", app.scholarshipProgram);
+          // const applicationDocs = await axios.get(
+          //   `${BASE_URL}/api/applicants/${app.applicantId}/applications`
+          // );
+          // const res = applicationDocs.data.data;
+          // console.log("resDocs", res);
           return {
             id: app.id,
             applicantName: applicantResponse.data.username,
@@ -95,6 +102,8 @@ const ApprovalList: React.FC = () => {
             documentUrl: app.applicationDocuments?.[0]?.fileUrl,
             applicationReviews: app.applicationReviews,
             updatedAt: app.updatedAt,
+            // applicationDocuments: applicationDocs.data.data?.[0]?.applicationDocuments
+            applicationDocuments: app.applicationDocuments
           };
         })
       );
@@ -157,8 +166,8 @@ const ApprovalList: React.FC = () => {
       );
 
       // Log to check the latest updatedAt for each group
-      console.log("latestUpdatedAtA:", latestUpdatedAtA);
-      console.log("latestUpdatedAtB:", latestUpdatedAtB);
+      // console.log("latestUpdatedAtA:", latestUpdatedAtA);
+      // console.log("latestUpdatedAtB:", latestUpdatedAtB);
 
       return latestUpdatedAtB - latestUpdatedAtA; // Sort from newest to oldest
     }
@@ -181,74 +190,6 @@ const ApprovalList: React.FC = () => {
           />
 
           {error && <div className="p-4 bg-red-100 text-red-800">{error}</div>}
-
-          {/* {loading ? (
-            <p className="text-center text-lg">Loading...</p>
-          ) : (
-            Object.entries(groupedApplications).map(([scholarshipId, apps]) => (
-              <div key={scholarshipId}>
-                <Link
-                  to={`/expert/review-application/scholarshipProgram/${apps[0]?.scholarshipProgramId}`}
-                >
-                  <div className="w-full flex items-center justify-between bg-white rounded-lg shadow-lg p-4 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-                    <div className="flex items-start gap-4">
-                      <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center">
-                        <img
-                          src={apps[0]?.scholarshipImage}
-                          alt="Scholarship Logo"
-                          className="rounded-md object-cover"
-                        />
-                      </div>
-                      <div className="space-y-6">
-                        <div className="flex gap-4">
-                          <h2 className="text-xl font-semibold">
-                            {
-                              apps.find(
-                                (app: any) =>
-                                  app.scholarshipProgramId == scholarshipId
-                              )?.scholarshipName
-                            }
-                          </h2>
-                        </div>
-                        <div className="flex items-center gap-6 mt-2 text-sm text-gray-500">
-                          <div className="flex flex-col">
-                            <h3 className="text-sm font-semibold">Deadline</h3>
-                            <span className="text-sm text-black font-semibold">
-                              {apps[0]?.scholarshipDeadline
-                                ? formatNaturalDate(apps[0].scholarshipDeadline)
-                                : "No deadline available"}
-                            </span>
-                          </div>
-                          <div className="flex flex-col">
-                            <h3 className="text-sm font-semibold">Award</h3>
-                            <span className="text-sm text-black font-semibold">
-                              {apps[0]?.scholarshipAmount &&
-                              !isNaN(Number(apps[0]?.scholarshipAmount))
-                                ? `$${formatCurrency(
-                                    Number(apps[0]?.scholarshipAmount),
-                                    "USD"
-                                  )}`
-                                : "No award available"}
-                            </span>
-                          </div>
-                          <div className="flex flex-col">
-                            <h3 className="text-sm font-semibold">
-                              Updated At
-                            </h3>
-                            <span className="text-sm text-black font-semibold">
-                              {apps[0]?.appliedDate
-                                ? formatNaturalDate(apps[0].appliedDate)
-                                : "No updated date available"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            ))
-          )} */}
 
           {loading ? (
             <p className="text-center text-lg">Loading...</p>
@@ -317,6 +258,7 @@ const ApprovalList: React.FC = () => {
               </div>
             ))
           )}
+          
 
           {/* Chấm điểm phần */}
           <Dialog.Root
@@ -341,6 +283,10 @@ const ApprovalList: React.FC = () => {
                       </p>
                       <p>
                         <strong>University:</strong> {selectedItem.university}
+                      </p>
+                      <p>
+                        <strong>Applied On:</strong>{" "}
+                        {formatDate(selectedItem.appliedDate)}
                       </p>
                       <p>
                         <strong>Applied On:</strong>{" "}

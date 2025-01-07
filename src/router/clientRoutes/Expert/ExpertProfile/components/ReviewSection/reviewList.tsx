@@ -13,10 +13,9 @@ import ScreenSpinner from "@/components/ScreenSpinner";
 import { z } from "zod";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
-
-
 type ApprovalItem = {
   id: number;
+  applicantId: number;
   applicantName: string;
   scholarshipProgramId: number;
   scholarshipName: string;
@@ -28,6 +27,12 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
+  applicationDocs?: {
+    applicationId: number;
+    type: string;
+    name: string;
+    fileUrl: string;
+  }[];
   applicationReviews?: {
     id: number;
     applicantName: string;
@@ -35,46 +40,47 @@ type ApprovalItem = {
     score: number;
     expertId: number;
     status: string;
-  }[];  
+  }[];
+  updatedAt: string;
 };
-
 
 const expertReviewSchema = z.object({
   score: z.string(),
   description: z.string(),
 });
 
-
 const ReviewList: React.FC = () => {
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const user = useSelector((state: any) => state.token.user);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {id} = useParams();
+  const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
   const [comment, setComment] = useState("");
   const [score, setScore] = useState<number | string>("");
   const [selectedReview, setSelectedReview] = useState<any>(null);
 
+  console.log("select",selectedItem?.applicationDocs);
+  
+
   const handleRowClick = (item: ApprovalItem, review: any) => {
     if (review.expertId != user.id) return;
 
     const isScored =
       review.score !== null && review.score !== undefined && review.score > 0;
-    
+
     if (isScored) {
       notification.info({
         message:
           "This application has already been scored. You cannot score it again.",
       });
-      return; 
-
+      return;
     }
-    setSelectedItem(item)
+    setSelectedItem(item);
     setSelectedReview(review);
     // onRowClick(item, review);
-    window.open(item.documentUrl, "_blank");
+    // window.open(item.documentUrl, "_blank");
   };
 
   const fetchApplicationReview = async () => {
@@ -85,23 +91,22 @@ const ReviewList: React.FC = () => {
         `${BASE_URL}/api/experts/${user.id}/assigned-applications`
       );
       const expertAssign = response.data.data;
-      //console.log("API response:", expertAssign);  
-      
+      console.log("API response:", expertAssign);
+
       const scholarshipId = id;
-      //console.log("scholarshipId:", scholarshipId);  
+      //console.log("scholarshipId:", scholarshipId);
 
       const filteredApplications = expertAssign.filter((app: any) => {
         //console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
         //console.log("scholarshipId:", scholarshipId);
-        
+
         return Number(app.scholarshipProgramId) == Number(scholarshipId);
       });
       //console.log("filter",filteredApplications);
-      
-  
+
       const detailedApplications = await Promise.all(
         expertAssign
-          .filter((app: any) => app.scholarshipProgramId == scholarshipId)  
+          .filter((app: any) => app.scholarshipProgramId == scholarshipId)
           .map(async (app: any) => {
             const applicantResponse = await axios.get(
               `${BASE_URL}/api/accounts/${app.applicantId}`
@@ -128,7 +133,6 @@ const ReviewList: React.FC = () => {
       );
       setApplications(detailedApplications);
       //console.log("detailapplication",detailedApplications);
-      
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
       console.error(err);
@@ -243,7 +247,6 @@ const ReviewList: React.FC = () => {
                 <td colSpan={8} className="p-4 text-center text-gray-500">
                   No applicants to review
                 </td>
-
               </tr>
             ) : Array.isArray(applications) && applications.length > 0 ? (
               applications.map((item, index) => (
@@ -270,7 +273,9 @@ const ReviewList: React.FC = () => {
                             {index + 1}
                           </td>
                           <td className="p-4 text-sm text-gray-800">
-                          {item.applicationReviews ? item.applicationReviews[0].applicantName : ""}
+                            {item.applicationReviews
+                              ? item.applicationReviews[0].applicantName
+                              : ""}
                           </td>
                           <td className="p-4 text-sm text-gray-800">
                             {item.scholarshipName}
@@ -307,7 +312,7 @@ const ReviewList: React.FC = () => {
                                   e.stopPropagation();
                                   if (!isScored) handleRowClick(item, review);
                                 }}
-                                disabled={isScored}
+                                // disabled={isScored}
                               >
                                 <Link
                                   to={item.documentUrl ?? " "}
@@ -418,7 +423,9 @@ const ReviewList: React.FC = () => {
                           </td>
 
                           <td className="p-4 text-sm text-gray-800">
-                            {item.applicationReviews ? item.applicationReviews[0].applicantName : ""}
+                            {item.applicationReviews
+                              ? item.applicationReviews[0].applicantName
+                              : ""}
                           </td>
                           <td className="p-4 text-sm text-gray-800">
                             {item.scholarshipName}
@@ -493,79 +500,112 @@ const ReviewList: React.FC = () => {
                   No data available
                 </td>
               </tr>
-
             )}
           </tbody>
-
         </table>
       </div>
       <Dialog.Root
-            open={!!selectedItem}
-            onOpenChange={() => setSelectedItem(null)}
-          >
-            <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-              <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md">
-                {selectedItem && (
-                  <div>
-                    <Dialog.Title className="text-2xl font-bold">
-                      {selectedItem.scholarshipName}
-                    </Dialog.Title>
-                    <Dialog.Description className="mt-2 text-sm text-gray-600">
-                      {selectedItem.details}
-                    </Dialog.Description>
+        open={!!selectedItem}
+        onOpenChange={() => setSelectedItem(null)}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md">
+            {selectedItem && (
+              <div>
+                <Dialog.Title className="text-2xl font-bold">
+                  {selectedItem.scholarshipName}
+                </Dialog.Title>
+                <Dialog.Description className="mt-2 text-sm text-gray-600">
+                  {selectedItem.details}
+                </Dialog.Description>
 
-                    <div className="mt-4">
-                      <p>
-                        <strong>Applicant:</strong> {selectedItem.applicantName}
+                <div className="mt-4">
+                  <p>
+                    <strong>Applicant:</strong> {selectedItem.applicantName}
+                  </p>
+                  <p>
+                    <strong>University:</strong> {selectedItem.university}
+                  </p>
+                  <p>
+                    <strong>Applied On:</strong>{" "}
+                    {formatDate(selectedItem.appliedDate)}
+                  </p>
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold">
+                      Submitted Documents
+                    </h3>
+                    {selectedItem.applicationDocs ? (
+                      selectedItem.applicationDocs.length > 0 ? (
+                        <ul className="mt-2 space-y-2">
+                          {selectedItem.applicationDocs.map((doc) => (
+                            <li
+                              key={doc.applicationId + doc.name}
+                              className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
+                            >
+                              <span>{doc.name}</span>
+                              <a
+                                href={doc.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                Download
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-gray-500">
+                          No documents available.
+                        </p>
+                      )
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        Loading documents...
                       </p>
-                      <p>
-                        <strong>University:</strong> {selectedItem.university}
-                      </p>
-                      <p>
-                        <strong>Applied On:</strong>{" "}
-                        {formatDate(selectedItem.appliedDate)}
-                      </p>
-                    </div>
-
-                    {/* Add form for scoring */}
-                    <div className="mt-4">
-                      <Label className="block text-sm font-medium text-gray-700">
-                        Score
-                      </Label>
-                      <Input
-                        type="number"
-                        value={score}
-                        onChange={(e) => setScore(e.target.value)}
-                        className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
-                        placeholder="Enter score (1-100)"
-                        min={1}
-                        max={100}
-                      />
-
-                      <Label className="block text-sm font-medium text-gray-700 mt-4">
-                        Comment
-                      </Label>
-                      <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
-                        placeholder="Enter comment"
-                      />
-
-                      <Button
-                        onClick={handleScoreSubmit}
-                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
-                      >
-                        Submit Review
-                      </Button>
-                    </div>
+                    )}
                   </div>
-                )}
-              </Dialog.Content>
-            </Dialog.Portal>
-            {isLoading && <ScreenSpinner />}
-          </Dialog.Root>
+                </div>
+
+                {/* Add form for scoring */}
+                <div className="mt-4">
+                  <Label className="block text-sm font-medium text-gray-700">
+                    Score
+                  </Label>
+                  <Input
+                    type="number"
+                    value={score}
+                    onChange={(e) => setScore(e.target.value)}
+                    className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
+                    placeholder="Enter score (1-100)"
+                    min={1}
+                    max={100}
+                  />
+
+                  <Label className="block text-sm font-medium text-gray-700 mt-4">
+                    Comment
+                  </Label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+                    placeholder="Enter comment"
+                  />
+
+                  <Button
+                    onClick={handleScoreSubmit}
+                    className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
+                  >
+                    Submit Review
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Dialog.Content>
+        </Dialog.Portal>
+        {isLoading && <ScreenSpinner />}
+      </Dialog.Root>
     </div>
   );
 };
