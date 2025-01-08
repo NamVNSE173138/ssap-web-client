@@ -16,19 +16,18 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SchoolLogo from "./logo";
 import { useSelector } from "react-redux";
-import RouteNames from "@/constants/routeNames";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
-import { getAccountById, getApplicationsByScholarship } from "@/services/ApiServices/accountService";
-import { getAllExperts, getExpertsByFunder } from "@/services/ApiServices/expertService";
+import {
+  getAccountById,
+  getApplicationsByScholarship,
+} from "@/services/ApiServices/accountService";
 import AssignExpertDialog from "./assign-expert-dialog";
 import ReviewingApplicationDialog from "./expert-reviewing-dialog";
 import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 import { format } from "date-fns";
-import {
-  getApplicationByApplicantIdAndScholarshipId,
-} from "@/services/ApiServices/applicationService";
+import { getApplicationByApplicantIdAndScholarshipId } from "@/services/ApiServices/applicationService";
 import ApplicationStatus from "@/constants/applicationStatus";
 import { getAwardMilestoneByScholarship } from "@/services/ApiServices/awardMilestoneService";
 import { formatDate } from "@/lib/date-formatter";
@@ -48,19 +47,20 @@ import {
   FaMapMarkerAlt,
   FaRegListAlt,
   FaTag,
-  FaTrash,
   FaTrashAlt,
   FaTrophy,
   FaUniversity,
   FaUserAlt,
   FaUsers,
-  FaUserTie,
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { notification } from "antd";
 import { IoIosAddCircleOutline, IoIosEye } from "react-icons/io";
 import { List, Paper, Tab, Tabs } from "@mui/material";
-import { getAllScholarshipProgramExperts, removeExpertsFromScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
+import {
+  getAllScholarshipProgramExperts,
+  removeExpertsFromScholarshipProgram,
+} from "@/services/ApiServices/scholarshipProgramService";
 import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 
 const ITEMS_PER_PAGE = 5;
@@ -75,7 +75,6 @@ const ScholarshipProgramDetail = () => {
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
   const isApplicant = user?.role;
-  const [fullName, setFullName] = useState<any>();
 
   const [applicants, setApplicants] = useState<any>(null);
 
@@ -85,7 +84,6 @@ const ScholarshipProgramDetail = () => {
 
   const [reviewingDialogOpen, setReviewingDialogOpen] =
     useState<boolean>(false);
-  // const [selectedExpert, setSelectedExpert] = useState<any>(null);
   const selectedExpert: any = null;
 
   const [reviewMilestones, setReviewMilestones] = useState<any>(null);
@@ -98,7 +96,6 @@ const ScholarshipProgramDetail = () => {
   const [awardMilestoneDialogOpen, setAwardMilestoneDialogOpen] =
     useState<boolean>(false);
 
-  const [cancelLoading, setCancelLoading] = useState<boolean>(false);
   const [funderName, setFunderName] = useState<any>();
 
   const [selectedTab, setSelectedTab] = useState(0);
@@ -127,7 +124,8 @@ const ScholarshipProgramDetail = () => {
     Reviewing: "yellow",
   };
 
-  const [currentTabPageForSubmitting, setCurrentTabPageForSubmitting] = useState(1);
+  const [currentTabPageForSubmitting, setCurrentTabPageForSubmitting] =
+    useState(1);
   const [currentTabPageForWinners, setCurrentTabPageForWinners] = useState(1);
   const totalTabPagesForSubmitting = Math.ceil(
     submittingApplications?.length / ITEMS_PER_PAGE
@@ -139,13 +137,13 @@ const ScholarshipProgramDetail = () => {
   const paginatedTabData =
     selectedTab === 0
       ? submittingApplications?.slice(
-        (currentTabPageForSubmitting - 1) * ITEMS_PER_PAGE,
-        currentTabPageForSubmitting * ITEMS_PER_PAGE
-      )
+          (currentTabPageForSubmitting - 1) * ITEMS_PER_PAGE,
+          currentTabPageForSubmitting * ITEMS_PER_PAGE
+        )
       : winnersApplications?.slice(
-        (currentTabPageForWinners - 1) * ITEMS_PER_PAGE,
-        currentTabPageForWinners * ITEMS_PER_PAGE
-      );
+          (currentTabPageForWinners - 1) * ITEMS_PER_PAGE,
+          currentTabPageForWinners * ITEMS_PER_PAGE
+        );
 
   const handleTabPageChange = (page: number) => {
     if (selectedTab === 0) {
@@ -234,9 +232,9 @@ const ScholarshipProgramDetail = () => {
 
             // Gọi API getApplicantProfileById để lấy thông tin fullName
             const profileResponse = await getApplicantProfileById(applicantId);
-            const fullName = profileResponse.data ?
-              `${profileResponse.data.firstName} ${profileResponse.data.lastName}` :
-              "Unknown Name";
+            const fullName = profileResponse.data
+              ? `${profileResponse.data.firstName} ${profileResponse.data.lastName}`
+              : "Unknown Name";
 
             return {
               ...application, // Giữ nguyên các thuộc tính hiện có
@@ -309,10 +307,7 @@ const ScholarshipProgramDetail = () => {
 
   const handleAssignExpertDialog = async () => {
     if (!data) return;
-    /*if (reviewMilestones.every((milestone: any) => milestone.toDate < new Date())) {
-      notification.error({ message: "You can not assign before deadline" });
-      return;
-    }*/
+
     setAssignExpertDialogOpen(true);
     setLoading(true);
     if (!data) return;
@@ -328,32 +323,16 @@ const ScholarshipProgramDetail = () => {
     setLoading(false);
   };
 
-  const deleteScholarship = async () => {
-    try {
-      const response = await axios.delete(
-        `${BASE_URL}/api/scholarship-programs/${id}`
-      );
-      if (response.data.statusCode == 200) {
-        setData(response.data.data);
-        navigate(RouteNames.ACTIVITY);
-      } else {
-        setError("Failed to delete scholarship");
-      }
-    } catch (error) {
-      setError((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleRemoveExperts = async (expertId: string) => {
     try {
-      const response = await removeExpertsFromScholarshipProgram(Number(id), [expertId]);
+      const response = await removeExpertsFromScholarshipProgram(Number(id), [
+        expertId,
+      ]);
 
       if (response.statusCode === 200) {
         notification.success({
-          message: 'Success',
-          description: 'Remove expert successful',
+          message: "Success",
+          description: "Remove expert successful",
         });
         fetchExpertsByScholarshipId();
       } else {
@@ -363,12 +342,11 @@ const ScholarshipProgramDetail = () => {
       console.error(error);
 
       notification.error({
-        message: 'Error',
-        description: 'Remove failed',
+        message: "Error",
+        description: "Remove failed",
       });
     }
   };
-
 
   console.log("IMAGE", data?.imageUrl);
 
@@ -420,18 +398,20 @@ const ScholarshipProgramDetail = () => {
                     : data.description}
                 </p>
               </div>
-
             </div>
             <span className="flex justify-start ps-5 pt-5 gap-2 items-center">
               <span className="relative flex h-3 w-3">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500`}></span>
-                <span className={`relative inline-flex rounded-full h-3 w-3 bg-green-500`}></span>
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500`}
+                ></span>
+                <span
+                  className={`relative inline-flex rounded-full h-3 w-3 bg-green-500`}
+                ></span>
               </span>
               <span className={`text-green-500 text-2xl font-medium`}>
                 {data.status}
               </span>
             </span>
-
 
             <div className="text-white text-center flex flex-wrap h-[40px] lg:h-[50px] mt-[26px] w-full">
               {isApplicant == "Applicant" || !user ? (
@@ -454,55 +434,17 @@ const ScholarshipProgramDetail = () => {
                     <>
                       {existingApplication[0].status ==
                         ApplicationStatus.NeedExtend && (
-                          <Button
-                            onClick={() =>
-                              navigate(
-                                `/funder/application/${existingApplication[0].id}`
-                              )
-                            }
-                            className="flex-1 text-xl w-full bg-yellow-500 h-full mr-3"
-                          >
-                            Extend Application{" "}
-                          </Button>
-                        )}
-
-                      {/*JSON.stringify(awardMilestones)*/}
-                      {/*existingApplication[0].status ==
-                        ApplicationStatus.Submitted &&
-                        new Date(existingApplication[0].updatedAt) <
-                        new Date(data.deadline) && (
-                          <AlertDialog>
-                            <AlertDialogTrigger
-                              className="flex-1 text-xl w-full h-full bg-transparent border text-red-700 hover:bg-red-800 hover:text-white border-red-700 rounded-[5px] cursor-pointer flex justify-center items-center"
-                              disabled={cancelLoading}
-                            >
-                              {cancelLoading ? (
-                                <div
-                                  className="w-5 h-5 border-2 border-white border-t-transparent border-solid rounded-full animate-spin"
-                                  aria-hidden="true"
-                                ></div>
-                              ) : (
-                                <span>Cancel applications </span>
-                              )}
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  You wanna cancel your application?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Cancel will delete your application.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>No</AlertDialogCancel>
-                                <AlertDialogAction onClick={cancelApplication}>
-                                  Yes
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        )*/}
+                        <Button
+                          onClick={() =>
+                            navigate(
+                              `/funder/application/${existingApplication[0].id}`
+                            )
+                          }
+                          className="flex-1 text-xl w-full bg-yellow-500 h-full mr-3"
+                        >
+                          Extend Application{" "}
+                        </Button>
+                      )}
                     </>
                   )}
                 </>
@@ -533,7 +475,6 @@ const ScholarshipProgramDetail = () => {
               existingApplication[0].status == ApplicationStatus.Submitted &&
               data.status != "FINISHED" && (
                 <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-
                   <div className="text-xl font-semibold mr-3">
                     Your application is being reviewed
                   </div>
@@ -543,7 +484,6 @@ const ScholarshipProgramDetail = () => {
               existingApplication.length > 0 &&
               existingApplication[0].status == ApplicationStatus.Rejected && (
                 <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-
                   <div className="text-xl font-semibold mr-3">
                     Your application to this scholarship have not been approved
                   </div>
@@ -600,7 +540,9 @@ const ScholarshipProgramDetail = () => {
             <div className="flex items-center gap-3">
               <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Created At</p>
+                <p className="text-sm font-semibold text-gray-500">
+                  Created At
+                </p>
                 <p className="text-lg font-semibold text-gray-800">
                   {data.deadline
                     ? format(new Date(data.createdAt), "MM/dd/yyyy")
@@ -612,7 +554,9 @@ const ScholarshipProgramDetail = () => {
             <div className="flex items-center gap-3">
               <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
               <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Application Deadline</p>
+                <p className="text-sm font-semibold text-gray-500">
+                  Application Deadline
+                </p>
                 <p className="text-lg font-semibold text-gray-800">
                   {data.deadline
                     ? format(new Date(data.deadline), "MM/dd/yyyy")
@@ -628,7 +572,9 @@ const ScholarshipProgramDetail = () => {
                   Value of Award
                 </p>
                 <p className="text-lg font-semibold text-gray-800">
-                  ${(data.scholarshipAmount).toLocaleString("en-US") || "Not specified"}
+                  $
+                  {data.scholarshipAmount.toLocaleString("en-US") ||
+                    "Not specified"}
                 </p>
               </div>
             </div>
@@ -664,8 +610,10 @@ const ScholarshipProgramDetail = () => {
               <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
             </div>
             <br></br>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-              style={{ transform: "translateX(50px)" }}>
+            <div
+              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+              style={{ transform: "translateX(50px)" }}
+            >
               {/* Cột bên trái */}
               <div className="flex flex-col gap-6">
                 <div className="lg:col-span-1 px-[16px] xsm:px-[24px] 2xl:px-0">
@@ -690,7 +638,10 @@ const ScholarshipProgramDetail = () => {
                               <FaUniversity className="text-gray-500" />
                               Awarding institution:
                             </p>
-                            <Link to="" className="text-blue-500 hover:underline">
+                            <Link
+                              to=""
+                              className="text-blue-500 hover:underline"
+                            >
                               {data.name}
                             </Link>
                           </div>
@@ -710,7 +661,9 @@ const ScholarshipProgramDetail = () => {
                               <FaDollarSign className="text-gray-500" />
                               Value of Award:
                             </p>
-                            <span>${(data.scholarshipAmount).toLocaleString("en-US")}</span>
+                            <span>
+                              ${data.scholarshipAmount.toLocaleString("en-US")}
+                            </span>
                           </div>
                           <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
                             <p className="text-gray-700 font-bold flex items-center gap-2">
@@ -785,7 +738,9 @@ const ScholarshipProgramDetail = () => {
                             <p className="text-gray-700 font-bold">
                               Category Name:
                             </p>
-                            <p className="text-gray-600">{data.category.name}</p>
+                            <p className="text-gray-600">
+                              {data.category.name}
+                            </p>
                           </div>
                         </div>
 
@@ -793,7 +748,9 @@ const ScholarshipProgramDetail = () => {
                         <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
                           <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
                           <div>
-                            <p className="text-gray-700 font-bold">Description:</p>
+                            <p className="text-gray-700 font-bold">
+                              Description:
+                            </p>
                             <p className="text-gray-600">
                               {data.category.description}
                             </p>
@@ -1033,7 +990,9 @@ const ScholarshipProgramDetail = () => {
                     <div className="p-2 bg-[#1eb2a6] rounded-full">
                       <FaCalendarAlt className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Review Milestone</h2>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                      Review Milestone
+                    </h2>
                   </div>
                   <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
                 </div>
@@ -1052,17 +1011,33 @@ const ScholarshipProgramDetail = () => {
                           className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
                         >
                           {/* Title */}
-                          <p className="font-bold text-2xl text-gray-900 mb-2">{milestone.description}</p>
+                          <p className="font-bold text-2xl text-gray-900 mb-2">
+                            {milestone.description}
+                          </p>
 
                           {/* Date Range */}
                           <div className="flex flex-col gap-2 w-full">
                             <div className="flex justify-between">
-                              <p className="text-gray-600 font-semibold">Start Date:</p>
-                              <p className="text-gray-700">{format(new Date(milestone.fromDate), "MM/dd/yyyy")}</p>
+                              <p className="text-gray-600 font-semibold">
+                                Start Date:
+                              </p>
+                              <p className="text-gray-700">
+                                {format(
+                                  new Date(milestone.fromDate),
+                                  "MM/dd/yyyy"
+                                )}
+                              </p>
                             </div>
                             <div className="flex justify-between">
-                              <p className="text-gray-600 font-semibold">End Date:</p>
-                              <p className="text-gray-700">{format(new Date(milestone.toDate), "MM/dd/yyyy")}</p>
+                              <p className="text-gray-600 font-semibold">
+                                End Date:
+                              </p>
+                              <p className="text-gray-700">
+                                {format(
+                                  new Date(milestone.toDate),
+                                  "MM/dd/yyyy"
+                                )}
+                              </p>
                             </div>
                           </div>
 
@@ -1086,14 +1061,18 @@ const ScholarshipProgramDetail = () => {
                     <div className="p-2 bg-[#1eb2a6] rounded-full">
                       <FaUsers className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Applied Applicants</h2>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                      Applied Applicants
+                    </h2>
                   </div>
                   <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
                 </div>
 
                 {Array.isArray(applicants) && applicants.length !== 0 && (
                   <button
-                    onClick={() => navigate(`/funder/choose-winners/${data.id}`)}
+                    onClick={() =>
+                      navigate(`/funder/choose-winners/${data.id}`)
+                    }
                     className="flex mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
                   >
                     <IoIosAddCircleOutline className="text-2xl" />
@@ -1112,30 +1091,43 @@ const ScholarshipProgramDetail = () => {
                   textColor="inherit"
                   centered
                 >
-                  <Tab label="Submitting Applications" sx={{ textTransform: "none", color: "blue", fontWeight: "bold" }} />
-                  <Tab label="Winners Applications" sx={{ textTransform: "none", color: "green", fontWeight: "bold" }} />
-
+                  <Tab
+                    label="Submitting Applications"
+                    sx={{
+                      textTransform: "none",
+                      color: "blue",
+                      fontWeight: "bold",
+                    }}
+                  />
+                  <Tab
+                    label="Winners Applications"
+                    sx={{
+                      textTransform: "none",
+                      color: "green",
+                      fontWeight: "bold",
+                    }}
+                  />
                 </Tabs>
 
                 {/* Paper */}
                 <Paper
                   elevation={3}
                   style={{
-                    padding: '20px',
-                    borderRadius: '10px',
-                    backgroundColor: '#fafafa',
-                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                    padding: "20px",
+                    borderRadius: "10px",
+                    backgroundColor: "#fafafa",
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   {/* Table Header */}
                   <div
                     style={{
-                      display: 'flex',
-                      fontWeight: 'bold',
-                      backgroundColor: '#f1f1f1',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
+                      display: "flex",
+                      fontWeight: "bold",
+                      backgroundColor: "#f1f1f1",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
                     }}
                   >
                     <div style={{ flex: 0.5 }}>#</div>
@@ -1152,30 +1144,37 @@ const ScholarshipProgramDetail = () => {
                       <div
                         key={app.id}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          backgroundColor: '#f9f9f9',
-                          padding: '10px',
-                          borderRadius: '8px',
-                          marginBottom: '10px',
-                          transition: 'background-color 0.3s ease',
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          backgroundColor: "#f9f9f9",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          marginBottom: "10px",
+                          transition: "background-color 0.3s ease",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#e3f2fd")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                        }
                       >
                         {/* Cột số thứ tự */}
                         <div style={{ flex: 0.5 }}>{index + 1}</div>
 
                         <div style={{ flex: 1 }}>
                           <img
-                            src={app.applicant.avatarUrl || '/path/to/default-avatar.jpg'}
+                            src={
+                              app.applicant.avatarUrl ||
+                              "/path/to/default-avatar.jpg"
+                            }
                             style={{
-                              width: '40px',
-                              height: '40px',
-                              borderRadius: '50%',
-                              objectFit: 'cover',
-                              border: '2px solid #0369a1',
+                              width: "40px",
+                              height: "40px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                              border: "2px solid #0369a1",
                             }}
                           />
                         </div>
@@ -1184,20 +1183,34 @@ const ScholarshipProgramDetail = () => {
                         <div style={{ flex: 1 }}>{app.applicant.fullName}</div>
 
                         {/* Cột status */}
-                        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                        <div
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
                           <span className="relative flex justify-center items-center gap-2">
                             {/* Hiệu ứng nhấp nháy */}
                             <span className="relative flex h-3 w-3">
                               <span
-                                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[app.status]}-500 opacity-75`}
+                                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${
+                                  statusColor[app.status]
+                                }-500 opacity-75`}
                               ></span>
                               <span
-                                className={`relative inline-flex rounded-full h-3 w-3 bg-${statusColor[app.status]}-500`}
+                                className={`relative inline-flex rounded-full h-3 w-3 bg-${
+                                  statusColor[app.status]
+                                }-500`}
                               ></span>
                             </span>
 
                             {/* Tên trạng thái */}
-                            <span className={`text-${statusColor[app.status]}-500 font-medium`}>
+                            <span
+                              className={`text-${
+                                statusColor[app.status]
+                              }-500 font-medium`}
+                            >
                               {app.status}
                             </span>
                           </span>
@@ -1205,66 +1218,96 @@ const ScholarshipProgramDetail = () => {
 
                         {/* Cột ngày nộp */}
                         <div style={{ flex: 1 }}>
-                          {app.appliedDate ? format(new Date(app.appliedDate), 'MM/dd/yyyy') : 'N/A'}
+                          {app.appliedDate
+                            ? format(new Date(app.appliedDate), "MM/dd/yyyy")
+                            : "N/A"}
                         </div>
 
                         {/* Cột actions */}
                         <div style={{ flex: 1 }}>
                           <Button
-                            onClick={() => navigate(`/funder/application/${app.id}`)}
+                            onClick={() =>
+                              navigate(`/funder/application/${app.id}`)
+                            }
                             style={{
-                              backgroundColor: '#1e88e5',
-                              color: '#fff',
-                              padding: '6px 12px',
-                              borderRadius: '5px',
+                              backgroundColor: "#1e88e5",
+                              color: "#fff",
+                              padding: "6px 12px",
+                              borderRadius: "5px",
                             }}
                           >
-                            <IoIosEye style={{ marginRight: '8px' }} />
+                            <IoIosEye style={{ marginRight: "8px" }} />
                             View application
                           </Button>
                         </div>
                       </div>
-
                     ))
                   ) : (
-                    <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
+                    <p className="text-center text-gray-500 font-semibold">
+                      No applicants available.
+                    </p>
                   )}
-                  <div style={{ marginTop: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'end' }}>
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      justifyContent: "end",
+                    }}
+                  >
                     {selectedTab === 0
-                      ? Array.from({ length: totalTabPagesForSubmitting }, (_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleTabPageChange(index + 1)}
-                          style={{
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            backgroundColor: currentTabPageForSubmitting === index + 1 ? '#419f97' : '#f1f1f1',
-                            color: currentTabPageForSubmitting === index + 1 ? 'white' : 'black',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {index + 1}
-                        </button>
-                      ))
-                      : Array.from({ length: totalTabPagesForWinners }, (_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleTabPageChange(index + 1)}
-                          style={{
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            backgroundColor: currentTabPageForWinners === index + 1 ? '#419f97' : '#f1f1f1',
-                            color: currentTabPageForWinners === index + 1 ? 'white' : 'black',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
+                      ? Array.from(
+                          { length: totalTabPagesForSubmitting },
+                          (_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleTabPageChange(index + 1)}
+                              style={{
+                                margin: "0 5px",
+                                padding: "5px 10px",
+                                backgroundColor:
+                                  currentTabPageForSubmitting === index + 1
+                                    ? "#419f97"
+                                    : "#f1f1f1",
+                                color:
+                                  currentTabPageForSubmitting === index + 1
+                                    ? "white"
+                                    : "black",
+                                border: "none",
+                                borderRadius: "5px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {index + 1}
+                            </button>
+                          )
+                        )
+                      : Array.from(
+                          { length: totalTabPagesForWinners },
+                          (_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleTabPageChange(index + 1)}
+                              style={{
+                                margin: "0 5px",
+                                padding: "5px 10px",
+                                backgroundColor:
+                                  currentTabPageForWinners === index + 1
+                                    ? "#419f97"
+                                    : "#f1f1f1",
+                                color:
+                                  currentTabPageForWinners === index + 1
+                                    ? "white"
+                                    : "black",
+                                border: "none",
+                                borderRadius: "5px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {index + 1}
+                            </button>
+                          )
+                        )}
                   </div>
                 </Paper>
               </div>
@@ -1280,14 +1323,18 @@ const ScholarshipProgramDetail = () => {
                     <div className="p-2 bg-[#1eb2a6] rounded-full">
                       <FaCalendarAlt className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Expert List for this scholarship</h2>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                      Expert List for this scholarship
+                    </h2>
                   </div>
                   <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
                 </div>
 
                 <div className="flex justify-end mb-5">
                   <button
-                    onClick={() => navigate(`/funder/add-expert-to-scholarship/${id}`)}
+                    onClick={() =>
+                      navigate(`/funder/add-expert-to-scholarship/${id}`)
+                    }
                     className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
                   >
                     <IoIosAddCircleOutline className="text-2xl" />
@@ -1307,20 +1354,20 @@ const ScholarshipProgramDetail = () => {
                 <Paper
                   elevation={3}
                   style={{
-                    padding: '20px',
-                    borderRadius: '10px',
-                    backgroundColor: '#fafafa',
-                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                    padding: "20px",
+                    borderRadius: "10px",
+                    backgroundColor: "#fafafa",
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <div
                     style={{
-                      display: 'flex',
-                      fontWeight: 'bold',
-                      backgroundColor: '#f1f1f1',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
+                      display: "flex",
+                      fontWeight: "bold",
+                      backgroundColor: "#f1f1f1",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
                     }}
                   >
                     <div style={{ flex: 0.5 }}>#</div>
@@ -1333,70 +1380,92 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Expert Cards */}
-                  {(paginatedExpert?.map((expert: any, index: any) => (
+                  {paginatedExpert?.map((expert: any, index: any) => (
                     <div
                       key={expert.id}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        backgroundColor: '#f9f9f9',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        marginBottom: '10px',
-                        transition: 'background-color 0.3s ease',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        backgroundColor: "#f9f9f9",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        transition: "background-color 0.3s ease",
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#e3f2fd")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                      }
                     >
                       {/* Cột số thứ tự */}
-                      <div style={{ flex: 0.5 }}>{(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}</div>
+                      <div style={{ flex: 0.5 }}>
+                        {(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}
+                      </div>
 
                       <div style={{ flex: 0.5 }}>
                         <img
-                          src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
+                          src={
+                            expert.avatarUrl || "/path/to/default-avatar.jpg"
+                          }
                           style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                            border: '2px solid #0369a1',
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "2px solid #0369a1",
                           }}
                         />
                       </div>
 
                       {/* Cột tên chuyên gia */}
                       <div style={{ flex: 0.75 }}>
-                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.name}</span>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.name}
+                        </span>
                       </div>
 
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.email}
+                        </span>
                       </div>
 
                       <div style={{ flex: 0.75 }}>
-                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.phoneNumber}
+                        </span>
                       </div>
 
                       {/* Cột major */}
                       <div style={{ flex: 1.5 }}>
-                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.major || "N/a"}
+                        </span>
                       </div>
 
-                      <div style={{ flex: 0.5 }} >
+                      <div style={{ flex: 0.5 }}>
                         <FaTrashAlt
                           style={{
-                            cursor: 'pointer',
-                            color: '#e57373',
-                            fontSize: '1.5rem',
+                            cursor: "pointer",
+                            color: "#e57373",
+                            fontSize: "1.5rem",
                           }}
                           onClick={() => handleRemoveExperts(expert.expertId)}
                         />
                       </div>
                     </div>
-                  ))
-                  )}
-                  <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+                  ))}
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      justifyContent: "end",
+                    }}
+                  >
                     {Array.from({ length: totalExpertPages }, (_, index) => (
                       <button
                         key={index}
@@ -1404,8 +1473,12 @@ const ScholarshipProgramDetail = () => {
                         style={{
                           margin: "0 5px",
                           padding: "5px 10px",
-                          backgroundColor: currentPageExpert === index + 1 ? "#419f97" : "#f1f1f1",
-                          color: currentPageExpert === index + 1 ? "white" : "black",
+                          backgroundColor:
+                            currentPageExpert === index + 1
+                              ? "#419f97"
+                              : "#f1f1f1",
+                          color:
+                            currentPageExpert === index + 1 ? "white" : "black",
                           border: "none",
                           borderRadius: "5px",
                           cursor: "pointer",
@@ -1418,10 +1491,8 @@ const ScholarshipProgramDetail = () => {
                 </Paper>
               </div>
             </div>
-
           </div>
         )}
-
       </section>
 
       {authorized != "Unauthorized" && (

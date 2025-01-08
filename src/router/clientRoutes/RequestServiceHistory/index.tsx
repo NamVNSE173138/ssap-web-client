@@ -12,12 +12,8 @@ import { Button, Paper, Tab, Tabs } from "@mui/material";
 import {
   FaSpinner,
   FaUserTie,
-  FaClock,
   FaChevronDown,
   FaChevronUp,
-  FaInfoCircle,
-  FaHashtag,
-  FaChevronCircleRight,
 } from "react-icons/fa";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
@@ -92,27 +88,27 @@ const RequestHistory = () => {
       <Paper
         elevation={3}
         style={{
-          padding: '20px',
-          borderRadius: '10px',
-          backgroundColor: '#fafafa',
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: "20px",
+          borderRadius: "10px",
+          backgroundColor: "#fafafa",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
         }}
       >
         {/* List Header */}
         <div
           style={{
-            display: 'flex',
-            fontWeight: 'bold',
-            backgroundColor: '#f1f1f1',
-            padding: '10px',
-            borderRadius: '8px',
-            marginBottom: '10px',
+            display: "flex",
+            fontWeight: "bold",
+            backgroundColor: "#f1f1f1",
+            padding: "10px",
+            borderRadius: "8px",
+            marginBottom: "10px",
           }}
         >
-          <div style={{ flex: '0.5', marginLeft: '20px' }}>No.</div>
-          <div style={{ flex: '2' }}>Service Name</div>
-          <div style={{ flex: '1.5' }}>Request Date</div>
-          <div style={{ flex: '1.5' }}>Action</div>
+          <div style={{ flex: "0.5", marginLeft: "20px" }}>No.</div>
+          <div style={{ flex: "2" }}>Service Name</div>
+          <div style={{ flex: "1.5" }}>Request Date</div>
+          <div style={{ flex: "1.5" }}>Action</div>
         </div>
 
         {/* Provider Requests List */}
@@ -120,64 +116,73 @@ const RequestHistory = () => {
           <div
             key={request.id}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px',
-              backgroundColor: '#ffffff',
-              border: '2px solid #e0e0e0',
-              borderRadius: '8px',
-              marginBottom: '10px',
-              transition: 'all 0.3s ease',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px",
+              backgroundColor: "#ffffff",
+              border: "2px solid #e0e0e0",
+              borderRadius: "8px",
+              marginBottom: "10px",
+              transition: "all 0.3s ease",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0px 4px 12px rgba(0, 0, 0, 0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0px 4px 12px rgba(0, 0, 0, 0.2)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
           >
             {/* No */}
-            <div style={{ flex: '0.5', color: '#333', marginLeft: '20px' }}>
+            <div style={{ flex: "0.5", color: "#333", marginLeft: "20px" }}>
               {index + 1}
             </div>
 
             {/* Service Name */}
-            <div style={{ flex: '2', color: '#333', fontWeight: '500' }}>
+            <div style={{ flex: "2", color: "#333", fontWeight: "500" }}>
               <Link
                 to={`/services-history/services/${request.requestDetails[0].serviceId}`}
                 style={{
-                  color: '#1e88e5',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
+                  color: "#1e88e5",
+                  textDecoration: "none",
+                  fontWeight: "500",
+                  display: "flex",
+                  alignItems: "center",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#1565c0')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#1e88e5')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#1565c0")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#1e88e5")}
               >
                 {request.service.name}
               </Link>
             </div>
 
             {/* Request Date */}
-            <div style={{ flex: '1.5', color: '#555', fontWeight: '500' }}>
+            <div style={{ flex: "1.5", color: "#555", fontWeight: "500" }}>
               {formatDate(request.requestDate)}
             </div>
 
             {/* Action */}
-            <div style={{ flex: '1.5' }}>
+            <div style={{ flex: "1.5" }}>
               <Button
-                onClick={() => window.location.href = `/services-history/request/${request.id}`}
+                onClick={() =>
+                  (window.location.href = `/services-history/request/${request.id}`)
+                }
                 style={{
-                  backgroundColor: '#1e88e5',
-                  color: '#fff',
-                  padding: '6px 12px',
-                  borderRadius: '5px',
-                  fontWeight: '500',
-                  display: 'inline-flex',
-                  alignItems: 'center',
+                  backgroundColor: "#1e88e5",
+                  color: "#fff",
+                  padding: "6px 12px",
+                  borderRadius: "5px",
+                  fontWeight: "500",
+                  display: "inline-flex",
+                  alignItems: "center",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1565c0')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1e88e5')}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1565c0")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1e88e5")
+                }
               >
-                <IoIosEye style={{ marginRight: '8px' }} />
+                <IoIosEye style={{ marginRight: "8px" }} />
                 View Request
               </Button>
             </div>

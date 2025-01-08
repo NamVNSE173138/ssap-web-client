@@ -1,11 +1,5 @@
 import {
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Box,
   Dialog,
@@ -14,10 +8,9 @@ import {
   DialogContentText,
   TextField,
   IconButton,
-  styled,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { updateFinishRequest } from "@/services/ApiServices/requestService";
 import { useEffect, useState } from "react";
 import {
@@ -37,8 +30,7 @@ import { toast } from "react-toastify";
 import { notification } from "antd";
 import { Button, DialogActions } from '@mui/material';
 import { Cancel, Save, Close, Send } from '@mui/icons-material';
-import { IoIosAddCircleOutline, IoMdAddCircle } from "react-icons/io";
-import AccountApplicantDialog from "../ServiceDetail/applicantrequests-dialog";
+import { IoIosAddCircleOutline} from "react-icons/io";
 import AddCommentRequest from "../ServiceDetail/add-comment-request";
 
 const RequestDetailTable = ({
