@@ -27,7 +27,7 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
-  applicationDocs?: {
+  applicationDocuments?: {
     applicationId: number;
     type: string;
     name: string;
@@ -60,9 +60,9 @@ const ReviewList: React.FC = () => {
   const [comment, setComment] = useState("");
   const [score, setScore] = useState<number | string>("");
   const [selectedReview, setSelectedReview] = useState<any>(null);
-
-  console.log("select",selectedItem?.applicationDocs);
   
+
+  console.log("select", selectedItem);
 
   const handleRowClick = (item: ApprovalItem, review: any) => {
     if (review.expertId != user.id) return;
@@ -94,15 +94,11 @@ const ReviewList: React.FC = () => {
       console.log("API response:", expertAssign);
 
       const scholarshipId = id;
-      //console.log("scholarshipId:", scholarshipId);
 
       const filteredApplications = expertAssign.filter((app: any) => {
-        //console.log("app.scholarshipProgram.id:", app.scholarshipProgramId);
-        //console.log("scholarshipId:", scholarshipId);
 
         return Number(app.scholarshipProgramId) == Number(scholarshipId);
       });
-      //console.log("filter",filteredApplications);
 
       const detailedApplications = await Promise.all(
         expertAssign
@@ -128,11 +124,12 @@ const ReviewList: React.FC = () => {
               details: scholarshipResponse.data.data.description,
               documentUrl: app.applicationDocuments?.[0]?.fileUrl,
               applicationReviews: app.applicationReviews,
+              applicationDocuments: app.applicationDocuments
             };
           })
       );
       setApplications(detailedApplications);
-      //console.log("detailapplication",detailedApplications);
+      console.log("ádfasdfasdfas",detailedApplications);
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
       console.error(err);
@@ -140,6 +137,8 @@ const ReviewList: React.FC = () => {
       setLoading(false);
     }
   };
+ 
+
   useEffect(() => {
     fetchApplicationReview();
   }, [user.id]);
@@ -314,14 +313,14 @@ const ReviewList: React.FC = () => {
                                 }}
                                 // disabled={isScored}
                               >
-                                <Link
+                                {/* <Link
                                   to={item.documentUrl ?? " "}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-block rounded-lg"
                                 >
+                                </Link> */}
                                   Review Document
-                                </Link>
                               </Button>
                               <Button
                                 className={`w-full h-full ${
@@ -462,16 +461,16 @@ const ReviewList: React.FC = () => {
                                   e.stopPropagation();
                                   if (!isScored) handleRowClick(item, review);
                                 }}
-                                disabled={isScored}
+                                // disabled={isScored}
                               >
-                                <Link
+                                {/* <Link
                                   to={item?.documentUrl ?? " "}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-block rounded-lg"
                                 >
+                                </Link> */}
                                   Review Document
-                                </Link>
                               </Button>
                               <Button
                                 className={`w-full h-full ${
@@ -535,23 +534,23 @@ const ReviewList: React.FC = () => {
                     <h3 className="text-lg font-semibold">
                       Submitted Documents
                     </h3>
-                    {selectedItem.applicationDocs ? (
-                      selectedItem.applicationDocs.length > 0 ? (
+                    {selectedItem?.applicationDocuments ? (
+                      selectedItem.applicationDocuments.length > 0 ? (
                         <ul className="mt-2 space-y-2">
-                          {selectedItem.applicationDocs.map((doc) => (
+                          {selectedItem.applicationDocuments.map((doc) => (
                             <li
                               key={doc.applicationId + doc.name}
                               className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
                             >
-                              <span>{doc.name}</span>
-                              <a
-                                href={doc.fileUrl}
+                              <Link
+                                to={doc.fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:underline"
-                              >
-                                Download
-                              </a>
+                                >
+                                <span>{doc.name}</span>
+                                {/* View */}
+                              </Link>
                             </li>
                           ))}
                         </ul>

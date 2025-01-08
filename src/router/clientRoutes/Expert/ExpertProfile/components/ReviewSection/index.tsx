@@ -82,11 +82,6 @@ const ApprovalList: React.FC = () => {
             `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgram.id}`
           );
           console.log("Scholarship Program:", app.scholarshipProgram);
-          // const applicationDocs = await axios.get(
-          //   `${BASE_URL}/api/applicants/${app.applicantId}/applications`
-          // );
-          // const res = applicationDocs.data.data;
-          // console.log("resDocs", res);
           return {
             id: app.id,
             applicantName: applicantResponse.data.username,
@@ -139,12 +134,10 @@ const ApprovalList: React.FC = () => {
   // }, {} as Record<string, ApprovalItem[]>);
 
   const groupedApplications = filteredApplications
-    // Sắp xếp tất cả ứng dụng trước theo appliedDate (mới nhất -> cũ nhất)
     .sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     )
-    // Nhóm ứng dụng theo scholarshipProgramId
     .reduce((acc, app) => {
       if (!acc[app.scholarshipProgramId]) {
         acc[app.scholarshipProgramId] = [];
@@ -165,11 +158,9 @@ const ApprovalList: React.FC = () => {
         ...appsB.map((app) => new Date(app.updatedAt).getTime())
       );
 
-      // Log to check the latest updatedAt for each group
-      // console.log("latestUpdatedAtA:", latestUpdatedAtA);
-      // console.log("latestUpdatedAtB:", latestUpdatedAtB);
+      
 
-      return latestUpdatedAtB - latestUpdatedAtA; // Sort from newest to oldest
+      return latestUpdatedAtB - latestUpdatedAtA; 
     }
   );
 
@@ -261,7 +252,7 @@ const ApprovalList: React.FC = () => {
           
 
           {/* Chấm điểm phần */}
-          <Dialog.Root
+          {/* <Dialog.Root
             open={!!selectedItem}
             onOpenChange={() => setSelectedItem(null)}
           >
@@ -295,7 +286,7 @@ const ApprovalList: React.FC = () => {
                     </div>
 
                     {/* Add form for scoring */}
-                    <div className="mt-4">
+                    {/* <div className="mt-4">
                       <Label className="block text-sm font-medium text-gray-700">
                         Score
                       </Label>
@@ -325,13 +316,13 @@ const ApprovalList: React.FC = () => {
                       >
                         Submit Review
                       </Button>
-                    </div>
-                  </div>
-                )}
-              </Dialog.Content>
-            </Dialog.Portal>
-            {isLoading && <ScreenSpinner />}
-          </Dialog.Root>
+                    </div> */}
+                  {/* </div> */}
+                {/* )} */}
+              {/* </Dialog.Content> */}
+            {/* </Dialog.Portal> */}
+            {/* {isLoading && <ScreenSpinner />} */}
+          {/* </Dialog.Root> */} 
         </div>
       </div>
     </Tabs.Content>
