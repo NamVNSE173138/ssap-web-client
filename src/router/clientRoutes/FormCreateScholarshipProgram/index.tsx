@@ -68,8 +68,12 @@ const FormCreateScholarshipProgram = () => {
   });
 
   const handleNext = (data: any) => {
-    setFormData({ ...formData, ...data }); // Lưu dữ liệu từ bước hiện tại
+    setFormData({ ...formData, ...data });
     setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    setStep(step - 1);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,41 +193,36 @@ const FormCreateScholarshipProgram = () => {
         <form className="space-y-6 ">
           <div className="flex items-center justify-center">
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                step === 1 ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               1
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                step === 2 ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 2 ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               2
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                step === 3 ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 3 ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               3
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                step === 4 ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 4 ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               4
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                step === 5 ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 5 ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               5
             </div>
@@ -231,28 +230,25 @@ const FormCreateScholarshipProgram = () => {
           <div className="flex justify-center gap-5">
             <div className="text-center w-30">
               <p
-                className={`text-sm font-medium ${
-                  step === 1 ? "text-blue-600" : "text-gray-500"
-                }`}
+                className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"
+                  }`}
               >
                 General Information
               </p>
             </div>
             <div className="text-center w-32">
               <p
-                className={`text-sm font-medium ${
-                  step === 2 ? "text-blue-600" : "text-gray-500"
-                }`}
+                className={`text-sm font-medium ${step === 2 ? "text-blue-600" : "text-gray-500"
+                  }`}
               >
                 {" "}
-                Required Documents
+                Criteria & Documents
               </p>
             </div>
             <div className="text-center w-28">
               <p
-                className={`text-sm font-medium ${
-                  step === 3 ? "text-blue-600" : "text-gray-500"
-                }`}
+                className={`text-sm font-medium ${step === 3 ? "text-blue-600" : "text-gray-500"
+                  }`}
               >
                 {" "}
                 Review Milestones
@@ -260,9 +256,8 @@ const FormCreateScholarshipProgram = () => {
             </div>
             <div className="text-center w-27">
               <p
-                className={`text-sm font-medium ${
-                  step === 4 ? "text-blue-600" : "text-gray-500"
-                }`}
+                className={`text-sm font-medium ${step === 4 ? "text-blue-600" : "text-gray-500"
+                  }`}
               >
                 {" "}
                 Award Milestones
@@ -270,13 +265,12 @@ const FormCreateScholarshipProgram = () => {
             </div>
             <div className="text-center w-32">
               <p
-                className={`text-sm font-medium ${
-                  step === 5 ? "text-blue-600" : "text-gray-500"
-                }`}
+                className={`text-sm font-medium ${step === 5 ? "text-blue-600" : "text-gray-500"
+                  }`}
               >
                 {" "}
-                Preview 
-             </p>
+                Preview
+              </p>
             </div>
           </div>
           {step === 1 && (
@@ -287,38 +281,36 @@ const FormCreateScholarshipProgram = () => {
 
           {step === 2 && (
             <>
-              <UcmStep formData={formData} onSave={handleNext} />
-              <div className="">
+              <UcmStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              {/* <div className="">
                 <Button onClick={() => setStep(1)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
 
           {step === 3 && (
             <>
-              <ReviewMilestoneStep formData={formData} onSave={handleNext} />
-              <div className="flex justify-between mt-4">
+              <ReviewMilestoneStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              {/* <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(2)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
 
           {step === 4 && (
             <>
-              <AwardMilestoneStep formData={formData} onSave={handleNext} />
-              <div className="flex justify-between mt-4">
+              <AwardMilestoneStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              {/* <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(3)}>Back</Button>
-              </div>
+              </div> */}
             </>
           )}
 
           {step === 5 && (
             <>
-              <ViewDataCreated formData={formData}/>
-              <div className="flex justify-between mt-4">
-                <Button onClick={() => setStep(4)}>Back</Button>
-              </div>
-              <div className="flex flex-col items-start">
+              <ViewDataCreated formData={formData} onBack={handleBack}/>
+              
+              <div className="flex flex-col items-start ml-10">
                 <span className="text-black">
                   <input
                     type="checkbox"
@@ -344,6 +336,9 @@ const FormCreateScholarshipProgram = () => {
                   Create Program
                 </Button>
               </div>
+              {/* <div className="flex justify-between mt-4">
+                <Button onClick={() => setStep(4)}>Back</Button>
+              </div> */}
             </>
           )}
         </form>
