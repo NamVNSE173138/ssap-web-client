@@ -1,21 +1,28 @@
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { RootState } from "@/store/store";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 import { FaCalendarAlt } from "react-icons/fa";
-import { Checkbox, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { getExpertsByFunder } from "@/services/ApiServices/expertService";
-import { IoIosAddCircleOutline, IoIosDoneAll, IoMdClose } from "react-icons/io";
-import { assignExpertsToScholarshipProgram, getAllScholarshipProgramExperts } from "@/services/ApiServices/scholarshipProgramService";
-import { message, notification } from "antd";
+import { IoIosDoneAll, IoMdClose } from "react-icons/io";
+import {
+  assignExpertsToScholarshipProgram,
+  getAllScholarshipProgramExperts,
+} from "@/services/ApiServices/scholarshipProgramService";
+import { notification } from "antd";
 import { SearchIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 
 const AddExpertToScholarship = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +35,7 @@ const AddExpertToScholarship = () => {
   const [selectedExperts, setSelectedExperts] = useState<any[]>([]);
   const [expertsInScholarship, setExpertsInScholarship] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filteredExpert, setFilteredExpert] = useState<any[]>([]);
+  const [_filteredExpert, setFilteredExpert] = useState<any[]>([]);
   const [scholarshipMajor, setScholarshipMajor] = useState<any[]>([]);
   const navigate = useNavigate();
   const ITEMS_PER_PAGE = 5;
@@ -48,12 +55,12 @@ const AddExpertToScholarship = () => {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
       return (
         expert.username.toLowerCase().includes(lowerCaseSearchTerm) ||
-        (expert.major && expert.major.toLowerCase().includes(lowerCaseSearchTerm))
+        (expert.major &&
+          expert.major.toLowerCase().includes(lowerCaseSearchTerm))
       );
     });
     setFilteredExpert(filtered);
   }, [searchTerm, _experts]);
-
 
   const clearSearch = () => {
     setSearchTerm("");
@@ -72,7 +79,7 @@ const AddExpertToScholarship = () => {
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
-        setScholarshipMajor(response.data.data.major.name)
+        setScholarshipMajor(response.data.data.major.name);
         console.log(response.data.data);
       } else {
         setError("Failed to fetch data");
@@ -124,7 +131,9 @@ const AddExpertToScholarship = () => {
   const handleDone = async () => {
     try {
       if (!_experts || _experts.length === 0) {
-        notification.error({ message: "Experts data is not loaded. Please try again later." });
+        notification.error({
+          message: "Experts data is not loaded. Please try again later.",
+        });
         return;
       }
 
@@ -135,7 +144,11 @@ const AddExpertToScholarship = () => {
 
       if (invalidExperts.length > 0) {
         const invalidExpertNames = invalidExperts
-          .map((expertId) => _experts.find((e) => e.expertId === expertId)?.username || "Unknown")
+          .map(
+            (expertId) =>
+              _experts.find((e) => e.expertId === expertId)?.username ||
+              "Unknown"
+          )
           .join(", ");
         notification.error({
           message: `The following experts do not match your scholarship major "(${scholarshipMajor})": ${invalidExpertNames}.`,
@@ -155,7 +168,6 @@ const AddExpertToScholarship = () => {
       notification.error({ message: "Failed to assign experts." });
     }
   };
-
 
   return (
     <div>
@@ -204,7 +216,9 @@ const AddExpertToScholarship = () => {
               <div className="p-2 bg-[#1eb2a6] rounded-full">
                 <FaCalendarAlt className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Expert List</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                Expert List
+              </h2>
             </div>
             <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
           </div>
@@ -214,11 +228,11 @@ const AddExpertToScholarship = () => {
           <Paper
             elevation={3}
             style={{
-              padding: '20px',
-              borderRadius: '10px',
-              backgroundColor: '#fafafa',
-              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-              overflow: 'auto',
+              padding: "20px",
+              borderRadius: "10px",
+              backgroundColor: "#fafafa",
+              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+              overflow: "auto",
             }}
           >
             <div className="w-full mt-4 lg:mt-6">
@@ -240,12 +254,12 @@ const AddExpertToScholarship = () => {
             </div>
             <div
               style={{
-                display: 'flex',
-                fontWeight: 'bold',
-                backgroundColor: '#f1f1f1',
-                padding: '10px',
-                borderRadius: '8px',
-                marginBottom: '10px',
+                display: "flex",
+                fontWeight: "bold",
+                backgroundColor: "#f1f1f1",
+                padding: "10px",
+                borderRadius: "8px",
+                marginBottom: "10px",
               }}
             >
               <div style={{ flex: 0.25 }}></div>
@@ -261,24 +275,29 @@ const AddExpertToScholarship = () => {
             {paginatedmExperts.length > 0 ? (
               paginatedmExperts.map((expert: any, index: any) => {
                 const isAlreadyInScholarship = expertsInScholarship.some(
-                  (existingExpert) => existingExpert.expertId === expert.expertId
+                  (existingExpert) =>
+                    existingExpert.expertId === expert.expertId
                 );
 
                 return (
                   <div
                     key={expert.id}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      backgroundColor: '#f9f9f9',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
-                      transition: 'background-color 0.3s ease',
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      backgroundColor: "#f9f9f9",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      transition: "background-color 0.3s ease",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#e3f2fd")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                    }
                   >
                     <div style={{ flex: 0.25 }}>
                       <input
@@ -296,56 +315,79 @@ const AddExpertToScholarship = () => {
                         onChange={() => {
                           if (selectedExperts.includes(expert.expertId)) {
                             setSelectedExperts(
-                              selectedExperts.filter((id) => id !== expert.expertId)
+                              selectedExperts.filter(
+                                (id) => id !== expert.expertId
+                              )
                             );
                           } else {
-                            setSelectedExperts([...selectedExperts, expert.expertId]);
+                            setSelectedExperts([
+                              ...selectedExperts,
+                              expert.expertId,
+                            ]);
                           }
                         }}
                       />
                     </div>
 
-
                     {/* Cột số thứ tự */}
-                    <div style={{ flex: 0.5 }}>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</div>
+                    <div style={{ flex: 0.5 }}>
+                      {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
+                    </div>
 
                     <div style={{ flex: 0.5 }}>
                       <img
-                        src={expert.avatarUrl || '/path/to/default-avatar.jpg'}
+                        src={expert.avatarUrl || "/path/to/default-avatar.jpg"}
                         style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '50%',
-                          objectFit: 'cover',
-                          border: '2px solid #0369a1',
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                          border: "2px solid #0369a1",
                         }}
                       />
                     </div>
 
                     {/* Cột tên chuyên gia */}
                     <div style={{ flex: 0.75 }}>
-                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.name}</span>
+                      <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                        {expert.name}
+                      </span>
                     </div>
 
                     <div style={{ flex: 1 }}>
-                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.email}</span>
+                      <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                        {expert.email}
+                      </span>
                     </div>
 
                     <div style={{ flex: 0.75 }}>
-                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.phoneNumber}</span>
+                      <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                        {expert.phoneNumber}
+                      </span>
                     </div>
 
                     {/* Cột major */}
                     <div style={{ flex: 1.5 }}>
-                      <span style={{ fontWeight: 'bold', color: '#0369a1' }}>{expert.major || "N/a"}</span>
+                      <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                        {expert.major || "N/a"}
+                      </span>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className="text-center text-gray-500">No experts match your search.</p>
+              <p className="text-center text-gray-500">
+                No experts match your search.
+              </p>
             )}
-            <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+            <div
+              style={{
+                marginTop: "20px",
+                marginBottom: "10px",
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
               {Array.from({ length: totalPages }, (_, index) => (
                 <button
                   key={index}
@@ -353,7 +395,8 @@ const AddExpertToScholarship = () => {
                   style={{
                     margin: "0 5px",
                     padding: "5px 10px",
-                    backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                    backgroundColor:
+                      currentPage === index + 1 ? "#419f97" : "#f1f1f1",
                     color: currentPage === index + 1 ? "white" : "black",
                     border: "none",
                     borderRadius: "5px",

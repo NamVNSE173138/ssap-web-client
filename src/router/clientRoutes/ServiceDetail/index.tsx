@@ -15,18 +15,15 @@ import {
 } from "@/services/ApiServices/serviceService";
 import {
   createRequest,
-  getRequestById,
   getRequestsByService,
 } from "@/services/ApiServices/requestService";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { uploadFile } from "@/services/ApiServices/testService";
 import {
-  FaCalendarAlt,
   FaClipboardList,
   FaEdit,
   FaExclamationTriangle,
-  FaEye,
   FaPlus,
   FaRedo,
   FaServicestack,
@@ -39,11 +36,7 @@ import {
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
-import {
-  FaInfoCircle,
-  FaDollarSign,
-  FaUser,
-} from "react-icons/fa";
+import { FaInfoCircle, FaDollarSign, FaUser } from "react-icons/fa";
 import { Button, Dialog, DialogTitle, Paper, Tab, Tabs } from "@mui/material";
 import { IoIosEye, IoIosPaper } from "react-icons/io";
 import {
@@ -79,8 +72,9 @@ interface ServiceType {
 const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
   return (
     <div
-      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${isOpen ? "block" : "hidden"
-        }`}
+      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${
+        isOpen ? "block" : "hidden"
+      }`}
       onClick={onClose}
     >
       <div
@@ -150,24 +144,31 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [isContractOpen, setContractOpen] = useState(false);
   const [_isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
-  const [requestapplicants, setRequestApplicants] = useState<any>({ pending: [], finished: [] });
+  const [requestapplicants, setRequestApplicants] = useState<any>({
+    pending: [],
+    finished: [],
+  });
   const [selectedTab, setSelectedTab] = useState(0);
   const [currentTabPageForPending, setCurrentTabPageForPending] = useState(1);
   const [currentTabPageForFinished, setCurrentTabPageForFinished] = useState(1);
 
-  const totalTabPagesForPending = Math.ceil(requestapplicants?.pending?.length / ITEMS_PER_PAGE);
-  const totalTabPagesForFinished = Math.ceil(requestapplicants?.finished?.length / ITEMS_PER_PAGE);
+  const totalTabPagesForPending = Math.ceil(
+    requestapplicants?.pending?.length / ITEMS_PER_PAGE
+  );
+  const totalTabPagesForFinished = Math.ceil(
+    requestapplicants?.finished?.length / ITEMS_PER_PAGE
+  );
 
   const paginatedTabData =
     selectedTab === 0
       ? requestapplicants?.pending?.slice(
-        (currentTabPageForPending - 1) * ITEMS_PER_PAGE,
-        currentTabPageForPending * ITEMS_PER_PAGE
-      )
+          (currentTabPageForPending - 1) * ITEMS_PER_PAGE,
+          currentTabPageForPending * ITEMS_PER_PAGE
+        )
       : requestapplicants?.finished?.slice(
-        (currentTabPageForFinished - 1) * ITEMS_PER_PAGE,
-        currentTabPageForFinished * ITEMS_PER_PAGE
-      );
+          (currentTabPageForFinished - 1) * ITEMS_PER_PAGE,
+          currentTabPageForFinished * ITEMS_PER_PAGE
+        );
 
   const handleTabPageChange = (page: number) => {
     if (selectedTab === 0) {
@@ -177,20 +178,23 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     }
   };
 
-
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
         const applications = await getRequestsByService(id);
         const requestApplicant = applications.data;
-        console.log(applications)
-        console.log(requestApplicant)
+        console.log(applications);
+        console.log(requestApplicant);
         setRequestApplicants({
-          pending: requestApplicant.filter((app: any) => app.status === "Pending"),
-          finished: requestApplicant.filter((app: any) => app.status === "Finished"),
+          pending: requestApplicant.filter(
+            (app: any) => app.status === "Pending"
+          ),
+          finished: requestApplicant.filter(
+            (app: any) => app.status === "Finished"
+          ),
         });
       } catch (error: any) {
-        console.log(error)
+        console.log(error);
       }
     };
     fetchApplicants();
@@ -263,7 +267,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
       const response = await getRequestsByService(serviceId);
       if (response.statusCode == 200) {
         setApplicants(response.data);
-        const existingRequest = response.data
+        const existingRequest = response.data;
         console.log(existingRequest);
         if (existingRequest) {
           setExistingRequestId(existingRequest.id);
@@ -368,7 +372,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     }
 
     if (description.length > 200) {
-      notification.error({ message: "Description cannot exceed 200 characters." });
+      notification.error({
+        message: "Description cannot exceed 200 characters.",
+      });
       return;
     }
 
@@ -465,7 +471,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             <div className="mb-5 flex justify-between items-center">
               <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
                 <IoIosPaper className="text-3xl text-blue-500 mr-3" />
-                <span className="font-bold">Request for {serviceData.name}</span>
+                <span className="font-bold">
+                  Request for {serviceData.name}
+                </span>
               </DialogTitle>
               <span
                 className="text-xl cursor-pointer text-gray-600 hover:text-red-500 transition-all"
@@ -489,8 +497,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-300 focus:outline-none shadow-sm"
                 />
                 <div
-                  className={`text-sm mt-1 ${description.length > 200 ? "text-red-500" : "text-gray-500"
-                    }`}
+                  className={`text-sm mt-1 ${
+                    description.length > 200 ? "text-red-500" : "text-gray-500"
+                  }`}
                 >
                   {description.length}/{200}
                 </div>
@@ -534,7 +543,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </div>
                 )}
               </div>
-
 
               <div className="mb-5">
                 <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
@@ -583,10 +591,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 <div className="flex gap-6">
                   <div
                     onClick={() => setPaymentMethod("Wallet")}
-                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Wallet"
-                      ? "border-blue-500 bg-blue-100"
-                      : "border-gray-300 hover:bg-gray-100"
-                      }`}
+                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${
+                      paymentMethod === "Wallet"
+                        ? "border-blue-500 bg-blue-100"
+                        : "border-gray-300 hover:bg-gray-100"
+                    }`}
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full">
                       <IoWalletOutline className="text-2xl" />
@@ -597,10 +606,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </div>
                   <div
                     onClick={() => setPaymentMethod("Cash")}
-                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === "Cash"
-                      ? "border-green-500 bg-green-100"
-                      : "border-gray-300 hover:bg-gray-100"
-                      }`}
+                    className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${
+                      paymentMethod === "Cash"
+                        ? "border-green-500 bg-green-100"
+                        : "border-gray-300 hover:bg-gray-100"
+                    }`}
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full">
                       <IoCashOutline className="text-2xl" />
@@ -676,10 +686,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
             <Breadcrumb>
               <BreadcrumbList className="text-[#000]">
                 <BreadcrumbItem>
-                  <Link
-                    to="/"
-                    className="md:text-xl text-lg "
-                  >
+                  <Link to="/" className="md:text-xl text-lg ">
                     Home
                   </Link>
                 </BreadcrumbItem>
@@ -735,31 +742,79 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                       <thead>
                         <tr className="bg-gray-100 text-gray-700">
-                          <th className="p-4 text-left font-semibold" style={{ width: '5%' }}>#</th> {/* Chiếm 0.5 */}
-                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Applicant Name</th> {/* Chiếm 2 */}
-                          <th className="p-4 text-left font-semibold" style={{ width: '10%' }}>Rating</th> {/* Chiếm 1 */}
-                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Comment</th> {/* Chiếm 2 */}
-                          <th className="p-4 text-left font-semibold" style={{ width: '15%' }}>Date</th> {/* Chiếm 1 */}
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "5%" }}
+                          >
+                            #
+                          </th>{" "}
+                          {/* Chiếm 0.5 */}
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "20%" }}
+                          >
+                            Applicant Name
+                          </th>{" "}
+                          {/* Chiếm 2 */}
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "10%" }}
+                          >
+                            Rating
+                          </th>{" "}
+                          {/* Chiếm 1 */}
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "20%" }}
+                          >
+                            Comment
+                          </th>{" "}
+                          {/* Chiếm 2 */}
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "15%" }}
+                          >
+                            Date
+                          </th>{" "}
+                          {/* Chiếm 1 */}
                         </tr>
                       </thead>
                       <tbody>
                         {feedbacks.map((feedback, index) => (
                           <tr key={index} className="border-t hover:bg-gray-50">
-                            <td className="p-4" style={{ width: '5%' }}>{index + 1}</td> {/* Chiếm 0.5 */}
-                            <td className="p-4" style={{ width: '20%' }}>{feedback.name || "********"}</td> {/* Chiếm 2 */}
-                            <td className="p-4 flex items-center" style={{ width: '10%' }}>
+                            <td className="p-4" style={{ width: "5%" }}>
+                              {index + 1}
+                            </td>{" "}
+                            {/* Chiếm 0.5 */}
+                            <td className="p-4" style={{ width: "20%" }}>
+                              {feedback.name || "********"}
+                            </td>{" "}
+                            {/* Chiếm 2 */}
+                            <td
+                              className="p-4 flex items-center"
+                              style={{ width: "10%" }}
+                            >
                               {[...Array(5)].map((_, i) => (
                                 <FaStar
                                   key={i}
-                                  color={i < feedback.rating ? "#FFB800" : "#ddd"}
+                                  color={
+                                    i < feedback.rating ? "#FFB800" : "#ddd"
+                                  }
                                   size={18}
                                 />
                               ))}
-                            </td> {/* Chiếm 1 */}
-                            <td className="p-4" style={{ width: '20%' }}>{feedback.content}</td> {/* Chiếm 2 */}
-                            <td className="p-4" style={{ width: '15%' }}>
-                              {new Date(feedback.feedbackDate).toLocaleDateString('en-US')}
-                            </td> {/* Chiếm 1 */}
+                            </td>{" "}
+                            {/* Chiếm 1 */}
+                            <td className="p-4" style={{ width: "20%" }}>
+                              {feedback.content}
+                            </td>{" "}
+                            {/* Chiếm 2 */}
+                            <td className="p-4" style={{ width: "15%" }}>
+                              {new Date(
+                                feedback.feedbackDate
+                              ).toLocaleDateString("en-US")}
+                            </td>{" "}
+                            {/* Chiếm 1 */}
                           </tr>
                         ))}
                       </tbody>
@@ -768,11 +823,36 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                       <thead>
                         <tr className="bg-gray-100 text-gray-700">
-                          <th className="p-4 text-left font-semibold" style={{ width: '5%' }}>#</th>
-                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Applicant Name</th>
-                          <th className="p-4 text-left font-semibold" style={{ width: '10%' }}>Rating</th>
-                          <th className="p-4 text-left font-semibold" style={{ width: '20%' }}>Comment</th>
-                          <th className="p-4 text-left font-semibold" style={{ width: '15%' }}>Date</th>
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "5%" }}
+                          >
+                            #
+                          </th>
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "20%" }}
+                          >
+                            Applicant Name
+                          </th>
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "10%" }}
+                          >
+                            Rating
+                          </th>
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "20%" }}
+                          >
+                            Comment
+                          </th>
+                          <th
+                            className="p-4 text-left font-semibold"
+                            style={{ width: "15%" }}
+                          >
+                            Date
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -823,10 +903,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                       <>
                         <button
                           onClick={() => openEditDialog()}
-                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
-                            ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                            : "bg-yellow-500 hover:bg-yellow-400 text-white"
-                            }`}
+                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
+                            !canEdit
+                              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                              : "bg-yellow-500 hover:bg-yellow-400 text-white"
+                          }`}
                           disabled={!canEdit}
                           title={
                             !canEdit
@@ -844,10 +925,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         </button> */}
                         <button
                           onClick={() => setConfirmationDialogOpen(true)}
-                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${!canEdit
-                            ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                            : "bg-red-600 hover:bg-red-500 text-white"
-                            }`}
+                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
+                            !canEdit
+                              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                              : "bg-red-600 hover:bg-red-500 text-white"
+                          }`}
                           disabled={!canEdit}
                           title={
                             !canEdit
@@ -877,7 +959,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 <div className="p-2 bg-[#1eb2a6] rounded-full">
                   <FaServicestack className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-3xl sm:text-3xl font-bold text-gray-800">Service Details</h2>
+                <h2 className="text-3xl sm:text-3xl font-bold text-gray-800">
+                  Service Details
+                </h2>
               </div>
               <div className="h-1 w-16 bg-[#1eb2a6] rounded mt-2"></div>
               <br />
@@ -890,7 +974,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-blue-50">
                     <FaInfoCircle className="text-blue-500 text-3xl" />
                     <div>
-                      <p className="text-lg font-semibold text-gray-700">Service Type:</p>
+                      <p className="text-lg font-semibold text-gray-700">
+                        Service Type:
+                      </p>
                       <p className="text-gray-600">{serviceData.type}</p>
                     </div>
                   </div>
@@ -900,7 +986,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     <FaUser className="text-indigo-500 text-3xl" />
                     <div>
                       <Link
-                        to={RouteNames.PROVIDER_INFORMATION.replace(":id", serviceData.providerId)}
+                        to={RouteNames.PROVIDER_INFORMATION.replace(
+                          ":id",
+                          serviceData.providerId
+                        )}
                         className="text-[#1eb2a6] hover:underline text-lg font-semibold"
                       >
                         Provider Information
@@ -915,7 +1004,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-green-50">
                     <FaDollarSign className="text-green-500 text-3xl" />
                     <div>
-                      <p className="text-lg font-semibold text-gray-700">Price:</p>
+                      <p className="text-lg font-semibold text-gray-700">
+                        Price:
+                      </p>
                       <p className="text-gray-600">${serviceData.price}</p>
                     </div>
                   </div>
@@ -924,7 +1015,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-yellow-50">
                     <FaClipboardList className="text-teal-500 text-3xl" />
                     <div>
-                      <p className="text-lg font-semibold text-gray-700">About This Service:</p>
+                      <p className="text-lg font-semibold text-gray-700">
+                        About This Service:
+                      </p>
                       <p className="text-gray-600">{serviceData.description}</p>
                     </div>
                   </div>
@@ -932,7 +1025,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               </div>
             </div>
           </div>
-
 
           <br></br>
           <br></br>
@@ -946,12 +1038,13 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     <div className="p-4 bg-gradient-to-r from-[#1eb2a6] to-[#0d9488] rounded-full">
                       <FaUsers className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-800">Applicant's Requests</h2>
+                    <h2 className="text-3xl font-bold text-gray-800">
+                      Applicant's Requests
+                    </h2>
                   </div>
                   {/* Gạch dưới */}
                   <div className="h-1 w-20 bg-gradient-to-r from-[#1eb2a6] to-[#0d9488] rounded mt-2"></div>
                 </div>
-
 
                 {/* Tabs */}
                 <Tabs
@@ -983,21 +1076,21 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 <Paper
                   elevation={3}
                   style={{
-                    padding: '20px',
-                    borderRadius: '10px',
-                    backgroundColor: '#fafafa',
-                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                    padding: "20px",
+                    borderRadius: "10px",
+                    backgroundColor: "#fafafa",
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   {/* Table Header */}
                   <div
                     style={{
-                      display: 'flex',
-                      fontWeight: 'bold',
-                      backgroundColor: '#f1f1f1',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
+                      display: "flex",
+                      fontWeight: "bold",
+                      backgroundColor: "#f1f1f1",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
                     }}
                   >
                     <div style={{ flex: 0.5 }}>#</div>
@@ -1013,17 +1106,21 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                       <div
                         key={app.id}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          backgroundColor: '#f9f9f9',
-                          padding: '10px',
-                          borderRadius: '8px',
-                          marginBottom: '10px',
-                          transition: 'background-color 0.3s ease',
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          backgroundColor: "#f9f9f9",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          marginBottom: "10px",
+                          transition: "background-color 0.3s ease",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e3f2fd')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#e3f2fd")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                        }
                       >
                         {/* Index */}
                         <div style={{ flex: 0.5 }}>{index + 1}</div>
@@ -1031,14 +1128,17 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         {/* Avatar */}
                         <div style={{ flex: 1 }}>
                           <img
-                            src={app.applicant.avatarUrl || '/path/to/default-avatar.jpg'}
+                            src={
+                              app.applicant.avatarUrl ||
+                              "/path/to/default-avatar.jpg"
+                            }
                             alt="Avatar"
                             style={{
-                              width: '40px',
-                              height: '40px',
-                              borderRadius: '50%',
-                              objectFit: 'cover',
-                              border: '2px solid #0369a1',
+                              width: "40px",
+                              height: "40px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                              border: "2px solid #0369a1",
                             }}
                           />
                         </div>
@@ -1048,32 +1148,49 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
                         {/* Applied At */}
                         <div style={{ flex: 1 }}>
-                          {app.requestDate ? format(new Date(app.requestDate), 'MM/dd/yyyy') : 'N/A'}
+                          {app.requestDate
+                            ? format(new Date(app.requestDate), "MM/dd/yyyy")
+                            : "N/A"}
                         </div>
 
                         {/* Actions */}
                         <div style={{ flex: 1 }}>
                           <Button
-                            onClick={() => navigate(`/provider/requestinformation/${app.id}`)}
+                            onClick={() =>
+                              navigate(`/provider/requestinformation/${app.id}`)
+                            }
                             style={{
-                              backgroundColor: '#1e88e5',
-                              color: '#fff',
-                              padding: '6px 12px',
-                              borderRadius: '5px',
+                              backgroundColor: "#1e88e5",
+                              color: "#fff",
+                              padding: "6px 12px",
+                              borderRadius: "5px",
                             }}
                           >
-                            <IoIosEye style={{ marginRight: '8px' }} />
+                            <IoIosEye style={{ marginRight: "8px" }} />
                             View Details
                           </Button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-gray-500 font-semibold">No applicants available.</p>
+                    <p className="text-center text-gray-500 font-semibold">
+                      No applicants available.
+                    </p>
                   )}
-                  <div style={{ marginTop: "20px", display: "flex", justifyContent: "end" }}>
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      display: "flex",
+                      justifyContent: "end",
+                    }}
+                  >
                     {Array.from(
-                      { length: selectedTab === 0 ? totalTabPagesForPending : totalTabPagesForFinished },
+                      {
+                        length:
+                          selectedTab === 0
+                            ? totalTabPagesForPending
+                            : totalTabPagesForFinished,
+                      },
                       (_, index) => (
                         <button
                           key={index}
@@ -1084,13 +1201,15 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                             backgroundColor:
                               (selectedTab === 0
                                 ? currentTabPageForPending
-                                : currentTabPageForFinished) === index + 1
+                                : currentTabPageForFinished) ===
+                              index + 1
                                 ? "#419f97"
                                 : "#f1f1f1",
                             color:
                               (selectedTab === 0
                                 ? currentTabPageForPending
-                                : currentTabPageForFinished) === index + 1
+                                : currentTabPageForFinished) ===
+                              index + 1
                                 ? "white"
                                 : "black",
                             border: "none",
@@ -1104,11 +1223,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     )}
                   </div>
                 </Paper>
-
               </div>
             </div>
           )}
-
         </div>
       </section>
 

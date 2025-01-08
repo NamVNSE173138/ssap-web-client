@@ -5,21 +5,21 @@ import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 import { Link, useNavigate } from "react-router-dom";
 import RouteNames from "@/constants/routeNames";
-import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramSkeleton from "./ScholarshipProgramSkeleton";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Paper } from "@mui/material";
 import { FaExclamationTriangle, FaEye, FaTrash } from "react-icons/fa";
 import { getAllApplications } from "@/services/ApiServices/applicationService";
-import { deleteScholarshipProgram, updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
+import { updateScholarshipStatus } from "@/services/ApiServices/scholarshipProgramService";
 
 const ITEMS_PER_PAGE = 5;
 
 const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
   return (
     <div
-      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${isOpen ? "block" : "hidden"
-        }`}
+      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 ${
+        isOpen ? "block" : "hidden"
+      }`}
       onClick={onClose}
     >
       <div
@@ -77,9 +77,9 @@ const Activity = () => {
   const deleteScholarship = async (id: any) => {
     try {
       const response = await updateScholarshipStatus(id, {
-        "status": "Closed"
+        status: "Closed",
       });
-      console.log(response)
+      console.log(response);
       if (response.statusCode === 200) {
         navigate("/funder/profile");
         await fetchData();
@@ -96,10 +96,11 @@ const Activity = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [response, applications] = await Promise.all([axios.get(
-        `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`,
-      ),
-      getAllApplications()
+      const [response, applications] = await Promise.all([
+        axios.get(
+          `${BASE_URL}/api/scholarship-programs/by-funder-id/${funderId}`
+        ),
+        getAllApplications(),
       ]);
 
       console.log("SCP", response.data.data);
@@ -225,8 +226,8 @@ const Activity = () => {
                           (e.currentTarget.style.backgroundColor = "#f1f1f1")
                         }
                         onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          index % 2 === 0 ? "#f9f9f9" : "#fff")
+                          (e.currentTarget.style.backgroundColor =
+                            index % 2 === 0 ? "#f9f9f9" : "#fff")
                         }
                       >
                         <td
@@ -265,11 +266,14 @@ const Activity = () => {
                             fontWeight: "500",
                           }}
                         >
-                          {new Date(item.createdAt).toLocaleDateString("en-US", {
-                            month: "2-digit",
-                            day: "2-digit",
-                            year: "numeric",
-                          })}
+                          {new Date(item.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "2-digit",
+                              day: "2-digit",
+                              year: "numeric",
+                            }
+                          )}
                         </td>
                         <td
                           style={{
@@ -301,8 +305,10 @@ const Activity = () => {
                             fontWeight: "500",
                           }}
                         >
-                          {applications && applications.filter((app: any) =>
-                            app.scholarshipProgramId == item.id).length}
+                          {applications &&
+                            applications.filter(
+                              (app: any) => app.scholarshipProgramId == item.id
+                            ).length}
                         </td>
                         <td
                           style={{
@@ -327,15 +333,25 @@ const Activity = () => {
 
                           <button
                             onClick={() => setConfirmationDialogOpen(true)}
-                            className={`flex items-center justify-center mt-2 px-4 py-2 text-sm font-medium rounded-lg transition duration-300 ${(applications.filter((app: any) => app.scholarshipProgramId == item.id).length !== 0) || item.status === "Closed"
-                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-red-500 text-white hover:bg-red-400"
-                              }`}
-                            disabled={(applications.filter((app: any) => app.scholarshipProgramId == item.id).length !== 0 || item.status === "Closed")}
-
+                            className={`flex items-center justify-center mt-2 px-4 py-2 text-sm font-medium rounded-lg transition duration-300 ${
+                              applications.filter(
+                                (app: any) =>
+                                  app.scholarshipProgramId == item.id
+                              ).length !== 0 || item.status === "Closed"
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-red-500 text-white hover:bg-red-400"
+                            }`}
+                            disabled={
+                              applications.filter(
+                                (app: any) =>
+                                  app.scholarshipProgramId == item.id
+                              ).length !== 0 || item.status === "Closed"
+                            }
                             title={
-                              (applications.filter((app: any) =>
-                                app.scholarshipProgramId == item.id).length !== 0 || item.status === "Closed")
+                              applications.filter(
+                                (app: any) =>
+                                  app.scholarshipProgramId == item.id
+                              ).length !== 0 || item.status === "Closed"
                                 ? "Cannot delete."
                                 : "Delete Scholarship"
                             }
@@ -359,7 +375,13 @@ const Activity = () => {
                 </tbody>
               </table>
             </div>
-            <div style={{ marginTop: "20px", display: "flex", justifyContent: "end" }}>
+            <div
+              style={{
+                marginTop: "20px",
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
               {Array.from({ length: totalPages }, (_, index) => (
                 <button
                   key={index}
@@ -367,7 +389,8 @@ const Activity = () => {
                   style={{
                     margin: "0 5px",
                     padding: "5px 10px",
-                    backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                    backgroundColor:
+                      currentPage === index + 1 ? "#419f97" : "#f1f1f1",
                     color: currentPage === index + 1 ? "white" : "black",
                     border: "none",
                     borderRadius: "5px",
