@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import * as Dialog from "@radix-ui/react-dialog";
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 import { useSelector } from "react-redux";
-import { formatDate } from "@/lib/date-formatter";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
-import ScreenSpinner from "@/components/ScreenSpinner";
-
-import { z } from "zod";
+// import { z } from "zod";
 
 import { formatNaturalDate } from "@/lib/dateUtils";
 import formatCurrency from "@/lib/currency-formatter";
@@ -46,22 +40,22 @@ type ApprovalItem = {
   updatedAt: string;
 };
 
-const expertReviewSchema = z.object({
-  score: z.string(),
-  description: z.string(),
-});
+// const expertReviewSchema = z.object({
+//   score: z.string(),
+//   description: z.string(),
+// });
 
 const ApprovalList: React.FC = () => {
   const user = useSelector((state: any) => state.token.user);
-  const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
-  const [selectedReview, setSelectedReview] = useState<any>(null);
+  // const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
+  // const [selectedReview, setSelectedReview] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [score, setScore] = useState<number | string>("");
-  const [comment, setComment] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [score, setScore] = useState<number | string>("");
+  // const [comment, setComment] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
 
   const fetchApplicationReview = async () => {
     setLoading(true);

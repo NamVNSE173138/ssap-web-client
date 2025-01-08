@@ -52,8 +52,8 @@ const expertReviewSchema = z.object({
 const ReviewList: React.FC = () => {
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const user = useSelector((state: any) => state.token.user);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_loading, setLoading] = useState(false);
+  const [_error, setError] = useState<string | null>(null);
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
@@ -95,10 +95,10 @@ const ReviewList: React.FC = () => {
 
       const scholarshipId = id;
 
-      const filteredApplications = expertAssign.filter((app: any) => {
+      // const filteredApplications = expertAssign.filter((app: any) => {
 
-        return Number(app.scholarshipProgramId) == Number(scholarshipId);
-      });
+      //   return Number(app.scholarshipProgramId) == Number(scholarshipId);
+      // });
 
       const detailedApplications = await Promise.all(
         expertAssign
