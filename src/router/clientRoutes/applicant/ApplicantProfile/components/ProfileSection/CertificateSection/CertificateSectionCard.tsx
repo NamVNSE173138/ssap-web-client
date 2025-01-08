@@ -17,7 +17,7 @@ const CertificateSectionCard = (props: any) => {
   const [dialogType, setDialogType] = useState<"add" | "update">("add");
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
-  const handleOpenDialog = (type: "add" | "update", item: any) => {
+  const handleOpenDialog = (type: "add" | "update", item?: any) => {
     setDialogType(type);
     setSelectedItem(item);
     setOpen(true);

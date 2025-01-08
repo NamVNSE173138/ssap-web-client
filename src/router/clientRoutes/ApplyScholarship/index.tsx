@@ -2,29 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  NotifyFunderNewApplicant,
-
-} from "@/services/ApiServices/notification";
+import { NotifyFunderNewApplicant } from "@/services/ApiServices/notification";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import EditableTable from "./application-document-table";
 import { uploadFile } from "@/services/ApiServices/testService";
-import Background from "../../../assets/back.webp";
 import { getScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { notification } from "antd";
 import { addApplication } from "@/services/ApiServices/applicationService";
 import ScholarshipContractDialog from "./ScholarshipContractDialog";
 import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
-import { z } from 'zod';
-import { Button, CircularProgress } from "@mui/material";
+import { z } from "zod";
+import { CircularProgress } from "@mui/material";
 import { FaEnvelope, FaFileAlt, FaPhoneAlt, FaUser } from "react-icons/fa";
-
-interface FormData {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-}
 
 const ApplyScholarship = () => {
   const navigate = useNavigate();
@@ -44,14 +33,16 @@ const ApplyScholarship = () => {
     if (currentStep < 4) {
       if (currentStep === 1) {
         const schema = z.object({
-          first_name: z.string().min(1, 'First name is required'),
-          last_name: z.string().min(1, 'Last name is required'),
-          email: z.string().email('Invalid email format'),
-          phone_number: z.string().regex(/^\d+$/, 'Invalid phone number'),
+          first_name: z.string().min(1, "First name is required"),
+          last_name: z.string().min(1, "Last name is required"),
+          email: z.string().email("Invalid email format"),
+          phone_number: z.string().regex(/^\d+$/, "Invalid phone number"),
         });
         const validation = schema.safeParse(formData);
         if (!validation.success) {
-          notification.error({ message: 'Please fill in all required fields correctly.' });
+          notification.error({
+            message: "Please fill in all required fields correctly.",
+          });
           return;
         }
       }
@@ -63,8 +54,8 @@ const ApplyScholarship = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const [applyLoading, setApplyLoading] = useState<boolean>(false)
-  const [scholarship, setScholarship] = useState<any>(null)
+  const [applyLoading, setApplyLoading] = useState<boolean>(false);
+  const [scholarship, setScholarship] = useState<any>(null);
 
   const [rowId, setRowId] = useState<number>(0);
   const [rows, setRows] = useState<any[]>([]);
@@ -77,19 +68,32 @@ const ApplyScholarship = () => {
     if (!user) return;
     const [profile, scholarship] = await Promise.all([
       getApplicantProfileById(user.id),
-      getScholarshipProgram(Number(id))]);
+      getScholarshipProgram(Number(id)),
+    ]);
 
     if (profile.statusCode !== 200) return;
     setScholarship(scholarship.data);
     let rowId = 0;
     setRows(
-      scholarship.data.documents.filter((item: any) => item.isRequired).map((item: any) => (
-        { id: ++rowId, name: item.type, type: item.type, file: null, isRequired: item.isRequired }
-      ))
-    )
+      scholarship.data.documents
+        .filter((item: any) => item.isRequired)
+        .map((item: any) => ({
+          id: ++rowId,
+          name: item.type,
+          type: item.type,
+          file: null,
+          isRequired: item.isRequired,
+        }))
+    );
 
     setRowId(rowId + 1);
-    setFormData({ ...formData, first_name: profile.data.firstName, last_name: profile.data.lastName, email: profile.data.email, phone_number: profile.data.phone });
+    setFormData({
+      ...formData,
+      first_name: profile.data.firstName,
+      last_name: profile.data.lastName,
+      email: profile.data.email,
+      phone_number: profile.data.phone,
+    });
   };
 
   const handleAddRow = () => {
@@ -108,11 +112,15 @@ const ApplyScholarship = () => {
     );
   };
 
-  const handleRequiredDocumentInputChange = (id: number, field: any, value: any) => {
+  const handleRequiredDocumentInputChange = (
+    id: number,
+    field: any,
+    value: any
+  ) => {
     setRows((prevRows) =>
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
-    console.log(rows)
+    console.log(rows);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,11 +155,13 @@ const ApplyScholarship = () => {
     setRows(
       rows.map((row) => ({
         ...row,
-        errors: row.isRequired ? {
-          name: !row.name,
-          type: !row.type,
-          file: !row.file,
-        } : {},
+        errors: row.isRequired
+          ? {
+              name: !row.name,
+              type: !row.type,
+              file: !row.file,
+            }
+          : {},
       }))
     );
     const submitForm = new FormData();
@@ -190,16 +200,15 @@ const ApplyScholarship = () => {
 
     try {
       const response = await addApplication(applicationData);
-      console.log(response)
+      console.log(response);
       await response.data;
       notification.success({ message: "Application submitted successfully" });
       navigate("/applicant/profile?tab=application-history");
       if (id) await NotifyFunderNewApplicant(isApplicant, parseInt(id));
     } catch (error) {
       console.error("Error submitting application:", error);
-    }
-    finally {
-      setApplyLoading(false)
+    } finally {
+      setApplyLoading(false);
     }
   };
 
@@ -208,33 +217,53 @@ const ApplyScholarship = () => {
   }, []);
 
   return (
-
     <div className="md:p-[30px] p-2 top-1/2 left-1/2 bg-[rgba(255,255,255,0.75)] z-20 rounded-md">
       <div className="w-full h-full bg-transparent md:px-10 px-5 flex flex-col justify-top">
         <div className="w-full">
-          {scholarship && <div className="mb-5">
-            <Link className="text-blue-500 underline" to={`/scholarship-program/${id}`}>
-              {`Back to ${scholarship.name}`}
-            </Link>
-          </div>}
+          {scholarship && (
+            <div className="mb-5">
+              <Link
+                className="text-blue-500 underline"
+                to={`/scholarship-program/${id}`}
+              >
+                {`Back to ${scholarship.name}`}
+              </Link>
+            </div>
+          )}
           <h3 className="text-3xl mb-7 md:mb-7 md:text-4xl text-black font-bold text-center">
             SCHOLARSHIP APPLICATION
           </h3>
         </div>
         <div className="flex items-center justify-center mb-6">
-          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 1 ? "bg-blue-600" : "bg-gray-300"}`}>
+          <div
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+              currentStep === 1 ? "bg-blue-600" : "bg-gray-300"
+            }`}
+          >
             1
           </div>
           <div className="h-1 w-20 bg-gray-300 mx-2"></div>
-          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 2 ? "bg-blue-600" : "bg-gray-300"}`}>
+          <div
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+              currentStep === 2 ? "bg-blue-600" : "bg-gray-300"
+            }`}
+          >
             2
           </div>
           <div className="h-1 w-20 bg-gray-300 mx-2"></div>
-          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 3 ? "bg-blue-600" : "bg-gray-300"}`}>
+          <div
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+              currentStep === 3 ? "bg-blue-600" : "bg-gray-300"
+            }`}
+          >
             3
           </div>
           <div className="h-1 w-20 bg-gray-300 mx-2"></div>
-          <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep === 4 ? "bg-blue-600" : "bg-gray-300"}`}>
+          <div
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+              currentStep === 4 ? "bg-blue-600" : "bg-gray-300"
+            }`}
+          >
             4
           </div>
         </div>
@@ -242,16 +271,40 @@ const ApplyScholarship = () => {
         {/* Step Subtitles */}
         <div className="flex justify-center">
           <div className="text-center w-32">
-            <p className={`text-sm font-medium ${currentStep === 1 ? "text-blue-600" : "text-gray-500"}`}>Basic Details</p>
+            <p
+              className={`text-sm font-medium ${
+                currentStep === 1 ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              Basic Details
+            </p>
           </div>
           <div className="text-center w-32">
-            <p className={`text-sm font-medium ${currentStep === 2 ? "text-blue-600" : "text-gray-500"}`}>Required Documents</p>
+            <p
+              className={`text-sm font-medium ${
+                currentStep === 2 ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              Required Documents
+            </p>
           </div>
           <div className="text-center w-32">
-            <p className={`text-sm font-medium ${currentStep === 3 ? "text-blue-600" : "text-gray-500"}`}>Optional Documents</p>
+            <p
+              className={`text-sm font-medium ${
+                currentStep === 3 ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              Optional Documents
+            </p>
           </div>
           <div className="text-center w-32">
-            <p className={`text-sm font-medium ${currentStep === 4 ? "text-blue-600" : "text-gray-500"}`}>Confirm Application</p>
+            <p
+              className={`text-sm font-medium ${
+                currentStep === 4 ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              Confirm Application
+            </p>
           </div>
         </div>
 
@@ -267,7 +320,9 @@ const ApplyScholarship = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* First Name */}
                   <div className="mb-6">
-                    <label className="text-gray-700 font-medium">First Name</label>
+                    <label className="text-gray-700 font-medium">
+                      First Name
+                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -283,7 +338,9 @@ const ApplyScholarship = () => {
 
                   {/* Last Name */}
                   <div className="mb-6">
-                    <label className="text-gray-700 font-medium">Last Name</label>
+                    <label className="text-gray-700 font-medium">
+                      Last Name
+                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -315,7 +372,9 @@ const ApplyScholarship = () => {
 
                   {/* Phone Number */}
                   <div className="mb-6">
-                    <label className="text-gray-700 font-medium">Phone Number</label>
+                    <label className="text-gray-700 font-medium">
+                      Phone Number
+                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -353,12 +412,15 @@ const ApplyScholarship = () => {
         {currentStep === 2 && (
           <div>
             <div className="max-w-6xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-
-              <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Upload Required Documents</h2>
+              <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                Upload Required Documents
+              </h2>
 
               <div className="mb-4">
                 The documents with the
-                <span style={{ color: 'red', marginLeft: 4, marginRight: 4 }}>*</span>
+                <span style={{ color: "red", marginLeft: 4, marginRight: 4 }}>
+                  *
+                </span>
                 are required by this scholarship
               </div>
 
@@ -388,13 +450,15 @@ const ApplyScholarship = () => {
                 </button>
               </div>
             </div>
-          </div>)}
+          </div>
+        )}
 
         {currentStep === 3 && (
           <div>
             <div className="max-w-6xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-
-              <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Upload Additional Documents</h2>
+              <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                Upload Additional Documents
+              </h2>
 
               {/* Add Document Button */}
               <div className="flex gap-[20px] lg:col-span-2 mb-6">
@@ -405,14 +469,18 @@ const ApplyScholarship = () => {
                     className="flex justify-start items-center hover:bg-[#1eb2a6] transition-all duration-200 gap-4 px-4 py-2 bg-white rounded-lg shadow-md hover:scale-105"
                   >
                     <IoIosAddCircleOutline className="text-3xl text-black group-hover:text-white" />
-                    <p className="text-xl text-black group-hover:text-white">Add Document</p>
+                    <p className="text-xl text-black group-hover:text-white">
+                      Add Document
+                    </p>
                   </button>
                 </div>
               </div>
 
               <div className="flex gap-[20px] lg:col-span-2">
                 <EditableTable
-                  documents={scholarship.documents.filter((doc: any) => !doc.isRequired)}
+                  documents={scholarship.documents.filter(
+                    (doc: any) => !doc.isRequired
+                  )}
                   rows={rowsOther}
                   setRows={setRowsOther}
                   handleDeleteRow={handleDeleteRow}
@@ -442,36 +510,50 @@ const ApplyScholarship = () => {
         {currentStep === 4 && (
           <div>
             <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-              <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Review Your Application</h2>
+              <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                Review Your Application
+              </h2>
 
               {/* Personal Information */}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Personal Information</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                  Personal Information
+                </h3>
                 <div className="p-6 bg-white border border-gray-300 rounded-lg shadow-sm">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* First Name */}
                     <div className="flex justify-between items-center mb-4 mr-10">
                       <div className="flex items-center">
                         <FaUser className="text-gray-600 mr-2" />
-                        <strong className="text-lg text-gray-700">First Name:</strong>
+                        <strong className="text-lg text-gray-700">
+                          First Name:
+                        </strong>
                       </div>
-                      <span className="text-gray-600">{formData.first_name}</span>
+                      <span className="text-gray-600">
+                        {formData.first_name}
+                      </span>
                     </div>
 
                     {/* Last Name */}
                     <div className="flex justify-between items-center mb-4 mr-10">
                       <div className="flex items-center">
                         <FaUser className="text-gray-600 mr-2" />
-                        <strong className="text-lg text-gray-700">Last Name:</strong>
+                        <strong className="text-lg text-gray-700">
+                          Last Name:
+                        </strong>
                       </div>
-                      <span className="text-gray-600">{formData.last_name}</span>
+                      <span className="text-gray-600">
+                        {formData.last_name}
+                      </span>
                     </div>
 
                     {/* Email */}
                     <div className="flex justify-between items-center mb-4 mr-10">
                       <div className="flex items-center">
                         <FaEnvelope className="text-gray-600 mr-2" />
-                        <strong className="text-lg text-gray-700">Email:</strong>
+                        <strong className="text-lg text-gray-700">
+                          Email:
+                        </strong>
                       </div>
                       <span className="text-gray-600">{formData.email}</span>
                     </div>
@@ -480,9 +562,13 @@ const ApplyScholarship = () => {
                     <div className="flex justify-between items-center mb-4 mr-10">
                       <div className="flex items-center">
                         <FaPhoneAlt className="text-gray-600 mr-2" />
-                        <strong className="text-lg text-gray-700">Phone:</strong>
+                        <strong className="text-lg text-gray-700">
+                          Phone:
+                        </strong>
                       </div>
-                      <span className="text-gray-600">{formData.phone_number}</span>
+                      <span className="text-gray-600">
+                        {formData.phone_number}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -492,20 +578,32 @@ const ApplyScholarship = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Required Documents */}
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Required Documents</h3>
-                  {scholarship && scholarship.documents && scholarship.documents.length > 0 ? (
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                    Required Documents
+                  </h3>
+                  {scholarship &&
+                  scholarship.documents &&
+                  scholarship.documents.length > 0 ? (
                     <div className="space-y-4">
-                      {rows.filter((doc: any) => doc.isRequired).map((doc: any, index: number) => (
-                        <div key={index} className="flex items-center p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50 hover:bg-gray-100 transition-all duration-200">
-                          <FaFileAlt className="text-blue-600 text-2xl mr-3" />
-                          <div className="flex-grow">
-                            <strong className="text-gray-800">Name:</strong> {doc.name?.length > 10 ? `${doc.name.substring(0, 15)}...` : doc.name}
-                            <div className="text-sm text-gray-600">
-                              <strong>Type:</strong> {doc.type}
+                      {rows
+                        .filter((doc: any) => doc.isRequired)
+                        .map((doc: any, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50 hover:bg-gray-100 transition-all duration-200"
+                          >
+                            <FaFileAlt className="text-blue-600 text-2xl mr-3" />
+                            <div className="flex-grow">
+                              <strong className="text-gray-800">Name:</strong>{" "}
+                              {doc.name?.length > 10
+                                ? `${doc.name.substring(0, 15)}...`
+                                : doc.name}
+                              <div className="text-sm text-gray-600">
+                                <strong>Type:</strong> {doc.type}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <div className="text-lg text-gray-800 font-medium p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50">
@@ -516,14 +614,22 @@ const ApplyScholarship = () => {
 
                 {/* Additional Documents */}
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Additional Documents</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                    Additional Documents
+                  </h3>
                   {rowsOther && rowsOther.length > 0 ? (
                     <div className="space-y-4">
                       {rowsOther.map((row: any, index: number) => (
-                        <div key={index} className="flex items-center p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50 hover:bg-gray-100 transition-all duration-200">
+                        <div
+                          key={index}
+                          className="flex items-center p-4 border rounded-lg border-gray-300 shadow-sm bg-gray-50 hover:bg-gray-100 transition-all duration-200"
+                        >
                           <FaFileAlt className="text-blue-600 text-2xl mr-3" />
                           <div className="flex-grow">
-                            <strong className="text-gray-800">Name:</strong> {row.name?.length > 10 ? `${row.name.substring(0, 15)}...` : row.name}
+                            <strong className="text-gray-800">Name:</strong>{" "}
+                            {row.name?.length > 10
+                              ? `${row.name.substring(0, 15)}...`
+                              : row.name}
                             <div className="text-sm text-gray-600">
                               <strong>Type:</strong> {row.type}
                             </div>
@@ -562,12 +668,15 @@ const ApplyScholarship = () => {
                       onClick={() => setContractOpen(true)}
                     >
                       Terms and Privacy
-                    </a>
-                    {" "}and proceed to read the scholarship contract.
+                    </a>{" "}
+                    and proceed to read the scholarship contract.
                   </span>
                 </div>
 
-                <ScholarshipContractDialog isOpen={isContractOpen} onClose={() => setContractOpen(false)} />
+                <ScholarshipContractDialog
+                  isOpen={isContractOpen}
+                  onClose={() => setContractOpen(false)}
+                />
               </div>
 
               {/* Navigation Buttons */}
@@ -596,7 +705,6 @@ const ApplyScholarship = () => {
         )}
       </div>
     </div>
-
   );
 };
 

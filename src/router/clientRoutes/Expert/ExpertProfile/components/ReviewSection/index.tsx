@@ -4,7 +4,6 @@ import { BASE_URL } from "@/constants/api";
 import { useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
 import * as Tabs from "@radix-ui/react-tabs";
-// import { z } from "zod";
 
 import { formatNaturalDate } from "@/lib/dateUtils";
 import formatCurrency from "@/lib/currency-formatter";
@@ -25,10 +24,10 @@ type ApprovalItem = {
   details: string;
   documentUrl?: string;
   applicationDocs?: {
-    applicationId:number;
+    applicationId: number;
     type: string;
     name: string;
-    fileUrl: string
+    fileUrl: string;
   }[];
   applicationReviews?: {
     id: number;
@@ -40,22 +39,13 @@ type ApprovalItem = {
   updatedAt: string;
 };
 
-// const expertReviewSchema = z.object({
-//   score: z.string(),
-//   description: z.string(),
-// });
-
 const ApprovalList: React.FC = () => {
   const user = useSelector((state: any) => state.token.user);
-  // const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
-  // const [selectedReview, setSelectedReview] = useState<any>(null);
+
   const [loading, setLoading] = useState(false);
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  // const [score, setScore] = useState<number | string>("");
-  // const [comment, setComment] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
 
   const fetchApplicationReview = async () => {
     setLoading(true);
@@ -65,7 +55,6 @@ const ApprovalList: React.FC = () => {
         `${BASE_URL}/api/experts/${user.id}/assigned-applications`
       );
       const rawApplications = response.data.data;
-
 
       const detailedApplications = await Promise.all(
         rawApplications.map(async (app: any) => {
@@ -91,8 +80,8 @@ const ApprovalList: React.FC = () => {
             documentUrl: app.applicationDocuments?.[0]?.fileUrl,
             applicationReviews: app.applicationReviews,
             updatedAt: app.updatedAt,
-            // applicationDocuments: applicationDocs.data.data?.[0]?.applicationDocuments
-            applicationDocuments: app.applicationDocuments
+
+            applicationDocuments: app.applicationDocuments,
           };
         })
       );
@@ -117,15 +106,6 @@ const ApprovalList: React.FC = () => {
       field.toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
-
-  // Grouping applications by scholarship name
-  // const groupedApplications = filteredApplications.reduce((acc, app) => {
-  //   if (!acc[app.scholarshipProgramId]) {
-  //     acc[app.scholarshipProgramId] = [];
-  //   }
-  //   acc[app.scholarshipProgramId].push(app);
-  //   return acc;
-  // }, {} as Record<string, ApprovalItem[]>);
 
   const groupedApplications = filteredApplications
     .sort(
@@ -152,9 +132,7 @@ const ApprovalList: React.FC = () => {
         ...appsB.map((app) => new Date(app.updatedAt).getTime())
       );
 
-      
-
-      return latestUpdatedAtB - latestUpdatedAtA; 
+      return latestUpdatedAtB - latestUpdatedAtA;
     }
   );
 
@@ -243,80 +221,6 @@ const ApprovalList: React.FC = () => {
               </div>
             ))
           )}
-          
-
-          {/* Chấm điểm phần */}
-          {/* <Dialog.Root
-            open={!!selectedItem}
-            onOpenChange={() => setSelectedItem(null)}
-          >
-            <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-              <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md">
-                {selectedItem && (
-                  <div>
-                    <Dialog.Title className="text-2xl font-bold">
-                      {selectedItem.scholarshipName}
-                    </Dialog.Title>
-                    <Dialog.Description className="mt-2 text-sm text-gray-600">
-                      {selectedItem.details}
-                    </Dialog.Description>
-
-                    <div className="mt-4">
-                      <p>
-                        <strong>Applicant:</strong> {selectedItem.applicantName}
-                      </p>
-                      <p>
-                        <strong>University:</strong> {selectedItem.university}
-                      </p>
-                      <p>
-                        <strong>Applied On:</strong>{" "}
-                        {formatDate(selectedItem.appliedDate)}
-                      </p>
-                      <p>
-                        <strong>Applied On:</strong>{" "}
-                        {formatDate(selectedItem.appliedDate)}
-                      </p>
-                    </div>
-
-                    {/* Add form for scoring */}
-                    {/* <div className="mt-4">
-                      <Label className="block text-sm font-medium text-gray-700">
-                        Score
-                      </Label>
-                      <Input
-                        type="number"
-                        value={score}
-                        onChange={(e) => setScore(e.target.value)}
-                        className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
-                        placeholder="Enter score (1-100)"
-                        min={1}
-                        max={100}
-                      />
-
-                      <Label className="block text-sm font-medium text-gray-700 mt-4">
-                        Comment
-                      </Label>
-                      <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
-                        placeholder="Enter comment"
-                      />
-
-                      <Button
-                        // onClick={handleScoreSubmit}
-                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
-                      >
-                        Submit Review
-                      </Button>
-                    </div> */}
-                  {/* </div> */}
-                {/* )} */}
-              {/* </Dialog.Content> */}
-            {/* </Dialog.Portal> */}
-            {/* {isLoading && <ScreenSpinner />} */}
-          {/* </Dialog.Root> */} 
         </div>
       </div>
     </Tabs.Content>

@@ -41,7 +41,7 @@ const FormCreateScholarshipProgram = () => {
     university: "",
     certificate: [],
     major: "",
-    criteria: [{ name: "", description: "" }],
+    criteria: [{ name: "", description: "", percentage: "" }],
     reviewMilestones: [
       { description: "Application Review", fromDate: "", toDate: "" },
       { description: "Interview", fromDate: "", toDate: "" },
@@ -193,36 +193,41 @@ const FormCreateScholarshipProgram = () => {
         <form className="space-y-6 ">
           <div className="flex items-center justify-center">
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 1 ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                step === 1 ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               1
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 2 ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                step === 2 ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               2
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 3 ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                step === 3 ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               3
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 4 ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                step === 4 ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               4
             </div>
             <div className="h-1 w-20 bg-gray-300 mx-2"></div>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${step === 5 ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                step === 5 ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               5
             </div>
@@ -230,16 +235,18 @@ const FormCreateScholarshipProgram = () => {
           <div className="flex justify-center gap-5">
             <div className="text-center w-30">
               <p
-                className={`text-sm font-medium ${step === 1 ? "text-blue-600" : "text-gray-500"
-                  }`}
+                className={`text-sm font-medium ${
+                  step === 1 ? "text-blue-600" : "text-gray-500"
+                }`}
               >
                 General Information
               </p>
             </div>
             <div className="text-center w-32">
               <p
-                className={`text-sm font-medium ${step === 2 ? "text-blue-600" : "text-gray-500"
-                  }`}
+                className={`text-sm font-medium ${
+                  step === 2 ? "text-blue-600" : "text-gray-500"
+                }`}
               >
                 {" "}
                 Criteria & Documents
@@ -247,8 +254,9 @@ const FormCreateScholarshipProgram = () => {
             </div>
             <div className="text-center w-28">
               <p
-                className={`text-sm font-medium ${step === 3 ? "text-blue-600" : "text-gray-500"
-                  }`}
+                className={`text-sm font-medium ${
+                  step === 3 ? "text-blue-600" : "text-gray-500"
+                }`}
               >
                 {" "}
                 Review Milestones
@@ -256,8 +264,9 @@ const FormCreateScholarshipProgram = () => {
             </div>
             <div className="text-center w-27">
               <p
-                className={`text-sm font-medium ${step === 4 ? "text-blue-600" : "text-gray-500"
-                  }`}
+                className={`text-sm font-medium ${
+                  step === 4 ? "text-blue-600" : "text-gray-500"
+                }`}
               >
                 {" "}
                 Award Milestones
@@ -265,8 +274,9 @@ const FormCreateScholarshipProgram = () => {
             </div>
             <div className="text-center w-32">
               <p
-                className={`text-sm font-medium ${step === 5 ? "text-blue-600" : "text-gray-500"
-                  }`}
+                className={`text-sm font-medium ${
+                  step === 5 ? "text-blue-600" : "text-gray-500"
+                }`}
               >
                 {" "}
                 Preview
@@ -275,13 +285,21 @@ const FormCreateScholarshipProgram = () => {
           </div>
           {step === 1 && (
             <>
-              <InformationStep formData={formData} onSave={handleNext} handelUploadFile={handleFileChange}/>
+              <InformationStep
+                formData={formData}
+                onSave={handleNext}
+                handelUploadFile={handleFileChange}
+              />
             </>
           )}
 
           {step === 2 && (
             <>
-              <UcmStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              <UcmStep
+                formData={formData}
+                onSave={handleNext}
+                onBack={handleBack}
+              />
               {/* <div className="">
                 <Button onClick={() => setStep(1)}>Back</Button>
               </div> */}
@@ -290,7 +308,11 @@ const FormCreateScholarshipProgram = () => {
 
           {step === 3 && (
             <>
-              <ReviewMilestoneStep formData={formData} onSave={handleNext} onBack={handleBack}/>
+              <ReviewMilestoneStep
+                formData={formData}
+                onSave={handleNext}
+                onBack={handleBack}
+              />
               {/* <div className="flex justify-between mt-4">
                 <Button onClick={() => setStep(2)}>Back</Button>
               </div> */}
@@ -299,17 +321,18 @@ const FormCreateScholarshipProgram = () => {
 
           {step === 4 && (
             <>
-              <AwardMilestoneStep formData={formData} onSave={handleNext} onBack={handleBack}/>
-              {/* <div className="flex justify-between mt-4">
-                <Button onClick={() => setStep(3)}>Back</Button>
-              </div> */}
+              <AwardMilestoneStep
+                formData={formData}
+                onSave={handleNext}
+                onBack={handleBack}
+              />
             </>
           )}
 
           {step === 5 && (
             <>
-              <ViewDataCreated formData={formData} onBack={handleBack}/>
-              
+              <ViewDataCreated formData={formData} />
+
               <div className="flex flex-col items-start ml-10">
                 <span className="text-black">
                   <input
@@ -331,14 +354,12 @@ const FormCreateScholarshipProgram = () => {
                 </span>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-between">
+                <Button onClick={() => setStep(4)}>Back</Button>
                 <Button type="button" onClick={handleAddNewScholarshipProgram}>
                   Create Program
                 </Button>
               </div>
-              {/* <div className="flex justify-between mt-4">
-                <Button onClick={() => setStep(4)}>Back</Button>
-              </div> */}
             </>
           )}
         </form>

@@ -1,6 +1,3 @@
-
-
-import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,11 +26,12 @@ const schema = z.object({
   criteria: z
     .array(
       z.object({
-        name: z.string().min(1, "Criterion name is required"),
-        description: z.string().min(1, "Criterion description is required"),
+        name: z.string().min(1, "Criteria name is required"),
+        description: z.string().min(1, "Criteria description is required"),
+        percentage: z.string().min(1, "Percentage of score is required"),
       })
     )
-    .min(1, "Please add at least one criterion")
+    .min(1, "Please add at least one criteria")
     .refine(
       (data) =>
         data.every((criterion) => criterion.name && criterion.description),
@@ -103,9 +101,8 @@ const UcmStep = ({
       university: formData.university || "",
       certificate: formData.certificate || [],
       major: formData.major || "",
-      // documents:  formData.documents || [{type: "", isRequired: true}],
       documents: formData.documents || [],
-      criteria: formData.criteria || [{ name: "", description: "" }],
+      criteria: formData.criteria || [{ name: "", description: "", percentage: "" }],
     },
   });
 
@@ -117,9 +114,9 @@ const UcmStep = ({
     }
 
 
-    const data = getValues(); // Lấy dữ liệu từ form
+    const data = getValues(); 
     if (data) {
-      // console.log("Form data: ", data);
+      
       const selectedDocuments = [...documentOptions].filter((doc) => (watch("documents") || []).includes(doc.id)).map((doc) => { return { type: doc.type, isRequired: true } })
       data.documents = selectedDocuments
       console.log("beforeSave", data);
@@ -168,7 +165,7 @@ const UcmStep = ({
       setValue("documents", formData.documents || []);
       setValue(
         "criteria",
-        formData.criteria || [{ name: "", description: "" }]
+        formData.criteria || [{ name: "", description: "", percentage: "" }]
       );
     }
   }, [formData, setValue]);
@@ -177,17 +174,14 @@ const UcmStep = ({
       <div>
         <div>
           <form className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
-            {/* Tiêu đề */}
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Academic Information</h2>
 
             <div className="space-y-8">
-              {/* University */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
                   Eligibility Criteria
                 </h3>
                 <div className="grid grid-cols-6 gap-4 mt-4">
-                  {/* University */}
                   <div className="col-span-6 sm:col-span-2">
                     <Label htmlFor="university" className="block text-sm font-medium text-gray-700">
                       University <span className="text-red-500">*</span>
@@ -204,7 +198,7 @@ const UcmStep = ({
                     )}
                   </div>
 
-                  {/* Certificates */}
+                  
                   <div className="col-span-6 sm:col-span-2">
                     <Label htmlFor="certificate" className="block text-sm font-medium text-gray-700">
                       Certificates <span className="text-red-500">*</span>
@@ -222,7 +216,7 @@ const UcmStep = ({
                     )}
                   </div>
 
-                  {/* Major */}
+                 
                   <div className="col-span-6 sm:col-span-2">
                     <Label htmlFor="major" className="block text-sm font-medium text-gray-700">
                       Major <span className="text-red-500">*</span>
@@ -244,11 +238,11 @@ const UcmStep = ({
               {/* Criteria */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">Criteria</h3>
-                <div className="mt-4">
-                  {watch("criteria")?.map((criterion: any, index: any) => (
+                <div className="mt-4 ">
+                  {watch("criteria")?.map((_criteria: any, index: any) => (
                     <div
                       key={index}
-                      className="relative border p-4 rounded-md space-y-2 bg-gray-50"
+                      className="relative border p-4 mb-2 rounded-md  bg-gray-50 grid grid-cols-3 gap-2 items-start"
                     >
                       {watch("criteria").length > 1 && (
                         <Button
@@ -260,7 +254,7 @@ const UcmStep = ({
                               { shouldValidate: true }
                             )
                           }
-                          className="absolute top-2 right-2 bg-gray-800 text-white hover:bg-gray-600 w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition-all duration-300"
+                          className="absolute top-2 right-2 bg-gray-800 text-white hover:bg-gray-600 w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 "
                           aria-label="Remove criterion"
                         >
                           <FaTrash className="w-5 h-5" />
@@ -269,7 +263,7 @@ const UcmStep = ({
                       <Input
                         {...register(`criteria.${index}.name`)}
                         placeholder="Ex: Academic Excellence"
-                        className="block w-full"
+                        className="w-full"
                       />
                       {errors.criteria &&
                         Array.isArray(errors.criteria) &&
@@ -281,7 +275,8 @@ const UcmStep = ({
                       <Input
                         {...register(`criteria.${index}.description`)}
                         placeholder="Ex: Requires a minimum GPA of 3.5"
-                        className="block w-full"
+                        className="w-full"
+                        
                       />
                       {errors.criteria &&
                         Array.isArray(errors.criteria) &&
@@ -290,12 +285,25 @@ const UcmStep = ({
                             {errors.criteria[index]?.description?.message}
                           </p>
                         )}
+                        <Input
+                        {...register(`criteria.${index}.percentage`)}
+                        placeholder="Ex: 30% "
+                        className="w-full"
+                        type="number"
+                      />
+                      {errors.criteria &&
+                        Array.isArray(errors.criteria) &&
+                        errors.criteria[index]?.percentage && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {errors.criteria[index]?.percentage?.message}
+                          </p>
+                        )}
                     </div>
                   ))}
                   <Button
                     type="button"
                     onClick={() =>
-                      setValue("criteria", [...watch("criteria"), { name: "", description: "" }])
+                      setValue("criteria", [...watch("criteria"), { name: "", description: "", percentage: "" }])
                     }
                     className="mt-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
                   >
@@ -305,7 +313,7 @@ const UcmStep = ({
               </div>
 
               <br></br>
-              {/* Required Documents */}
+             
               <div>
                 <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
                   Required Documents

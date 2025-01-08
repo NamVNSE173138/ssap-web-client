@@ -21,7 +21,7 @@ import {
   IoMdCheckmarkCircleOutline,
   IoMdTime,
 } from "react-icons/io";
-import { IoIosSearch, IoMdClose } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
 import {

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
-import { notification } from "antd";
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
 export async function getAllApplicantProfiles() {

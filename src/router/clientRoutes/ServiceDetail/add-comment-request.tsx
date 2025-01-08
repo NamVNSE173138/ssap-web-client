@@ -4,7 +4,7 @@ import { RootState } from "@/store/store";
 import { AddComment } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Dialog, DialogTitle } from "@mui/material";
 import { notification } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaCommentDots } from "react-icons/fa";
 import { IoCloudUpload } from "react-icons/io5";
