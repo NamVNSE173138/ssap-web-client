@@ -37,7 +37,7 @@ const ApplicationHistorySection = (_props: any) => {
   const totalPages = Math.ceil(applications?.length / ITEMS_PER_PAGE);
   const paginatedmApplications = applications?.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const handlePageChange = (page: number) => {
@@ -186,27 +186,22 @@ const ApplicationHistorySection = (_props: any) => {
                       </h3>
 
                       <span className="text-sm text-black font-semibold">
-                        <ul className="list-none inline-flex">
+                        <ul className="list-none">
                           {application.applicationDocuments.length === 0 && (
                             <span>No Submitted Documents</span>
                           )}
                           {application.applicationDocuments.map(
                             (doc, index) => (
-                              <div>
+                              <li key={index} className="mb-2">
                                 <a
                                   href={doc.fileUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-blue-500 hover:text-blue-700 underline transition duration-200 ease-in-out hover:scale-105"
                                 >
-                                  {doc.type}
+                                  {`${index + 1}. ${doc.type}`}
                                 </a>
-                                {index <
-                                  application.applicationDocuments.length -
-                                  1 && (
-                                    <span className="text-blue-500">,&nbsp;</span>
-                                  )}
-                              </div>
+                              </li>
                             ),
                           )}
                         </ul>
@@ -225,7 +220,14 @@ const ApplicationHistorySection = (_props: any) => {
           ))}
         </div>
       </div>
-      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          marginTop: "20px",
+          marginBottom: "10px",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
@@ -233,7 +235,8 @@ const ApplicationHistorySection = (_props: any) => {
             style={{
               margin: "0 5px",
               padding: "5px 10px",
-              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+              backgroundColor:
+                currentPage === index + 1 ? "#419f97" : "#f1f1f1",
               color: currentPage === index + 1 ? "white" : "black",
               border: "none",
               borderRadius: "5px",
