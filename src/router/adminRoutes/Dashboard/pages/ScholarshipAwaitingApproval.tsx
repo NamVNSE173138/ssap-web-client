@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import {
@@ -25,8 +25,10 @@ import { AiOutlineCheckCircle } from "react-icons/ai";
 import { FaEye, FaTimesCircle } from "react-icons/fa";
 import { notification } from "antd";
 import { NotifyFunderScholarshipAcceptance, NotifyFunderScholarshipRejection } from "@/services/ApiServices/notification";
+import RouteNames from "@/constants/routeNames";
 
 const ScholarshipAwaitingApproval = () => {
+    const navigate = useNavigate();
     const token = useSelector((state: any) => state.token.token);
     const [data, setData] = useState<ScholarshipProgramType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -56,6 +58,7 @@ const ScholarshipAwaitingApproval = () => {
             await updateScholarshipStatus(Number(scholarship.id), { "status": "Open" });
             notification.success({ message: "Scholarship approved successfully." });
             NotifyFunderScholarshipAcceptance(Number(scholarship.id));
+            navigate("/admin/dashboard");
         } catch (error) {
             console.error("Error approving scholarship:", error);
             notification.error({ message: "Error approving scholarship." });
@@ -89,7 +92,7 @@ const ScholarshipAwaitingApproval = () => {
             await updateScholarshipStatus(scholarshipId, { "status": "Rejected" });
 
             notification.success({ message: "Rejection email sent successfully." });
-
+            navigate("/admin/dashboard");
             setRejectedScholarship(null);
             setRejectionReason("");
         } catch (error) {
