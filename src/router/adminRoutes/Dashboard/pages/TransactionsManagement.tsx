@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getAllTransactions } from "@/services/ApiServices/paymentService";
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Alert, TablePagination, Typography } from "@mui/material";
-import { FaTimesCircle, FaCheckCircle, FaPiggyBank } from "react-icons/fa";
+import { Box, Paper, CircularProgress, Alert} from "@mui/material";
+import { FaTimesCircle, FaCheckCircle } from "react-icons/fa";
 import { getAllWallets } from "@/services/ApiServices/accountService";
 
 const ITEMS_PER_PAGE = 5;

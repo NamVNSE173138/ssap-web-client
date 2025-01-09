@@ -2,32 +2,21 @@ import { useState, useEffect } from 'react';
 import Header from '../components/Header/index';
 import Sidebar from '../components/Sidebar/index';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useToast } from '@/components/ui/use-toast';
 import { requestNotify } from '@/services/requestNotify';
 import { getMessaging, onMessage } from 'firebase/messaging';
-import { setFcmToken } from '@/reducers/fcmTokenSlice';
 
 // const DefaultLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
 const DefaultLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const user = useSelector((state: RootState) => state.token.user);
   const messaging = getMessaging();
-    //const unread = useSelector((state: RootState) => state.unreadNotify.unreadNotify);
     const {toast} = useToast();
     const navigate = useNavigate();
-    const fcm = useSelector((state: RootState) => state.fcmToken.token);
-    const dispatch = useDispatch();
-  const notify = async () => {
-    if (user != null && fcm == null) {
-      const fcmToken = await requestNotify(user.id);
-      
-      if (fcmToken != null) {
-         dispatch(setFcmToken(fcmToken));
-      }
-    }
-  };
+    
+  
 
     const playNotificationSound = () => {
       const audio = new Audio("/noti-sound.mp3");

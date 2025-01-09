@@ -6,7 +6,6 @@ import { BASE_URL } from "@/constants/api";
 import axios from "axios";
 import { notification } from "antd";
 import * as Dialog from "@radix-ui/react-dialog";
-import { formatDate } from "@/lib/date-formatter";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ScreenSpinner from "@/components/ScreenSpinner";
@@ -60,7 +59,6 @@ const ReviewList: React.FC = () => {
   const [comment, setComment] = useState("");
   const [score, setScore] = useState<number | string>("");
   const [selectedReview, setSelectedReview] = useState<any>(null);
-  
 
   console.log("select", selectedItem);
 
@@ -79,7 +77,6 @@ const ReviewList: React.FC = () => {
     }
     setSelectedItem(item);
     setSelectedReview(review);
-    // onRowClick(item, review);
     // window.open(item.documentUrl, "_blank");
   };
 
@@ -94,11 +91,6 @@ const ReviewList: React.FC = () => {
       console.log("API response:", expertAssign);
 
       const scholarshipId = id;
-
-      // const filteredApplications = expertAssign.filter((app: any) => {
-
-      //   return Number(app.scholarshipProgramId) == Number(scholarshipId);
-      // });
 
       const detailedApplications = await Promise.all(
         expertAssign
@@ -124,12 +116,11 @@ const ReviewList: React.FC = () => {
               details: scholarshipResponse.data.data.description,
               documentUrl: app.applicationDocuments?.[0]?.fileUrl,
               applicationReviews: app.applicationReviews,
-              applicationDocuments: app.applicationDocuments
+              applicationDocuments: app.applicationDocuments,
             };
           })
       );
       setApplications(detailedApplications);
-      console.log("ádfasdfasdfas",detailedApplications);
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
       console.error(err);
@@ -137,7 +128,6 @@ const ReviewList: React.FC = () => {
       setLoading(false);
     }
   };
- 
 
   useEffect(() => {
     fetchApplicationReview();
@@ -271,7 +261,6 @@ const ReviewList: React.FC = () => {
                       return (
                         <tr
                           key={review.id}
-                          //onClick={() => handleRowClick(item, review)}
                           className="hover:bg-gray-50"
                         >
                           <td className="p-4 text-sm text-gray-800">
@@ -307,27 +296,6 @@ const ReviewList: React.FC = () => {
                           </td>
                           <td className="p-4 text-sm">
                             <div className="flex items-center space-x-2">
-                              <Button
-                                className={`w-full h-full ${
-                                  isScored
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-blue-500 text-white"
-                                }`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (!isScored) handleRowClick(item, review);
-                                }}
-                                // disabled={isScored}
-                              >
-                                {/* <Link
-                                  to={item.documentUrl ?? " "}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-block rounded-lg"
-                                >
-                                </Link> */}
-                                  Review Document
-                              </Button>
                               <Button
                                 className={`w-full h-full ${
                                   isScored
@@ -457,7 +425,7 @@ const ReviewList: React.FC = () => {
                           </td>
                           <td className="p-4 text-sm">
                             <div className="flex items-center space-x-2">
-                              <Button
+                              {/* <Button
                                 className={`w-full h-full ${
                                   isScored
                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -469,15 +437,9 @@ const ReviewList: React.FC = () => {
                                 }}
                                 // disabled={isScored}
                               >
-                                {/* <Link
-                                  to={item?.documentUrl ?? " "}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-block rounded-lg"
-                                >
-                                </Link> */}
-                                  Review Document
-                              </Button>
+                                
+                                Review Document
+                              </Button> */}
                               <Button
                                 className={`w-full h-full ${
                                   isScored
@@ -534,7 +496,15 @@ const ReviewList: React.FC = () => {
                   </p>
                   <p>
                     <strong>Applied On:</strong>{" "}
-                    {formatDate(selectedItem.appliedDate)}
+                    {/* {formatDate(selectedItem.appliedDate, " ")} */}
+                    {new Date(selectedItem.appliedDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      }
+                    )}
                   </p>
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold">
@@ -553,7 +523,7 @@ const ReviewList: React.FC = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:underline"
-                                >
+                              >
                                 <span>{doc.name}</span>
                                 {/* View */}
                               </Link>

@@ -28,7 +28,7 @@ interface Application {
 
 const ApplicationHistorySection = (_props: any) => {
   const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -37,7 +37,7 @@ const ApplicationHistorySection = (_props: any) => {
   const totalPages = Math.ceil(applications?.length / ITEMS_PER_PAGE);
   const paginatedmApplications = applications?.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
   );
 
   const handlePageChange = (page: number) => {
@@ -52,11 +52,11 @@ const ApplicationHistorySection = (_props: any) => {
       setError(null);
       try {
         const response = await getApplicationsByApplicant(
-          Number(applicant?.id),
+          Number(applicant?.id)
         );
 
         const data = response.data.sort((a: any, b: any) =>
-          compareDate(a.appliedDate, b.appliedDate),
+          compareDate(a.appliedDate, b.appliedDate)
         );
 
         const filteredApplications = data.filter((application: any) => {
@@ -156,7 +156,7 @@ const ApplicationHistorySection = (_props: any) => {
                       <h3 className="text-sm font-semibold">Deadline</h3>
                       <span className="text-sm text-black font-semibold">
                         {formatNaturalDate(
-                          application.scholarshipProgram.deadline,
+                          application.scholarshipProgram.deadline
                         )}
                       </span>
                     </div>
@@ -167,7 +167,7 @@ const ApplicationHistorySection = (_props: any) => {
                         $
                         {formatCurrency(
                           application.scholarshipProgram.scholarshipAmount,
-                          "USD",
+                          "USD"
                         )}{" "}
                         per winner
                       </span>
@@ -202,7 +202,7 @@ const ApplicationHistorySection = (_props: any) => {
                                   {`${index + 1}. ${doc.type}`}
                                 </a>
                               </li>
-                            ),
+                            )
                           )}
                         </ul>
                       </span>

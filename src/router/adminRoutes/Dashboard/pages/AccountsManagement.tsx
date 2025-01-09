@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Card,
   Typography,
   IconButton,
   Tooltip,
@@ -8,13 +7,6 @@ import {
   Button,
   Select,
   MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
   CircularProgress,
   DialogTitle,
   DialogContent,
@@ -28,12 +20,18 @@ import {
   Paper,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
+import {
+  getAllAccounts,
+  updateAccount,
+} from "@/services/ApiServices/accountService";
 import { TrashIcon } from "@heroicons/react/24/solid";
-import { FaCheckCircle, FaEnvelope, FaExclamationCircle, FaMapMarkerAlt, FaPhoneAlt, FaTimesCircle } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 import React from "react";
 import { GridArrowDownwardIcon } from "@mui/x-data-grid";
-import { ArrowDown } from "lucide-react";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -41,24 +39,14 @@ const AccountsManagement = () => {
   const [accounts, setAccounts] = useState<AccountWithRole[]>([]);
   const [loading, setLoading] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(null);
+  const [currentAccount, setCurrentAccount] = useState<AccountWithRole | null>(
+    null
+  );
   const [status, setStatus] = useState("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentPageApplicant, setCurrentPageApplicant] = useState(1);
   const [currentPageFunder, setCurrentPageFunder] = useState(1);
   const [currentPageProvider, setCurrentPageProvider] = useState(1);
   const [currentPageExpert, setCurrentPageExpert] = useState(1);
-
-
-  const totalPages = Math.ceil(accounts?.length / ITEMS_PER_PAGE);
-  const paginatedAccounts = accounts?.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
 
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -79,9 +67,13 @@ const AccountsManagement = () => {
     getAllAccounts()
       .then((data) => {
         if (selectedTab == 0)
-          setAccounts(data.filter((account: any) => account.status == "Active"));
+          setAccounts(
+            data.filter((account: any) => account.status == "Active")
+          );
         else
-          setAccounts(data.filter((account: any) => account.status == "Inactive"));
+          setAccounts(
+            data.filter((account: any) => account.status == "Inactive")
+          );
       })
       .catch((error) => {
         console.error("Error fetching accounts:", error);
@@ -145,7 +137,12 @@ const AccountsManagement = () => {
     }
   };
 
-  const renderTable = (roleName: string, filteredAccounts: AccountWithRole[], currentPage: number, setCurrentPage: (page: number) => void) => {
+  const renderTable = (
+    roleName: string,
+    filteredAccounts: AccountWithRole[],
+    currentPage: number,
+    setCurrentPage: (page: number) => void
+  ) => {
     const totalPages = Math.ceil(filteredAccounts.length / ITEMS_PER_PAGE);
     const paginatedAccounts = filteredAccounts.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
@@ -157,59 +154,89 @@ const AccountsManagement = () => {
     };
 
     return (
-      <Paper sx={{ borderRadius: 2, boxShadow: 3, padding: 2, marginBottom: 4 }}>
+      <Paper
+        sx={{ borderRadius: 2, boxShadow: 3, padding: 2, marginBottom: 4 }}
+      >
         {/* Header Row */}
         {roleName === "Applicant" && (
-          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+          <h2
+            style={{
+              marginLeft: "16px",
+              marginBottom: "24px",
+              color: "#3f51b5",
+              fontWeight: "bold",
+            }}
+          >
             Applicant Account
           </h2>
         )}
         {roleName === "Funder" && (
-          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+          <h2
+            style={{
+              marginLeft: "16px",
+              marginBottom: "24px",
+              color: "#3f51b5",
+              fontWeight: "bold",
+            }}
+          >
             Funder Account
           </h2>
         )}
         {roleName === "Provider" && (
-          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+          <h2
+            style={{
+              marginLeft: "16px",
+              marginBottom: "24px",
+              color: "#3f51b5",
+              fontWeight: "bold",
+            }}
+          >
             Provider Account
           </h2>
         )}
         {roleName === "Expert" && (
-          <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+          <h2
+            style={{
+              marginLeft: "16px",
+              marginBottom: "24px",
+              color: "#3f51b5",
+              fontWeight: "bold",
+            }}
+          >
             Expert Account
           </h2>
         )}
         <div
           style={{
-            display: 'flex',
-            backgroundColor: '#f5f5f5',
-            fontWeight: 'bold',
-            padding: '10px',
-            borderRadius: '8px',
-            marginBottom: '10px',
+            display: "flex",
+            backgroundColor: "#f5f5f5",
+            fontWeight: "bold",
+            padding: "10px",
+            borderRadius: "8px",
+            marginBottom: "10px",
           }}
         >
-          <div style={{ flex: 0.5, marginRight: '20px' }}>#.</div>
-          <div style={{ flex: 0.5, marginRight: '20px' }}>ID</div>
-          <div style={{ flex: 1.75, marginRight: '20px' }}>Username</div>
-          <div style={{ flex: 1.5, marginRight: '20px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+          <div style={{ flex: 0.5, marginRight: "20px" }}>#.</div>
+          <div style={{ flex: 0.5, marginRight: "20px" }}>ID</div>
+          <div style={{ flex: 1.75, marginRight: "20px" }}>Username</div>
+          <div style={{ flex: 1.5, marginRight: "20px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center" }}>
               Phone
             </div>
           </div>
-          <div style={{ flex: 2.5, marginRight: '20px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+          <div style={{ flex: 2.5, marginRight: "20px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center" }}>
               Email
             </div>
           </div>
-          <div style={{ flex: 2.5, marginRight: '20px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+          <div style={{ flex: 2.5, marginRight: "20px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center" }}>
               Address
             </div>
           </div>
-          <div style={{ flex: 1, marginRight: '20px' }}>Avatar</div>
-          <div style={{ flex: 1, marginRight: '20px' }}>Status</div>
-          <div style={{ flex: 1, marginRight: '20px' }}>Actions</div>
+          <div style={{ flex: 1, marginRight: "20px" }}>Avatar</div>
+          <div style={{ flex: 1, marginRight: "20px" }}>Status</div>
+          <div style={{ flex: 1, marginRight: "20px" }}>Actions</div>
         </div>
 
         {/* Data Rows */}
@@ -217,51 +244,57 @@ const AccountsManagement = () => {
           <React.Fragment key={account.id}>
             <div
               style={{
-                display: 'flex',
-                padding: '10px',
-                cursor: 'pointer',
-                backgroundColor: '#fff',
-                borderBottom: '1px solid #ddd',
-                transition: 'background-color 0.3s',
+                display: "flex",
+                padding: "10px",
+                cursor: "pointer",
+                backgroundColor: "#fff",
+                borderBottom: "1px solid #ddd",
+                transition: "background-color 0.3s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f1f1f1")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#fff")
+              }
               onClick={() => handleToggle(account.id)} // for handle toggle action
             >
-              <div style={{ flex: 0.5, marginRight: '20px' }}>{index + 1}</div>
-              <div style={{ flex: 0.5, marginRight: '20px' }}>{account.id}</div>
-              <div style={{ flex: 1.75, marginRight: '20px' }}>{account.username}</div>
-              <div style={{ flex: 1.5, marginRight: '20px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <div style={{ flex: 0.5, marginRight: "20px" }}>{index + 1}</div>
+              <div style={{ flex: 0.5, marginRight: "20px" }}>{account.id}</div>
+              <div style={{ flex: 1.75, marginRight: "20px" }}>
+                {account.username}
+              </div>
+              <div style={{ flex: 1.5, marginRight: "20px" }}>
+                <div style={{ display: "inline-flex", alignItems: "center" }}>
                   {account.phoneNumber || "N/A"}
                 </div>
               </div>
-              <div style={{ flex: 2.5, marginRight: '20px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <div style={{ flex: 2.5, marginRight: "20px" }}>
+                <div style={{ display: "inline-flex", alignItems: "center" }}>
                   {account.email || "N/A"}
                 </div>
               </div>
-              <div style={{ flex: 2.5, marginRight: '20px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <div style={{ flex: 2.5, marginRight: "20px" }}>
+                <div style={{ display: "inline-flex", alignItems: "center" }}>
                   {account.address || "N/A"}
                 </div>
               </div>
-              <div style={{ flex: 1, marginRight: '20px' }}>
+              <div style={{ flex: 1, marginRight: "20px" }}>
                 <img
                   src={account.avatarUrl || "https://github.com/shadcn.png"}
                   alt="Avatar"
                   style={{
                     height: 40,
                     width: 40,
-                    display: 'inline-flex',
-                    alignItems: 'center',
+                    display: "inline-flex",
+                    alignItems: "center",
                     borderRadius: "50%",
                     objectFit: "cover",
                   }}
                 />
               </div>
-              <div style={{ flex: 1, marginRight: '20px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <div style={{ flex: 1, marginRight: "20px" }}>
+                <div style={{ display: "inline-flex", alignItems: "center" }}>
                   {account.status === "Active" ? (
                     <FaCheckCircle className="text-green-500 mr-1" />
                   ) : account.status === "Inactive" ? (
@@ -272,15 +305,15 @@ const AccountsManagement = () => {
                   {account.status || "N/A"}
                 </div>
               </div>
-              <div style={{ flex: 1, marginRight: '20px' }}>
-                <div style={{ display: 'inline-flex', gap: '10px' }}>
+              <div style={{ flex: 1, marginRight: "20px" }}>
+                <div style={{ display: "inline-flex", gap: "10px" }}>
                   <Tooltip title="Edit Account">
                     <IconButton
                       onClick={(e) => {
                         e.stopPropagation(); // prevent the row click
                         handleEditAccount(account);
                       }}
-                      sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                      sx={{ color: "blue", "&:hover": { color: "#1976d2" } }}
                     >
                       <EditIcon />
                     </IconButton>
@@ -288,7 +321,7 @@ const AccountsManagement = () => {
                   <Tooltip title="Delete Account">
                     <IconButton
                       onClick={() => handleDeleteAccount(account.id)}
-                      sx={{ color: 'red', '&:hover': { color: '#d32f2f' } }}
+                      sx={{ color: "red", "&:hover": { color: "#d32f2f" } }}
                     >
                       <TrashIcon />
                     </IconButton>
@@ -298,8 +331,15 @@ const AccountsManagement = () => {
             </div>
 
             {/* Collapsible content */}
-            {(account.roleName == "Provider" || account.roleName == "Funder") && (
-              <div style={{ paddingLeft: '10px', paddingTop: '10px', paddingBottom: '10px' }}>
+            {(account.roleName == "Provider" ||
+              account.roleName == "Funder") && (
+              <div
+                style={{
+                  paddingLeft: "10px",
+                  paddingTop: "10px",
+                  paddingBottom: "10px",
+                }}
+              >
                 <Collapse in={openRows[account.id]} timeout={300} unmountOnExit>
                   <Accordion>
                     <AccordionSummary
@@ -322,7 +362,14 @@ const AccountsManagement = () => {
             )}
           </React.Fragment>
         ))}
-        <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+        <div
+          style={{
+            marginTop: "20px",
+            marginBottom: "10px",
+            display: "flex",
+            justifyContent: "end",
+          }}
+        >
           {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index}
@@ -330,7 +377,8 @@ const AccountsManagement = () => {
               style={{
                 margin: "0 5px",
                 padding: "5px 10px",
-                backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                backgroundColor:
+                  currentPage === index + 1 ? "#419f97" : "#f1f1f1",
                 color: currentPage === index + 1 ? "white" : "black",
                 border: "none",
                 borderRadius: "5px",
@@ -347,7 +395,14 @@ const AccountsManagement = () => {
 
   return (
     <>
-      <h2 style={{ marginLeft: "16px", marginBottom: "24px", color: "#3f51b5", fontWeight: "bold" }}>
+      <h2
+        style={{
+          marginLeft: "16px",
+          marginBottom: "24px",
+          color: "#3f51b5",
+          fontWeight: "bold",
+        }}
+      >
         Accounts Management
       </h2>
       <Tabs
@@ -359,7 +414,6 @@ const AccountsManagement = () => {
         textColor="inherit"
         centered
       >
-
         <Tab
           label="Active Accounts"
           sx={{ textTransform: "none", color: "green", fontWeight: "bold" }}
@@ -375,29 +429,62 @@ const AccountsManagement = () => {
       ) : (
         <>
           <div className="mt-7">
-            {renderTable("Applicant", accounts.filter(account => account.roleName === "Applicant"), currentPageApplicant, setCurrentPageApplicant)}
+            {renderTable(
+              "Applicant",
+              accounts.filter((account) => account.roleName === "Applicant"),
+              currentPageApplicant,
+              setCurrentPageApplicant
+            )}
             <br />
-            {renderTable("Funder", accounts.filter(account => account.roleName === "Funder"), currentPageFunder, setCurrentPageFunder)}
+            {renderTable(
+              "Funder",
+              accounts.filter((account) => account.roleName === "Funder"),
+              currentPageFunder,
+              setCurrentPageFunder
+            )}
             <br />
-            {renderTable("Provider", accounts.filter(account => account.roleName === "Provider"), currentPageProvider, setCurrentPageProvider)}
+            {renderTable(
+              "Provider",
+              accounts.filter((account) => account.roleName === "Provider"),
+              currentPageProvider,
+              setCurrentPageProvider
+            )}
             <br />
-            {renderTable("Expert", accounts.filter(account => account.roleName === "Expert"), currentPageExpert, setCurrentPageExpert)}
+            {renderTable(
+              "Expert",
+              accounts.filter((account) => account.roleName === "Expert"),
+              currentPageExpert,
+              setCurrentPageExpert
+            )}
           </div>
         </>
       )}
 
       {/* Edit Account Status Dialog */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} fullWidth>
+      <Dialog
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        fullWidth
+      >
         <DialogTitle>Edit Account Status</DialogTitle>
         <DialogContent>
-          <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)} fullWidth>
+          <Select
+            label="Status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            fullWidth
+          >
             <MenuItem value="Active">Active</MenuItem>
             <MenuItem value="Inactive">Inactive</MenuItem>
           </Select>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} color="secondary">Cancel</Button>
-          <Button onClick={handleUpdateStatus} color="primary">Update</Button>
+          <Button onClick={() => setOpenEditDialog(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateStatus} color="primary">
+            Update
+          </Button>
         </DialogActions>
       </Dialog>
     </>
