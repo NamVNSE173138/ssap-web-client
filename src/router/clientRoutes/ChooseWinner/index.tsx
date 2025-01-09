@@ -129,9 +129,9 @@ const ChooseWinner = () => {
 
       await Promise.all(applyPromises);
 
-      if (availableScholarships === 0) {
-        await updateScholarshipStatus(Number(data?.id), "Finished");
-      }
+      //if (availableScholarships === 0) {
+        await updateScholarshipStatus(Number(data?.id), "Closed");
+      //}
 
       notification.success({
         message: "Approve successfully!",

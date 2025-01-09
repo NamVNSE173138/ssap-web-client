@@ -167,7 +167,7 @@ const ReviewList: React.FC = () => {
 
       const currentDate = new Date();
       let isReview = true;
-      reviewMilestone?.data.forEach((review: any) => {
+      /*reviewMilestone?.data.forEach((review: any) => {
         if (
           new Date(review.fromDate) < currentDate &&
           new Date(review.toDate) > currentDate
@@ -178,7 +178,13 @@ const ReviewList: React.FC = () => {
             isReview = false;
           }
         }
-      });
+      });*/
+
+      if (selectedReview.description.toLowerCase() === "application review") {
+        isReview = true;
+      } else {
+        isReview = false;
+      }
 
       const numericScore = Number(score);
       const payload = {
@@ -290,7 +296,7 @@ const ReviewList: React.FC = () => {
                           <td className="p-4 text-sm text-gray-800">{score}</td>
                           <td
                             className={`p-4 text-sm font-medium ${
-                              review.status === "Approved"
+                              (review.status === "Approved" || review.status === "Passed")
                                 ? "text-green-600"
                                 : review.status === "Failed"
                                 ? "text-red-600"
@@ -440,7 +446,7 @@ const ReviewList: React.FC = () => {
                           <td className="p-4 text-sm text-gray-800">{score}</td>
                           <td
                             className={`p-4 text-sm font-medium ${
-                              review.status === "Approved"
+                              (review.status === "Passed" || review.status === "Approved")
                                 ? "text-green-600"
                                 : review.status === "Failed"
                                 ? "text-red-600"

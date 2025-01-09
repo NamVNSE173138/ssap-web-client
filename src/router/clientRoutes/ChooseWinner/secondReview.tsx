@@ -12,6 +12,7 @@ interface FirstReviewProps {
 }
 
 const statusColor: any = {
+  Passed: "green",
   Submitted: "blue",
   Approved: "green",
   Rejected: "red",
@@ -71,8 +72,9 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
         //console.log(expertNamesData);
         //console.log(fetchedData);
         // Group by applicationId and calculate average score
+        //console.log("fetchedData",fetchedData);
         const groupedData = fetchedData.reduce((acc: any, item: any) => {
-          const { applicationId, applicantName, score, expertId, status } = item;
+          const { applicationId, applicantName, score, expertId, status, comment } = item;
 
           if (!acc[applicationId]) {
             acc[applicationId] = {
@@ -86,9 +88,10 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
           acc[applicationId].applicantName = applicantName
           acc[applicationId].expertReview += expertNamesData[expertId] + ", ";
           acc[applicationId].updatedAt = "...";
-          if (status == "Approved") acc[applicationId].status += 1;
+          if (status == "Passed") acc[applicationId].status += 1;
           else acc[applicationId].status -= 1;
 
+          if(comment == null) acc[applicationId].isReviewing = true;
           return acc;
         }, {});
 
@@ -100,7 +103,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
           comment: "...",
           expertReview: group.expertReview.slice(0, -2),
           updatedAt: "...",
-          status: group.status > 0 ? "Approved" : "Rejected"
+          status: group.isReviewing ? "Reviewing" : (group.status > 0 ? "Approved" : "Rejected")
         }));
         setApplications(result);
         setExpanded(fetchedData.map((row: any) => ({ id: row.id, expanded: false })));
