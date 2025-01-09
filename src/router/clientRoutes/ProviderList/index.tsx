@@ -1,12 +1,15 @@
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import RouteNames from "@/constants/routeNames";
 import { getAllAccounts } from "@/services/ApiServices/accountService";
 import { Button, List, Paper } from "@mui/material";
 import { Breadcrumb } from "antd";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { useEffect, useState } from "react";
-import { FaUsers, FaEye, FaPhoneAlt, FaEnvelope, FaSpinner } from "react-icons/fa"; // Added icons for better UX
+import { FaUsers, FaSpinner } from "react-icons/fa";
 import { IoIosEye } from "react-icons/io";
 import { Link } from "react-router-dom";
 
@@ -46,28 +49,28 @@ const ProviderList = () => {
       <Paper
         elevation={3}
         style={{
-          padding: '20px',
-          borderRadius: '10px',
-          backgroundColor: '#fafafa',
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: "20px",
+          borderRadius: "10px",
+          backgroundColor: "#fafafa",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
         }}
       >
         {/* Table Header */}
         <div
           style={{
-            display: 'flex',
-            fontWeight: 'bold',
-            backgroundColor: '#f1f1f1',
-            padding: '10px',
-            borderRadius: '8px',
-            marginBottom: '10px',
+            display: "flex",
+            fontWeight: "bold",
+            backgroundColor: "#f1f1f1",
+            padding: "10px",
+            borderRadius: "8px",
+            marginBottom: "10px",
           }}
         >
-          <div style={{ flex: '1', marginLeft: '20px' }}>No.</div>
-          <div style={{ flex: '2' }}>Provider Name</div>
-          <div style={{ flex: '2' }}>Email</div>
-          <div style={{ flex: '2' }}>Phone</div>
-          <div style={{ flex: '2' }}>Action</div>
+          <div style={{ flex: "1", marginLeft: "20px" }}>No.</div>
+          <div style={{ flex: "2" }}>Provider Name</div>
+          <div style={{ flex: "2" }}>Email</div>
+          <div style={{ flex: "2" }}>Phone</div>
+          <div style={{ flex: "2" }}>Action</div>
         </div>
 
         {/* Providers List */}
@@ -75,56 +78,90 @@ const ProviderList = () => {
           <div
             key={provider.id}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px',
-              backgroundColor: '#ffffff',
-              border: '2px solid #e0e0e0',
-              borderRadius: '8px',
-              marginBottom: '10px',
-              transition: 'all 0.3s ease',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px",
+              backgroundColor: "#ffffff",
+              border: "2px solid #e0e0e0",
+              borderRadius: "8px",
+              marginBottom: "10px",
+              transition: "all 0.3s ease",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0px 4px 12px rgba(0, 0, 0, 0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0px 4px 12px rgba(0, 0, 0, 0.2)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
           >
-            <div style={{ flex: '1', marginLeft: '20px', color: '#333', fontWeight: '500' }}>{index + 1}</div>
-            <div style={{ flex: '2', fontWeight: '500', color: '#333' }}>{provider.username}</div>
-            <div style={{ flex: '2', color: '#555' }}>
-              <span style={{ color: '#0099cc', marginRight: '8px', fontWeight: '500' }}>📧</span>
-              {provider.email || 'Not Available'}
+            <div
+              style={{
+                flex: "1",
+                marginLeft: "20px",
+                color: "#333",
+                fontWeight: "500",
+              }}
+            >
+              {index + 1}
             </div>
-            <div style={{ flex: '2', color: '#555' }}>
-              <span style={{ color: '#00cc66', marginRight: '8px', fontWeight: '500' }}>📞</span>
-              {provider.phoneNumber || 'Not Available'}
+            <div style={{ flex: "2", fontWeight: "500", color: "#333" }}>
+              {provider.username}
             </div>
-            <div style={{ flex: '2' }}>
-              <Button
-                onClick={() => window.location.href = RouteNames.PROVIDER_INFORMATION.replace(':id', provider.id)}
+            <div style={{ flex: "2", color: "#555" }}>
+              <span
                 style={{
-                  backgroundColor: '#1e88e5',
-                  color: '#fff',
-                  padding: '6px 12px',
-                  borderRadius: '5px',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
+                  color: "#0099cc",
+                  marginRight: "8px",
+                  fontWeight: "500",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1565c0')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1e88e5')}
               >
-                <IoIosEye style={{ marginRight: '8px' }} />
+                📧
+              </span>
+              {provider.email || "Not Available"}
+            </div>
+            <div style={{ flex: "2", color: "#555" }}>
+              <span
+                style={{
+                  color: "#00cc66",
+                  marginRight: "8px",
+                  fontWeight: "500",
+                }}
+              >
+                📞
+              </span>
+              {provider.phoneNumber || "Not Available"}
+            </div>
+            <div style={{ flex: "2" }}>
+              <Button
+                onClick={() =>
+                  (window.location.href =
+                    RouteNames.PROVIDER_INFORMATION.replace(":id", provider.id))
+                }
+                style={{
+                  backgroundColor: "#1e88e5",
+                  color: "#fff",
+                  padding: "6px 12px",
+                  borderRadius: "5px",
+                  fontWeight: "500",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1565c0")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1e88e5")
+                }
+              >
+                <IoIosEye style={{ marginRight: "8px" }} />
                 View Services
               </Button>
             </div>
-
           </div>
         ))}
       </Paper>
-
     </div>
-
   );
 
   if (loading) {
@@ -147,11 +184,15 @@ const ProviderList = () => {
           <Breadcrumb>
             <BreadcrumbList className="text-white">
               <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">Home</Link>
+                <Link to="/" className="md:text-xl text-lg">
+                  Home
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <Link to="/services" className="md:text-xl text-lg">Services</Link>
+                <Link to="/services" className="md:text-xl text-lg">
+                  Services
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>

@@ -13,6 +13,17 @@ export async function getAllScholarshipProgram() {
     }
 }
 
+export async function deleteScholarshipProgram(id: number){
+    try {
+        const response = await axios.delete(`${BASE_URL}/api/scholarship-programs/${id}`);
+        console.log('Scholarship program deleted successfully:', response.data);
+        return response;
+    } catch (error: any) {
+        console.error('API error while deleting scholarship program:', error?.response?.data || error.message);
+        throw error;
+    }
+}
+
 export async function countScholarshipProgram() {
     try {
         const response = await axios.get(`${BASE_URL}/api/scholarship-programs/count`);

@@ -1,22 +1,29 @@
-import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
-import { Link, useParams } from "react-router-dom"
-import SchoolLogo from "../ScholarshipProgramDetail/logo"
-import { useEffect, useState } from "react"
-import NotFound from "@/router/commonRoutes/404"
-import { Spin } from "antd"
-import { formatOnlyDate } from "@/lib/date-formatter"
-import { getRequestWithApplicantAndRequestDetails } from "@/services/ApiServices/requestService"
-import RequestDetailTable from "./request-detail-table"
-import { useSelector } from "react-redux"
-import { FaBirthdayCake, FaEnvelope, FaFlag, FaTransgender, FaUserCircle, FaUsers } from "react-icons/fa"
-import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService"
+import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Link, useParams } from "react-router-dom";
+import SchoolLogo from "../ScholarshipProgramDetail/logo";
+import { useEffect, useState } from "react";
+import NotFound from "@/router/commonRoutes/404";
+import { Spin } from "antd";
+import { getRequestWithApplicantAndRequestDetails } from "@/services/ApiServices/requestService";
+import RequestDetailTable from "./request-detail-table";
+import { useSelector } from "react-redux";
+import { FaEnvelope, FaUserCircle } from "react-icons/fa";
+import { getApplicantProfileById } from "@/services/ApiServices/applicantProfileService";
 
-const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => {
+const ApplicantRequestInfo = ({
+  showButtons = true,
+  requestId = null,
+}: any) => {
   const { id } = requestId ?? useParams<{ id: string }>();
   const [request, setRequest] = useState<any>(null);
   const [applicant, setApplicant] = useState<any>(null);
-  const [applicantProfile, setApplicantProfile] = useState<any>(null);
+  const [_applicantProfile, setApplicantProfile] = useState<any>(null);
   const [service, setService] = useState<any>(null);
   const [requestDetails, setRequestDetails] = useState<any>(null);
   const [_error, setError] = useState<string>("");
@@ -26,17 +33,21 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
   const fetchRequest = async () => {
     try {
       if (!id) return;
-      const request = await getRequestWithApplicantAndRequestDetails(parseInt(id));
+      const request = await getRequestWithApplicantAndRequestDetails(
+        parseInt(id)
+      );
       console.log(request);
-      console.log(request.data)
+      console.log(request.data);
 
       if (request.statusCode == 200) {
         setRequest(request.data);
-        
-        console.log(request.data.applicant)
-        const applicantProfileResponse = await getApplicantProfileById(request.data.applicant.id);
+
+        console.log(request.data.applicant);
+        const applicantProfileResponse = await getApplicantProfileById(
+          request.data.applicant.id
+        );
         const fullName = `${applicantProfileResponse.data.firstName} ${applicantProfileResponse.data.lastName}`;
-        setApplicant({...request.data.applicant,fullName,});
+        setApplicant({ ...request.data.applicant, fullName });
         setApplicantProfile(request.data.applicant.applicantProfile);
         setRequestDetails(request.data.requestDetails);
         setService(request.data.requestDetails[0].service);
@@ -52,8 +63,8 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
 
   useEffect(() => {
     fetchRequest();
-  }, [])
-  if (!id) return <NotFound />
+  }, []);
+  if (!id) return <NotFound />;
   if (loading) {
     return <Spin size="large" />;
   }
@@ -100,7 +111,11 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <Link
-                    to={user.role === 'Applicant' ? `/applicant/requestinformation/${request.id}` : `/provider/requestinformation/${request.id}`}
+                    to={
+                      user.role === "Applicant"
+                        ? `/applicant/requestinformation/${request.id}`
+                        : `/provider/requestinformation/${request.id}`
+                    }
                     className="text-[#000] md:text-xl text-lg font-extrabold"
                   >
                     {applicant.fullName}
@@ -111,7 +126,11 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
           </div>
           <div className="w-full">
             <div className="lg:flex-row items-center :lg:items-center flex-row flex gap-[20px] ">
-              <SchoolLogo imageUrl={applicant.avatarUrl ?? "https://github.com/shadcn.png"} />
+              <SchoolLogo
+                imageUrl={
+                  applicant.avatarUrl ?? "https://github.com/shadcn.png"
+                }
+              />
               <div>
                 <p className="text-white text-4xl font-semibold hover:text-indigo-300 transition-colors duration-300">
                   <FaUserCircle className="inline-block mr-2 text-indigo-200" />
@@ -145,12 +164,18 @@ const ApplicantRequestInfo = ({ showButtons = true, requestId = null }: any) => 
               Request Details for {service.name}
               <span className="block bg-sky-500 w-[24px] h-[6px] rounded-[8px] mt-[4px]"></span>
             </p>
-            <RequestDetailTable showButtons={showButtons} request={request} fetchRequest={fetchRequest} requestDetails={requestDetails} description={request.description} />
+            <RequestDetailTable
+              showButtons={showButtons}
+              request={request}
+              fetchRequest={fetchRequest}
+              requestDetails={requestDetails}
+              description={request.description}
+            />
           </div>
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
 export default ApplicantRequestInfo;

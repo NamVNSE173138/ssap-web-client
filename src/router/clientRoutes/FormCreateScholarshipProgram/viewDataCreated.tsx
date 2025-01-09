@@ -6,7 +6,6 @@ import {
   FaCalendarAlt,
   FaCertificate,
   FaClipboardList,
-  FaCode,
   FaCreditCard,
   FaDollarSign,
   FaExclamationCircle,
@@ -27,16 +26,18 @@ import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 import { useEffect, useState } from "react";
 
-const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: any) => void; }) => {
+const ViewDataCreated = ({ formData }: { formData: any }) => {
   const user = useSelector((state: any) => state.token.user);
   const isApplicant = user?.role;
   const [categories, setCategories] = useState<any>(null);
   const [majors, setMajors] = useState<any>(null);
   const [universities, setUniversities] = useState<any>(null);
   const [certificates, setCertificates] = useState<any>(null);
-  const fetchCategories = async (categoryId : number) => {
+  const fetchCategories = async (categoryId: number) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/categories/${categoryId}`);
+      const response = await axios.get(
+        `${BASE_URL}/api/categories/${categoryId}`
+      );
       console.log("category", response.data.data);
 
       setCategories(response.data.data);
@@ -44,7 +45,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
       console.error("Error fetching categories", error);
     }
   };
-  const fetchMajors = async (majorId : number) => {
+  const fetchMajors = async (majorId: number) => {
     try {
       const response = await axios.get(`${BASE_URL}/api/majors/${majorId}`);
       console.log("major", response.data.data);
@@ -54,9 +55,11 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
       console.error("Error fetching majors", error);
     }
   };
-  const fetchUniversities = async (universityId : number) => {
+  const fetchUniversities = async (universityId: number) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/universities/${universityId}`);
+      const response = await axios.get(
+        `${BASE_URL}/api/universities/${universityId}`
+      );
       console.log("university", response.data.data);
 
       setUniversities(response.data.data);
@@ -64,9 +67,11 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
       console.error("Error fetching university", error);
     }
   };
-  const fetchCertificates = async (certificatesId : number) => {
+  const fetchCertificates = async (certificatesId: number) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/certificates/${certificatesId}`);
+      const response = await axios.get(
+        `${BASE_URL}/api/certificates/${certificatesId}`
+      );
       console.log("certificate", response.data.data);
 
       setCertificates(response.data.data);
@@ -164,7 +169,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                       </p>
                       <p className="text-lg font-semibold text-gray-800">
                         {formData.deadline &&
-                          !isNaN(new Date(formData.deadline).getTime())
+                        !isNaN(new Date(formData.deadline).getTime())
                           ? format(new Date(formData.deadline), "MM/dd/yyyy")
                           : "Not specified"}
                       </p>
@@ -185,7 +190,6 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                 </div>
               </section>
             </div>
-
           </div>
           <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
             <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
@@ -297,7 +301,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                           </AccordionSummary>
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                             {formData.criteria &&
-                              formData.criteria.length > 0 ? (
+                            formData.criteria.length > 0 ? (
                               <div className="flex flex-col gap-4">
                                 {formData.criteria.map((criteria: any) => (
                                   <div
@@ -337,7 +341,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                               <FaTag className="text-[#1eb2a6]" />
                               Scholarship Category
                             </h3>
-                          {/* {JSON.stringify(categories)} */}
+                            {/* {JSON.stringify(categories)} */}
                           </AccordionSummary>
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                             {/* Category Name */}
@@ -361,7 +365,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                                   Description:
                                 </p>
                                 <p className="text-gray-600">
-                                {categories ? categories.description : ""}
+                                  {categories ? categories.description : ""}
                                 </p>
                               </div>
                             </div>
@@ -387,7 +391,6 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                               Applicable Majors & Skills
                             </h3>
                             {/* {JSON.stringify(majors)} */}
-
                           </AccordionSummary>
 
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
@@ -412,7 +415,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                                         Description:
                                       </p>
                                       <p className="text-gray-600">
-                                      {majors ? majors.description : ""}
+                                        {majors ? majors.description : ""}
                                       </p>
                                     </div>
                                   </div>
@@ -507,7 +510,9 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                                         Description:
                                       </p>
                                       <p className="text-gray-600">
-                                      {universities ? universities.description : ""}
+                                        {universities
+                                          ? universities.description
+                                          : ""}
                                       </p>
                                     </div>
                                   </div>
@@ -537,55 +542,57 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                           </AccordionSummary>
                           <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
                             {formData.certificates &&
-                              formData.certificates.length > 0 ? (
-                              formData.certificates.map(
-                                (certificate: any) => (
-                                  <Accordion
-                                    key={certificate.id}
-                                    className="mt-4"
+                            formData.certificates.length > 0 ? (
+                              formData.certificates.map((certificate: any) => (
+                                <Accordion
+                                  key={certificate.id}
+                                  className="mt-4"
+                                >
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls={`certificate-${certificate.id}-content`}
+                                    id={`certificate-${certificate.id}-header`}
+                                    className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
                                   >
-                                    <AccordionSummary
-                                      expandIcon={<ExpandMoreIcon />}
-                                      aria-controls={`certificate-${certificate.id}-content`}
-                                      id={`certificate-${certificate.id}-header`}
-                                      className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <FaCertificate className="text-gray-500" />
-                                        <span className="font-bold text-gray-700">
+                                    <div className="flex items-center gap-2">
+                                      <FaCertificate className="text-gray-500" />
+                                      <span className="font-bold text-gray-700">
                                         {certificates ? certificates.name : ""}
-                                        </span>
-                                      </div>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                      <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-                                        <div className="flex items-start gap-3">
-                                          <FaInfoCircle className="text-gray-400 text-xl mt-1" />
-                                          <div>
-                                            <p className="text-gray-700 font-bold">
-                                              Description:
-                                            </p>
-                                            <p className="text-gray-600">
-                                            {certificates ? certificates.description : ""}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        <div className="flex items-start gap-3">
-                                          <FaTag className="text-gray-400 text-xl mt-1" />
-                                          <div>
-                                            <p className="text-gray-700 font-bold">
-                                              Type:
-                                            </p>
-                                            <p className="text-gray-600">
-                                            {certificates ? certificates.type : ""}
-                                            </p>
-                                          </div>
+                                      </span>
+                                    </div>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+                                    <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
+                                      <div className="flex items-start gap-3">
+                                        <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                                        <div>
+                                          <p className="text-gray-700 font-bold">
+                                            Description:
+                                          </p>
+                                          <p className="text-gray-600">
+                                            {certificates
+                                              ? certificates.description
+                                              : ""}
+                                          </p>
                                         </div>
                                       </div>
-                                    </AccordionDetails>
-                                  </Accordion>
-                                )
-                              )
+                                      <div className="flex items-start gap-3">
+                                        <FaTag className="text-gray-400 text-xl mt-1" />
+                                        <div>
+                                          <p className="text-gray-700 font-bold">
+                                            Type:
+                                          </p>
+                                          <p className="text-gray-600">
+                                            {certificates
+                                              ? certificates.type
+                                              : ""}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </AccordionDetails>
+                                </Accordion>
+                              ))
                             ) : (
                               <p className="text-gray-600 italic">
                                 No certificates required.
@@ -618,7 +625,7 @@ const ViewDataCreated = ({ formData, onBack }: { formData: any; onBack: (data: a
                     <br />
                     <List sx={{ pt: 0 }}>
                       {!formData.reviewMilestones ||
-                        formData.reviewMilestones.length === 0 ? (
+                      formData.reviewMilestones.length === 0 ? (
                         <p className="p-10 text-center text-gray-500 font-semibold text-xl">
                           No review milestones for this scholarship
                         </p>

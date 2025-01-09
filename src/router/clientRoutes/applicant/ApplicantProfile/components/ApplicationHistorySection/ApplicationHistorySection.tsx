@@ -28,7 +28,7 @@ interface Application {
 
 const ApplicationHistorySection = (_props: any) => {
   const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -52,11 +52,11 @@ const ApplicationHistorySection = (_props: any) => {
       setError(null);
       try {
         const response = await getApplicationsByApplicant(
-          Number(applicant?.id),
+          Number(applicant?.id)
         );
 
         const data = response.data.sort((a: any, b: any) =>
-          compareDate(a.appliedDate, b.appliedDate),
+          compareDate(a.appliedDate, b.appliedDate)
         );
 
         const filteredApplications = data.filter((application: any) => {
@@ -156,7 +156,7 @@ const ApplicationHistorySection = (_props: any) => {
                       <h3 className="text-sm font-semibold">Deadline</h3>
                       <span className="text-sm text-black font-semibold">
                         {formatNaturalDate(
-                          application.scholarshipProgram.deadline,
+                          application.scholarshipProgram.deadline
                         )}
                       </span>
                     </div>
@@ -167,7 +167,7 @@ const ApplicationHistorySection = (_props: any) => {
                         $
                         {formatCurrency(
                           application.scholarshipProgram.scholarshipAmount,
-                          "USD",
+                          "USD"
                         )}{" "}
                         per winner
                       </span>
@@ -186,28 +186,23 @@ const ApplicationHistorySection = (_props: any) => {
                       </h3>
 
                       <span className="text-sm text-black font-semibold">
-                        <ul className="list-none inline-flex">
+                        <ul className="list-none">
                           {application.applicationDocuments.length === 0 && (
                             <span>No Submitted Documents</span>
                           )}
                           {application.applicationDocuments.map(
                             (doc, index) => (
-                              <div>
+                              <li key={index} className="mb-2">
                                 <a
                                   href={doc.fileUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-blue-500 hover:text-blue-700 underline transition duration-200 ease-in-out hover:scale-105"
                                 >
-                                  {doc.type}
+                                  {`${index + 1}. ${doc.type}`}
                                 </a>
-                                {index <
-                                  application.applicationDocuments.length -
-                                  1 && (
-                                    <span className="text-blue-500">,&nbsp;</span>
-                                  )}
-                              </div>
-                            ),
+                              </li>
+                            )
                           )}
                         </ul>
                       </span>
@@ -225,7 +220,14 @@ const ApplicationHistorySection = (_props: any) => {
           ))}
         </div>
       </div>
-      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          marginTop: "20px",
+          marginBottom: "10px",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
@@ -233,7 +235,8 @@ const ApplicationHistorySection = (_props: any) => {
             style={{
               margin: "0 5px",
               padding: "5px 10px",
-              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+              backgroundColor:
+                currentPage === index + 1 ? "#419f97" : "#f1f1f1",
               color: currentPage === index + 1 ? "white" : "black",
               border: "none",
               borderRadius: "5px",

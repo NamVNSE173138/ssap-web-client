@@ -64,7 +64,7 @@ const SkillInformation = () => {
   }, [id, user?.id]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
@@ -75,23 +75,12 @@ const SkillInformation = () => {
       if (!user) return;
 
       const isDuplicate = skills.some(
-        (skill) => skill.name.toLowerCase() === formValues.name.toLowerCase(),
+        (skill) => skill.name.toLowerCase() === formValues.name.toLowerCase()
       );
       if (isDuplicate) {
         message.error(`Skill name '${formValues.name}' already exists.`);
         return;
       }
-
-      // await updateApplicantSkills(Number(user.id), [formValues]);
-      // message.success("Skill added successfully!");
-      // setSkills([...skills, formValues]);
-      // setFormValues({
-      //   name: "",
-      //   type: "",
-      //   description: "",
-      //   skillId: null,
-      //   applicantId: user?.id,
-      // });
     } catch (error) {
       message.error("Failed to add skill.");
     }
@@ -102,10 +91,9 @@ const SkillInformation = () => {
       if (!user || formValues.skillId === null) return;
 
       const updatedSkills = skills.map((skill) =>
-        skill.id === formValues.skillId ? { ...skill, ...formValues } : skill,
+        skill.id === formValues.skillId ? { ...skill, ...formValues } : skill
       );
 
-      // await updateApplicantSkills(Number(user.id), updatedSkills);
       message.success("Skill updated successfully!");
       setSkills(updatedSkills);
     } catch (error) {
@@ -120,7 +108,7 @@ const SkillInformation = () => {
   const handleDelete = async (skillId: number) => {
     try {
       if (!user) return;
-      await deleteApplicantSkill(Number(user.id), skillId);
+      await deleteApplicantSkill(Number(user.id));
       message.success("Skill deleted successfully!");
       setSkills(skills.filter((skill) => skill.id !== skillId));
     } catch (error) {
