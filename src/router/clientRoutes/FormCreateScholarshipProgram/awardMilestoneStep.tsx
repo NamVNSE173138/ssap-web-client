@@ -84,16 +84,17 @@ const AwardMilestoneStep = ({
           ctx.addIssue({
             code: "custom",
             path: ["awardMilestones", index, "toDate"],
-            message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${formData.reviewMilestones.length > 0
-              ? formatDate(
-                formData.reviewMilestones.sort(
-                  (a: any, b: any) =>
-                    new Date(a.toDate).getTime() -
-                    new Date(b.toDate).getTime()
-                )[formData.reviewMilestones.length - 1].toDate
-              )
-              : ""
-              }`,
+            message: `The 'From' and 'To' date must be later than the all of review milestones. which is ${
+              formData.reviewMilestones.length > 0
+                ? formatDate(
+                    formData.reviewMilestones.sort(
+                      (a: any, b: any) =>
+                        new Date(a.toDate).getTime() -
+                        new Date(b.toDate).getTime()
+                    )[formData.reviewMilestones.length - 1].toDate
+                  )
+                : ""
+            }`,
           });
         } else if (
           data.awardMilestones
@@ -135,10 +136,10 @@ const AwardMilestoneStep = ({
           });
         } else if (
           Number(formData.value) -
-          data.awardMilestones.reduce(
-            (sum: number, award: any) => sum + award.amount,
-            0
-          ) !=
+            data.awardMilestones.reduce(
+              (sum: number, award: any) => sum + award.amount,
+              0
+            ) !=
           0
         ) {
           ctx.addIssue({
@@ -229,41 +230,40 @@ const AwardMilestoneStep = ({
   return (
     <>
       <div>
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto space-y-12">
-          {/* Header */}
-          <div className="border-b pb-6">
-            <h2 className="text-3xl font-bold text-blue-700">Award Milestones</h2>
-          </div>
-
-          {/* Award Value */}
-          <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Value of Award:{" "}
-              <span className="text-green-600">${Number(formData.value).toLocaleString("en-US")}</span>
-            </h3>
-          </div>
-
-          {/* Form */}
-          <form className="space-y-10">
+        <div className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            Payment Milestones
+          </h2>
+          <h2 className="text-xl font-bold text-black mb-5 ml-5">
+            Value of Award:{" "}
+            <span className="text-green-500">
+              ${Number(formData.value).toLocaleString("en-US")}
+            </span>
+          </h2>{" "}
+          {/* Ensuring the value of award is shown for each milestone */}
+          <form className="space-y-8">
             {awardMilestones.map((milestone, index) => (
-              <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-md space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold text-blue-700">
-                    Milestone {index + 1}
-                  </h3>
-                </div>
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm"
+              >
+                <h3 className="text-md font-bold text-blue-700 mb-4">
+                  Milestone {index + 1}
+                </h3>
 
-                {/* Fields Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Grid layout for fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">
                   {/* From Date */}
-                  <div className="flex flex-col">
+                  <div className="max-w-sm w-full text-black-2">
                     <Label htmlFor={`fromDate-${index}`}>From Date</Label>
                     <Input
                       id={`fromDate-${index}`}
                       type="date"
                       value={milestone.fromDate || ""}
-                      onChange={(e) => updateAwardMilestone(index, "fromDate", e.target.value)}
-                      className="mt-1"
+                      onChange={(e) =>
+                        updateAwardMilestone(index, "fromDate", e.target.value)
+                      }
+                      className="w-full"
                     />
                     {errors.awardMilestones?.[index]?.fromDate && (
                       <p className="text-red-500 text-sm mt-1">
@@ -273,14 +273,16 @@ const AwardMilestoneStep = ({
                   </div>
 
                   {/* To Date */}
-                  <div className="flex flex-col">
+                  <div className="max-w-sm w-full text-black-2">
                     <Label htmlFor={`toDate-${index}`}>To Date</Label>
                     <Input
                       id={`toDate-${index}`}
                       type="date"
                       value={milestone.toDate || ""}
-                      onChange={(e) => updateAwardMilestone(index, "toDate", e.target.value)}
-                      className="mt-1"
+                      onChange={(e) =>
+                        updateAwardMilestone(index, "toDate", e.target.value)
+                      }
+                      className="w-full"
                     />
                     {errors.awardMilestones?.[index]?.toDate && (
                       <p className="text-red-500 text-sm mt-1">
@@ -290,7 +292,7 @@ const AwardMilestoneStep = ({
                   </div>
 
                   {/* Required File Types */}
-                  <div className="flex flex-col">
+                  <div className="max-w-sm w-full text-black-2">
                     <Label>Required File Types</Label>
                     <Controller
                       control={control}
@@ -299,31 +301,45 @@ const AwardMilestoneStep = ({
                         <Select
                           isMulti
                           options={[
-                            { value: "Academic Transcript", label: "Academic Transcript" },
-                            { value: "Financial Report", label: "Financial Report" },
+                            {
+                              value: "Academic Transcript",
+                              label: "Academic Transcript",
+                            },
+                            {
+                              value: "Financial Report",
+                              label: "Financial Report",
+                            },
                           ]}
                           value={field.value?.map((doc) =>
                             [
-                              { value: "Academic Transcript", label: "Academic Transcript" },
-                              { value: "Financial Report", label: "Financial Report" },
+                              {
+                                value: "Academic Transcript",
+                                label: "Academic Transcript",
+                              },
+                              {
+                                value: "Financial Report",
+                                label: "Financial Report",
+                              },
                             ].find((option) => option.value === doc.type)
                           )}
                           onChange={(selected) =>
                             field.onChange(
-                              selected.map((item: any) => ({ type: item.value }))
+                              selected.map((item: any) => ({
+                                type: item.value,
+                              }))
                             )
                           }
-                          className="mt-1"
+                          className="w-full"
                         />
                       )}
                     />
                   </div>
 
                   {/* Amount */}
-                  <div className="flex flex-col">
+                  <div className="max-w-sm w-full text-black-2">
                     <Label htmlFor={`amount-${index}`}>Amount</Label>
-                    <div className="relative flex">
-                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-green-600">
+                    <div className="flex">
+                      <span className="text-md text-green-500 bg-gray-100 border border-gray-200 px-3 flex items-center rounded-l-md">
                         $
                       </span>
                       <Input
@@ -331,32 +347,42 @@ const AwardMilestoneStep = ({
                         type="number"
                         placeholder="Enter amount"
                         value={
-                          index === awardMilestones.length - 1
+                          Number(awardMilestones.length) == 1
                             ? Number(formData.value)
                             : Number(milestone.amount)
                         }
-                        disabled={index === awardMilestones.length - 1}
+                        disabled={index == awardMilestones.length - 1}
                         onChange={(e) => {
-                          if (index === awardMilestones.length - 1) return;
+                          if (index == awardMilestones.length - 1) {
+                            return;
+                          }
+                          //console.log(awardMilestones);
                           const remainingAmount =
                             Number(formData.value) -
                             awardMilestones.reduce(
-                              (sum, award, id) =>
-                                id === awardMilestones.length - 1
-                                  ? sum
-                                  : sum + (id === index ? parseFloat(e.target.value) : Number(award.amount)),
+                              (sum: number, award: any, id: number) => {
+                                if (id == awardMilestones.length - 1)
+                                  return sum;
+                                if (index == id)
+                                  return sum + parseFloat(e.target.value);
+                                return sum + Number(award.amount);
+                              },
                               0
                             );
                           updateAwardMilestones([
-                            { index, field: "amount", value: parseFloat(e.target.value) || 0 },
+                            {
+                              index: index,
+                              field: "amount",
+                              value: parseFloat(e.target.value) || 0,
+                            },
                             {
                               index: awardMilestones.length - 1,
                               field: "amount",
-                              value: Math.max(0, remainingAmount),
+                              value: remainingAmount < 0 ? 0 : remainingAmount,
                             },
                           ]);
                         }}
-                        className="pl-8"
+                        className="w-full rounded-r-md"
                       />
                     </div>
                     {errors.awardMilestones?.[index]?.amount && (
@@ -367,37 +393,46 @@ const AwardMilestoneStep = ({
                   </div>
                 </div>
 
-                {/* Submission Guide */}
-                <div>
+                <div className="sm:col-span-2 mt-6 max-w-230 mx-auto text-black-2">
                   <Label htmlFor={`note-${index}`}>Submission Guide</Label>
                   <Textarea
                     id={`note-${index}`}
                     value={milestone.note || ""}
                     onChange={(e) => {
                       const updatedMilestones = [...awardMilestones];
-                      updatedMilestones[index] = { ...updatedMilestones[index], note: e.target.value };
-                      setValue("awardMilestones", updatedMilestones, { shouldDirty: true });
+                      updatedMilestones[index] = {
+                        ...updatedMilestones[index],
+                        note: e.target.value,
+                      };
+                      setValue("awardMilestones", updatedMilestones, {
+                        shouldDirty: true,
+                      });
                     }}
                     rows={4}
-                    placeholder="Provide guidance for submission"
-                    className="mt-1"
+                    placeholder="Enter submission guide"
+                    className="w-full border border-gray-300 rounded-md p-2"
                   />
                 </div>
               </div>
             ))}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between">
-              <Button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded" onClick={onBack}>
+            <div className="flex justify-between mt-4">
+              <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={onBack}
+              >
                 Back
               </Button>
-              <Button type="button" className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleNext}>
+              <Button
+                type="button"
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={handleNext}
+              >
                 Next
               </Button>
             </div>
           </form>
         </div>
-
       </div>
     </>
   );
