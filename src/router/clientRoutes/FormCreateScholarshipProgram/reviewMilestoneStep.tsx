@@ -107,10 +107,10 @@ const ReviewMilestoneStep = ({
     <>
       <div>
         <div>
-          <form className="grid grid-cols-6 gap-4 my-5 bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
-            <div className="col-span-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Review Milestones</h2>
-            </div>
+          <form className="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto space-y-10">
+            <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
+              Review Milestones
+            </h2>
 
             <div className="col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((field, index) => (
@@ -181,7 +181,7 @@ const ReviewMilestoneStep = ({
               ))}
             </div>
             <div className="col-span-6 flex justify-between mt-4">
-            <Button
+              <Button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded"
                 onClick={onBack}

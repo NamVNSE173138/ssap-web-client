@@ -127,9 +127,9 @@ const InformationStep = ({
     <>
       <div>
         <div>
-          <form className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
+          <form className="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto">
             {/* Tiêu đề */}
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+            <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
               General Information
             </h2>
 
@@ -137,9 +137,47 @@ const InformationStep = ({
             <div className="space-y-8">
               {/* Thông tin cơ bản */}
               <div>
-                <div className="grid grid-cols-6 gap-4 mt-4">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Scholarship Name */}
+                  <div>
+                    <Label htmlFor="scholarshipName" className="block text-sm font-medium text-gray-700">
+                      Scholarship Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("scholarshipName")}
+                      placeholder="Enter scholarship name"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {errors.scholarshipName?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipName?.message)}</p>
+                    )}
+                  </div>
+
+                  {/* Deadline */}
+                  <div>
+                    <Label htmlFor="deadline" className="block text-sm font-medium text-gray-700">
+                      Application Deadline <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("deadline")}
+                      type="date"
+                      id="deadline"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {errors.deadline?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Mô tả */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Scholarship Details</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                   {/* Scholarship Type */}
-                  <div className="col-span-6 sm:col-span-2">
+                  <div>
                     <Label htmlFor="scholarshipType" className="block text-sm font-medium text-gray-700">
                       Scholarship Type <span className="text-red-500">*</span>
                     </Label>
@@ -148,188 +186,125 @@ const InformationStep = ({
                       value={selectedCategory}
                       onChange={handleCategoryChange}
                       isSearchable
+                      placeholder="Select type"
                       className="mt-1"
                     />
                     {errors.scholarshipType?.message && (
-                      <p className="text-red-500">
-                        {String(errors.scholarshipType.message)}
-                      </p>
+                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
                     )}
                   </div>
 
                   {/* Educational Level */}
-                  <div className="col-span-6 sm:col-span-2">
+                  <div>
                     <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700">
                       Educational Level <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       {...register("educationalLevel")}
-                      className="mt-1 block w-full"
+                      placeholder="Enter level"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
                     {errors.educationalLevel?.message && (
-                      <p className="text-sm text-red-500 mt-1">{errors.educationalLevel?.message && (
-                        <p className="text-red-500">
-                          {String(errors.educationalLevel.message)}
-                        </p>
-                      )}</p>
+                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
                     )}
                   </div>
 
-                  {/* Scholarship Name */}
-                  <div className="col-span-6 sm:col-span-2">
-                    <Label htmlFor="scholarshipName" className="block text-sm font-medium text-gray-700">
-                      Scholarship Name <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      {...register("scholarshipName")}
-                      className="mt-1 block w-full"
-                    />
-                    {errors.scholarshipName?.message && (
-                      <p className="text-sm text-red-500 mt-1">{errors.scholarshipName?.message && (
-                        <p className="text-red-500">
-                          {String(errors.scholarshipName.message)}
-                        </p>
-                      )}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Mô tả */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
-                  Scholarship Details
-                </h3>
-                <div className="mt-4">
-                  <Label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                    Scholarship Description <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    {...register("description")}
-                    rows={4}
-                    className="mt-1 block w-full"
-                  />
-                  {errors.description?.message && (
-                    <p className="text-sm text-red-500 mt-1">{errors.description?.message && (
-                      <p className="text-red-500">
-                        {String(errors.description.message)}
-                      </p>
-                    )}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Giá trị và số lượng */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
-                  Funding Details
-                </h3>
-                <div className="grid grid-cols-6 gap-4 mt-4">
-                  {/* Value */}
-                  <div className="col-span-6 sm:col-span-2">
-                    <Label htmlFor="value" className="block text-sm font-medium text-gray-700">
-                      Scholarship Value <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      {...register("value")}
-                      className="mt-1 block w-full"
-                    />
-                    {errors.value?.message && (
-                      <p className="text-sm text-red-500 mt-1"> {errors.value?.message && (
-                        <p className="text-red-500">{String(errors.value.message)}</p>
-                      )}</p>
-                    )}
-                  </div>
-
-                  {/* Quantity */}
-                  <div className="col-span-6 sm:col-span-2">
-                    <Label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
-                      Scholarship Quantity <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      {...register("quantity")}
-                      className="mt-1 block w-full"
-                    />
-                    {errors.quantity?.message && (
-                      <p className="text-sm text-red-500 mt-1"> {errors.quantity?.message && (
-                        <p className="text-red-500">
-                          {String(errors.quantity.message)}
-                        </p>
-                      )}</p>
-                    )}
-                  </div>
-
-                  {/* Award Progress */}
-                  <div className="col-span-6 sm:col-span-2">
-                    <Label htmlFor="awardProgress" className="block text-sm font-medium text-gray-700">
-                      Award Progress <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      {...register("awardProgress")}
-                      className="mt-1 block w-full"
-                    />
-                    {errors.awardProgress?.message && (
-                      <p className="text-sm text-red-500 mt-1">{errors.awardProgress?.message && (
-                        <p className="text-red-500">
-                          {String(errors.awardProgress.message)}
-                        </p>
-                      )}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
-                  Attachments
-                </h3>
-                <div className="grid grid-cols-6 gap-4 mt-4">
                   {/* Upload Image */}
-                  <div className="col-span-6 sm:col-span-3">
+                  <div>
                     <Label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
-                      Upload Image
+                      Scholarship Logo
                     </Label>
                     <Input
                       type="file"
                       id="imageUrl"
                       onChange={handelUploadFile}
                       accept="image/*"
-                      className="mt-1 block w-full"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                     />
                   </div>
+                </div>
 
-                  {/* Deadline */}
-                  <div className="col-span-6 sm:col-span-3">
-                    <Label htmlFor="deadline" className="block text-sm font-medium text-gray-700">
-                      Application Deadline <span className="text-red-500">*</span>
+                {/* Scholarship Description */}
+                <div className="mt-6">
+                  <Label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                    Scholarship Description <span className="text-red-500">*</span>
+                  </Label>
+                  <Textarea
+                    {...register("description")}
+                    rows={4}
+                    placeholder="Provide a brief description"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {errors.description?.message && (
+                    <p className="text-sm text-red-500 mt-1">{String(errors.description.message)}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Giá trị và số lượng */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Funding Details</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  {/* Value */}
+                  <div>
+                    <Label htmlFor="value" className="block text-sm font-medium text-gray-700">
+                      Scholarship Value ($) <span className="text-red-500">*</span>
                     </Label>
                     <Input
-                      {...register("deadline")}
-                      type="date"
-                      id="deadline"
-                      className="mt-1 block w-full"
+                      {...register("value")}
+                      placeholder="Enter value"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
-                    {errors.deadline?.message && (
-                      <p className="text-sm text-red-500 mt-1">{errors.deadline?.message && (
-                        <p className="text-red-500">
-                          {String(errors.deadline.message)}
-                        </p>
-                      )}</p>
+                    {errors.value?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.value.message)}</p>
+                    )}
+                  </div>
+
+                  {/* Quantity */}
+                  <div>
+                    <Label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
+                      Scholarship Quantity <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("quantity")}
+                      placeholder="Enter quantity"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {errors.quantity?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.quantity.message)}</p>
+                    )}
+                  </div>
+
+                  {/* Award Progress */}
+                  <div>
+                    <Label htmlFor="awardProgress" className="block text-sm font-medium text-gray-700">
+                      Award Progress <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      {...register("awardProgress")}
+                      placeholder="Enter progress"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {errors.awardProgress?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.awardProgress.message)}</p>
                     )}
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end mt-4">
+
+            {/* Submit */}
+            <div className="flex justify-end mt-6">
               <Button
                 type="button"
-                className="bg-blue-500 text-white py-2 px-4 rounded"
+                className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition"
                 onClick={handleNext}
               >
                 Next
               </Button>
             </div>
           </form>
+
 
         </div>
       </div>
