@@ -82,7 +82,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
           acc[applicationId].applicantName = applicantName;
           acc[applicationId].expertReview += expertNamesData[expertId] + ", ";
           acc[applicationId].updatedAt = "...";
-          if (status == "Passed") acc[applicationId].status += 1;
+          if (status == "Passed" || status == "Approved") acc[applicationId].status += 1;
           else acc[applicationId].status -= 1;
 
           if(comment == null) acc[applicationId].isReviewing = true;
@@ -165,7 +165,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                   >
                     <td style={{ padding: "12px" }}>{index + 1}</td>
                     <td style={{ padding: "12px" }}>{row.applicantName}</td>
-                    <td style={{ padding: "12px" }}>{row.score}</td>
+                    <td style={{ padding: "12px" }}>{row.comment != null && row.score}</td>
 
                     <td style={{ padding: "12px" }}>
                       <span
@@ -280,7 +280,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                             color: "white",
                           }}
                         >
-                          Review Date
+                          Deadline Date
                         </th>
                         <th
                           style={{
@@ -320,7 +320,7 @@ const SecondReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                             }}
                           >
                             <td style={{ padding: "12px", fontWeight: "500" }}>
-                              {row.score}
+                              {row.comment != null && row.score}
                             </td>
                             <td style={{ padding: "12px", fontWeight: "500" }}>
                               {row.comment}

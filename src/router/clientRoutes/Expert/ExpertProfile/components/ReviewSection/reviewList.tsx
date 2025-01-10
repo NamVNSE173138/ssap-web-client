@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { z } from "zod";
-import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 type ApprovalItem = {
   id: number;
@@ -151,11 +150,11 @@ const ReviewList: React.FC = () => {
         return;
       }
 
-      const reviewMilestone = await getAllReviewMilestonesByScholarship(
+      /*const reviewMilestone = await getAllReviewMilestonesByScholarship(
         selectedItem.scholarshipProgramId
-      );
+      );*/
 
-      const currentDate = new Date();
+      //const currentDate = new Date();
       let isReview = true;
       /*reviewMilestone?.data.forEach((review: any) => {
         if (
