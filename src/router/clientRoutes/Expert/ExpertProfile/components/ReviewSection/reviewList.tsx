@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { z } from "zod";
-import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
 
 type ApprovalItem = {
   id: number;
@@ -151,13 +150,13 @@ const ReviewList: React.FC = () => {
         return;
       }
 
-      const reviewMilestone = await getAllReviewMilestonesByScholarship(
+      /*const reviewMilestone = await getAllReviewMilestonesByScholarship(
         selectedItem.scholarshipProgramId
-      );
+      );*/
 
-      const currentDate = new Date();
+      //const currentDate = new Date();
       let isReview = true;
-      reviewMilestone?.data.forEach((review: any) => {
+      /*reviewMilestone?.data.forEach((review: any) => {
         if (
           new Date(review.fromDate) < currentDate &&
           new Date(review.toDate) > currentDate
@@ -168,7 +167,13 @@ const ReviewList: React.FC = () => {
             isReview = false;
           }
         }
-      });
+      });*/
+
+      if (selectedReview.description.toLowerCase() === "application review") {
+        isReview = true;
+      } else {
+        isReview = false;
+      }
 
       const numericScore = Number(score);
       const payload = {
@@ -279,7 +284,7 @@ const ReviewList: React.FC = () => {
                           <td className="p-4 text-sm text-gray-800">{score}</td>
                           <td
                             className={`p-4 text-sm font-medium ${
-                              review.status === "Approved"
+                              (review.status === "Approved" || review.status === "Passed")
                                 ? "text-green-600"
                                 : review.status === "Failed"
                                 ? "text-red-600"
@@ -408,7 +413,7 @@ const ReviewList: React.FC = () => {
                           <td className="p-4 text-sm text-gray-800">{score}</td>
                           <td
                             className={`p-4 text-sm font-medium ${
-                              review.status === "Approved"
+                              (review.status === "Passed" || review.status === "Approved")
                                 ? "text-green-600"
                                 : review.status === "Failed"
                                 ? "text-red-600"
