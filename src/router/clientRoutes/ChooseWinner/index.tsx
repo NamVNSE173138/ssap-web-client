@@ -73,6 +73,8 @@ const ChooseWinner = () => {
 
             return {
               ...application,
+              isInterview: application.applicationReviews.some(
+                (review: any) => review.description == "Interview"),
               applicant: {
                 ...application.applicant,
                 fullName,
@@ -579,7 +581,8 @@ const ChooseWinner = () => {
                               }}
                             >
                               <td style={{ padding: "12px" }}>
-                                {app.status == ApplicationStatus.Reviewing && (
+                                {app.status == ApplicationStatus.Reviewing &&
+                                app.isInterview && (
                                   <input
                                     type="checkbox"
                                     disabled={

@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { getAllEducationLevel } from "@/services/ApiServices/scholarshipProgramService";
 
 interface OptionType {
   value: string;
@@ -29,8 +30,8 @@ const schema = z.object({
     .string()
     .regex(/^\d+$/, "Award Progress must be a number")
     .transform((val) => parseInt(val, 10))
-    .refine((val) => val >= 1 && val <= 10, {
-      message: "Award Progress must be between 1 and 10",
+    .refine((val) => val >= 1 && val <= 5, {
+      message: "Award Progress must be between 1 and 5",
     }),
   imageUrl: z.string().optional(),
   deadline: z.string().min(1, "Deadline is required"),
@@ -47,7 +48,11 @@ const InformationStep = ({
   handelUploadFile: any;
 }) => {
   const [categories, setCategories] = useState<OptionType[]>([]);
+  const [educationLevel, setEducationLevel] = useState<OptionType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<OptionType | null>(
+    null
+  );
+  const [selectedEducation, setSelectedEducation] = useState<OptionType | null>(
     null
   );
   const [_imageFile, setImageFile] = useState<File[]>([]);
@@ -60,8 +65,10 @@ const InformationStep = ({
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/categories`);
+      const [response, educationLevel] = await Promise.all([axios.get(`${BASE_URL}/api/categories`),
+        getAllEducationLevel()]);
       console.log("category", response.data.data);
+      console.log("education", educationLevel);
 
       setCategories(
         response.data.data.map((category: any) => ({
@@ -69,6 +76,10 @@ const InformationStep = ({
           label: category.name,
         }))
       );
+      setEducationLevel(educationLevel.map((level: any) => ({
+        value: level,
+        label: level,
+      })));
     } catch (error) {
       console.error("Error fetching categories", error);
     }
@@ -114,6 +125,11 @@ const InformationStep = ({
     setValue("scholarshipType", option?.value || "", { shouldValidate: true });
   };
 
+  const handleEducationLevelChange = (option: OptionType | null) => {
+    setSelectedEducation(option);
+    setValue("educationalLevel", option?.value || "", { shouldValidate: true });
+  };
+
   useEffect(() => {
     if (formData.scholarshipType) {
       const matchingOption = categories.find(
@@ -122,6 +138,15 @@ const InformationStep = ({
       setSelectedCategory(matchingOption || null);
     }
   }, [formData.scholarshipType, categories]);
+
+  useEffect(() => {
+    if (formData.educationalLevel) {
+      const matchingOption = educationLevel.find(
+        (category) => category === formData.educationalLevel
+      );
+      setSelectedEducation(matchingOption || null);
+    }
+  }, [formData.educationalLevel, educationLevel]);
 
   return (
     <>
@@ -199,11 +224,19 @@ const InformationStep = ({
                     <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700">
                       Educational Level <span className="text-red-500">*</span>
                     </Label>
-                    <Input
+                    <Select
+                      options={educationLevel}
+                      value={selectedEducation}
+                      onChange={handleEducationLevelChange}
+                      isSearchable
+                      placeholder="Select type"
+                      className="mt-1"
+                    />
+                    {/*<Input
                       {...register("educationalLevel")}
                       placeholder="Enter level"
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    />*/}
                     {errors.educationalLevel?.message && (
                       <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
                     )}
