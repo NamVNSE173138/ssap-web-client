@@ -6,6 +6,7 @@ import { BASE_URL } from "@/constants/api";
 import axios from "axios";
 import { notification } from "antd";
 import * as Dialog from "@radix-ui/react-dialog";
+import * as Card from "@radix-ui/react-slot";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ScreenSpinner from "@/components/ScreenSpinner";
@@ -16,6 +17,8 @@ type ApprovalItem = {
   id: number;
   applicantId: number;
   applicantName: string;
+  applicantPhone: string;
+  applicantEmail: string;
   scholarshipProgramId: number;
   scholarshipName: string;
   scholarshipImage?: string;
@@ -26,6 +29,11 @@ type ApprovalItem = {
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
+  criteria?: {
+    name: string;
+    description: string;
+    percentage: string;
+  }[];
   applicationDocuments?: {
     applicationId: number;
     type: string;
@@ -92,6 +100,12 @@ const ReviewList: React.FC = () => {
 
       const scholarshipId = id;
 
+      // const scholarshipResponse = await axios.get(
+      //   `${BASE_URL}/api/scholarship-programs/${expertAssign[2].scholarshipProgramId}`
+      //   // `${BASE_URL}/api/scholarship-programs/${applications[0].scholarshipProgramId}`
+      // );
+      // console.log("ScPL", scholarshipResponse.data.data);
+
       const detailedApplications = await Promise.all(
         expertAssign
           .filter((app: any) => app.scholarshipProgramId == scholarshipId)
@@ -99,12 +113,17 @@ const ReviewList: React.FC = () => {
             const applicantResponse = await axios.get(
               `${BASE_URL}/api/accounts/${app.applicantId}`
             );
+            console.log("APpppppppppppp", applicantResponse.data);
             const scholarshipResponse = await axios.get(
               `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgramId}`
+              // `${BASE_URL}/api/scholarship-programs/${applications[0].scholarshipProgramId}`
             );
+            console.log("ScPL", scholarshipResponse.data.data);
             return {
               id: app.id,
-              applicantName: applicantResponse.data.username,
+              applicantName: app.applicantName,
+              applicantPhone: applicantResponse.data.phoneNumber,
+              applicantEmail: applicantResponse.data.email,
               scholarshipProgramId: app.scholarshipProgramId,
               scholarshipName: app.scholarshipProgram.name,
               scholarshipImage: app.scholarshipProgram.imageUrl,
@@ -115,12 +134,14 @@ const ReviewList: React.FC = () => {
               status: app.status,
               details: scholarshipResponse.data.data.description,
               documentUrl: app.applicationDocuments?.[0]?.fileUrl,
+              criteria: scholarshipResponse.data.data.criteria,
               applicationReviews: app.applicationReviews,
               applicationDocuments: app.applicationDocuments,
             };
           })
       );
       setApplications(detailedApplications);
+      console.log("detail", detailedApplications);
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
       console.error(err);
@@ -182,7 +203,7 @@ const ReviewList: React.FC = () => {
       notification.success({ message: "Review submitted successfully" });
       setIsLoading(false);
       setSelectedItem(null);
-      fetchApplicationReview();
+      await fetchApplicationReview();
       setScore("");
       setComment("");
     } catch (error) {
@@ -253,10 +274,7 @@ const ReviewList: React.FC = () => {
                           ? review.score
                           : "Not Scored";
                       return (
-                        <tr
-                          key={review.id}
-                          className="hover:bg-gray-50"
-                        >
+                        <tr key={review.id} className="hover:bg-gray-50">
                           <td className="p-4 text-sm text-gray-800">
                             {index + 1}
                           </td>
@@ -471,103 +489,181 @@ const ReviewList: React.FC = () => {
       >
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md">
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray p-6 rounded-lg shadow-lg max-w-[800px] w-full">
             {selectedItem && (
               <div>
-                <Dialog.Title className="text-2xl font-bold">
-                  {selectedItem.scholarshipName}
+                <Dialog.Title className="text-2xl font-bold text-black">
+                  Application Review
                 </Dialog.Title>
                 <Dialog.Description className="mt-2 text-sm text-gray-600">
-                  {selectedItem.details}
+                  {" "}
                 </Dialog.Description>
-
-                <div className="mt-4">
-                  <p>
-                    <strong>Applicant:</strong> {selectedItem.applicantName}
-                  </p>
-                  <p>
-                    <strong>University:</strong> {selectedItem.university}
-                  </p>
-                  <p>
-                    <strong>Applied On:</strong>{" "}
-                    {/* {formatDate(selectedItem.appliedDate, " ")} */}
-                    {new Date(selectedItem.appliedDate).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "2-digit",
-                        day: "2-digit",
-                        year: "numeric",
-                      }
-                    )}
-                  </p>
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold">
-                      Submitted Documents
-                    </h3>
-                    {selectedItem?.applicationDocuments ? (
-                      selectedItem.applicationDocuments.length > 0 ? (
-                        <ul className="mt-2 space-y-2">
-                          {selectedItem.applicationDocuments.map((doc) => (
-                            <li
-                              key={doc.applicationId + doc.name}
-                              className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
-                            >
-                              <Link
-                                to={doc.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                              >
-                                <span>{doc.name}</span>
-                                {/* View */}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-gray-500">
-                          No documents available.
+                <div className="border border-gray-300 "> </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-rows-2 gap-3">
+                    <Card.Slot>
+                      <div className="bg-white mt-4 rounded-lg shadow-3 p-3 space-y-1 ">
+                        <h3 className="text-lg font-semibold text-black mb-4">
+                          Applicant Information
+                        </h3>
+                        <p>
+                          <strong>Name:</strong> {selectedItem.applicantName}
                         </p>
-                      )
-                    ) : (
-                      <p className="text-sm text-gray-500">
-                        Loading documents...
-                      </p>
-                    )}
+                        <p>
+                          <strong>Email:</strong> {selectedItem.applicantEmail}
+                        </p>
+                        <p>
+                          <strong>Phone:</strong> {selectedItem.applicantPhone}
+                        </p>
+                        <p>
+                          <strong>University:</strong> {selectedItem.university}
+                        </p>
+                        <p>
+                          <strong>Scholarship Program:</strong>{" "}
+                        </p>
+                          {selectedItem.scholarshipName}
+                        <p>
+                          <strong>Applied On:</strong>{" "}
+                          {new Date(
+                            selectedItem.appliedDate
+                          ).toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </Card.Slot>
+                    <Card.Slot>
+                      <div className=" bg-white rounded-lg shadow-3 p-3">
+                        <h3 className="text-lg font-semibold text-black relative">
+                          Submitted Documents{" "}
+                          <span className="absolute top-0 text-xs ml-1 text-red-500">
+                            ({selectedItem?.applicationDocuments?.length})
+                          </span>
+                        </h3>
+                        <div className="max-h-48 overflow-y-auto overflow-hidden mt-3">
+                        {selectedItem?.applicationDocuments ? (
+                          selectedItem.applicationDocuments.length > 0 ? (
+                            <ul className=" space-y-1">
+                              {selectedItem.applicationDocuments.map((doc) => (
+                                <li
+                                  key={doc.applicationId + doc.name}
+                                  className="flex items-center justify-between p-2 rounded-lg"
+                                >
+                                  <Link
+                                    to={doc.fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline"
+                                  >
+                                    <span>- {doc.name}</span>
+                                    {/* View */}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-gray-500">
+                              No documents available.
+                            </p>
+                          )
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            Loading documents...
+                          </p>
+                        )}
+                        </div>
+                      </div>
+                    </Card.Slot>
                   </div>
-                </div>
 
-                {/* Add form for scoring */}
-                <div className="mt-4">
-                  <Label className="block text-sm font-medium text-gray-700">
-                    Score
-                  </Label>
-                  <Input
-                    type="number"
-                    value={score}
-                    onChange={(e) => setScore(e.target.value)}
-                    className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
-                    placeholder="Enter score (1-100)"
-                    min={1}
-                    max={100}
-                  />
+                  {/* Add form for scoring */}
+                  <div className="col-span-2">
+                    <Card.Slot>
+                      <div className="bg-white mt-4 rounded-lg shadow-3 p-3">
+                        <div>
+                          <h3 className="text-lg font-semibold text-black relative">
+                            Scoring Criteria{" "}
+                            <span className="absolute top-0 text-xs ml-1 text-red-500">
+                              ({selectedItem?.criteria?.length})
+                            </span>
+                          </h3>
+                          <div className="max-h-46 overflow-y-auto overflow-hidden mt-3 shadow-2 rounded-md">
+                          {selectedItem?.criteria ? (
+                            selectedItem.criteria.length > 0 ? (
+                              <ul className="space-y-1">
+                                {selectedItem.criteria.map((criteria) => (
+                                  <li
+                                    key={criteria.name}
+                                    className="flex items-center justify-around p-2 rounded-lg"
+                                  >
+                                    <p> {criteria.name} <span> ({criteria.percentage}%)</span></p>
+                                    <span> 
+                                      <Input/>
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-gray-500">
+                                No criteria available.
+                              </p>
+                            )
+                          ) : (
+                            <p className="text-sm text-gray-500">
+                              Loading criteria...
+                            </p>
+                          )}
+                          </div>
+                          <Label className="block text-sm font-medium text-gray-700">
+                            Score
+                          </Label>
+                          <Input
+                            type="number"
+                            value={score}
+                            onChange={(e) => setScore(e.target.value)}
+                            className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
+                            placeholder="Enter score (1-100)"
+                            min={1}
+                            max={100}
+                          />
+                        </div>
+                        
+                        <div className="">
+                          {/* <Label className="block text-sm font-medium text-gray-700">
+                            Score
+                          </Label>
+                          <Input
+                            type="number"
+                            value={score}
+                            onChange={(e) => setScore(e.target.value)}
+                            className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
+                            placeholder="Enter score (1-100)"
+                            min={1}
+                            max={100}
+                          /> */}
 
-                  <Label className="block text-sm font-medium text-gray-700 mt-4">
-                    Comment
-                  </Label>
-                  <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
-                    placeholder="Enter comment"
-                  />
+                          <Label className="block text-sm font-medium text-gray-700 mt-4">
+                            Comment
+                          </Label>
+                          <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+                            placeholder="Enter comment"
+                          />
 
-                  <Button
-                    onClick={handleScoreSubmit}
-                    className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
-                  >
-                    Submit Review
-                  </Button>
+                          <Button
+                            onClick={handleScoreSubmit}
+                            className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
+                          >
+                            Submit Review
+                          </Button>
+                        </div>
+                      </div>
+                    </Card.Slot>
+                  </div>
                 </div>
               </div>
             )}
