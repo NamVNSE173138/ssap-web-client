@@ -17,16 +17,13 @@ import {
   createRequest,
   getRequestsByService,
 } from "@/services/ApiServices/requestService";
-import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { uploadFile } from "@/services/ApiServices/testService";
 import {
-  FaClipboardList,
   FaEdit,
   FaExclamationTriangle,
   FaPlus,
   FaRedo,
-  FaServicestack,
   FaStar,
   FaTimes,
   FaTrash,
@@ -68,6 +65,30 @@ interface ServiceType {
   status: string;
   providerId: string;
 }
+
+const fedbacks = [
+  {
+    name: "Alice Johnson",
+    comment:
+      "Excellent service! The provider was professional and delivered beyond expectations.",
+    rating: 5,
+    date: "2025-01-12",
+  },
+  {
+    name: "Michael Smith",
+    comment:
+      "Great experience. Highly recommend this provider for quality and timely service.",
+    rating: 4,
+    date: "2025-01-10",
+  },
+  {
+    name: "Emily Davis",
+    comment:
+      "The service was exactly what I needed. Would definitely use again!",
+    rating: 5,
+    date: "2025-01-08",
+  },
+];
 
 const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
   return (
@@ -679,14 +700,160 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         </div>
       )}
 
+      {isFeedbackDialogOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-[#1eb2a6]">
+                Feedback Details
+              </h2>
+            </div>
+
+            {feedbacks.length > 0 ? (
+              <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                <thead>
+                  <tr className="bg-gray-100 text-gray-700">
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "5%" }}
+                    >
+                      #
+                    </th>{" "}
+                    {/* Chiếm 0.5 */}
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "20%" }}
+                    >
+                      Applicant Name
+                    </th>{" "}
+                    {/* Chiếm 2 */}
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "10%" }}
+                    >
+                      Rating
+                    </th>{" "}
+                    {/* Chiếm 1 */}
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "20%" }}
+                    >
+                      Comment
+                    </th>{" "}
+                    {/* Chiếm 2 */}
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "15%" }}
+                    >
+                      Date
+                    </th>{" "}
+                    {/* Chiếm 1 */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {feedbacks.map((feedback, index) => (
+                    <tr key={index} className="border-t hover:bg-gray-50">
+                      <td className="p-4" style={{ width: "5%" }}>
+                        {index + 1}
+                      </td>{" "}
+                      {/* Chiếm 0.5 */}
+                      <td className="p-4" style={{ width: "20%" }}>
+                        {feedback.name || "********"}
+                      </td>{" "}
+                      {/* Chiếm 2 */}
+                      <td
+                        className="p-4 flex items-center"
+                        style={{ width: "10%" }}
+                      >
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar
+                            key={i}
+                            color={i < feedback.rating ? "#FFB800" : "#ddd"}
+                            size={18}
+                          />
+                        ))}
+                      </td>{" "}
+                      {/* Chiếm 1 */}
+                      <td className="p-4" style={{ width: "20%" }}>
+                        {feedback.content}
+                      </td>{" "}
+                      {/* Chiếm 2 */}
+                      <td className="p-4" style={{ width: "15%" }}>
+                        {new Date(feedback.feedbackDate).toLocaleDateString(
+                          "en-US"
+                        )}
+                      </td>{" "}
+                      {/* Chiếm 1 */}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                <thead>
+                  <tr className="bg-gray-100 text-gray-700">
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "5%" }}
+                    >
+                      #
+                    </th>
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "20%" }}
+                    >
+                      Applicant Name
+                    </th>
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "10%" }}
+                    >
+                      Rating
+                    </th>
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "20%" }}
+                    >
+                      Comment
+                    </th>
+                    <th
+                      className="p-4 text-left font-semibold"
+                      style={{ width: "15%" }}
+                    >
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-gray-600">
+                      No feedback available.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+            <div className="mt-4 text-right">
+              <button
+                onClick={handleCloseFeedbackDialog}
+                className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 transition-all"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/*Header Section*/}
       <div className="relative">
-        <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-start items-start p-[40px] gap-[80px] z-10">
+        {/* <ScholarshipProgramBackground /> */}
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-start items-start p-[40px] gap-[80px] z-10">
           <div>
             <Breadcrumb>
               <BreadcrumbList className="text-[#000]">
                 <BreadcrumbItem>
-                  <Link to="/" className="md:text-xl text-lg ">
+                  <Link to="/" className="md:text-xl text-lg font-medium">
                     Home
                   </Link>
                 </BreadcrumbItem>
@@ -701,327 +868,233 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <p className="text-[#000] md:text-xl text-lg font-semibold">
+                  <p className="text-[#1eb2a6] md:text-xl text-lg font-semibold">
                     {serviceData.name}
                   </p>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className={isProvider ? "w-2/3" : ""}>
-            <div className="lg:flex-col items-center flex-row flex gap-[20px]">
-              <div>
-                <p className="text-white text-5xl lg:line-clamp-3 line-clamp-5 font-bold ">
-                  {serviceData.name}
-                </p>
-              </div>
-              <div className="flex flex-col items gap-2">
-                <div className="flex items-center gap-2">
-                  <FaStar color="yellow" size={20} />
-                  <p
-                    className="text-yellow-500 cursor-pointer underline hover:text-yellow-400 transition-all"
-                    onClick={handleFeedbackClick}
-                  >
-                    {averageRating.toFixed(1)} ({feedbackCount}{" "}
-                    {feedbackCount === 1 ? "feedback" : "feedbacks"})
-                  </p>
-                </div>
-              </div>
-            </div>
+        </div>
+      </div>
 
-            {isFeedbackDialogOpen && (
-              <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-[#1eb2a6]">
-                      Feedback Details
-                    </h2>
+      <section className="bg-gray-50 py-10">
+        <div className="container mx-auto px-6">
+          {/*Content Section*/}
+          <div className="flex justify-center py-10">
+            <div className="w-11/12 md:w-4/5 bg-white shadow-lg rounded-xl p-10 space-y-6">
+              {/*Header Section*/}
+              <div className={isProvider ? "w-2/3" : ""}>
+                <div className="lg:flex-col items-center flex-row flex gap-[20px]">
+                  <div>
+                    <p className="text-black text-5xl lg:line-clamp-3 line-clamp-5 font-bold ">
+                      {serviceData.name}
+                    </p>
                   </div>
-
-                  {feedbacks.length > 0 ? (
-                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                      <thead>
-                        <tr className="bg-gray-100 text-gray-700">
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "5%" }}
-                          >
-                            #
-                          </th>{" "}
-                          {/* Chiếm 0.5 */}
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "20%" }}
-                          >
-                            Applicant Name
-                          </th>{" "}
-                          {/* Chiếm 2 */}
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "10%" }}
-                          >
-                            Rating
-                          </th>{" "}
-                          {/* Chiếm 1 */}
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "20%" }}
-                          >
-                            Comment
-                          </th>{" "}
-                          {/* Chiếm 2 */}
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "15%" }}
-                          >
-                            Date
-                          </th>{" "}
-                          {/* Chiếm 1 */}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {feedbacks.map((feedback, index) => (
-                          <tr key={index} className="border-t hover:bg-gray-50">
-                            <td className="p-4" style={{ width: "5%" }}>
-                              {index + 1}
-                            </td>{" "}
-                            {/* Chiếm 0.5 */}
-                            <td className="p-4" style={{ width: "20%" }}>
-                              {feedback.name || "********"}
-                            </td>{" "}
-                            {/* Chiếm 2 */}
-                            <td
-                              className="p-4 flex items-center"
-                              style={{ width: "10%" }}
-                            >
-                              {[...Array(5)].map((_, i) => (
-                                <FaStar
-                                  key={i}
-                                  color={
-                                    i < feedback.rating ? "#FFB800" : "#ddd"
-                                  }
-                                  size={18}
-                                />
-                              ))}
-                            </td>{" "}
-                            {/* Chiếm 1 */}
-                            <td className="p-4" style={{ width: "20%" }}>
-                              {feedback.content}
-                            </td>{" "}
-                            {/* Chiếm 2 */}
-                            <td className="p-4" style={{ width: "15%" }}>
-                              {new Date(
-                                feedback.feedbackDate
-                              ).toLocaleDateString("en-US")}
-                            </td>{" "}
-                            {/* Chiếm 1 */}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                      <thead>
-                        <tr className="bg-gray-100 text-gray-700">
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "5%" }}
-                          >
-                            #
-                          </th>
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "20%" }}
-                          >
-                            Applicant Name
-                          </th>
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "10%" }}
-                          >
-                            Rating
-                          </th>
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "20%" }}
-                          >
-                            Comment
-                          </th>
-                          <th
-                            className="p-4 text-left font-semibold"
-                            style={{ width: "15%" }}
-                          >
-                            Date
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td
-                            colSpan={5}
-                            className="p-4 text-center text-gray-600"
-                          >
-                            No feedback available.
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  )}
-                  <div className="mt-4 text-right">
-                    <button
-                      onClick={handleCloseFeedbackDialog}
-                      className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 transition-all"
-                    >
-                      Close
-                    </button>
+                  <div className="flex flex-col items gap-2">
+                    <div className="flex items-center gap-2">
+                      <FaStar color="yellow" size={20} />
+                      <p
+                        className="text-yellow-500 cursor-pointer underline hover:text-yellow-400 transition-all"
+                        onClick={handleFeedbackClick}
+                      >
+                        {averageRating.toFixed(1)} ({feedbackCount}{" "}
+                        {feedbackCount === 1 ? "review" : "reviews"})
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            <div className="text-center flex h-[50px] mt-[26px]">
-              <div className="flex justify-between w-full gap-4">
-                {showButtons && (
-                  <>
-                    {isApplicant ? (
-                      requestStatus === "Finished" ? (
-                        <button
-                          onClick={handleRequestNow}
-                          className="flex items-center justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
-                        >
-                          <FaRedo className="mr-2" /> Request Again
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleRequestNow}
-                          className="flex items-center mb-3 justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
-                        >
-                          <FaPlus className="mr-2" /> Request Now
-                        </button>
-                      )
-                    ) : !isFunder && isProvider ? (
+                <div className="text-center flex h-[50px] mt-[26px]">
+                  <div className="flex justify-between w-full gap-4">
+                    {showButtons && (
                       <>
-                        <button
-                          onClick={() => openEditDialog()}
-                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
-                            !canEdit
-                              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                              : "bg-yellow-500 hover:bg-yellow-400 text-white"
-                          }`}
-                          disabled={!canEdit}
-                          title={
-                            !canEdit
-                              ? "There is already an applicant to buy this service."
-                              : ""
-                          }
-                        >
-                          <FaEdit className="mr-2" /> Edit
-                        </button>
-                        {/* <button
+                        {isApplicant ? (
+                          requestStatus === "Finished" ? (
+                            <button
+                              onClick={handleRequestNow}
+                              className="flex items-center justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                            >
+                              <FaRedo className="mr-2" /> Request Again
+                            </button>
+                          ) : (
+                            <button
+                              onClick={handleRequestNow}
+                              className="flex items-center mb-3 justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                            >
+                              <FaPlus className="mr-2" /> Request Now
+                            </button>
+                          )
+                        ) : !isFunder && isProvider ? (
+                          <>
+                            <button
+                              onClick={() => openEditDialog()}
+                              className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
+                                !canEdit
+                                  ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                                  : "bg-yellow-500 hover:bg-yellow-400 text-white"
+                              }`}
+                              disabled={!canEdit}
+                              title={
+                                !canEdit
+                                  ? "There is already an applicant to buy this service."
+                                  : ""
+                              }
+                            >
+                              <FaEdit className="mr-2" /> Edit
+                            </button>
+                            {/* <button
                           onClick={handleOpenApplicantDialog}
                           className="flex items-center justify-center w-full bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
                         >
                           <FaEye className="mr-2" /> View Request
                         </button> */}
-                        <button
-                          onClick={() => setConfirmationDialogOpen(true)}
-                          className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
-                            !canEdit
-                              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                              : "bg-red-600 hover:bg-red-500 text-white"
-                          }`}
-                          disabled={!canEdit}
-                          title={
-                            !canEdit
-                              ? "There is already an applicant to buy this service."
-                              : ""
-                          }
-                        >
-                          <FaTrash className="mr-2" /> Delete
-                        </button>
-                      </>
-                    ) : (
-                      <div></div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <section className="bg-gradient-to-r from-gray-50 to-gray-100 py-10">
-        <div className="container mx-auto px-6">
-          <div className="flex justify-center">
-            <div className="w-11/12 md:w-4/5 bg-white shadow-xl rounded-2xl p-10 space-y-6">
-              <div className="relative flex items-center gap-3">
-                <div className="p-2 bg-[#1eb2a6] rounded-full">
-                  <FaServicestack className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-3xl sm:text-3xl font-bold text-gray-800">
-                  Service Details
-                </h2>
-              </div>
-              <div className="h-1 w-16 bg-[#1eb2a6] rounded mt-2"></div>
-              <br />
-
-              {/* Content Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left Column */}
-                <div className="space-y-4">
-                  {/* Service Type */}
-                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-blue-50">
-                    <FaInfoCircle className="text-blue-500 text-3xl" />
-                    <div>
-                      <p className="text-lg font-semibold text-gray-700">
-                        Service Type:
-                      </p>
-                      <p className="text-gray-600">{serviceData.type}</p>
-                    </div>
-                  </div>
-
-                  {/* Provider Information */}
-                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-indigo-50">
-                    <FaUser className="text-indigo-500 text-3xl" />
-                    <div>
-                      <Link
-                        to={RouteNames.PROVIDER_INFORMATION.replace(
-                          ":id",
-                          serviceData.providerId
+                            <button
+                              onClick={() => setConfirmationDialogOpen(true)}
+                              className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
+                                !canEdit
+                                  ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                                  : "bg-red-600 hover:bg-red-500 text-white"
+                              }`}
+                              disabled={!canEdit}
+                              title={
+                                !canEdit
+                                  ? "There is already an applicant to buy this service."
+                                  : ""
+                              }
+                            >
+                              <FaTrash className="mr-2" /> Delete
+                            </button>
+                          </>
+                        ) : (
+                          <div></div>
                         )}
-                        className="text-[#1eb2a6] hover:underline text-lg font-semibold"
-                      >
-                        Provider Information
-                      </Link>
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
+              </div>
 
-                {/* Right Column */}
-                <div className="space-y-4">
-                  {/* Price */}
-                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-green-50">
-                    <FaDollarSign className="text-green-500 text-3xl" />
-                    <div>
-                      <p className="text-lg font-semibold text-gray-700">
-                        Price:
-                      </p>
-                      <p className="text-gray-600">${serviceData.price}</p>
-                    </div>
-                  </div>
-
-                  {/* About This Service */}
-                  <div className="flex items-center space-x-4 hover:shadow-xl transition-all duration-300 p-4 rounded-lg hover:bg-yellow-50">
-                    <FaClipboardList className="text-teal-500 text-3xl" />
-                    <div>
-                      <p className="text-lg font-semibold text-gray-700">
-                        About This Service:
-                      </p>
-                      <p className="text-gray-600">{serviceData.description}</p>
-                    </div>
-                  </div>
+              {/* Provider Information */}
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                <img
+                  src="https://via.placeholder.com/100"
+                  alt="Provider Avatar"
+                  className="w-24 h-24 rounded-full object-cover shadow-md"
+                />
+                <div className="flex flex-col space-y-3">
+                  <h2 className="text-2xl font-bold text-gray-800">John Doe</h2>
+                  <p className="text-sm font-medium text-gray-600">
+                    Senior Service Provider
+                  </p>
+                  <p className="text-gray-700">
+                    Experienced service provider with over 10 years of expertise
+                    in delivering high-quality services to clients worldwide.
+                    Passionate about solving problems and creating value.
+                  </p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div>
+                  <div className="flex items-center justify-center">
+                    <FaStar color="yellow" size={24} />
+                    <p className="text-3xl font-bold text-[#ffff00] ml-2">
+                      {averageRating.toFixed(1)}
+                    </p>
+                  </div>
+                  <p className="text-sm text-gray-500 font-bold">Rating</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-[#1eb2a6]">
+                    {feedbackCount}
+                  </p>
+                  <p className="text-sm text-gray-500 font-bold">
+                    {feedbackCount === 1 ? "Feedback" : "Feedbacks"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-[#1eb2a6]">15</p>
+                  <p className="text-sm text-gray-500 font-bold">Services</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-[#1eb2a6]">100%</p>
+                  <p className="text-sm text-gray-500 font-bold">
+                    Response Rate
+                  </p>
+                </div>
+              </div>
+
+              {/* Other Services */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-gray-800">
+                  Other Services
+                </h3>
+                <ul className="space-y-4">
+                  {/* Service Item */}
+                  <li className="p-4 border rounded-lg hover:shadow-lg transition duration-300">
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      Service 1
+                    </h4>
+                    <p className="text-gray-600">
+                      Brief description of Service 1. Highlight the value this
+                      service offers.
+                    </p>
+                  </li>
+                  <li className="p-4 border rounded-lg hover:shadow-lg transition duration-300">
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      Service 2
+                    </h4>
+                    <p className="text-gray-600">
+                      Brief description of Service 2. Showcase unique aspects of
+                      the service.
+                    </p>
+                  </li>
+                  <li className="p-4 border rounded-lg hover:shadow-lg transition duration-300">
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      Service 3
+                    </h4>
+                    <p className="text-gray-600">
+                      Brief description of Service 3. Explain why customers love
+                      this service.
+                    </p>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Feedback Section */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-gray-800">
+                  {feedbackCount} reviews
+                </h3>
+                <ul className="space-y-6">
+                  {fedbacks.map((feedback, index) => (
+                    <li
+                      key={index}
+                      className="p-4 bg-white rounded-lg shadow-md border border-gray-200"
+                    >
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm font-medium text-gray-800">
+                          {feedback.name}
+                        </p>
+                        <p className="text-xs text-gray-500">{feedback.date}</p>
+                      </div>
+                      <div className="flex items-center space-x-1 mt-1">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <FaStar
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < feedback.rating
+                                ? "text-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 mt-2">{feedback.comment}</p>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>

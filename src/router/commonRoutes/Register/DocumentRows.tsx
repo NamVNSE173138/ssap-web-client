@@ -1,28 +1,54 @@
 import { Input } from "@/components/ui/input";
-import { Button, IconButton, MenuItem, Select, TableCell, TableRow, Tooltip } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  MenuItem,
+  Select,
+  TableCell,
+  TableRow,
+  Tooltip,
+} from "@mui/material";
 import { CloudUploadIcon, TrashIcon } from "lucide-react";
 
-const DocumentRows = ({ row, setRows, documentType, handleDeleteRow, handleInputChange }: any) => {
+const DocumentRows = ({
+  row,
+  setRows,
+  documentType,
+  handleDeleteRow,
+  handleInputChange,
+}: any) => {
   return (
-    <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell component="th" scope="row">
+    <TableRow
+      key={row.id}
+      sx={{
+        "&:last-child td, &:last-child th": { border: 0 },
+      }}
+    >
+      {/* Name Input */}
+      <TableCell sx={{ width: "25%", minWidth: "150px" }}>
         <Input
-          className={`w-[200px] ${row.errors?.name ? 'border-red-500' : ''}`}
+          className={`w-full ${row.errors?.name ? "border-red-500" : ""}`}
           value={row.name}
-          onChange={(e) => handleInputChange(row.id, 'name', e.target.value)}
+          onChange={(e) => handleInputChange(row.id, "name", e.target.value)}
           placeholder="Enter name"
         />
         {row.errors?.name && (
           <span className="text-red-500 text-sm mt-1">Name is required</span>
         )}
       </TableCell>
-      <TableCell>
+
+      {/* Select Dropdown */}
+      <TableCell sx={{ width: "30%", minWidth: "200px" }}>
         <Select
-          value={row.type || ''}
-          onChange={(e) => handleInputChange(row.id, 'type', e.target.value)}
+          value={row.type || ""}
+          onChange={(e) => handleInputChange(row.id, "type", e.target.value)}
           displayEmpty
           size="small"
-          sx={{ width: '100%' }}
+          sx={{
+            width: "100%",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+          }}
         >
           <MenuItem value="" disabled>
             Select Type
@@ -37,20 +63,28 @@ const DocumentRows = ({ row, setRows, documentType, handleDeleteRow, handleInput
           <span className="text-red-500 text-sm mt-1">Type is required</span>
         )}
       </TableCell>
-      <TableCell align="right">
+
+      {/* Upload File Button */}
+      <TableCell sx={{ width: "25%", minWidth: "150px" }} align="right">
         <Button
           size="small"
           component="label"
           variant="contained"
           sx={{
-            backgroundColor: row.errors?.file ? 'error.main' : '#1eb2a6',
-            '&:hover': {
-              backgroundColor: row.errors?.file ? 'error.dark' : '#179d8f',
+            backgroundColor: row.errors?.file ? "error.main" : "#1eb2a6",
+            "&:hover": {
+              backgroundColor: row.errors?.file ? "error.dark" : "#179d8f",
             },
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            maxWidth: "150px",
           }}
           startIcon={<CloudUploadIcon />}
         >
-          {row.fileName && row.fileName.length > 3 ? `${row.fileName.slice(0, 3)}...` : row.fileName || 'Upload file*'}
+          {row.fileName && row.fileName.length > 10
+            ? `${row.fileName.slice(0, 10)}...`
+            : row.fileName || "Upload"}
           <input
             hidden
             type="file"
@@ -59,33 +93,34 @@ const DocumentRows = ({ row, setRows, documentType, handleDeleteRow, handleInput
               if (file) {
                 setRows((prevRows: any) =>
                   prevRows.map((r: any) =>
-                    r.id === row.id ? { ...r, file: file, fileName: file.name } : r
+                    r.id === row.id
+                      ? { ...r, file: file, fileName: file.name }
+                      : r
                   )
                 );
-                handleInputChange(row.id, 'file', file);
+                handleInputChange(row.id, "file", file);
               }
             }}
           />
         </Button>
       </TableCell>
-      <TableCell align="right">
+
+      {/* Delete Icon */}
+      <TableCell sx={{ width: "10%", minWidth: "50px" }} align="right">
         <Tooltip title="Delete row" arrow>
           <IconButton
             onClick={() => handleDeleteRow(row.id)}
             aria-label="delete"
             color="error"
             size="small"
-            sx={{ padding: '4px' }}
+            sx={{ padding: "4px" }}
           >
             <TrashIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       </TableCell>
-
     </TableRow>
-
   );
 };
 
 export default DocumentRows;
-

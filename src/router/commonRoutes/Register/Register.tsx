@@ -5,7 +5,7 @@ import parseJwt from "@/services/parseJwt";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import RegisterImage from "../../../assets/login-image.jpg";
+import RegisterImage from "../../../assets/college-students.jpg";
 import {
   FaBook,
   FaBuilding,
@@ -615,26 +615,37 @@ const Register = () => {
 
   return (
     <div className="h-full">
-      <div className="h-screen w-screen relative">
-        <div className="absolute top-0 left-0 w-full h-full">
+      <div className="h-screen w-screen relative flex">
+        <div className="w-full md:w-[50%] h-[50%] md:h-full relative">
           <img
             src={RegisterImage}
-            alt="Register background"
-            className="w-full h-full object-cover "
+            alt="Login background"
+            className="w-full h-full object-cover"
           />
+          <div className="absolute top-0 left-0 w-full h-full bg-black opacity-80"></div>
+          <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center text-center px-5">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3">
+              Start Your Journey to a Bright Future
+            </h1>
+            <p className="text-base md:text-lg text-white">
+              Join us today to explore and apply for the best scholarships
+              available, achieve your academic goals, unlock new opportunities,
+              and pave the way for a successful future
+            </p>
+          </div>
         </div>
-        <div className="absolute top-0 left-0 w-full h-full bg-black z-10 opacity-5 "></div>{" "}
-        <div className="absolute md:w-[50%] w-[80%] h-[60%] md:h-[80%] md:p-[30px] p-2 top-1/2 left-1/2 bg-[rgba(255,255,255,0.75)] z-20 -translate-x-1/2 -translate-y-1/2 rounded-md">
-          <div className="w-full h-full bg-transparent md:px-10 px-5 flex flex-col justify-top">
+
+        <div className="w-[50%] h-full bg-white z-20 md:p-[30px] p-2">
+          <div className="w-full h-full bg-transparent md:px-10 px-5 flex flex-col justify-center">
             <div className="w-full">
               <h3 className="text-3xl mb-7 md:mb-7 md:text-4xl text-black font-bold text-center">
-                BECOME A MEMBER
+                Become a Member
               </h3>
             </div>
             <div className="flex items-center justify-center mb-6">
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                  currentStep === 1 ? "bg-blue-600" : "bg-gray-300"
+                  currentStep === 1 ? "bg-[#1eb2a6]" : "bg-gray-300"
                 }`}
               >
                 1
@@ -642,7 +653,7 @@ const Register = () => {
               <div className="h-1 w-20 bg-gray-300 mx-2"></div>
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                  currentStep === 2 ? "bg-blue-600" : "bg-gray-300"
+                  currentStep === 2 ? "bg-[#1eb2a6]" : "bg-gray-300"
                 }`}
               >
                 2
@@ -650,7 +661,7 @@ const Register = () => {
               <div className="h-1 w-20 bg-gray-300 mx-2"></div>
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                  currentStep === 3 ? "bg-blue-600" : "bg-gray-300"
+                  currentStep === 3 ? "bg-[#1eb2a6]" : "bg-gray-300"
                 }`}
               >
                 3
@@ -658,7 +669,7 @@ const Register = () => {
               <div className="h-1 w-20 bg-gray-300 mx-2"></div>
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
-                  currentStep === 4 ? "bg-blue-600" : "bg-gray-300"
+                  currentStep === 4 ? "bg-[#1eb2a6]" : "bg-gray-300"
                 }`}
               >
                 4
@@ -667,7 +678,7 @@ const Register = () => {
 
             {currentStep === 1 && (
               <div>
-                <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                <h2 className="text-2xl font-bold text-[#1eb2a6] mb-6 text-center">
                   Choose Your Role
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -695,7 +706,7 @@ const Register = () => {
                         onClick={() => handleRoleSelection(roleId)}
                         className={`p-6 cursor-pointer border rounded-lg shadow-md transition-transform duration-300 hover:scale-105 ${
                           selectedRole === roleId
-                            ? "bg-blue-100 border-blue-500"
+                            ? "bg-teal-100 border-[#1eb2a6]"
                             : "border-gray-300"
                         }`}
                       >
@@ -717,7 +728,7 @@ const Register = () => {
                   disabled={!selectedRole}
                   className={`mt-6 py-3 px-5 rounded-xl w-full transition-all duration-300 ${
                     selectedRole
-                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg"
+                      ? "bg-[#1eb2a6] text-white hover:bg-teal-600 shadow-lg"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
@@ -728,7 +739,7 @@ const Register = () => {
                   <p className="text-base text-black">
                     You already have an account?{" "}
                     <Link to="/login">
-                      <span className="font-semibold underline cursor-pointer">
+                      <span className="font-semibold cursor-pointer text-[#1eb2a6]">
                         Login
                       </span>
                     </Link>
@@ -738,7 +749,7 @@ const Register = () => {
             )}
             {currentStep === 2 && (
               <div>
-                <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                <h2 className="text-2xl font-bold text-[#1eb2a6] mb-6 text-center">
                   Verify Step
                 </h2>
                 <div className="space-y-6 overflow-y-auto max-h-[270px]">
@@ -758,13 +769,13 @@ const Register = () => {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your email"
-                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                          className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6] rounded-md"
                         />
                       </div>
                     </div>
                     <button
                       type="button"
-                      className="bg-blue-600 text-white p-2 rounded ml-5"
+                      className="bg-[#1eb2a6] text-white p-2 rounded ml-5"
                       onClick={handleSendOtp}
                     >
                       Send OTP
@@ -778,6 +789,7 @@ const Register = () => {
                     onCancel={() => setIsDialogVisible(false)}
                     okText="Yes"
                     cancelText="No"
+                    centered
                   >
                     <p>
                       Are you sure you want to use this email:{" "}
@@ -802,13 +814,13 @@ const Register = () => {
                               value={otp}
                               onChange={(e) => setOtp(e.target.value)}
                               placeholder="Enter your OTP"
-                              className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                              className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6] rounded-md"
                             />
                           </div>
                         </div>
                         <button
                           type="button"
-                          className="bg-blue-600 text-white p-2 rounded ml-5"
+                          className="bg-[#1eb2a6] text-white p-2 rounded ml-5"
                           onClick={handleVerifyOtp}
                           disabled={isVerifyingOtp}
                         >
@@ -829,7 +841,7 @@ const Register = () => {
                   <button
                     onClick={handleNextStep}
                     disabled={!isOtpVerified || !selectedRole}
-                    className={`bg-blue-600 text-white p-3 rounded-md w-1/4 hover:bg-blue-700 transition-colors duration-300 ${
+                    className={`bg-[#1eb2a6] text-white p-3 rounded-md w-1/4 hover:bg-teal-600 transition-colors duration-300 ${
                       !isOtpVerified || !selectedRole
                         ? "bg-gray-400 cursor-not-allowed"
                         : ""
@@ -844,10 +856,10 @@ const Register = () => {
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               {currentStep === 3 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                  <h2 className="text-2xl font-bold text-[#1eb2a6] mb-6 text-center">
                     Fill in Your Information
                   </h2>
-                  <div className="space-y-6 overflow-y-auto max-h-[270px]">
+                  <div className="space-y-6 overflow-y-auto max-h-[350px]">
                     <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
                       <span className="text-black-600">📋</span>
                       <span className="text-black-600 text-2xl">
@@ -859,7 +871,7 @@ const Register = () => {
                         {/* Username */}
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
-                            <FaUser className="inline text-blue-600 mr-2" />{" "}
+                            <FaUser className="inline text-[#1eb2a6] mr-2" />{" "}
                             Username
                             <span className="text-red-500 text-sm font-medium">
                               {" "}
@@ -870,7 +882,7 @@ const Register = () => {
                             <input
                               {...register("username")}
                               placeholder="Enter your username"
-                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                             />
                           </div>
                           {errors.username && (
@@ -883,7 +895,7 @@ const Register = () => {
                         {/* Email */}
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
-                            <FaEnvelope className="inline text-blue-600 mr-2" />{" "}
+                            <FaEnvelope className="inline text-[#1eb2a6] mr-2" />{" "}
                             Email
                             <span className="text-red-500 text-sm font-medium">
                               {" "}
@@ -900,7 +912,7 @@ const Register = () => {
                               }
                               disabled
                               placeholder="Enter your email"
-                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                             />
                           </div>
                           {errors.email && (
@@ -913,7 +925,7 @@ const Register = () => {
                         {/* Phone Number */}
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
-                            <FaPhoneAlt className="inline text-blue-600 mr-2" />{" "}
+                            <FaPhoneAlt className="inline text-[#1eb2a6] mr-2" />{" "}
                             Phone
                             <span className="text-red-500 text-sm font-medium">
                               {" "}
@@ -924,7 +936,7 @@ const Register = () => {
                             <input
                               {...register("phoneNumber")}
                               placeholder="Enter your phone number"
-                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                             />
                           </div>
                           {errors.phoneNumber && (
@@ -937,7 +949,7 @@ const Register = () => {
                         {/* Password */}
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
-                            <FaKey className="inline text-blue-600 mr-2" />{" "}
+                            <FaKey className="inline text-[#1eb2a6] mr-2" />{" "}
                             Password
                             <span className="text-red-500 text-sm font-medium">
                               {" "}
@@ -949,12 +961,12 @@ const Register = () => {
                               {...register("password")}
                               type={showPassword ? "text" : "password"}
                               placeholder="Enter your password"
-                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                             />
                             <button
                               type="button"
                               onClick={togglePasswordVisibility}
-                              className="ml-3 text-gray-500 hover:text-blue-500"
+                              className="ml-3 text-gray-500 hover:text-[#1eb2a6]"
                             >
                               {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
@@ -969,7 +981,7 @@ const Register = () => {
                         {/* Address */}
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
-                            <FaMapMarkedAlt className="inline text-blue-600 mr-2" />{" "}
+                            <FaMapMarkedAlt className="inline text-[#1eb2a6] mr-2" />{" "}
                             Address
                             <span className="text-red-500 text-sm font-medium">
                               {" "}
@@ -980,7 +992,7 @@ const Register = () => {
                             <input
                               {...register("address")}
                               placeholder="Enter your address"
-                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full text-gray-800 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                             />
                           </div>
                           {errors.address && (
@@ -993,7 +1005,7 @@ const Register = () => {
                         {/* Avatar Upload */}
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">
-                            <FaImage className="inline text-blue-600 mr-2" />{" "}
+                            <FaImage className="inline text-[#1eb2a6] mr-2" />{" "}
                             Upload Avatar
                             <span className="text-red-500 text-sm font-medium">
                               {" "}
@@ -1033,7 +1045,7 @@ const Register = () => {
                               <input
                                 {...register("firstName")}
                                 placeholder="Enter your first name"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.firstName && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1050,7 +1062,7 @@ const Register = () => {
                               <input
                                 {...register("lastName")}
                                 placeholder="Enter your last name"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.lastName && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1067,7 +1079,7 @@ const Register = () => {
                               <input
                                 {...register("birthDate")}
                                 type="date"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.birthDate && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1083,7 +1095,7 @@ const Register = () => {
                               </label>
                               <select
                                 {...register("gender")}
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               >
                                 <option value="">Select your gender</option>
                                 <option value="Male">Male</option>
@@ -1105,7 +1117,7 @@ const Register = () => {
                               <input
                                 {...register("nationality")}
                                 placeholder="Enter your nationality"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.nationality && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1122,7 +1134,7 @@ const Register = () => {
                               <input
                                 {...register("ethnicity")}
                                 placeholder="Enter your ethnicity"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.ethnicity && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1152,7 +1164,7 @@ const Register = () => {
                               <input
                                 {...register("education.school")}
                                 placeholder="Enter your school"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.education?.school && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1169,7 +1181,7 @@ const Register = () => {
                               <input
                                 {...register("education.educationLevel")}
                                 placeholder="Enter your education level"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.education?.educationLevel && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1186,7 +1198,7 @@ const Register = () => {
                               <input
                                 {...register("education.major")}
                                 placeholder="Enter your major"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.education?.major && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1203,7 +1215,7 @@ const Register = () => {
                               <input
                                 {...register("education.gpa")}
                                 placeholder="Enter your GPA"
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               />
                               {errors.education?.gpa && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -1219,7 +1231,7 @@ const Register = () => {
                               </label>
                               <select
                                 {...register("education.fromYear")}
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               >
                                 <option value="">Select Year</option>
 
@@ -1243,7 +1255,7 @@ const Register = () => {
                               </label>
                               <select
                                 {...register("education.toYear")}
-                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               >
                                 <option value="">Select Year</option>
                                 {[...Array(50)].map((_, i) => (
@@ -1267,7 +1279,7 @@ const Register = () => {
                             <textarea
                               {...register("education.description")}
                               placeholder="Provide brief description"
-                              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
                               rows={4}
                             />
                             {errors.education?.description && (
@@ -1308,7 +1320,7 @@ const Register = () => {
                                 <input
                                   {...register("organizationName")}
                                   placeholder="Enter your organization name"
-                                  className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                  className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6] rounded-md"
                                 />
                               </div>
                               {errors.organizationName && (
@@ -1330,7 +1342,7 @@ const Register = () => {
                                 <input
                                   {...register("contactPersonName")}
                                   placeholder="Enter contact person name"
-                                  className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-md"
+                                  className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6] rounded-md"
                                 />
                               </div>
                               {errors.contactPersonName && (
@@ -1416,7 +1428,7 @@ const Register = () => {
                     <button
                       onClick={handleNextStep}
                       disabled={!selectedRole}
-                      className="bg-blue-600 text-white p-3 rounded-md w-1/4 hover:bg-blue-700 transition-colors duration-300"
+                      className="bg-[#1eb2a6] text-white p-3 rounded-md w-1/4 hover:bg-teal-600 transition-colors duration-300"
                     >
                       Next Step
                     </button>
@@ -1426,8 +1438,8 @@ const Register = () => {
 
               {currentStep === 4 && (
                 <div>
-                  <div className="overflow-y-auto max-h-[300px]">
-                    <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center ">
+                  <div className="overflow-y-auto max-h-[383px]">
+                    <h2 className="text-2xl font-bold text-[#1eb2a6] mb-6 text-center ">
                       Preview Your Details
                     </h2>
                     <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
@@ -1460,7 +1472,7 @@ const Register = () => {
                         <div className="flex-1 space-y-4">
                           {/* Role */}
                           <div className="flex items-center space-x-3">
-                            <FaUsers className="text-blue-600 text-2xl" />
+                            <FaUsers className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Role:</strong>{" "}
                               {selectedRole === 2
@@ -1473,7 +1485,7 @@ const Register = () => {
 
                           {/* Username */}
                           <div className="flex items-center space-x-3">
-                            <FaUser className="text-blue-600 text-2xl" />
+                            <FaUser className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Username:</strong>{" "}
                               {watch("username")?.length > 13
@@ -1484,7 +1496,7 @@ const Register = () => {
 
                           {/* Email */}
                           <div className="flex items-center space-x-3">
-                            <FaEnvelope className="text-blue-600 text-2xl" />
+                            <FaEnvelope className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Email:</strong>{" "}
                               {watch("email") || "Not provided"}
@@ -1493,7 +1505,7 @@ const Register = () => {
 
                           {/* Phone Number */}
                           <div className="flex items-center space-x-3">
-                            <FaPhoneAlt className="text-blue-600 text-2xl" />
+                            <FaPhoneAlt className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Phone:</strong>{" "}
                               {watch("phoneNumber") || "Not provided"}
@@ -1502,7 +1514,7 @@ const Register = () => {
 
                           {/* Password */}
                           <div className="flex items-center space-x-3">
-                            <FaKey className="text-blue-600 text-2xl" />
+                            <FaKey className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Password:</strong>{" "}
                               {watch("password") ? "••••••••" : "Not provided"}
@@ -1511,7 +1523,7 @@ const Register = () => {
 
                           {/* Address */}
                           <div className="flex items-center space-x-3">
-                            <FaMapMarkedAlt className="text-blue-600 text-2xl" />
+                            <FaMapMarkedAlt className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Address:</strong>{" "}
                               {watch("address") || "Not provided"}
@@ -1537,7 +1549,7 @@ const Register = () => {
                             <div className="space-y-4">
                               {/* First Name */}
                               <div className="flex items-center space-x-3">
-                                <FaUserAlt className="text-blue-600 text-2xl" />
+                                <FaUserAlt className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>First Name:</strong>{" "}
                                   {watch("firstName") || "Not provided"}
@@ -1546,7 +1558,7 @@ const Register = () => {
 
                               {/* Birth Date */}
                               <div className="flex items-center space-x-3">
-                                <FaCalendarAlt className="text-blue-600 text-2xl" />
+                                <FaCalendarAlt className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Birth Date:</strong>{" "}
                                   {watch("birthDate")
@@ -1559,7 +1571,7 @@ const Register = () => {
 
                               {/* Gender */}
                               <div className="flex items-center space-x-3">
-                                <FaVenusMars className="text-blue-600 text-2xl" />
+                                <FaVenusMars className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Gender:</strong>{" "}
                                   {watch("gender") || "Not provided"}
@@ -1571,7 +1583,7 @@ const Register = () => {
                             <div className="space-y-4">
                               {/* Last Name */}
                               <div className="flex items-center space-x-3">
-                                <FaUserAlt className="text-blue-600 text-2xl" />
+                                <FaUserAlt className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Last Name:</strong>{" "}
                                   {watch("lastName") || "Not provided"}
@@ -1580,7 +1592,7 @@ const Register = () => {
 
                               {/* Nationality */}
                               <div className="flex items-center space-x-3">
-                                <FaFlag className="text-blue-600 text-2xl" />
+                                <FaFlag className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Nationality:</strong>{" "}
                                   {watch("nationality") || "Not provided"}
@@ -1589,7 +1601,7 @@ const Register = () => {
 
                               {/* Ethnicity */}
                               <div className="flex items-center space-x-3">
-                                <FaUsers className="text-blue-600 text-2xl" />
+                                <FaUsers className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Ethnicity:</strong>{" "}
                                   {watch("ethnicity") || "Not provided"}
@@ -1611,7 +1623,7 @@ const Register = () => {
                             <div className="space-y-4">
                               {/* School */}
                               <div className="flex items-center space-x-3">
-                                <FaSchool className="text-blue-600 text-2xl" />
+                                <FaSchool className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>School:</strong>{" "}
                                   {watch("education.school") || "Not provided"}
@@ -1620,7 +1632,7 @@ const Register = () => {
 
                               {/* Education Level */}
                               <div className="flex items-center space-x-3">
-                                <FaGraduationCap className="text-blue-600 text-2xl" />
+                                <FaGraduationCap className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Education Level:</strong>{" "}
                                   {watch("education.educationLevel") ||
@@ -1630,7 +1642,7 @@ const Register = () => {
 
                               {/* Major */}
                               <div className="flex items-center space-x-3">
-                                <FaBook className="text-blue-600 text-2xl" />
+                                <FaBook className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Major:</strong>{" "}
                                   {watch("education.major") || "Not provided"}
@@ -1641,7 +1653,7 @@ const Register = () => {
                             <div className="space-y-4">
                               {/* GPA */}
                               <div className="flex items-center space-x-3">
-                                <FaStar className="text-blue-600 text-2xl" />
+                                <FaStar className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>GPA:</strong>{" "}
                                   {watch("education.gpa") || "Not provided"}
@@ -1650,7 +1662,7 @@ const Register = () => {
 
                               {/* Start Year */}
                               <div className="flex items-center space-x-3">
-                                <FaCalendarAlt className="text-blue-600 text-2xl" />
+                                <FaCalendarAlt className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>Start Year:</strong>{" "}
                                   {watch("education.fromYear") ||
@@ -1660,7 +1672,7 @@ const Register = () => {
 
                               {/* End Year */}
                               <div className="flex items-center space-x-3">
-                                <FaRegCalendarAlt className="text-blue-600 text-2xl" />
+                                <FaRegCalendarAlt className="text-[#1eb2a6] text-2xl" />
                                 <p className="text-lg text-gray-800 font-medium">
                                   <strong>End Year:</strong>{" "}
                                   {watch("education.toYear") || "Not provided"}
@@ -1671,7 +1683,7 @@ const Register = () => {
 
                           {/* Description */}
                           <div className="flex items-center space-x-3 mt-4">
-                            <FaFileAlt className="text-blue-600 text-2xl" />
+                            <FaFileAlt className="text-[#1eb2a6] text-2xl" />
                             <p className="text-lg text-gray-800 font-medium">
                               <strong>Description:</strong>{" "}
                               {watch("education.description") || "Not provided"}
@@ -1683,7 +1695,7 @@ const Register = () => {
                     {(selectedRole === 4 || selectedRole === 2) && (
                       <>
                         <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                          <span className="text-blue-600">📋</span>
+                          <span className="text-[#1eb2a6]">📋</span>
                           <span className="text-2xl">
                             Necessary Information
                           </span>
@@ -1694,7 +1706,7 @@ const Register = () => {
                           <div className="grid grid-cols-2 gap-6 mb-6">
                             {/* Organization Name */}
                             <div className="flex items-center space-x-3 p-4 border rounded-lg border-gray-300 shadow-sm">
-                              <FaBuilding className="text-blue-600 text-2xl" />
+                              <FaBuilding className="text-[#1eb2a6] text-2xl" />
                               <p className="text-lg text-gray-800 font-medium">
                                 <strong>Organization Name:</strong>{" "}
                                 {watch("organizationName") || "Not provided"}
@@ -1703,7 +1715,7 @@ const Register = () => {
 
                             {/* Contact Person Name */}
                             <div className="flex items-center space-x-3 p-4 border rounded-lg border-gray-300 shadow-sm">
-                              <FaUserTie className="text-blue-600 text-2xl" />
+                              <FaUserTie className="text-[#1eb2a6] text-2xl" />
                               <p className="text-lg text-gray-800 font-medium">
                                 <strong>Contact Person Name:</strong>{" "}
                                 {watch("contactPersonName") || "Not provided"}
@@ -1713,7 +1725,7 @@ const Register = () => {
 
                           {/* Documents Section */}
                           <div className="flex items-center space-x-3 mb-4">
-                            <FaFileAlt className="text-blue-600 text-2xl" />
+                            <FaFileAlt className="text-[#1eb2a6] text-2xl" />
                             <span className="text-lg text-gray-800 font-medium">
                               <strong>Documents:</strong>
                             </span>
@@ -1759,7 +1771,7 @@ const Register = () => {
                     <button
                       onClick={onError}
                       type="submit"
-                      className="bg-blue-600 text-white p-3 rounded"
+                      className="bg-[#1eb2a6] text-white p-3 rounded"
                     >
                       Confirm & Register
                     </button>

@@ -9,12 +9,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ScholarshipProgramType } from "../ScholarshipProgram/data";
 import Spinner from "@/components/Spinner";
-import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import SchoolLogo from "./logo";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "@/constants/api";
 import { RootState } from "@/store/store";
@@ -38,14 +36,12 @@ import {
   FaBook,
   FaCalendarAlt,
   FaCertificate,
-  FaClipboardList,
   FaCode,
-  FaCreditCard,
-  FaDollarSign,
   FaExclamationCircle,
+  FaGraduationCap,
   FaInfoCircle,
+  FaListAlt,
   FaMapMarkerAlt,
-  FaRegListAlt,
   FaTag,
   FaTrashAlt,
   FaTrophy,
@@ -351,628 +347,497 @@ const ScholarshipProgramDetail = () => {
   console.log("IMAGE", data?.imageUrl);
 
   if (!data) return <Spinner size="large" />;
+  if (_loading) return <Spinner size="large" />;
 
   return (
-    <div>
-      <div className="relative">
-        <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px]  z-10">
-          <div className="">
-            <Breadcrumb className="">
-              <BreadcrumbList className="text-[#000]">
-                <BreadcrumbItem>
-                  <Link to="/" className="md:text-xl text-lg">
-                    Home
-                  </Link>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <Link
-                    to="/scholarship-program"
-                    className=" text-[#000] md:text-xl font-medium text-lg"
-                  >
-                    Scholarship Program
-                  </Link>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <p className="text-[#000] md:text-xl text-lg font-semibold">
-                    {data.name}
-                  </p>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <div className="">
-            <div className="lg:flex-row items-center lg:items-center flex-row flex gap-[20px] lg:gap-[25px] ">
-              <SchoolLogo
-                imageUrl={data.imageUrl || "https://github.com/shadcn.png"}
-              />
-              <div>
-                <p className="text-[#000] text-3xl md:text-4xl lg:text-5xl  lg:line-clamp-3 line-clamp-5 font-medium">
+    <div className="bg-gray-50 mb-10">
+      <Breadcrumb className="p-10">
+        <BreadcrumbList className="text-[#000]">
+          <BreadcrumbItem>
+            <Link to="/" className="md:text-xl text-lg font-medium">
+              Home
+            </Link>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <Link
+              to="/scholarship-program"
+              className="md:text-xl text-lg font-medium"
+            >
+              Scholarship Program
+            </Link>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <p className="text-[#1eb2a6] md:text-xl text-lg font-semibold">
+              {data.name}
+            </p>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <section className="bg-gray-50 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+        <div className="max-w-7xl mx-auto p-8 shadow-lg rounded-md">
+          <div className="max-w-[100%] mx-auto">
+            <section className="w-full max-w-none flex flex-col lg:flex-row justify-between items-center mx-auto py-6 lg:py-6 gap-6 lg:gap-10">
+              {/* Left Section */}
+              <div className="flex flex-col lg:w-[70%] gap-6">
+                <p className="text-[#000] text-3xl md:text-4xl lg:text-5xl font-bold text-center lg:text-left">
                   {data.name}
                 </p>
-                <p className="text-[#000] text-xl md:text-2xl lg:text-3xl text-heading-5 hidden lg:block mt-[12px]">
-                  {data.description.length > 50
-                    ? `${data.description.substring(0, 50)}...`
-                    : data.description}
-                </p>
+                <img
+                  // src={data.imageUrl}
+                  src="https://wallpapers.com/images/hd/harvard-university-gilman-hall-q5t2pnf1jbwhg6hk.jpg"
+                  className="w-[100%] h-[300px] sm:w-[100%] sm:h-[300px] lg:h-[400px] lg:w-[100%] bg-white object-cover rounded-md"
+                  alt="Scholarship Image"
+                />
               </div>
-            </div>
-            <span className="flex justify-start ps-5 pt-5 gap-2 items-center">
-              <span className="relative flex h-3 w-3">
-                <span
-                  className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500`}
-                ></span>
-                <span
-                  className={`relative inline-flex rounded-full h-3 w-3 bg-green-500`}
-                ></span>
-              </span>
-              <span className={`text-green-500 text-2xl font-medium`}>
-                {data.status}
-              </span>
-            </span>
 
-            <div className="text-white text-center flex flex-wrap h-[40px] lg:h-[50px] mt-[26px] w-full">
-              {isApplicant == "Applicant" || !user ? (
-                <>
-                  {existingApplication &&
-                    existingApplication.length == 0 &&
-                    data.status != "FINISHED" &&
-                    new Date(data.deadline) > new Date() && (
-                      <Button
-                        onClick={() =>
-                          navigate(`/scholarship-program/${id}/application`)
-                        }
-                        className="flex-1 text-lg lg:text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f] "
-                      >
-                        Apply now{" "}
-                      </Button>
-                    )}
-
-                  {existingApplication && existingApplication.length > 0 && (
-                    <>
-                      {existingApplication[0].status ==
-                        ApplicationStatus.NeedExtend && (
-                        <Button
-                          onClick={() =>
-                            navigate(
-                              `/funder/application/${existingApplication[0].id}`
-                            )
-                          }
-                          className="flex-1 text-xl w-full bg-yellow-500 h-full mr-3"
-                        >
-                          Extend Application{" "}
-                        </Button>
-                      )}
-                    </>
-                  )}
-                </>
-              ) : (
-                authorized != "Unauthorized" &&
-                user.id == data.funderId && (
-                  <div className="flex justify-between w-full gap-3">
-                    <Button
-                      onClick={() => handleOpenAwardMilestoneDialog()}
-                      className="flex-1 text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
-                    >
-                      <FaTrophy className="mr-2" /> Award Milestones
-                    </Button>
-                  </div>
-                )
-              )}
-            </div>
-
-            {data.status == "FINISHED" && !existingApplication && (
-              <div className="h-20 max-w-4xl p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                <div className="text-xl font-semibold mr-3">
-                  This scholarship has finished
-                </div>
-              </div>
-            )}
-            {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status == ApplicationStatus.Submitted &&
-              data.status != "FINISHED" && (
-                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                  <div className="text-xl font-semibold mr-3">
-                    Your application is being reviewed
-                  </div>
-                </div>
-              )}
-            {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status == ApplicationStatus.Rejected && (
-                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                  <div className="text-xl font-semibold mr-3">
-                    Your application to this scholarship have not been approved
-                  </div>
-                </div>
-              )}
-            {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status == ApplicationStatus.Approved && (
-                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                  <div className="text-xl font-semibold mr-3">
-                    You have won this scholarship
-                  </div>
-                </div>
-              )}
-            {existingApplication &&
-              existingApplication.length > 0 &&
-              existingApplication[0].status == ApplicationStatus.NeedExtend && (
-                <div className="h-20 max-w-4xl  p-3 bg-[rgba(255,255,255,0.49)] shadow-lg rounded-md mt-1">
-                  <div className="text-xl font-semibold mr-3">
-                    You need to extend this scholarship before{" "}
-                    {formatDate(extendBeforeDate)}
-                  </div>
-                </div>
-              )}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white lg:bg-white drop-shadow-[0_0_5px_rgba(0,0,0,0.1)] lg:drop-shadow-[0_5px_25px_rgba(0,0,0,0.05)] relative">
-        <section className="w-full max-w-none flex justify-between items-center mx-auto py-6 lg:py-10 px-4 lg:px-0">
-          <div className="flex w-full justify-around gap-12">
-            <div className="flex items-center gap-3">
-              <FaUserAlt className="text-[#1eb2a6] text-xl" />
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">Funder</p>
-                <p className="text-lg font-semibold text-gray-800">
-                  {funderName}
+              {/* Right Section */}
+              <div className="flex flex-col w-full lg:w-[30%] gap-4 text-black font-semibold">
+                <p className="text-xl sm:text-2xl text-center lg:text-left">
+                  Award per winner
                 </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <FaCreditCard className="text-[#1eb2a6] text-xl" />
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">
-                  Funding Type
-                </p>
-                <p className="text-lg font-semibold text-gray-800">
-                  {"Wallet or Cash"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">
-                  Created At
-                </p>
-                <p className="text-lg font-semibold text-gray-800">
-                  {data.deadline
-                    ? format(new Date(data.createdAt), "MM/dd/yyyy")
-                    : "Not specified"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <FaCalendarAlt className="text-[#1eb2a6] text-xl" />
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">
-                  Application Deadline
-                </p>
-                <p className="text-lg font-semibold text-gray-800">
-                  {data.deadline
-                    ? format(new Date(data.deadline), "MM/dd/yyyy")
-                    : "Not specified"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <FaAward className="text-[#1eb2a6] text-xl" />
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-500">
-                  Value of Award
-                </p>
-                <p className="text-lg font-semibold text-gray-800">
-                  $
-                  {data.scholarshipAmount.toLocaleString("en-US") ||
-                    "Not specified"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <section className="bg-white lg:bg-grey-lightest py-[40px] md:py-[60px]">
-        <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-          <div className="max-w-[1216px] mx-auto ">
-            <div className="mb-6 px-4 sm:px-6 xl:px-0">
-              <div className="relative flex items-center gap-3">
-                <div className="p-2 bg-[#1eb2a6] rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="white"
-                    className="w-6 h-6"
+                <div className="flex flex-wrap lg:flex-nowrap items-center gap-4 justify-center lg:justify-start">
+                  <p className="text-[#1eb2a6] text-3xl sm:text-4xl">
+                    ${data.scholarshipAmount.toLocaleString("en-US")}
+                  </p>
+                  <span
+                    className={`px-3 py-1 rounded-md text-base sm:text-lg font-medium ${
+                      data.status === "Open"
+                        ? "bg-green-100 text-green-700"
+                        : data.status === "Closed"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.75 9.75L15.75 15.75M15.75 9.75L9.75 15.75M6 4.5H18M6 19.5H18M3 9H21M3 15H21"
-                    />
-                  </svg>
+                    {data.status}
+                  </span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                  About the Scholarship
-                </h2>
+
+                <p className="flex items-center text-sm sm:text-base">
+                  <FaUserAlt color="#1eb2a6" className="mr-2" />
+                  Funded by:{" "}
+                  <span className="font-normal ml-2">{funderName}</span>
+                </p>
+                <p className="flex items-center text-sm sm:text-base">
+                  <FaListAlt color="#1eb2a6" className="mr-2" />
+                  Category:{" "}
+                  <span className="font-normal ml-2">{data.category.name}</span>
+                </p>
+                <p className="flex items-center text-sm sm:text-base">
+                  <FaAward color="#1eb2a6" className="mr-2" />
+                  Number of awards:{" "}
+                  <span className="font-normal ml-2">
+                    {data.numberOfScholarships} scholarships
+                  </span>
+                </p>
+                <p className="flex items-center text-sm sm:text-base">
+                  <FaGraduationCap color="#1eb2a6" className="mr-2" />
+                  Education Level:{" "}
+                  <span className="font-normal ml-2">
+                    {data.educationLevel}
+                  </span>
+                </p>
+                <p className="flex items-center text-sm sm:text-base">
+                  <FaCalendarAlt color="#1eb2a6" className="mr-2" />
+                  Deadline:{" "}
+                  <span className="font-normal ml-2">
+                    {data.deadline
+                      ? format(new Date(data.createdAt), "MM/dd/yyyy")
+                      : "Not specified"}
+                  </span>
+                </p>
+
+                <div>
+                  {isApplicant == "Applicant" || !user ? (
+                    <>
+                      {existingApplication &&
+                        existingApplication.length === 0 &&
+                        data.status !== "FINISHED" &&
+                        new Date(data.deadline) > new Date() && (
+                          <Button
+                            onClick={() =>
+                              navigate(`/scholarship-program/${id}/application`)
+                            }
+                            className="text-lg lg:text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f]"
+                          >
+                            Apply now
+                          </Button>
+                        )}
+                      {existingApplication &&
+                        existingApplication.length > 0 && (
+                          <>
+                            {existingApplication[0].status ===
+                              ApplicationStatus.NeedExtend && (
+                              <Button
+                                onClick={() =>
+                                  navigate(
+                                    `/funder/application/${existingApplication[0].id}`
+                                  )
+                                }
+                                className="text-lg lg:text-xl w-full bg-yellow-500 h-full"
+                              >
+                                Extend Application
+                              </Button>
+                            )}
+                            {existingApplication[0].status ===
+                              ApplicationStatus.Reviewing && (
+                              <Button
+                                disabled
+                                className="text-lg lg:text-xl w-full h-full"
+                              >
+                                Already Applied
+                              </Button>
+                            )}
+                          </>
+                        )}
+                    </>
+                  ) : (
+                    authorized !== "Unauthorized" &&
+                    user.id === data.funderId && (
+                      <div className="flex justify-between w-full gap-3">
+                        <Button
+                          onClick={() => handleOpenAwardMilestoneDialog()}
+                          className="text-lg bg-[#1eb2a6] hover:bg-[#0d978b] w-full h-full flex items-center justify-center"
+                        >
+                          <FaTrophy className="mr-2" /> Award Milestones
+                        </Button>
+                      </div>
+                    )
+                  )}
+                </div>
+                <div>
+                  {data.status === "FINISHED" && !existingApplication && (
+                    <div className="h-20 max-w-4xl font-semibold text-xl text-center">
+                      This scholarship has finished
+                    </div>
+                  )}
+                  {existingApplication &&
+                    existingApplication.length > 0 &&
+                    existingApplication[0].status ===
+                      ApplicationStatus.Reviewing &&
+                    data.status !== "FINISHED" && (
+                      <div className="h-20 max-w-4xl font-semibold text-xl text-center">
+                        Your application is being reviewed
+                      </div>
+                    )}
+                  {existingApplication &&
+                    existingApplication.length > 0 &&
+                    existingApplication[0].status ==
+                      ApplicationStatus.Rejected && (
+                      <div className="h-20 max-w-4xl font-semibold text-xl text-center">
+                        Your application to this scholarship have not been
+                        approved
+                      </div>
+                    )}
+                  {existingApplication &&
+                    existingApplication.length > 0 &&
+                    existingApplication[0].status ==
+                      ApplicationStatus.Approved && (
+                      <div className="h-20 max-w-4xl font-semibold text-xl text-center">
+                        You have won this scholarship
+                      </div>
+                    )}
+                  {existingApplication &&
+                    existingApplication.length > 0 &&
+                    existingApplication[0].status ==
+                      ApplicationStatus.NeedExtend && (
+                      <div className="h-20 max-w-4xl font-semibold text-xl text-center">
+                        You need to extend this scholarship before{" "}
+                        {formatDate(extendBeforeDate)}
+                      </div>
+                    )}
+                  {/* Add more application status blocks here if needed */}
+                </div>
               </div>
-              <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
-            </div>
-            <br></br>
-            <div
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-              style={{ transform: "translateX(50px)" }}
-            >
-              {/* Cột bên trái */}
-              <div className="flex flex-col gap-6">
-                <div className="lg:col-span-1 px-[16px] xsm:px-[24px] 2xl:px-0">
-                  <div className="lg:pe-[112px]">
-                    <Accordion defaultExpanded={false}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1-content"
-                        id="panel1-header"
-                        className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
-                      >
-                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                          <FaInfoCircle className="text-[#1eb2a6]" />
-                          Overview
-                        </h3>
-                      </AccordionSummary>
-                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                        {/* Awarding institution & Applications */}
-                        <div className="flex gap-4 flex-wrap justify-between mb-6">
-                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                            <p className="text-gray-700 font-bold flex items-center gap-2">
-                              <FaUniversity className="text-gray-500" />
-                              Awarding institution:
+            </section>
+            <div className="">
+              <div className="mb-6">
+                {/* Header Section */}
+                <div className="flex items-center mt-6">
+                  <div className="bg-[#1eb2a6] w-1 h-[calc(1em+20px)] rounded-full mr-2"></div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                    About this Scholarship
+                  </h2>
+                </div>
+
+                {/* Content Section */}
+                <div className="mt-6 p-4 sm:p-6 lg:p-8 gap-6">
+                  <p className="text-gray-500 text-sm md:text-base lg:text-lg">
+                    {data.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-[100%] mb-6">
+                <div className="flex items-center mt-6">
+                  <div className="bg-[#1eb2a6] w-1 h-[calc(1em+20px)] rounded-full mr-2"></div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                    Requirements
+                  </h2>
+                </div>
+                <div className="mt-6">
+                  {data.criteria && data.criteria.length > 0 ? (
+                    <div className="flex flex-col gap-4">
+                      {data.criteria.map((criterion) => (
+                        <div
+                          key={criterion.name}
+                          className="p-4 bg-gray-50 rounded-lg shadow-sm"
+                        >
+                          <div>
+                            <p className="text-gray-700 font-bold text-md">
+                              {criterion.name}
                             </p>
-                            <Link
-                              to=""
-                              className="text-blue-500 hover:underline"
-                            >
-                              {data.name}
-                            </Link>
-                          </div>
-                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                            <p className="text-gray-700 font-bold flex items-center gap-2">
-                              <FaInfoCircle className="text-gray-500" />
-                              Funding details:
+                            <p className="text-gray-600 text-sm">
+                              {criterion.description}
                             </p>
-                            <span>{data.description}</span>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <FaExclamationCircle className="text-red-500 text-4xl" />
+                      <p className="text-gray-600 italic">
+                        No eligibility criteria specified.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-                        {/* Qualification & Number of awards */}
-                        <div className="flex gap-4 flex-wrap justify-between mb-6">
-                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                            <p className="text-gray-700 font-bold flex items-center gap-2">
-                              <FaDollarSign className="text-gray-500" />
-                              Value of Award:
-                            </p>
-                            <span>
-                              ${data.scholarshipAmount.toLocaleString("en-US")}
+              <div>
+                <div className="flex items-center mb-6">
+                  <div className="bg-[#1eb2a6] w-1 h-[calc(1em+20px)] rounded-full mr-2"></div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                    Details
+                  </h2>
+                </div>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel3-content"
+                    id="panel3-header"
+                    className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
+                  >
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaBook className="text-[#1eb2a6]" />
+                      Applicable Majors & Skills
+                    </h3>
+                  </AccordionSummary>
+
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg">
+                    {data?.major ? (
+                      <Accordion
+                        key={data.major.id}
+                        sx={{
+                          border: "none",
+                          boxShadow: "none",
+                        }}
+                      >
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls={`major-${data.major.id}-content`}
+                          id={`major-${data.major.id}-header`}
+                          className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                        >
+                          <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                            <FaBook className="text-gray-500" />
+                            {data.major.name}
+                          </h4>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
+                            <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                            <div>
+                              <p className="text-gray-700 font-bold">
+                                Description:
+                              </p>
+                              <p className="text-gray-600">
+                                {data.major.description}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="w-full">
+                            <h5 className="font-bold text-gray-700 mb-3">
+                              Skills:
+                            </h5>
+
+                            <div>
+                              {data.major.skills.map((skill) => (
+                                <Accordion key={skill.id}>
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls={`skill-${skill.id}-content`}
+                                    id={`skill-${skill.id}-header`}
+                                    className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                                  >
+                                    <h6 className="font-bold text-gray-700 flex items-center gap-2">
+                                      <FaCode className="text-gray-500" />
+                                      {skill.name}
+                                    </h6>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+                                    <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                                      <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                                      <div>
+                                        <p className="text-gray-700 font-bold">
+                                          Description:
+                                        </p>
+                                        <p className="text-gray-600">
+                                          {skill.description}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </AccordionDetails>
+                                </Accordion>
+                              ))}
+                            </div>
+                          </div>
+                        </AccordionDetails>
+                      </Accordion>
+                    ) : (
+                      <p className="text-gray-600 italic">
+                        No majors or skills available at the moment.
+                      </p>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel3-content"
+                    id="panel3-header"
+                    className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
+                  >
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaUniversity className="text-[#1eb2a6]" />
+                      Applicable University
+                    </h3>
+                  </AccordionSummary>
+
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg">
+                    {data?.university ? (
+                      <Accordion
+                        key={data.university.id}
+                        sx={{
+                          border: "none",
+                          boxShadow: "none",
+                        }}
+                      >
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls={`university-${data.university.id}-content`}
+                          id={`university-${data.university.id}-header`}
+                          className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                        >
+                          <div className="flex flex-col">
+                            <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                              <FaUniversity className="text-gray-500" />
+                              {data.university.name}
+                            </h4>
+                            <span className="text-gray-600 flex items-center gap-1">
+                              <FaMapMarkerAlt className="text-gray-400" />
+                              {data.university.city}
                             </span>
                           </div>
-                          <div className="md:w-[48%] w-full bg-gray-50 p-4 rounded-lg shadow-sm">
-                            <p className="text-gray-700 font-bold flex items-center gap-2">
-                              <FaRegListAlt className="text-gray-500" />
-                              Number of awards available:
-                            </p>
-                            <span>{data.numberOfScholarships}</span>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
+                            <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                            <div>
+                              <p className="text-gray-700 font-bold">
+                                Description:
+                              </p>
+                              <p className="text-gray-600">
+                                {data.university.description}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </AccordionDetails>
-                    </Accordion>
+                        </AccordionDetails>
+                      </Accordion>
+                    ) : (
+                      <p className="text-gray-600 italic">
+                        No applicable universities available at the moment.
+                      </p>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
 
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="criteria-content"
-                        id="criteria-header"
-                        className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
-                      >
-                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                          <FaClipboardList className="text-[#1eb2a6]" />
-                          Eligibility Criteria
-                        </h3>
-                      </AccordionSummary>
-                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                        {data.criteria && data.criteria.length > 0 ? (
-                          <div className="flex flex-col gap-4">
-                            {data.criteria.map((criterion) => (
-                              <div
-                                key={criterion.name}
-                                className="p-4 bg-gray-50 rounded-lg shadow-sm"
-                              >
-                                <div>
-                                  <p className="text-gray-700 font-bold text-md">
-                                    {criterion.name}
-                                  </p>
-                                  <p className="text-gray-600 text-sm">
-                                    {criterion.description}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center text-center gap-2">
-                            <FaExclamationCircle className="text-red-500 text-4xl" />
-                            <p className="text-gray-600 italic">
-                              No eligibility criteria specified.
-                            </p>
-                          </div>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel2-content"
-                        id="panel2-header"
-                        className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
-                      >
-                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                          <FaTag className="text-[#1eb2a6]" />
-                          Scholarship Category
-                        </h3>
-                      </AccordionSummary>
-                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                        {/* Category Name */}
-                        <div className="w-full flex items-start gap-3 mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
-                          <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
-                          <div>
-                            <p className="text-gray-700 font-bold">
-                              Category Name:
-                            </p>
-                            <p className="text-gray-600">
-                              {data.category.name}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
-                          <FaInfoCircle className="text-gray-400 text-2xl mt-1" />
-                          <div>
-                            <p className="text-gray-700 font-bold">
-                              Description:
-                            </p>
-                            <p className="text-gray-600">
-                              {data.category.description}
-                            </p>
-                          </div>
-                        </div>
-                      </AccordionDetails>
-                    </Accordion>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cột bên phải */}
-              <div className="flex flex-col gap-6">
-                <div className="lg:col-span-1 px-[16px] xsm:px-[24px] 2xl:px-0">
-                  <div className="lg:pe-[112px]">
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel3-content"
-                        id="panel3-header"
-                        className="bg-blue-50 hover:bg-blue-100 transition-all rounded-t-lg"
-                      >
-                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                          <FaBook className="text-[#1eb2a6]" />
-                          Applicable Majors & Skills
-                        </h3>
-                      </AccordionSummary>
-
-                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                        {data?.major ? (
-                          <Accordion key={data.major.id}>
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls={`major-${data.major.id}-content`}
-                              id={`major-${data.major.id}-header`}
-                              className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                            >
-                              <h4 className="font-bold text-gray-700 flex items-center gap-2">
-                                <FaBook className="text-gray-500" />
-                                {data.major.name}
-                              </h4>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel3-content"
+                    id="panel3-header"
+                    className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
+                  >
+                    <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
+                      <FaCertificate className="text-[#1eb2a6]" />
+                      Required Certificates
+                    </h3>
+                  </AccordionSummary>
+                  <AccordionDetails className="bg-white p-6 rounded-b-lg">
+                    {data.certificates && data.certificates.length > 0 ? (
+                      data.certificates.map((certificate) => (
+                        <Accordion
+                          key={certificate.id}
+                          className="mt-4"
+                          sx={{
+                            border: "none",
+                            boxShadow: "none",
+                          }}
+                        >
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls={`certificate-${certificate.id}-content`}
+                            id={`certificate-${certificate.id}-header`}
+                            className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FaCertificate className="text-gray-500" />
+                              <span className="font-bold text-gray-700">
+                                {certificate.name}
+                              </span>
+                            </div>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
+                              <div className="flex items-start gap-3">
                                 <FaInfoCircle className="text-gray-400 text-xl mt-1" />
                                 <div>
                                   <p className="text-gray-700 font-bold">
                                     Description:
                                   </p>
                                   <p className="text-gray-600">
-                                    {data.major.description}
+                                    {certificate.description}
                                   </p>
                                 </div>
                               </div>
-
-                              <div className="w-full">
-                                <h5 className="font-bold text-gray-700 mb-3">
-                                  Skills:
-                                </h5>
-
-                                <div>
-                                  {data.major.skills.map((skill) => (
-                                    <Accordion key={skill.id}>
-                                      <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls={`skill-${skill.id}-content`}
-                                        id={`skill-${skill.id}-header`}
-                                        className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                                      >
-                                        <h6 className="font-bold text-gray-700 flex items-center gap-2">
-                                          <FaCode className="text-gray-500" />
-                                          {skill.name}
-                                        </h6>
-                                      </AccordionSummary>
-                                      <AccordionDetails>
-                                        <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
-                                          <FaInfoCircle className="text-gray-400 text-xl mt-1" />
-                                          <div>
-                                            <p className="text-gray-700 font-bold">
-                                              Description:
-                                            </p>
-                                            <p className="text-gray-600">
-                                              {skill.description}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </AccordionDetails>
-                                    </Accordion>
-                                  ))}
-                                </div>
-                              </div>
-                            </AccordionDetails>
-                          </Accordion>
-                        ) : (
-                          <p className="text-gray-600 italic">
-                            No majors or skills available at the moment.
-                          </p>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel3-content"
-                        id="panel3-header"
-                        className="bg-yellow-50 hover:bg-yellow-100 transition-all rounded-t-lg"
-                      >
-                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                          <FaUniversity className="text-[#1eb2a6]" />
-                          Applicable University
-                        </h3>
-                      </AccordionSummary>
-
-                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                        {data?.university ? (
-                          <Accordion key={data.university.id}>
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls={`university-${data.university.id}-content`}
-                              id={`university-${data.university.id}-header`}
-                              className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                            >
-                              <div className="flex flex-col">
-                                <h4 className="font-bold text-gray-700 flex items-center gap-2">
-                                  <FaUniversity className="text-gray-500" />
-                                  {data.university.name}
-                                </h4>
-                                <span className="text-gray-600 flex items-center gap-1">
-                                  <FaMapMarkerAlt className="text-gray-400" />
-                                  {data.university.city}
-                                </span>
-                              </div>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              <div className="w-full flex items-start gap-3 p-4 bg-gray-50 rounded-lg shadow-sm">
-                                <FaInfoCircle className="text-gray-400 text-xl mt-1" />
+                              <div className="flex items-start gap-3">
+                                <FaTag className="text-gray-400 text-xl mt-1" />
                                 <div>
                                   <p className="text-gray-700 font-bold">
-                                    Description:
+                                    Type:
                                   </p>
                                   <p className="text-gray-600">
-                                    {data.university.description}
+                                    {certificate.type}
                                   </p>
                                 </div>
                               </div>
-                            </AccordionDetails>
-                          </Accordion>
-                        ) : (
-                          <p className="text-gray-600 italic">
-                            No applicable universities available at the moment.
-                          </p>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel3-content"
-                        id="panel3-header"
-                        className="bg-green-50 hover:bg-green-100 transition-all rounded-t-lg"
-                      >
-                        <h3 className="text-[#1eb2a6] font-semibold text-lg flex items-center gap-2">
-                          <FaCertificate className="text-[#1eb2a6]" />
-                          Required Certificates
-                        </h3>
-                      </AccordionSummary>
-                      <AccordionDetails className="bg-white p-6 rounded-b-lg shadow-lg">
-                        {data.certificates && data.certificates.length > 0 ? (
-                          data.certificates.map((certificate) => (
-                            <Accordion key={certificate.id} className="mt-4">
-                              <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls={`certificate-${certificate.id}-content`}
-                                id={`certificate-${certificate.id}-header`}
-                                className="bg-gray-100 hover:bg-gray-200 transition-all rounded-lg"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <FaCertificate className="text-gray-500" />
-                                  <span className="font-bold text-gray-700">
-                                    {certificate.name}
-                                  </span>
-                                </div>
-                              </AccordionSummary>
-                              <AccordionDetails>
-                                <div className="w-full flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-                                  <div className="flex items-start gap-3">
-                                    <FaInfoCircle className="text-gray-400 text-xl mt-1" />
-                                    <div>
-                                      <p className="text-gray-700 font-bold">
-                                        Description:
-                                      </p>
-                                      <p className="text-gray-600">
-                                        {certificate.description}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-start gap-3">
-                                    <FaTag className="text-gray-400 text-xl mt-1" />
-                                    <div>
-                                      <p className="text-gray-700 font-bold">
-                                        Type:
-                                      </p>
-                                      <p className="text-gray-600">
-                                        {certificate.type}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </AccordionDetails>
-                            </Accordion>
-                          ))
-                        ) : (
-                          <p className="text-gray-600 italic">
-                            No certificates required.
-                          </p>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-                  </div>
-                </div>
+                            </div>
+                          </AccordionDetails>
+                        </Accordion>
+                      ))
+                    ) : (
+                      <p className="text-gray-600 italic">
+                        No certificates required.
+                      </p>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
               </div>
             </div>
           </div>

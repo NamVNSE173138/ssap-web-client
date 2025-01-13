@@ -1,12 +1,29 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import Spinner from "@/components/Spinner";
-import { getAccountById, getAccountWallet } from "@/services/ApiServices/accountService";
+import {
+  getAccountById,
+  getAccountWallet,
+} from "@/services/ApiServices/accountService";
 import { getServicesByProvider } from "@/services/ApiServices/serviceService";
 import ServiceCard from "@/components/Services/ServiceCard";
-import { FaExclamationTriangle, FaSadTear, FaServicestack, FaStar, FaTasks, FaTimes, FaUser, FaWallet } from "react-icons/fa";
+import {
+  FaExclamationTriangle,
+  FaSadTear,
+  FaServicestack,
+  FaStar,
+  FaTasks,
+  FaTimes,
+  FaUser,
+  FaWallet,
+} from "react-icons/fa";
 import { IoIosPaper } from "react-icons/io";
 import RequestFormModal from "../ServiceDetail/applicantRequestForm-dialog";
 import RouteNames from "@/constants/routeNames";
@@ -37,7 +54,6 @@ const ProviderInformation = () => {
     setCurrentPage(page);
   };
 
-
   useEffect(() => {
     const fetchProviderData = async () => {
       setLoading(true);
@@ -45,21 +61,28 @@ const ProviderInformation = () => {
       try {
         const providerResponse = await getAccountById(parseInt(id));
         const servicesResponse = await getServicesByProvider(parseInt(id));
-        const activeServices = servicesResponse.data.filter((service: any) => service.status === 'Active');
+        const activeServices = servicesResponse.data.filter(
+          (service: any) => service.status === "Active"
+        );
         setProviderData(providerResponse);
         setServices(activeServices);
 
-        const allFeedbacks = servicesResponse.data.reduce((acc: any[], service: any) => {
-          return acc.concat(service.feedbacks);
-        }, []);
+        const allFeedbacks = servicesResponse.data.reduce(
+          (acc: any[], service: any) => {
+            return acc.concat(service.feedbacks);
+          },
+          []
+        );
 
-        const totalRatings = allFeedbacks.reduce((acc: number, feedback: any) => {
-          return acc + (feedback.rating || 0);
-        }, 0);
+        const totalRatings = allFeedbacks.reduce(
+          (acc: number, feedback: any) => {
+            return acc + (feedback.rating || 0);
+          },
+          0
+        );
 
-        const averageRating = allFeedbacks.length > 0
-          ? totalRatings / allFeedbacks.length
-          : 0;
+        const averageRating =
+          allFeedbacks.length > 0 ? totalRatings / allFeedbacks.length : 0;
 
         setAverageRatings(averageRating);
       } catch (error) {
@@ -104,7 +127,7 @@ const ProviderInformation = () => {
       if (error.response.data.statusCode === 400) {
         setIsWalletDialogOpen(true);
       }
-      console.error('Error checking wallet:', error);
+      console.error("Error checking wallet:", error);
     }
   };
 
@@ -112,32 +135,49 @@ const ProviderInformation = () => {
     <>
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/40 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px] z-10">
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-start items-start p-[70px] gap-[170px] z-10">
           <Breadcrumb>
             <BreadcrumbList className="text-white">
               <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg hover:text-blue-300 transition-all">Home</Link>
+                <Link
+                  to="/"
+                  className="md:text-xl text-lg hover:text-blue-300 transition-all"
+                >
+                  Home
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <Link to="/services" className="text-white md:text-xl text-lg hover:text-blue-300 transition-all">Services</Link>
+                <Link
+                  to="/services"
+                  className="text-white md:text-xl text-lg hover:text-blue-300 transition-all"
+                >
+                  Services
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <Link to="/provider-list" className="md:text-xl text-lg hover:text-blue-300 transition-all">Providers List</Link>
+                <Link
+                  to="/provider-list"
+                  className="md:text-xl text-lg hover:text-blue-300 transition-all"
+                >
+                  Providers List
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <p className="text-white md:text-xl text-lg">Provider Information</p>
+                <p className="text-white md:text-xl text-lg">
+                  Provider Information
+                </p>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </div>
 
-      <section className="bg-gray-100 py-12 shadow-xl rounded-lg">
+      <section className="bg-white py-12 rounded-lg">
         <div className="container mx-auto px-6">
-          <div className="flex items-center gap-8 mb-10 bg-gradient-to-r from-cyan-500 to-blue-300 p-8 rounded-lg shadow-lg">
+          <div className="flex items-center gap-8 mb-10 bg-blue-500 p-8 rounded-lg shadow-lg">
             <img
               src={providerData?.avatarUrl || "https://github.com/shadcn.png"}
               alt="Provider Avatar"
@@ -150,10 +190,12 @@ const ProviderInformation = () => {
               </h2>
               <div className="text-lg mt-2">
                 <p className="flex items-center gap-2 text-gray-100">
-                  <FaTasks className="text-green-400" /> Total Services: {totalServices}
+                  <FaTasks className="text-green-400" /> Total Services:{" "}
+                  {totalServices}
                 </p>
                 <p className="flex items-center gap-2 text-gray-100">
-                  <FaStar className="text-yellow-400" /> Average Rating: {averageRatings.toFixed(1)}
+                  <FaStar className="text-yellow-400" /> Average Rating:{" "}
+                  {averageRatings.toFixed(1)}
                 </p>
               </div>
             </div>
@@ -168,23 +210,25 @@ const ProviderInformation = () => {
             <button
               disabled={!user || user?.role !== "Applicant"}
               onClick={handleRequestForm}
-              className={`flex justify-center items-center transition-all duration-300 gap-4 px-8 py-4 rounded-xl shadow-xl transform ${!user
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-white hover:bg-blue-600 hover:text-white hover:scale-105"
-                }`}
+              className={`flex justify-center items-center border-1 border-gray-300 shadow-lg transition-all duration-300 gap-4 px-8 py-4 rounded-xl transform ${
+                !user
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-white hover:bg-[#1eb2a6] hover:text-white"
+              }`}
             >
               <IoIosPaper
-                className={`text-3xl transition-all ease-in-out transform ${!user ? "text-gray-500" : "text-blue-500 hover:scale-110"
-                  }`}
+                className={`text-3xl transition-all ease-in-out transform ${
+                  !user ? "text-gray-500" : "text-blue-500"
+                }`}
               />
               <p
-                className={`text-xl font-semibold ${!user ? "text-gray-500" : "text-blue-600"
-                  }`}
+                className={`text-xl font-semibold ${
+                  !user ? "text-gray-500" : "text-blue-600"
+                }`}
               >
                 Request Form
               </p>
             </button>
-
           </div>
 
           {/* Services Grid */}
@@ -197,7 +241,9 @@ const ProviderInformation = () => {
           ) : (
             <div className="flex flex-col items-center justify-center text-center py-16">
               <FaSadTear className="text-blue-500 text-6xl mb-4" />
-              <p className="text-gray-700 text-lg">This provider has not created any services yet.</p>
+              <p className="text-gray-700 text-lg">
+                This provider has not created any services yet.
+              </p>
             </div>
           )}
         </div>
@@ -208,33 +254,46 @@ const ProviderInformation = () => {
         isOpen={isRequestFormOpen}
         handleClose={handleCloseRequestFormModal}
         services={services}
-        handleSubmit={() => { }}
+        handleSubmit={() => {}}
       />
 
       <Dialog open={isWalletDialogOpen} onClose={handleCloseWalletDialog}>
         <div className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto">
           <div className="flex items-center mb-6">
             <FaExclamationTriangle className="text-yellow-500 text-4xl mr-4" />
-            <h3 className="text-2xl font-semibold text-gray-800">You don't have a wallet yet!</h3>
+            <h3 className="text-2xl font-semibold text-gray-800">
+              You don't have a wallet yet!
+            </h3>
           </div>
           <p className="my-4 text-lg text-gray-600">
-            You need to create a wallet to add services. Do you want to go to the Wallet page?
+            You need to create a wallet to add services. Do you want to go to
+            the Wallet page?
           </p>
           <div className="flex justify-end gap-4 mt-6">
             <button
               onClick={handleCloseWalletDialog}
-              className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-all flex items-center gap-2">
+              className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-all flex items-center gap-2"
+            >
               <FaTimes className="text-gray-700" /> Cancel
             </button>
             <button
               onClick={handleNavigateToWallet}
-              className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all flex items-center gap-2">
+              className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-all flex items-center gap-2"
+            >
               <FaWallet className="text-white" /> Yes, Go to Wallet
             </button>
           </div>
         </div>
       </Dialog>
-      <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+      <div
+        style={{
+          paddingTop: "20px",
+          marginBottom: "10px",
+          display: "flex",
+          justifyContent: "end",
+          backgroundColor: "white",
+        }}
+      >
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
@@ -242,7 +301,8 @@ const ProviderInformation = () => {
             style={{
               margin: "0 5px",
               padding: "5px 10px",
-              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+              backgroundColor:
+                currentPage === index + 1 ? "#419f97" : "#f1f1f1",
               color: currentPage === index + 1 ? "white" : "black",
               border: "none",
               borderRadius: "5px",
@@ -254,7 +314,6 @@ const ProviderInformation = () => {
         ))}
       </div>
     </>
-
   );
 };
 

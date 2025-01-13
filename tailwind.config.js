@@ -62,7 +62,7 @@ export default {
           3: "#FAFAFA",
         },
         graydark: "#333A48",
-        whiten: "#F1F5F9",
+        whiten: "#FFFFFF",
         whiter: "#F5F7FD",
         boxdark: "#24303F",
         "boxdark-2": "#1A222C",
