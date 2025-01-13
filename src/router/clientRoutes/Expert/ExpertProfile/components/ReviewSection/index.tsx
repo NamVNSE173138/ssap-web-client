@@ -80,7 +80,6 @@ const ApprovalList: React.FC = () => {
             documentUrl: app.applicationDocuments?.[0]?.fileUrl,
             applicationReviews: app.applicationReviews,
             updatedAt: app.updatedAt,
-
             applicationDocuments: app.applicationDocuments,
           };
         })
