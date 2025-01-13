@@ -17,6 +17,7 @@ export type ScholarshipProgramType = {
     id:string;
     name:string;
     description:string;
+    percentage:number;
   }>;
   category: {
     id: string;
