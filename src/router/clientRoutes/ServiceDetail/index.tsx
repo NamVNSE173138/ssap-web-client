@@ -899,7 +899,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                           <FaPlus className="mr-2" /> Request Now
                         </button>
                       )
-                    ) : !isFunder && isProvider ? (
+                    ) : !isFunder && isProvider && serviceData.providerId == user.id ? (
                       <>
                         <button
                           onClick={() => openEditDialog()}
