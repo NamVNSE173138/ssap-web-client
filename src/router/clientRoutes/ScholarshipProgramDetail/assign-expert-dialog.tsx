@@ -27,13 +27,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { assignExpertsToApplicationApi } from "@/services/ApiServices/applicationService";
 import { Input } from "@/components/ui/input";
+import Spinner from "@/components/Spinner";
 
 const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   const token = useSelector((state: RootState) => state.token.token);
   const [experts, setExperts] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [_loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [assignLoading, setAssignLoading] = useState(false);
 
   const [selectedReviewMilestone, setSelectedReviewMilestone] =
@@ -52,13 +53,13 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
   );
   // Fetch experts related to the scholarship program
   const fetchExperts = async () => {
-    setLoading(true);
+    //setLoading(true);
     try {
       const response = await axios.get(
         `${BASE_URL}/api/scholarship-programs/${scholarshipId}/experts`
       );
 
-      console.log("EXXXXXXXXXX", response.data);
+      //console.log("EXXXXXXXXXX", response.data);
 
       if (Array.isArray(response.data.data)) {
         setExperts(response.data.data);
@@ -69,13 +70,13 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
     } catch (error) {
       console.error("Failed to fetch experts:", error);
     } finally {
-      setLoading(false);
+      //setLoading(false);
     }
   };
 
   // Fetch applications for the scholarship program
   const fetchApplications = async () => {
-    setLoading(true);
+    //setLoading(true);
     try {
       const response = await axios.get(
         `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`
@@ -104,7 +105,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
     } catch (error) {
       console.error("Failed to fetch applications:", error);
     } finally {
-      setLoading(false);
+      //setLoading(false);
     }
   };
 
@@ -113,78 +114,86 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
       //fetchExperts();
       fetchReviewingExperts();
     }
-  }, [open]);
+  }, []);
 
   const fetchReviewingExperts = async () => {
-    let applications = await fetchApplications();
-    const experts = await fetchExperts();
-    const reviewMilestones = await getAllReviewMilestonesByScholarship(
-      scholarshipId
-    );
-    let milestone = reviewMilestones.data
-      .filter((milestone: any) => new Date(milestone.fromDate) > new Date())
-      .sort(
-        (a: any, b: any) =>
-          new Date(a.fromDate).getTime() - new Date(b.fromDate).getTime()
-      )[0];
-    if (
-      reviewMilestones.data.some(
-        (milestone: any) =>
-          new Date(milestone.fromDate) <= new Date() &&
-          new Date(milestone.toDate) >= new Date()
-      )
-    ) {
-      const happeningReviewMilestone = reviewMilestones.data.find(
-        (milestone: any) =>
-          new Date(milestone.fromDate) <= new Date() &&
-          new Date(milestone.toDate) >= new Date()
-      );
-      notification.error({
-        message:
-          happeningReviewMilestone.description +
-          " is happening, you can not assign now.",
-      });
-      setSelectedReviewMilestone(null);
-      setApplications([]);
-      return;
-    } else if (!milestone) {
-      notification.error({ message: "All review milestone is over." });
-      setSelectedReviewMilestone(null);
-      setApplications([]);
-      return;
-    }
-    setSelectedReviewMilestone(milestone);
-    if (milestone.description == "Application Review") {
-    } else if (milestone.description == "Interview") {
-      const reviewedApplications = applications.filter((application: any) =>
-        application.applicationReviews.find(
-          (review: any) => review.description == "Application Review"
-        )
-      );
-
-      applications = reviewedApplications.filter(
-        (application: any) =>
-          application.applicationReviews.find(
-            (review: any) => review.status == "Approved"
-          ) != null
-      );
-    }
-    setApplications(applications);
-
-    for (const application of applications) {
-      const reviewingExpertIds = application.applicationReviews
-        .filter((review: any) => review.description == milestone.description)
-        .map((review: any) => review.expertId);
-      setReviewingExperts((reviewingExpert: any) => {
-        reviewingExpert[application.id] = experts.filter((expert: any) =>
-          reviewingExpertIds.includes(expert.expertId)
+    try{
+        setLoading(true);
+        let applications = await fetchApplications();
+        const experts = await fetchExperts();
+        const reviewMilestones = await getAllReviewMilestonesByScholarship(
+          scholarshipId
         );
-        setValue((value: any) => {
-          value[application.id] = reviewingExpert[application.id];
-          return value;
-        });
-        return reviewingExpert;
-      });
+        let milestone = reviewMilestones.data
+          .filter((milestone: any) => new Date(milestone.fromDate) > new Date())
+          .sort(
+            (a: any, b: any) =>
+              new Date(a.fromDate).getTime() - new Date(b.fromDate).getTime()
+          )[0];
+        if (
+          reviewMilestones.data.some(
+            (milestone: any) =>
+              new Date(milestone.fromDate) <= new Date() &&
+              new Date(milestone.toDate) >= new Date()
+          )
+        ) {
+          const happeningReviewMilestone = reviewMilestones.data.find(
+            (milestone: any) =>
+              new Date(milestone.fromDate) <= new Date() &&
+              new Date(milestone.toDate) >= new Date()
+          );
+          notification.error({
+            message:
+              happeningReviewMilestone.description +
+              " is happening, you can not assign now.",
+          });
+          setSelectedReviewMilestone(null);
+          setApplications([]);
+          return;
+        } else if (!milestone) {
+          notification.error({ message: "All review milestone is over." });
+          setSelectedReviewMilestone(null);
+          setApplications([]);
+          return;
+        }
+        setSelectedReviewMilestone(milestone);
+        if (milestone.description == "Application Review") {
+        } else if (milestone.description == "Interview") {
+          const reviewedApplications = applications.filter((application: any) =>
+            application.applicationReviews.find(
+              (review: any) => review.description == "Application Review"
+            )
+          );
+
+          applications = reviewedApplications.filter(
+            (application: any) =>
+              application.applicationReviews.find(
+                (review: any) => review.status == "Approved"
+              ) != null
+          );
+        }
+        setApplications(applications);
+
+        for (const application of applications) {
+          const reviewingExpertIds = application.applicationReviews
+            .filter((review: any) => review.description == milestone.description)
+            .map((review: any) => review.expertId);
+          setReviewingExperts((reviewingExpert: any) => {
+            reviewingExpert[application.id] = experts.filter((expert: any) =>
+              reviewingExpertIds.includes(expert.expertId)
+            );
+            setValue((value: any) => {
+              value[application.id] = reviewingExpert[application.id];
+              return value;
+            });
+            return reviewingExpert;
+          });
+        }
+    }catch(err){
+        notification.error({ message: "Failed to fetch reviewing experts: "+err });
+    }
+    finally{
+       setLoading(false);
     }
   };
 
@@ -320,7 +329,9 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                 <GridCloseIcon style={{ fontSize: "inherit" }} />
               </IconButton>
             </DialogTitle>
-            {selectedReviewMilestone &&
+            {loading ? 
+              <Spinner/> :
+            (<>{selectedReviewMilestone &&
               selectedReviewMilestone?.description == "Application Review" && (
                 <div className="font-bold flex justify-center text-orange-500">
                   You can only assign 1 expert for this review
@@ -568,7 +579,7 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                   Next
                 </Button>
               </div>
-            )}
+            )}</>)}
           </>
         )}
 
