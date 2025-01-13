@@ -34,6 +34,16 @@ export async function countScholarshipProgram() {
     }
 }
 
+export async function getAllEducationLevel() {
+    try {
+        const response = await axios.get(`${BASE_URL}/api/scholarship-programs/education-level`);
+        return response.data;
+    } catch (error: any) {
+        console.error('API error:', error?.response?.data || error.message);
+        throw error;
+    }
+}
+
 export async function getScholarshipProgram(id: number) {
     try {
         const response = await axios.get(`${BASE_URL}/api/scholarship-programs/${id}`);

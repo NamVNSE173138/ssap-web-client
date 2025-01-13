@@ -73,6 +73,8 @@ const ChooseWinner = () => {
 
             return {
               ...application,
+              isInterview: application.applicationReviews.some(
+                (review: any) => review.description == "Interview"),
               applicant: {
                 ...application.applicant,
                 fullName,
@@ -132,20 +134,11 @@ const ChooseWinner = () => {
 
       await Promise.all(applyPromises);
 
-      if (availableScholarships === 0) {
-        await updateScholarshipStatus(Number(data?.id), "Finished");
-      }
+      //if (availableScholarships === 0) {
+        await updateScholarshipStatus(Number(data?.id), {status:"Closed"});
+      //}
 
-      notification.success({
-        message: "Approve successfully!",
-      });
-      for (const row of selectedRows)
-        await SendNotification({
-          topic: row.applicantId.toString(),
-          link: `/funder/application/${row.id}`,
-          title: "Your application has been approved",
-          body: `Your application for ${data?.name} has been approved.`,
-        });
+      
       handleCloseModal();
       filteredRows
         .filter((row: any) => !selectedRows.includes(row))
@@ -162,7 +155,17 @@ const ChooseWinner = () => {
 
           await updateApplication(row.id, payload);
         });
+      notification.success({
+        message: "Approve successfully!",
+      });
       await fetchData();
+      for (const row of selectedRows)
+        await SendNotification({
+          topic: row.applicantId.toString(),
+          link: `/funder/application/${row.id}`,
+          title: "Your application has been approved",
+          body: `Your application for ${data?.name} has been approved.`,
+        });
     } catch (error) {
       console.error(error);
       setError("Failed to apply for selected winners.");
@@ -578,7 +581,8 @@ const ChooseWinner = () => {
                               }}
                             >
                               <td style={{ padding: "12px" }}>
-                                {app.status == ApplicationStatus.Reviewing && (
+                                {app.status == ApplicationStatus.Reviewing &&
+                                app.isInterview && (
                                   <input
                                     type="checkbox"
                                     disabled={

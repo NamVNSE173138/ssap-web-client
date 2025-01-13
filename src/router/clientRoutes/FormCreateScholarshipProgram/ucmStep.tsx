@@ -22,7 +22,7 @@ const schema = z.object({
     .array(z.string())
     .min(1, "Please choose at least one certificate"),
   major: z.string().min(1, "Please choose a major"),
-  documents: z.array(z.number()).min(1, "At least one document is required"),
+  documents: z.array(z.number().or(z.object({}))).min(1, "At least one document is required"),
   criteria: z
     .array(
       z.object({
@@ -38,7 +38,14 @@ const schema = z.object({
       {
         message: "Each criterion must have both name and description",
       }
-    ),
+    )
+    .refine(
+        (data:any) =>
+          data && data.reduce((sum:any, criterion:any) => sum + Number(criterion.percentage), 0) == 100,
+        {
+          message: "The total percentage of all criteria must equal 100",
+        }
+      ),
 });
 
 const UcmStep = ({
@@ -293,6 +300,7 @@ const UcmStep = ({
                   </div>
                 ))}
               </div>
+              {errors.criteria && errors.criteria.root && <p className="text-red-500 text-sm">{String(errors.criteria.root.message)}</p>}
               <Button
                 type="button"
                 onClick={() =>
