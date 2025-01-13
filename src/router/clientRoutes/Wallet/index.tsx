@@ -3,8 +3,15 @@ import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import { Spin, Modal, Input, Button, notification, Table } from "antd";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { createWallet, getAccountWallet, updateWalletBankInformation } from "@/services/ApiServices/accountService";
-import { createCheckoutSession, getTransactionsByWalletSenderId } from "@/services/ApiServices/paymentService";
+import {
+  createWallet,
+  getAccountWallet,
+  updateWalletBankInformation,
+} from "@/services/ApiServices/accountService";
+import {
+  createCheckoutSession,
+  getTransactionsByWalletSenderId,
+} from "@/services/ApiServices/paymentService";
 
 const Wallet = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -27,7 +34,7 @@ const Wallet = () => {
       if (!user) return;
       try {
         const data = await getAccountWallet(Number(user?.id));
-        console.log(data)
+        console.log(data);
         if (data) {
           setWalletData(data);
           await fetchTransactions(data.data.id);
@@ -70,12 +77,12 @@ const Wallet = () => {
 
   const handleAddMoney = async () => {
     if (!user) {
-      notification.error({ message: 'User not found. Please login.' });
+      notification.error({ message: "User not found. Please login." });
       return;
     }
 
     if (!addAmount || isNaN(Number(addAmount)) || Number(addAmount) <= 0) {
-      setError('Please enter a valid amount');
+      setError("Please enter a valid amount");
       return;
     }
 
@@ -89,26 +96,26 @@ const Wallet = () => {
         amount: Number(addAmount),
         senderId: user.id,
         receiverId: user.id,
-        description: 'Add Money to Wallet',
+        description: "Add Money to Wallet",
       };
 
       const { data } = await createCheckoutSession(checkoutSessionRequest);
-      console.log(data)
+      console.log(data);
 
       if (data) {
         window.location.href = data.sessionUrl;
-
       } else {
-        notification.error({ message: 'Unable to create payment session. Please try again.' });
+        notification.error({
+          message: "Unable to create payment session. Please try again.",
+        });
       }
     } catch (error) {
       console.error(error);
-      notification.error({ message: 'Error creating payment session' });
+      notification.error({ message: "Error creating payment session" });
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -120,11 +127,15 @@ const Wallet = () => {
     setAccountNameError("");
     setAccountNumberError("");
     if (!/^[a-zA-Z\s]+$/.test(bankAccountName) || bankAccountName.length > 50) {
-      setAccountNameError("Account Name must be letters only and up to 50 characters.");
+      setAccountNameError(
+        "Account Name must be letters only and up to 50 characters."
+      );
       return;
     }
     if (!/^\d+$/.test(bankAccountNumber) || bankAccountNumber.length > 20) {
-      setAccountNumberError("Account Number must be digits only and up to 20 characters.");
+      setAccountNumberError(
+        "Account Number must be digits only and up to 20 characters."
+      );
       return;
     }
 
@@ -150,12 +161,16 @@ const Wallet = () => {
     setAccountNumberError("");
 
     if (!/^[a-zA-Z\s]+$/.test(bankAccountName) || bankAccountName.length > 50) {
-      setAccountNameError("Account Name must be letters only and up to 50 characters.");
+      setAccountNameError(
+        "Account Name must be letters only and up to 50 characters."
+      );
       return;
     }
 
     if (!/^\d+$/.test(bankAccountNumber) || bankAccountNumber.length > 20) {
-      setAccountNumberError("Account Number must be digits only and up to 20 characters.");
+      setAccountNumberError(
+        "Account Number must be digits only and up to 20 characters."
+      );
       return;
     }
 
@@ -184,46 +199,50 @@ const Wallet = () => {
 
   const columns = [
     {
-      title: 'Transaction ID',
-      dataIndex: 'transactionId',
-      key: 'transactionId',
+      title: "Transaction ID",
+      dataIndex: "transactionId",
+      key: "transactionId",
     },
     {
-      title: 'Payment Method',
-      dataIndex: 'paymentMethod',
-      key: 'paymentMethod',
+      title: "Payment Method",
+      dataIndex: "paymentMethod",
+      key: "paymentMethod",
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
       render: (amount: number) => `${amount}$`,
     },
     {
-      title: 'Transaction Date',
-      dataIndex: 'transactionDate',
-      key: 'transactionDate',
+      title: "Transaction Date",
+      dataIndex: "transactionDate",
+      key: "transactionDate",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => (
-        <span className={`text-${status === 'Successful' ? 'green' : 'red'}-500`}>{status}</span>
+        <span
+          className={`text-${status === "Successful" ? "green" : "red"}-500`}
+        >
+          {status}
+        </span>
       ),
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
     },
   ];
 
   return (
     <div className="flex w-full">
-      <div className="flex flex-col items-center p-5 h-full w-full bg-gradient-to-b from-blue-100 to-blue-300">
-        <h1 className="text-3xl font-semibold text-blue-700 mb-4">Wallet 💰</h1>
+      <div className="flex flex-col items-center p-5 h-full w-full bg-white">
+        <h1 className="text-3xl font-semibold text-blue-700 mb-4">Wallet</h1>
 
         {error ? (
           <div className="w-full lg:w-2/3 bg-blue-500 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
@@ -236,19 +255,23 @@ const Wallet = () => {
           </div>
         ) : (
           <>
-            <div className="w-full lg:w-2/3 bg-blue-600 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
+            <div className="w-full lg:w-2/3 bg-blue-600 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform">
               <h2 className="text-2xl">Balance</h2>
               <p className="text-5xl font-bold mt-2">
-                {walletData?.data.balance}$
+                ${(walletData?.data.balance).toLocaleString("en-US")}
               </p>
             </div>
             <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-lg mb-5">
-              <h2 className="text-lg font-semibold text-blue-600 mb-2">Bank Account Information</h2>
+              <h2 className="text-lg font-semibold text-blue-600 mb-2">
+                Bank Account Information
+              </h2>
               <p>
-                <span className="font-semibold">Account Name:</span> {walletData?.data.bankAccountName || "N/a"}
+                <span className="font-semibold">Account Name:</span>{" "}
+                {walletData?.data.bankAccountName || "N/a"}
               </p>
               <p>
-                <span className="font-semibold">Account Number:</span> {walletData?.data.bankAccountNumber || "N/a"}
+                <span className="font-semibold">Account Number:</span>{" "}
+                {walletData?.data.bankAccountNumber || "N/a"}
               </p>
               {!walletData?.bankAccountName && (
                 <Button
@@ -266,16 +289,14 @@ const Wallet = () => {
                 className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-500 transition duration-200 ease-in-out transform hover:scale-105"
               >
                 <AiOutlinePlusCircle size={24} />
-                <span className="font-semibold">Add money</span>
-              </button>
-              <button onClick={handleWithdrawClick} className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-400 transition duration-200 ease-in-out transform hover:scale-105">
-                <AiOutlineMinusCircle size={24} />
-                <span className="font-semibold">Withdraw</span>
+                <span className="font-semibold">Add balance</span>
               </button>
             </div>
 
             <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-lg mb-5">
-              <h2 className="text-lg font-semibold text-blue-600 mb-2">Transaction History</h2>
+              <h2 className="text-lg font-semibold text-blue-600 mb-2">
+                Transaction History
+              </h2>
               <Table
                 columns={columns}
                 dataSource={transactions}
@@ -290,7 +311,9 @@ const Wallet = () => {
       {isModalWithdrawOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-1/3 text-center">
-            <h2 className="font-semibold text-xl mb-4">Thank you for using our service!</h2>
+            <h2 className="font-semibold text-xl mb-4">
+              Thank you for using our service!
+            </h2>
             <p>Good luck!</p>
             <button
               onClick={closeModal}
@@ -307,42 +330,73 @@ const Wallet = () => {
         open={isUpdateBankModalOpen}
         onCancel={() => setIsUpdateBankModalOpen(false)}
         footer={[
-          <Button key="cancel" onClick={() => setIsUpdateBankModalOpen(false)} className="bg-gray-200 hover:bg-gray-300">
+          <Button
+            key="cancel"
+            onClick={() => setIsUpdateBankModalOpen(false)}
+            className="bg-gray-200 hover:bg-gray-300"
+          >
             Cancel
           </Button>,
-          <Button key="update" type="primary" onClick={handleUpdateBankInformation} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button
+            key="update"
+            type="primary"
+            onClick={handleUpdateBankInformation}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
             Update
           </Button>,
         ]}
       >
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">Bank Account Name:</label>
+          <label className="text-blue-600 font-semibold">
+            Bank Account Name:
+          </label>
           <Input
             value={bankAccountName}
             onChange={(e) => setBankAccountName(e.target.value)}
-            className={`mt-2 p-3 border rounded-lg w-full ${accountNameError ? 'border-red-500' : ''}`}
+            className={`mt-2 p-3 border rounded-lg w-full ${
+              accountNameError ? "border-red-500" : ""
+            }`}
           />
-          {accountNameError && <div className="text-red-500 text-sm">{accountNameError}</div>}
-          <div className={`text-sm mt-1 ${bankAccountName.length > 50 ? 'text-red-500' : 'text-gray-500'}`}>
+          {accountNameError && (
+            <div className="text-red-500 text-sm">{accountNameError}</div>
+          )}
+          <div
+            className={`text-sm mt-1 ${
+              bankAccountName.length > 50 ? "text-red-500" : "text-gray-500"
+            }`}
+          >
             {bankAccountName.length}/50
           </div>
         </div>
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">Bank Account Number:</label>
+          <label className="text-blue-600 font-semibold">
+            Bank Account Number:
+          </label>
           <Input
             value={bankAccountNumber}
             onChange={(e) => setBankAccountNumber(e.target.value)}
-            className={`mt-2 p-3 border rounded-lg w-full ${accountNumberError ? 'border-red-500' : ''}`}
+            className={`mt-2 p-3 border rounded-lg w-full ${
+              accountNumberError ? "border-red-500" : ""
+            }`}
           />
-          {accountNumberError && <div className="text-red-500 text-sm">{accountNumberError}</div>}
-          <div className={`text-sm mt-1 ${bankAccountNumber.length > 20 ? 'text-red-500' : 'text-gray-500'}`}>
+          {accountNumberError && (
+            <div className="text-red-500 text-sm">{accountNumberError}</div>
+          )}
+          <div
+            className={`text-sm mt-1 ${
+              bankAccountNumber.length > 20 ? "text-red-500" : "text-gray-500"
+            }`}
+          >
             {bankAccountNumber.length}/20
           </div>
         </div>
       </Modal>
 
       <Modal
-        title={<h2 className="text-xl font-semibold text-blue-600">Create Wallet</h2>}
+        title={
+          <h2 className="text-xl font-semibold text-blue-600">Create Wallet</h2>
+        }
         open={isOpenDialog}
         onCancel={() => setIsOpenDialog(false)}
         footer={[
@@ -364,39 +418,67 @@ const Wallet = () => {
         ]}
       >
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">Bank Account Name:</label>
+          <label className="text-blue-600 font-semibold">
+            Bank Account Name:
+          </label>
           <Input
             placeholder="Enter bank account name"
             value={bankAccountName}
             onChange={(e) => setBankAccountName(e.target.value)}
-            className={`mt-2 p-3 border rounded-lg w-full ${accountNameError ? 'border-red-500' : ''}`}
+            className={`mt-2 p-3 border rounded-lg w-full ${
+              accountNameError ? "border-red-500" : ""
+            }`}
           />
-          {accountNameError && <div className="text-red-500 text-sm">{accountNameError}</div>}
-          <div className={`text-sm mt-1 ${bankAccountName.length > 50 ? 'text-red-500' : 'text-gray-500'}`}>
+          {accountNameError && (
+            <div className="text-red-500 text-sm">{accountNameError}</div>
+          )}
+          <div
+            className={`text-sm mt-1 ${
+              bankAccountName.length > 50 ? "text-red-500" : "text-gray-500"
+            }`}
+          >
             {bankAccountName.length}/50
           </div>
         </div>
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">Bank Account Number:</label>
+          <label className="text-blue-600 font-semibold">
+            Bank Account Number:
+          </label>
           <Input
             placeholder="Enter bank account number"
             value={bankAccountNumber}
             onChange={(e) => setBankAccountNumber(e.target.value)}
-            className={`mt-2 p-3 border rounded-lg w-full ${accountNumberError ? 'border-red-500' : ''}`}
+            className={`mt-2 p-3 border rounded-lg w-full ${
+              accountNumberError ? "border-red-500" : ""
+            }`}
           />
-          {accountNumberError && <div className="text-red-500 text-sm">{accountNumberError}</div>}
-          <div className={`text-sm mt-1 ${bankAccountNumber.length > 20 ? 'text-red-500' : 'text-gray-500'}`}>
+          {accountNumberError && (
+            <div className="text-red-500 text-sm">{accountNumberError}</div>
+          )}
+          <div
+            className={`text-sm mt-1 ${
+              bankAccountNumber.length > 20 ? "text-red-500" : "text-gray-500"
+            }`}
+          >
             {bankAccountNumber.length}/20
           </div>
         </div>
       </Modal>
 
       <Modal
-        title={<h2 className="text-xl font-semibold text-blue-600">Add Money to Wallet</h2>}
+        title={
+          <h2 className="text-xl font-semibold text-blue-600">
+            Add Money to Wallet
+          </h2>
+        }
         open={isModalOpen}
         onCancel={handleCancel}
         footer={[
-          <Button key="cancel" onClick={handleCancel} className="bg-gray-200 hover:bg-gray-300">
+          <Button
+            key="cancel"
+            onClick={handleCancel}
+            className="bg-gray-200 hover:bg-gray-300"
+          >
             Cancel
           </Button>,
           <Button
