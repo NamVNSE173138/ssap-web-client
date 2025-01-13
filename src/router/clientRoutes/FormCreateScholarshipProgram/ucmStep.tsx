@@ -9,7 +9,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 interface OptionType {
   value: string;
@@ -22,7 +22,7 @@ const schema = z.object({
     .array(z.string())
     .min(1, "Please choose at least one certificate"),
   major: z.string().min(1, "Please choose a major"),
-  documents: z.array(z.number()).min(1, "At least one document is required"),
+  documents: z.array(z.number().or(z.object({}))).min(1, "At least one document is required"),
   criteria: z
     .array(
       z.object({
@@ -38,7 +38,14 @@ const schema = z.object({
       {
         message: "Each criterion must have both name and description",
       }
-    ),
+    )
+    .refine(
+        (data:any) =>
+          data && data.reduce((sum:any, criterion:any) => sum + Number(criterion.percentage), 0) == 100,
+        {
+          message: "The total percentage of all criteria must equal 100",
+        }
+      ),
 });
 
 const UcmStep = ({
@@ -114,9 +121,9 @@ const UcmStep = ({
     }
 
 
-    const data = getValues(); 
+    const data = getValues();
     if (data) {
-      
+
       const selectedDocuments = [...documentOptions].filter((doc) => (watch("documents") || []).includes(doc.id)).map((doc) => { return { type: doc.type, isRequired: true } })
       data.documents = selectedDocuments
       console.log("beforeSave", data);
@@ -173,33 +180,32 @@ const UcmStep = ({
     <>
       <div>
         <div>
-          <form className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Academic Information</h2>
-
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
-                  Eligibility Criteria
-                </h3>
-                <div className="grid grid-cols-6 gap-4 mt-4">
-                  <div className="col-span-6 sm:col-span-2">
+          <form className="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto space-y-10">
+            {/* Tiêu đề chính */}
+            <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
+              Criteria & Documents
+            </h2>
+            {/* Academic Information & Required Documents */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Academic Information */}
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md space-y-6">
+                <h3 className="text-2xl font-semibold text-gray-700 border-b pb-2">Academic Information</h3>
+                <div className="space-y-4">
+                  {/* University */}
+                  <div>
                     <Label htmlFor="university" className="block text-sm font-medium text-gray-700">
                       University <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       options={universities}
                       onChange={(option) => handleSelectChange(option, "university")}
-                      className="mt-1"
+                      className="mt-2"
                     />
-                    {errors.university && (
-                      <p className="text-red-500 text-sm">
-                        {String(errors.university.message)}
-                      </p>
-                    )}
+                    {errors.university && <p className="text-red-500 text-sm">{String(errors.university.message)}</p>}
                   </div>
 
-                  
-                  <div className="col-span-6 sm:col-span-2">
+                  {/* Certificates */}
+                  <div>
                     <Label htmlFor="certificate" className="block text-sm font-medium text-gray-700">
                       Certificates <span className="text-red-500">*</span>
                     </Label>
@@ -207,121 +213,33 @@ const UcmStep = ({
                       options={certificates}
                       isMulti
                       onChange={(options) => handleMultiSelectChange(options, "certificate")}
-                      className="mt-1"
+                      className="mt-2"
                     />
-                    {errors.certificate && (
-                      <p className="text-red-500 text-sm">
-                        {String(errors.certificate.message)}
-                      </p>
-                    )}
+                    {errors.certificate && <p className="text-red-500 text-sm">{String(errors.certificate.message)}</p>}
                   </div>
 
-                 
-                  <div className="col-span-6 sm:col-span-2">
+                  {/* Major */}
+                  <div>
                     <Label htmlFor="major" className="block text-sm font-medium text-gray-700">
                       Major <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       options={majors}
                       onChange={(option) => handleSelectChange(option, "major")}
-                      className="mt-1"
+                      className="mt-2"
                     />
-                    {errors.major && (
-                      <p className="text-red-500 text-sm">
-                        {String(errors.major.message)}
-                      </p>
-                    )}
+                    {errors.major && <p className="text-red-500 text-sm">{String(errors.major.message)}</p>}
                   </div>
                 </div>
               </div>
 
-              {/* Criteria */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">Criteria</h3>
-                <div className="mt-4 ">
-                  {watch("criteria")?.map((_criteria: any, index: any) => (
-                    <div
-                      key={index}
-                      className="relative border p-4 mb-2 rounded-md  bg-gray-50 grid grid-cols-3 gap-2 items-start"
-                    >
-                      {watch("criteria").length > 1 && (
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            setValue(
-                              "criteria",
-                              watch("criteria").filter((_: any, i: any) => i !== index),
-                              { shouldValidate: true }
-                            )
-                          }
-                          className="absolute top-2 right-2 bg-gray-800 text-white hover:bg-gray-600 w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 "
-                          aria-label="Remove criterion"
-                        >
-                          <FaTrash className="w-5 h-5" />
-                        </Button>
-                      )}
-                      <Input
-                        {...register(`criteria.${index}.name`)}
-                        placeholder="Ex: Academic Excellence"
-                        className="w-full"
-                      />
-                      {errors.criteria &&
-                        Array.isArray(errors.criteria) &&
-                        errors.criteria[index]?.name && (
-                          <p className="text-sm text-red-500 mt-1">
-                            {errors.criteria[index]?.name?.message}
-                          </p>
-                        )}
-                      <Input
-                        {...register(`criteria.${index}.description`)}
-                        placeholder="Ex: Requires a minimum GPA of 3.5"
-                        className="w-full"
-                        
-                      />
-                      {errors.criteria &&
-                        Array.isArray(errors.criteria) &&
-                        errors.criteria[index]?.description && (
-                          <p className="text-sm text-red-500 mt-1">
-                            {errors.criteria[index]?.description?.message}
-                          </p>
-                        )}
-                        <Input
-                        {...register(`criteria.${index}.percentage`)}
-                        placeholder="Ex: 30% "
-                        className="w-full"
-                        type="number"
-                      />
-                      {errors.criteria &&
-                        Array.isArray(errors.criteria) &&
-                        errors.criteria[index]?.percentage && (
-                          <p className="text-sm text-red-500 mt-1">
-                            {errors.criteria[index]?.percentage?.message}
-                          </p>
-                        )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      setValue("criteria", [...watch("criteria"), { name: "", description: "", percentage: "" }])
-                    }
-                    className="mt-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
-                  >
-                    Add New Criteria
-                  </Button>
-                </div>
-              </div>
-
-              <br></br>
-             
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 border-b pb-2">
-                  Required Documents
-                </h3>
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm text-gray-500">
-                    Select the documents applicants must submit for this scholarship.
-                  </p>
+              {/* Required Documents */}
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold text-gray-700 border-b pb-2">Required Documents</h3>
+                <p className="text-gray-500 text-sm mt-2">
+                  Select the documents applicants must submit for this scholarship.
+                </p>
+                <div className="mt-4 space-y-3">
                   {documentOptions.map((doc) => (
                     <div key={doc.id} className="flex items-center space-x-2">
                       <Checkbox
@@ -334,31 +252,78 @@ const UcmStep = ({
                       </Label>
                     </div>
                   ))}
-                  {errors.documents && (
-                    <p className="text-red-500 text-sm">
-                      {String(errors.documents.message)}
-                    </p>
-                  )}
+                  {errors.documents && <p className="text-red-500 text-sm">{String(errors.documents.message)}</p>}
                 </div>
               </div>
             </div>
-            <div className="flex justify-between mt-4">
-            <Button
-                type="button"
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={onBack}
-              >
-                Back
-              </Button>
+
+            {/* Eligibility Criteria */}
+            <div className="bg-gray-50 p-6 rounded-lg shadow-md space-y-6">
+              <h3 className="text-2xl font-semibold text-gray-700 border-b pb-2">Eligibility Criteria</h3>
+              <div className="space-y-4">
+                {watch("criteria")?.map((_criteria: any, index: any) => (
+                  <div
+                    key={index}
+                    className="relative p-4 border rounded-md bg-white shadow-sm grid grid-cols-3 gap-4"
+                  >
+                    {watch("criteria").length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() =>
+                          setValue(
+                            "criteria",
+                            watch("criteria").filter((_: any, i: any) => i !== index),
+                            { shouldValidate: true }
+                          )
+                        }
+                        className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-full shadow"
+                      >
+                        <FaTrash className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <Input
+                      {...register(`criteria.${index}.name`)}
+                      placeholder="Ex: Academic Excellence"
+                      className="w-full"
+                    />
+                    <Input
+                      {...register(`criteria.${index}.description`)}
+                      placeholder="Ex: Requires a minimum GPA of 3.5"
+                      className="w-full"
+                    />
+                    <Input
+                      {...register(`criteria.${index}.percentage`)}
+                      placeholder="Ex: 30%"
+                      className="w-full"
+                      type="number"
+                    />
+                  </div>
+                ))}
+              </div>
+              {errors.criteria && errors.criteria.root && <p className="text-red-500 text-sm">{String(errors.criteria.root.message)}</p>}
               <Button
                 type="button"
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={handleNext}
+                onClick={() =>
+                  setValue("criteria", [...watch("criteria"), { name: "", description: "", percentage: "" }])
+                }
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
               >
+                <FaPlus />
+                <span>Add New Criteria</span>
+              </Button>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-between mt-8">
+              <Button onClick={onBack} type="button" className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+                Back
+              </Button>
+              <Button onClick={handleNext} type="button" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
                 Next
               </Button>
             </div>
           </form>
+
         </div>
       </div>
     </>

@@ -67,6 +67,10 @@ const ScholarshipProgramDetail = () => {
   const [data, setData] = useState<ScholarshipProgramType | null>(null);
   const [authorized, setAuthorized] = useState<string | null>(null);
   const [_loading, setLoading] = useState<boolean>(true);
+  const [reviewMilestoneLoading, setReviewMilestoneLoading] = useState<boolean>(true);
+  const [applicationLoading, setApplicationLoading] = useState<boolean>(true);
+  const [expertLoading, setExpertLoading] = useState<boolean>(true);
+
   const [_error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state.token.user);
@@ -173,10 +177,9 @@ const ScholarshipProgramDetail = () => {
 
       if (response.data.statusCode === 200) {
         setData(response.data.data);
-        console.log(response.data.data);
+        //console.log(response.data.data);
         const nameOfFunder = await getAccountById(response.data.data.funderId);
         setFunderName(nameOfFunder.username);
-
         setAuthorized(response.data.message);
         if (user) {
           const application = await getApplicationByApplicantIdAndScholarshipId(
@@ -185,11 +188,11 @@ const ScholarshipProgramDetail = () => {
           );
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(
-            response.data.data.id
+                response.data.data.id
           );
-          await fetchApplicants(Number(id));
-          await fetchReviewMilestones(Number(id));
-          await fetchExpertsByScholarshipId();
+          await fetchApplicants(Number(id)),
+          await fetchReviewMilestones(Number(id)),
+          await fetchExpertsByScholarshipId()
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
               if (
@@ -218,8 +221,9 @@ const ScholarshipProgramDetail = () => {
 
   const fetchApplicants = async (scholarshipId: number) => {
     try {
+      setApplicationLoading(true);
       const response = await getApplicationsByScholarship(scholarshipId);
-      console.log("fetchApplicant", response);
+      //console.log("fetchApplicant", response);
       if (response.statusCode === 200) {
         // Duyệt qua từng ứng viên và gọi API để lấy thông tin profile
         const applicantsWithFullName = await Promise.all(
@@ -249,7 +253,7 @@ const ScholarshipProgramDetail = () => {
     } catch (error) {
       setError((error as Error).message);
     } finally {
-      setLoading(false);
+      setApplicationLoading(false);
     }
   };
 
@@ -271,8 +275,9 @@ const ScholarshipProgramDetail = () => {
 
   const fetchExpertsByScholarshipId = async () => {
     try {
+      setExpertLoading(true);
       const response = await getAllScholarshipProgramExperts(Number(id));
-      console.log(response);
+      //console.log(response);
       if (response.statusCode == 200) {
         setExperts(response.data);
       } else {
@@ -281,12 +286,13 @@ const ScholarshipProgramDetail = () => {
     } catch (error) {
       setError((error as Error).message);
     } finally {
-      setLoading(false);
+      setExpertLoading(false);
     }
   };
 
   const fetchReviewMilestones = async (scholarshipId: number) => {
     try {
+      setReviewMilestoneLoading(true);
       const response = await getAllReviewMilestonesByScholarship(scholarshipId);
       //console.log(response);
       if (response.statusCode == 200) {
@@ -297,7 +303,7 @@ const ScholarshipProgramDetail = () => {
     } catch (error) {
       setError((error as Error).message);
     } finally {
-      setLoading(false);
+      setReviewMilestoneLoading(false);
     }
   };
 
@@ -307,7 +313,7 @@ const ScholarshipProgramDetail = () => {
     setAssignExpertDialogOpen(true);
     setLoading(true);
     if (!data) return;
-    await fetchExpertsByScholarshipId();
+    //await fetchExpertsByScholarshipId();
     setLoading(false);
   };
 
@@ -846,7 +852,7 @@ const ScholarshipProgramDetail = () => {
         <br></br>
         <br></br>
 
-        {isApplicant == "Funder" && (
+        {isApplicant == "Funder" && data.funderId == user.id && (
           <div>
             <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
               <div className="max-w-[1216px] mx-auto">
@@ -863,7 +869,9 @@ const ScholarshipProgramDetail = () => {
                 </div>
                 <br />
                 <List sx={{ pt: 0 }}>
-                  {!reviewMilestones || reviewMilestones.length === 0 ? (
+                  {reviewMilestoneLoading ? (
+                    <Spinner />
+                  ) : (!reviewMilestones || reviewMilestones.length === 0 ? (
                     <p className="p-10 text-center text-gray-500 font-semibold text-xl">
                       No review milestones for this scholarship
                     </p>
@@ -911,7 +919,7 @@ const ScholarshipProgramDetail = () => {
                         </Paper>
                       ))}
                     </div>
-                  )}
+                  ))}
                 </List>
               </div>
             </div>
@@ -1004,7 +1012,9 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Applicants List */}
-                  {paginatedTabData?.length > 0 ? (
+                  {applicationLoading ? (
+                    <Spinner />
+                  ) : paginatedTabData?.length > 0 ? (
                     paginatedTabData.map((app: any, index: number) => (
                       <div
                         key={app.id}
@@ -1245,7 +1255,9 @@ const ScholarshipProgramDetail = () => {
                   </div>
 
                   {/* Expert Cards */}
-                  {paginatedExpert?.map((expert: any, index: any) => (
+                  {expertLoading ? (
+                    <Spinner />
+                  ) : paginatedExpert?.map((expert: any, index: any) => (
                     <div
                       key={expert.id}
                       style={{
@@ -1360,7 +1372,7 @@ const ScholarshipProgramDetail = () => {
         )}
       </section>
 
-      {authorized != "Unauthorized" && (
+      {authorized != "Unauthorized" && assignExpertDialogOpen && (
         <AssignExpertDialog
           open={assignExpertDialogOpen}
           onClose={() => setAssignExpertDialogOpen(false)}
