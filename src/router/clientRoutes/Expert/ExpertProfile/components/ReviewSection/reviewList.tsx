@@ -67,6 +67,36 @@ const ReviewList: React.FC = () => {
   const [comment, setComment] = useState("");
   const [score, setScore] = useState<number | string>("");
   const [selectedReview, setSelectedReview] = useState<any>(null);
+  const [criteriaScores, setCriteriaScores] = useState<{
+    [key: string]: number;
+  }>({});
+
+  const calculateTotalScore = () => {
+    if (!selectedItem?.criteria) return 0;
+
+    const totalWeightedScore = selectedItem.criteria.reduce(
+      (acc, criterion) => {
+        const criterionScore = criteriaScores[criterion.name] || 0; // Lấy điểm cho tiêu chí (mặc định 0 nếu không có)
+        return acc + (criterionScore * parseFloat(criterion.percentage)) / 100; // Nhân với phần trăm
+      },
+      0
+    );
+
+    const totalPercentage = selectedItem.criteria.reduce(
+      (acc, criterion) => acc + parseFloat(criterion.percentage),
+      0
+    );
+
+    return totalPercentage > 0 ? totalWeightedScore.toFixed(2) : 0; // Tránh chia cho 0
+  };
+
+  const handleCriterionScoreChange = (name: string, value: string) => {
+    const numericValue = parseFloat(value) || 0;
+    setCriteriaScores((prev) => ({
+      ...prev,
+      [name]: numericValue,
+    }));
+  };
 
   console.log("select", selectedItem);
 
@@ -155,7 +185,10 @@ const ReviewList: React.FC = () => {
   }, [user.id]);
 
   const handleScoreSubmit = async () => {
-    if (!selectedItem || !selectedReview || score === "") {
+    const totalScore = calculateTotalScore(); // Tính total score
+    setScore(totalScore);
+
+    if (!selectedItem || !selectedReview || totalScore === "") {
       notification.error({ message: "Please input a score" });
       return;
     }
@@ -521,7 +554,7 @@ const ReviewList: React.FC = () => {
                         <p>
                           <strong>Scholarship Program:</strong>{" "}
                         </p>
-                          {selectedItem.scholarshipName}
+                        {selectedItem.scholarshipName}
                         <p>
                           <strong>Applied On:</strong>{" "}
                           {new Date(
@@ -543,36 +576,38 @@ const ReviewList: React.FC = () => {
                           </span>
                         </h3>
                         <div className="max-h-48 overflow-y-auto overflow-hidden mt-3">
-                        {selectedItem?.applicationDocuments ? (
-                          selectedItem.applicationDocuments.length > 0 ? (
-                            <ul className=" space-y-1">
-                              {selectedItem.applicationDocuments.map((doc) => (
-                                <li
-                                  key={doc.applicationId + doc.name}
-                                  className="flex items-center justify-between p-2 rounded-lg"
-                                >
-                                  <Link
-                                    to={doc.fileUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline"
-                                  >
-                                    <span>- {doc.name}</span>
-                                    {/* View */}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
+                          {selectedItem?.applicationDocuments ? (
+                            selectedItem.applicationDocuments.length > 0 ? (
+                              <ul className=" space-y-1">
+                                {selectedItem.applicationDocuments.map(
+                                  (doc) => (
+                                    <li
+                                      key={doc.applicationId + doc.name}
+                                      className="flex items-center justify-between p-2 rounded-lg"
+                                    >
+                                      <Link
+                                        to={doc.fileUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                      >
+                                        <span>- {doc.name}</span>
+                                        {/* View */}
+                                      </Link>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-gray-500">
+                                No documents available.
+                              </p>
+                            )
                           ) : (
                             <p className="text-sm text-gray-500">
-                              No documents available.
+                              Loading documents...
                             </p>
-                          )
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            Loading documents...
-                          </p>
-                        )}
+                          )}
                         </div>
                       </div>
                     </Card.Slot>
@@ -589,47 +624,65 @@ const ReviewList: React.FC = () => {
                               ({selectedItem?.criteria?.length})
                             </span>
                           </h3>
-                          <div className="max-h-46 overflow-y-auto overflow-hidden mt-3 shadow-2 rounded-md">
-                          {selectedItem?.criteria ? (
-                            selectedItem.criteria.length > 0 ? (
-                              <ul className="space-y-1">
-                                {selectedItem.criteria.map((criteria) => (
-                                  <li
-                                    key={criteria.name}
-                                    className="flex items-center justify-around p-2 rounded-lg"
-                                  >
-                                    <p> {criteria.name} <span> ({criteria.percentage}%)</span></p>
-                                    <span> 
-                                      <Input/>
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
+                          <div className="max-h-[150px] overflow-y-auto overflow-hidden mt-3 shadow-2 rounded-md">
+                            {selectedItem?.criteria ? (
+                              selectedItem.criteria.length > 0 ? (
+                                <ul className="space-y-1">
+                                  {selectedItem.criteria.map((criteria) => (
+                                    <li
+                                      key={criteria.name}
+                                      className="flex items-center justify-between p-2 rounded-lg"
+                                    >
+                                      <p>
+                                        {" "}
+                                        {criteria.name}{" "}
+                                        <span className="text-sm">
+                                          {" "}
+                                          ({criteria.percentage} %)
+                                        </span>
+                                      </p>
+                                      <span>
+                                        <Input
+                                          type="number"
+                                          min={0}
+                                          max={100}
+                                          value={
+                                            criteriaScores[criteria.name] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleCriterionScoreChange(
+                                              criteria.name,
+                                              e.target.value
+                                            )
+                                          }
+                                        />
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-gray-500">
+                                  No criteria available.
+                                </p>
+                              )
                             ) : (
                               <p className="text-sm text-gray-500">
-                                No criteria available.
+                                Loading criteria...
                               </p>
-                            )
-                          ) : (
-                            <p className="text-sm text-gray-500">
-                              Loading criteria...
-                            </p>
-                          )}
+                            )}
                           </div>
-                          <Label className="block text-sm font-medium text-gray-700">
-                            Score
-                          </Label>
-                          <Input
-                            type="number"
-                            value={score}
-                            onChange={(e) => setScore(e.target.value)}
-                            className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
-                            placeholder="Enter score (1-100)"
-                            min={1}
-                            max={100}
-                          />
+                          <div className="flex justify-end items-center gap-5">
+                            <Label className=" text-md font-semibold text-black">
+                              Total Score
+                            </Label>
+                            <Input
+                              value={calculateTotalScore()}
+                              readOnly
+                              className="w-2/3 h-full p-3 mt-2 border border-gray-300 rounded-lg"
+                            />
+                          </div>
                         </div>
-                        
+
                         <div className="">
                           {/* <Label className="block text-sm font-medium text-gray-700">
                             Score
@@ -644,14 +697,15 @@ const ReviewList: React.FC = () => {
                             max={100}
                           /> */}
 
-                          <Label className="block text-sm font-medium text-gray-700 mt-4">
+                          <Label className="block text-lg font-semibold text-black mt-7">
                             Comment
                           </Label>
                           <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+                            className="w-full p-4 mt-2 border border-gray-300 rounded-lg"
                             placeholder="Enter comment"
+                            rows={5}
                           />
 
                           <Button
