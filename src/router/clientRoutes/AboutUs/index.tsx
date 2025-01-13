@@ -12,9 +12,9 @@ const AboutUs = () => {
     <div
       style={{
         textAlign: "center",
-        padding: "50px",
+        // padding: "50px",
         fontFamily: "Arial, sans-serif",
-        backgroundColor: "#e5f6f6",
+        backgroundColor: "#fff",
       }}
     >
       <img
@@ -24,13 +24,10 @@ const AboutUs = () => {
           width: "100%",
           maxHeight: "450px",
           objectFit: "cover",
-          borderRadius: "20px",
           boxShadow: "0 6px 15px rgba(0, 0, 0, 0.2)",
           transition: "transform 0.3s ease",
           marginBottom: "30px",
         }}
-        onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-        onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
       />
 
       <h1

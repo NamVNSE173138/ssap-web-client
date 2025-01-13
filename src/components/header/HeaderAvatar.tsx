@@ -109,7 +109,7 @@ const HeaderAvatar = () => {
           {/* Profile */}
           <DropdownMenuItem
             onClick={handleProfileClick}
-            className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
           >
             <CgProfile className="mr-3 text-xl text-gray-600" />
             <span className="text-gray-700">Profile</span>
@@ -118,7 +118,7 @@ const HeaderAvatar = () => {
           {/* Wallet */}
           <DropdownMenuItem
             onClick={handleWalletClick}
-            className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
           >
             <FiDollarSign className="mr-3 text-xl text-green-500" />
             <span className="text-gray-700">Wallet</span>
@@ -128,7 +128,7 @@ const HeaderAvatar = () => {
           <AlertDialog>
             {/* Wrap DropdownMenuItem with AlertDialogTrigger */}
             <AlertDialogTrigger asChild>
-              <div className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
+              <div className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors cursor-pointer">
                 <LogOut className="mr-3 text-xl" />
                 <span>Log out</span>
               </div>

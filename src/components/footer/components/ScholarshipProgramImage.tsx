@@ -1,11 +1,22 @@
-import ScholarshipProgramImage from '../../../assets/awrapper.webp';
+import { useLocation } from "react-router-dom";
+import ScholarshipProgramImage from "../../../assets/banner.png";
+import ServicesImage from "../../../assets/awrapper.webp";
 
 const ScholarshipProgramBackground = () => {
-    return (
-        <section>
-            <img src={ScholarshipProgramImage} alt="bg_footer" className="h-[300px] lg:h-[55vh] object-cover w-full " />
-        </section>
-    );
+  const location = useLocation();
+  return (
+    <section>
+      <img
+        src={
+          location.pathname === "/services"
+            ? ServicesImage
+            : ScholarshipProgramImage
+        }
+        alt="bg_footer"
+        className="h-[300px] lg:h-[55vh] object-cover w-full"
+      />
+    </section>
+  );
 };
 
 export default ScholarshipProgramBackground;
