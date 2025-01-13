@@ -51,8 +51,8 @@ type ApprovalItem = {
 };
 
 const expertReviewSchema = z.object({
-  score: z.string(),
-  description: z.string(),
+  score: z.string().min(1).max(100, "Score must be between 1 and 100"),
+  description: z.string().min(1, "Description is required"),
 });
 
 const ReviewList: React.FC = () => {
@@ -204,24 +204,7 @@ const ReviewList: React.FC = () => {
         return;
       }
 
-      /*const reviewMilestone = await getAllReviewMilestonesByScholarship(
-        selectedItem.scholarshipProgramId
-      );*/
-
-      //const currentDate = new Date();
       let isReview = true;
-      /*reviewMilestone?.data.forEach((review: any) => {
-        if (
-          new Date(review.fromDate) < currentDate &&
-          new Date(review.toDate) > currentDate
-        ) {
-          if (review.description.toLowerCase() === "application review") {
-            isReview = true;
-          } else {
-            isReview = false;
-          }
-        }
-      });*/
 
       if (selectedReview.description.toLowerCase() === "application review") {
         isReview = true;
@@ -335,7 +318,8 @@ const ReviewList: React.FC = () => {
                           <td className="p-4 text-sm text-gray-800">{score}</td>
                           <td
                             className={`p-4 text-sm font-medium ${
-                              (review.status === "Approved" || review.status === "Passed")
+                              review.status === "Approved" ||
+                              review.status === "Passed"
                                 ? "text-green-600"
                                 : review.status === "Failed"
                                 ? "text-red-600"
@@ -464,7 +448,8 @@ const ReviewList: React.FC = () => {
                           <td className="p-4 text-sm text-gray-800">{score}</td>
                           <td
                             className={`p-4 text-sm font-medium ${
-                              (review.status === "Passed" || review.status === "Approved")
+                              review.status === "Passed" ||
+                              review.status === "Approved"
                                 ? "text-green-600"
                                 : review.status === "Failed"
                                 ? "text-red-600"
@@ -597,7 +582,6 @@ const ReviewList: React.FC = () => {
                                         className="text-blue-600 hover:underline"
                                       >
                                         <span>- {doc.name}</span>
-                                        {/* View */}
                                       </Link>
                                     </li>
                                   )
@@ -638,7 +622,7 @@ const ReviewList: React.FC = () => {
                                       key={criteria.name}
                                       className="flex items-center justify-between p-2 rounded-lg"
                                     >
-                                      <p>
+                                      <p className="font-semibold">
                                         {" "}
                                         {criteria.name}{" "}
                                         <span className="text-sm">
@@ -712,13 +696,14 @@ const ReviewList: React.FC = () => {
                             placeholder="Enter comment"
                             rows={5}
                           />
-
-                          <Button
-                            onClick={handleScoreSubmit}
-                            className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
-                          >
-                            Submit Review
-                          </Button>
+                          <div className="flex justify-end">
+                            <Button
+                              onClick={handleScoreSubmit}
+                              className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
+                            >
+                              Submit Review
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </Card.Slot>
