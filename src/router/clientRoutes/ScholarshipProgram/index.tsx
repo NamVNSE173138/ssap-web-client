@@ -152,7 +152,7 @@ const ScholarshipProgram = () => {
 
         <div className="flex flex-wrap px-10 gap-5">
 
-          <div className="w-full xl:w-[9%] min-w-[200px] mt-10 mr-5">
+          <div className="w-full md:w-[17%] lg:w-[17%] min-w-[230px] mt-10 mr-5">
             <span className="bg-[#1eb2a6] w-full mx-auto mb-3 rounded-full h-[3px] block"></span>
             <Accordion defaultExpanded>
               <AccordionSummary
@@ -218,7 +218,7 @@ const ScholarshipProgram = () => {
           </div>
 
 
-          <menu className="w-[100%] xl:w-[80%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+          <menu className="w-full md:w-[62%] lg:w-[70%] xl:w-[75%] min-w-[230px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
             {loading ? (
               <ScholarshipProgramSkeleton />
             ) : error ? (

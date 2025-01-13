@@ -987,7 +987,7 @@ const ScholarshipProgramDetail = () => {
         <br></br>
         <br></br>
 
-        {isApplicant == "Funder" && (
+        {isApplicant == "Funder" && data.funderId == user.id && (
           <div>
             <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
               <div className="max-w-[1216px] mx-auto">
