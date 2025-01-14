@@ -21,7 +21,7 @@ import {
   IoMdCheckmarkCircleOutline,
   IoMdTime,
 } from "react-icons/io";
-import { IoIosSearch, IoMdClose } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import AddServiceModal from "../Activity/AddServiceModal";
 import RouteNames from "@/constants/routeNames";
 import {
@@ -42,9 +42,14 @@ import {
 import MultiStepSubscriptionModal from "../Activity/SubscriptionModal";
 import { Button, Modal, notification } from "antd";
 import { getSubscriptionByProviderId } from "@/services/ApiServices/subscriptionService";
-import { getPaginatedServices, getServicesByProviderId, getServicesByProviderPaginated } from "@/services/ApiServices/serviceService";
+import {
+  getPaginatedServices,
+  getServicesByProviderId,
+  getServicesByProviderPaginated,
+} from "@/services/ApiServices/serviceService";
 import { MdDateRange } from "react-icons/md";
 import MultiStepUpgradeSubscriptionModal from "../Activity/SubscriptionUpgradeModal";
+import { SearchIcon } from "lucide-react";
 
 interface SubscriptionDetails {
   name: string;
@@ -83,7 +88,7 @@ const Service = () => {
     try {
       if (user?.role === "Provider") {
         const subscriptionResponse = await getSubscriptionByProviderId(
-          Number(user?.id),
+          Number(user?.id)
         );
         console.log(subscriptionResponse);
         const accountResponse = await getAccountById(Number(user?.id));
@@ -91,11 +96,11 @@ const Service = () => {
         if (subscriptionResponse && subscriptionResponse.statusCode === 200) {
           const subscriptionData = subscriptionResponse?.data || {};
           const formattedEndDate = formatDate(
-            accountResponse.subscriptionEndDate,
+            accountResponse.subscriptionEndDate
           );
           const purchaseDate = calculatePurchaseDate(
             formattedEndDate,
-            subscriptionData.validMonths,
+            subscriptionData.validMonths
           );
 
           setSubscriptionDetails({
@@ -125,7 +130,7 @@ const Service = () => {
 
   const calculatePurchaseDate = (
     subscriptionEndDate: string,
-    validMonths: number,
+    validMonths: number
   ): string => {
     const endDate = parseFormattedDate(subscriptionEndDate);
     if (!endDate) return "N/A";
@@ -196,10 +201,13 @@ const Service = () => {
   const fetchSubscriptionForProvider = async () => {
     try {
       if (user?.role === "Provider") {
-        const subscription = await getSubscriptionByProviderId(Number(user?.id));
+        const subscription = await getSubscriptionByProviderId(
+          Number(user?.id)
+        );
 
         if (subscription && subscription.data) {
-          const numberOfServicesAllowed = subscription.data.numberOfServices ?? 0;
+          const numberOfServicesAllowed =
+            subscription.data.numberOfServices ?? 0;
           const totalServices = await fetchTotalServices();
           console.log(totalServices);
 
@@ -210,7 +218,7 @@ const Service = () => {
     } catch (error) {
       console.error("Error fetching subscription for provider:", error);
       setError(
-        "All your services 'Inactive'. Please buy subscription to view them!",
+        "All your services 'Inactive'. Please buy subscription to view them!"
       );
     }
   };
@@ -229,29 +237,32 @@ const Service = () => {
     }
   };
 
-
   const fetchData = async () => {
     setLoading(true);
     try {
       let response: any = {};
       if (user?.role === "Provider") {
-        response = await getServicesByProviderPaginated(Number(user.id), currentPage, pageSize);
+        response = await getServicesByProviderPaginated(
+          Number(user.id),
+          currentPage,
+          pageSize
+        );
         console.log(response);
       } else {
-        response = await getPaginatedServices(currentPage, pageSize)
+        response = await getPaginatedServices(currentPage, pageSize);
       }
 
       if (response.data.statusCode === 200) {
         const services = response.data.data.items || [];
         const totalPages = response.data.data.totalPages || 1;
-        console.log(services)
-        console.log(totalPages)
+        console.log(services);
+        console.log(totalPages);
 
         if (user?.role === "Provider") {
           setData(services);
         } else {
           const activeServices = services.filter(
-            (service: any) => service.status === "Active",
+            (service: any) => service.status === "Active"
           );
           setData(activeServices);
           setFilteredData(activeServices);
@@ -291,8 +302,8 @@ const Service = () => {
   useEffect(() => {
     setFilteredData(
       data.filter((service) =>
-        service.name.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
+        service.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     );
   }, [searchTerm, data]);
 
@@ -364,53 +375,52 @@ const Service = () => {
       : "Upgrade your subscription for enhanced benefits.";
 
   return (
-    <div>
+    <>
       <div className="relative">
         <ScholarshipProgramBackground />
+      </div>
 
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
+      <div className="relative w-full flex flex-col lg:flex-row justify-between items-center p-5 lg:p-[40px] z-10">
+        <Breadcrumb className="flex-1">
+          <BreadcrumbList className="text-[#000] font-bold">
+            <BreadcrumbItem>
+              <Link
+                to="/"
+                className="text-lg md:text-xl hover:underline cursor-pointer"
+              >
+                Home
+              </Link>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <p className="text-[#1eb2a6] font-medium text-lg md:text-xl hover:underline cursor-pointer">
+                Services
+              </p>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-          <Breadcrumb>
-            <BreadcrumbList className="text-[#000]">
-              <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">
-                  Home
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <p className="text-[#000] font-medium md:text-xl text-lg">
-                  Services
-                </p>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="w-full mt-6">
-            <div className="relative w-full">
-              <input
-                className="w-2/3 h-full pl-12 pr-12 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out bg-white text-lg"
-                placeholder="Search for services..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <IoIosSearch className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-xl" />
-              {searchTerm && (
-                <IoMdClose
-                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
-                  onClick={clearSearch}
-                />
-              )}
-            </div>
-          </div>
+        <div className="relative w-full max-w-xl mt-4 lg:mt-0">
+          <input
+            className="w-full h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6] focus:border-[#1eb2a6] transition-all duration-300 ease-in-out rounded-lg text-lg placeholder-gray-500 text-gray-800"
+            placeholder="Search for services..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <SearchIcon className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500 text-xl" />
+          {searchTerm && (
+            <IoMdClose
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 cursor-pointer text-xl hover:text-red-500 transition-colors"
+              onClick={clearSearch}
+            />
+          )}
         </div>
       </div>
 
-
-      <div className="flex bg-white justify-between p-4 items-center z-20">
+      <div className="flex bg-white justify-between p-4 px-10 items-center z-20">
         {user?.role === "Provider" && (
-          <div className="flex w-full justify-between items-center">
-            <div className="flex items-center text-black text-lg">
+          <div className="flex w-full justify-between items-center flex-wrap">
+            <div className="flex items-center text-black text-lg w-full sm:w-auto">
               <span>Number of services created left: </span>
               <span className="font-semibold ml-2">{numberOfServicesLeft}</span>
 
@@ -428,14 +438,15 @@ const Service = () => {
               )}
             </div>
 
-            {/* Phần nút bấm - sát phải */}
-            <div className="flex gap-4">
+            {/* Buttons Section */}
+            <div className="flex flex-wrap gap-4 w-full sm:w-auto justify-between sm:justify-end mt-4 sm:mt-0">
               <Button
                 onClick={handleAddServiceClick}
-                className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white h-full shadow-lg active:scale-95 ${numberOfServicesLeft === 0
-                  ? "bg-gray-400 text-gray-500 cursor-not-allowed"
-                  : "bg-blue-500 text-white"
-                  }`}
+                className={`flex justify-center items-center hover:bg-blue-600 hover:text-white transition-all duration-300 gap-4 px-6 py-3 bg-white h-full shadow-lg active:scale-95 ${
+                  numberOfServicesLeft === 0
+                    ? "bg-gray-400 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-500 text-white"
+                } w-full sm:w-auto`}
                 disabled={numberOfServicesLeft === 0}
                 title={
                   numberOfServicesLeft === 0
@@ -444,12 +455,18 @@ const Service = () => {
                 }
               >
                 <IoIosAddCircleOutline
-                  className={`text-2xl ${numberOfServicesLeft === 0 ? "text-gray-500" : "text-blue-500"
-                    } transition-all duration-300 ease-in-out transform hover:scale-110`}
+                  className={`text-2xl ${
+                    numberOfServicesLeft === 0
+                      ? "text-gray-500"
+                      : "text-blue-500"
+                  } transition-all duration-300 ease-in-out transform hover:scale-110`}
                 />
                 <p
-                  className={`text-xl ${numberOfServicesLeft === 0 ? "text-gray-500" : "text-blue-600"
-                    } font-semibold`}
+                  className={`text-xl ${
+                    numberOfServicesLeft === 0
+                      ? "text-gray-500"
+                      : "text-blue-600"
+                  } font-semibold`}
                 >
                   Add Service
                 </p>
@@ -459,10 +476,11 @@ const Service = () => {
                 onClick={handleBuySubscriptionClick}
                 disabled={isBuySubscriptionDisabled}
                 title={buySubscriptionTitle}
-                className={`flex justify-center items-center gap-1 px-4 py-3 h-full shadow-lg active:scale-95 transition-all duration-300 ${isBuySubscriptionDisabled
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
-                  : "bg-white hover:bg-green-600 hover:text-white"
-                  }`}
+                className={`flex justify-center items-center gap-1 px-4 py-3 h-full shadow-lg active:scale-95 transition-all duration-300 ${
+                  isBuySubscriptionDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                    : "bg-white hover:bg-green-600 hover:text-white"
+                } w-full sm:w-auto`}
               >
                 <FaCreditCard className="text-2xl transition-all duration-300 ease-in-out transform hover:scale-110" />
                 <p className="text-xl font-semibold">Buy Subscription</p>
@@ -472,10 +490,11 @@ const Service = () => {
                 onClick={handleUpgradeSubscriptionClick}
                 disabled={isUpgradeSubscriptionDisabled}
                 title={upgradeSubscriptionTitle}
-                className={`flex justify-center items-center gap-1 px-4 py-3 h-full shadow-lg active:scale-95 transition-all duration-300 ${isUpgradeSubscriptionDisabled
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
-                  : "bg-white hover:bg-yellow-600 hover:text-white"
-                  }`}
+                className={`flex justify-center items-center gap-1 px-4 py-3 h-full shadow-lg active:scale-95 transition-all duration-300 ${
+                  isUpgradeSubscriptionDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 hover:text-gray-500"
+                    : "bg-white hover:bg-yellow-600 hover:text-white"
+                } w-full sm:w-auto`}
               >
                 <FaArrowUp className="text-2xl transition-all duration-300 ease-in-out transform hover:scale-110" />
                 <p className="text-xl font-semibold">Upgrade Subscription</p>
@@ -491,25 +510,20 @@ const Service = () => {
               className="flex justify-center items-center bg-[#1eb2a6] hover:bg-[#0d978b] shadow-lg px-4 py-2 "
             >
               <IoMdTime className="text-2xl text-white" />
-              <p className="text-xl text-white font-semibold">
-                View History
-              </p>
+              <p className="text-xl text-white font-semibold">View History</p>
             </Button>
             <Button
               onClick={handleNavigateProviderList}
               className="flex justify-center items-center bg-[#1eb2a6] hover:bg-[#0d978b] shadow-lg px-4 py-2 "
             >
               <IoPerson className="text-2xl text-white" />
-              <p className="text-xl text-white font-semibold">
-                Provider List
-              </p>
+              <p className="text-xl text-white font-semibold">Provider List</p>
             </Button>
           </div>
         )}
       </div>
 
-
-      <ul className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-10 p-10">
+      <ul className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8 p-10 bg-white">
         {loading ? (
           <ServiceSkeleton />
         ) : error ? (
@@ -527,6 +541,7 @@ const Service = () => {
           ))
         )}
       </ul>
+
       {filteredData.length === 0 && searchTerm && (
         <div className="flex flex-col items-center justify-center text-center py-16">
           <FaSadTear className="text-blue-500 text-6xl mb-4" />
@@ -534,7 +549,7 @@ const Service = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center p-6 bg-blue-50 rounded-lg shadow-md">
+      <div className="flex justify-between items-center p-6 bg-white rounded-lg shadow-md">
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
@@ -581,7 +596,7 @@ const Service = () => {
 
       <Modal
         title={
-          <div className="flex items-center gap-2 text-blue-400">
+          <div className="flex items-center gap-2 text-[#1eb2a6]">
             <FaInfoCircle className="text-3xl" />
             <span className="text-2xl font-semibold">Subscription Details</span>
           </div>
@@ -592,7 +607,7 @@ const Service = () => {
           <Button
             key="close"
             onClick={handleCloseModal}
-            className="bg-blue-400 hover:bg-blue-500 text-white"
+            className="bg-[#1eb2a6] hover:bg-[#1eb2a6] text-white"
           >
             Close
           </Button>,
@@ -601,7 +616,6 @@ const Service = () => {
         className="subscription-modal"
         style={{
           borderRadius: "10px",
-          background: "#f0f8ff",
           padding: "20px",
         }}
       >
@@ -609,44 +623,44 @@ const Service = () => {
           <div className="text-gray-800">
             <br></br>
             <div className="flex items-center mb-3">
-              <h3 className="text-2xl font-semibold text-blue-400">
+              <h3 className="text-2xl font-semibold text-[#1eb2a6]">
                 {subscriptionDetails.name}
               </h3>
             </div>
             <div className="flex items-center mb-3">
-              <IoMdCheckmarkCircleOutline className="text-blue-400 text-2xl mr-2" />
+              <IoMdCheckmarkCircleOutline className="text-[#1eb2a6] text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Description:</strong> {subscriptionDetails.description}
               </p>
             </div>
             <div className="flex items-center mb-3">
-              <FaDollarSign className="text-blue-400 text-2xl mr-2" />
+              <FaDollarSign className="text-[#1eb2a6] text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Amount:</strong> ${subscriptionDetails.amount}
               </p>
             </div>
             <div className="flex items-center mb-3">
-              <IoIosApps className="text-blue-400 text-2xl mr-2" />
+              <IoIosApps className="text-[#1eb2a6] text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Number of Services:</strong>{" "}
                 {subscriptionDetails.numberOfServices}
               </p>
             </div>
             <div className="flex items-center mb-3">
-              <FaClock className="text-blue-400 text-2xl mr-2" />
+              <FaClock className="text-[#1eb2a6] text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Valid Months:</strong> {subscriptionDetails.validMonths}
               </p>
             </div>
             <div className="flex items-center mb-3">
-              <FaCalendarAlt className="text-blue-400 text-2xl mr-2" />
+              <FaCalendarAlt className="text-[#1eb2a6] text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Purchase Date:</strong>{" "}
                 {subscriptionDetails.purchaseDate}
               </p>
             </div>
             <div className="flex items-center mb-3">
-              <MdDateRange className="text-blue-400 text-2xl mr-2" />
+              <MdDateRange className="text-[#1eb2a6] text-2xl mr-2" />
               <p className="text-lg">
                 <strong>Subscription End Date:</strong>{" "}
                 {subscriptionDetails.subscriptionEndDate}
@@ -655,7 +669,7 @@ const Service = () => {
           </div>
         ) : (
           <div className="text-center">
-            <p className="text-lg text-blue-400">
+            <p className="text-lg text-[#1eb2a6]">
               Loading subscription details...
             </p>
           </div>
@@ -689,7 +703,7 @@ const Service = () => {
           </div>
         </div>
       </Dialog>
-    </div>
+    </>
   );
 };
 

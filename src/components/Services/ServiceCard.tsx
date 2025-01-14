@@ -1,17 +1,15 @@
 import { Separator } from "../ui/separator";
 import { Link } from "react-router-dom";
-import { FaDollarSign, FaStar, FaAddressBook, FaClipboardList, FaCheckCircle } from "react-icons/fa";
+import { FaDollarSign, FaAddressBook, FaStar } from "react-icons/fa";
 import { ServiceType } from "@/router/clientRoutes/Service/data";
 import { useEffect, useState } from "react";
 import { getServiceById } from "@/services/ApiServices/serviceService";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import ServiceBanner from "../../assets/scholarship_banner.png";
 
 const ServiceCard = (service: ServiceType) => {
   const [_services, setServices] = useState<ServiceType | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
-  const user = useSelector((state: RootState) => state.token.user);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -22,7 +20,10 @@ const ServiceCard = (service: ServiceType) => {
 
           const feedbacks = fetchedService.data.feedbacks || [];
           if (feedbacks.length > 0) {
-            const totalRating = feedbacks.reduce((acc: any, feedback: any) => acc + (feedback.rating || 0), 0);
+            const totalRating = feedbacks.reduce(
+              (acc: any, feedback: any) => acc + (feedback.rating || 0),
+              0
+            );
             setAverageRating(totalRating / feedbacks.length);
             setFeedbackCount(feedbacks.length);
           }
@@ -39,73 +40,83 @@ const ServiceCard = (service: ServiceType) => {
 
   return (
     <Link to={`/services/${service.id}`}>
-      <div className="flex flex-col justify-between gap-6 p-4 rounded-3xl shadow shadow-gray-400  cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:translate-y-1">
-        <div>
-          <h2
-            className="text-lg md:text-xl mt-5 font-medium text-gray-800 hover:text-indigo-600 transition-colors truncate"
-            style={{ maxWidth: 'calc(100% - 0px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-          >
-            {service?.name}
-          </h2>
+      <div className="relative h-[400px] flex flex-col justify-between rounded-3xl shadow shadow-gray-400 cursor-pointer hover:bg-gray-100 hover:shadow-xl transition-all">
+        <div
+          className="absolute top-0 left-0 w-full text-m p-2 rounded-t-3xl pl-6 z-10 font-bold"
+          style={{
+            backgroundColor:
+              service.status === "Active" ? "#1eb2a6" : "lightgray",
+            color: service.status === "Active" ? "white" : "black",
+          }}
+        >
+          {service.status}
         </div>
 
-        <Separator orientation="horizontal" className="border-gray-300 my-3" />
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
-            <FaStar
-              color="#FFD700"
-              className="transition-all transform hover:scale-150 hover:animate-pulse ease-in-out duration-300"
-            />
-            <p className="text-gray-800">
-              {averageRating.toFixed(1)} ({feedbackCount} {feedbackCount === 1 ? "review" : "reviews"})
+        <div
+          className="h-[150px] bg-cover bg-center flex items-center justify-center text-white text-2xl font-bold rounded-t-3xl pt-10"
+          style={{
+            backgroundImage: `url(${ServiceBanner})`,
+          }}
+        >
+          <div className="flex flex-col items-center">
+            <span className="text-sm" style={{ lineHeight: "1.2em" }}>
+              Service Price
+            </span>
+            <span className="text-4xl" style={{ lineHeight: "1.2em" }}>
+              {service.price === 0
+                ? "Free"
+                : `$${service.price.toLocaleString("en-US")}`}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col flex-grow p-4">
+          <div>
+            <p
+              className="text-lg md:text-xl lg:text-xl mt-4 font-bold text-black"
+              style={{ height: "60px", lineHeight: "1.2em" }}
+            >
+              {service?.name}
             </p>
           </div>
-          <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
-            <FaAddressBook
-              color="#1eb2a6"
-              className="transition-all transform hover:scale-125 hover:animate-bounce ease-in-out duration-300"
-            />
-            <p className="text-gray-800">{service.type || "No Type Specified"}</p>
-          </div>
 
-          <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
-            <FaClipboardList
-              color="#1eb2a6"
-              className="transition-all transform hover:scale-125 hover:animate-ping ease-in-out duration-300"
-            />
-            <p className="text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap max-w-full" style={{ maxWidth: '50ch' }}>
-              {service.description || "No description Specified"}
+          <div className="flex-grow mb-5" style={{ height: "40px" }}>
+            <p className="text-gray-700 text-sm">
+              {service.description.length > 80
+                ? service.description.substring(0, 80) + "..."
+                : service.description}
             </p>
           </div>
 
-          {user?.role === 'Provider' && (
-            <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
-              <FaCheckCircle
-                className={`text-2xl ${service.status === "Active" ? "text-teal-500" : "text-red-500"}`}
-              />
-              <div>
-                <p className={`text-ellipsis ${service.status === "Active" ? "text-teal-600" : "text-red-600"}`}>
-                  {service.status}
-                </p>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center gap-2 text-gray-700 mt-2">
+            <FaStar color="#FFD700" size={18} />
+            <p className="text-sm font-semibold">
+              {averageRating.toFixed(1)} ({feedbackCount}{" "}
+              {feedbackCount === 1 ? "review" : "reviews"})
+            </p>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-3 text-sm md:text-base hover:text-indigo-600 transition-colors">
-            <FaDollarSign
-              color="#1eb2a6"
-              className="transition-all transform hover:scale-125 hover:animate-wiggle ease-in-out duration-300"
-            />
-            <p className="text-gray-800">
+        <Separator className="my-2" />
+
+        <div className="grid grid-cols-2 gap-4 p-4 ml-2 mb-2">
+          <div className="flex items-center gap-2 text-gray-700">
+            <FaAddressBook color="#1eb2a6" size={24} />
+            <p className="text-sm truncate">
+              {service.type || "No Type Specified"}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 text-gray-700">
+            <FaDollarSign color="#1eb2a6" size={24} />
+            <p className="text-sm truncate">
               {service.price === 0
                 ? "Free"
                 : service.price
-                  ? `$${service.price.toFixed(2)}`
-                  : "Price not available"}
+                ? `$${service.price.toLocaleString("en-US")}`
+                : "Price not available"}
             </p>
           </div>
-
-
         </div>
       </div>
     </Link>

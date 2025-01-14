@@ -11,43 +11,41 @@ import { Card } from "@/components/ScholarshipProgram";
 import scholarshipProgram, { ScholarshipProgramType } from "./data";
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { SearchIcon } from "lucide-react";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Slider } from "@mui/material";
+import { Box, Slider } from "@mui/material";
 import { getAllScholarshipProgram } from "@/services/ApiServices/scholarshipProgramService";
 import { FaCalendar, FaDollarSign, FaInfoCircle } from "react-icons/fa";
-import { HiOutlineChevronDown } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io";
+
+const ITEMS_PER_PAGE = 9;
+
 const ScholarshipProgram = () => {
-  const [data, setData] =
-    useState<ScholarshipProgramType[]>(scholarshipProgram);
+  const [data, setData] = useState<ScholarshipProgramType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([0, 50000]);
+  const [scholarshipAmount, setScholarshipAmount] = useState<number[]>([
+    0, 50000,
+  ]);
   const [scholarshipDeadline, setScholarshipDeadline] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
-  const [fullData, setFullData] = useState<ScholarshipProgramType[]>(scholarshipProgram);
+  const [fullData, setFullData] =
+    useState<ScholarshipProgramType[]>(scholarshipProgram);
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const handlePageExpertsChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 200, behavior: "smooth" });
+  };
 
   const fetchData = async () => {
     try {
-      const [
-    response,
-    /*countryDatas,
-    majorDatas,
-    categoriesDatas,
-    certificatesDatas*/
-  ] = await Promise.all([
-    getAllScholarshipProgram(),
-    /*getAllCountries(),
-    getAllMajors(),
-    getAllCategories(),
-    getAllCertificates()*/
-  ]);
+      const [response] = await Promise.all([getAllScholarshipProgram()]);
       if (response.data.statusCode === 200) {
-        setData(response.data.data.items);
-        setFullData(response.data.data.items);
-        /*setCountries(countryDatas.data);
-        setMajors(majorDatas.data.items);
-        setCategories(categoriesDatas.data);
-        setCertificates(certificatesDatas.data);*/
+        const filteredData = response.data.data.items.filter(
+          (item: any) => item.status !== "Draft"
+        );
+        setData(filteredData);
+        setFullData(filteredData);
       } else {
         setError("Failed to fetch data");
       }
@@ -59,32 +57,41 @@ const ScholarshipProgram = () => {
   };
 
   const filterScholarships = () => {
-    const dataFull = fullData;
-
-    const filteredByKeyword = dataFull.filter((scholarship) => {
+    let filteredData = fullData;
+    if (keyword) {
       const keywordLower = keyword.toLowerCase();
+      filteredData = filteredData.filter(
+        (scholarship) =>
+          scholarship.name.toLowerCase().includes(keywordLower) ||
+          scholarship.major.name.toLowerCase().includes(keywordLower)
+      );
+    }
+
+    filteredData = filteredData.filter((scholarship) => {
+      const scholarshipValue = scholarship.scholarshipAmount;
       return (
-        scholarship.name.toLowerCase().includes(keywordLower) ||
-        (scholarship.university).name.toLowerCase().includes(keywordLower) ||
-        (scholarship.major).name.toLowerCase().includes(keywordLower)
+        scholarshipValue >= scholarshipAmount[0] &&
+        scholarshipValue <= scholarshipAmount[1]
       );
     });
 
-    const filteredScholarships = filteredByKeyword.filter((scholarship) => {
-      const scholarshipValue = scholarship.scholarshipAmount;
-      const scholarshipDeadlineDate = new Date(scholarship.deadline);
+    if (scholarshipDeadline) {
+      const deadlineDate = new Date(scholarshipDeadline);
+      filteredData = filteredData.filter((scholarship) => {
+        const scholarshipDeadlineDate = new Date(scholarship.deadline);
+        return scholarshipDeadlineDate >= deadlineDate;
+      });
+    }
 
-      const isWithinAmountRange =
-        scholarshipValue >= scholarshipAmount[0] && scholarshipValue <= scholarshipAmount[1];
-      const isAfterDeadline =
-        scholarshipDeadline ? scholarshipDeadlineDate >= new Date(scholarshipDeadline) : true;
-
-      return isWithinAmountRange && isAfterDeadline;
-    });
-
-    setData(filteredScholarships);
+    setData(filteredData);
+    setCurrentPage(1);
   };
 
+  const totalDataPages = Math.ceil(data?.length / ITEMS_PER_PAGE);
+  const paginatedData = data?.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   useEffect(() => {
     fetchData();
@@ -94,72 +101,62 @@ const ScholarshipProgram = () => {
     filterScholarships();
   }, [keyword, scholarshipAmount, scholarshipDeadline, fullData]);
 
-
-
   return (
-    <div>
+    <div className="bg-white">
       <div className="relative">
         <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
-          <div>
-            <Breadcrumb className="">
-              <BreadcrumbList className="text-[#000]">
-                <BreadcrumbItem>
-                  <Link to="/" className="md:text-xl text-lg">
-                    Home
-                  </Link>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <p className="text-[#000] font-medium md:text-xl text-lg">
-                    Scholarship Program
-                  </p>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+      </div>
 
-          <div className="w-full mt-4 lg:mt-6">
-            <div className="relative w-full">
-              <input
-                className="w-2/3 h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 ease-in-out rounded-lg shadow-lg bg-gradient-to-r  text-lg placeholder-gray-500 text-gray-800"
-                placeholder="Search for scholarship, university, major..."
-                value={keyword}
-                onChange={(e) => {
-                  setKeyword(e.target.value);
-                  console.log(e.target.value);
-                }}
-              />
-              <SearchIcon className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500 text-xl" />
-              {keyword && (
-                <IoMdClose
-                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-500 cursor-pointer text-xl hover:text-red-500 transition-colors"
-                  onClick={() => setKeyword("")}
-                />
-              )}
-            </div>
-          </div>
+      <div className="relative w-full flex flex-col lg:flex-row justify-between items-center p-5 lg:p-[40px] z-10">
+        <Breadcrumb className="flex-1">
+          <BreadcrumbList className="text-[#000] font-bold">
+            <BreadcrumbItem>
+              <Link
+                to="/"
+                className="text-lg md:text-xl hover:underline cursor-pointer"
+              >
+                Home
+              </Link>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <p className="text-[#1eb2a6] font-medium text-lg md:text-xl hover:underline cursor-pointer">
+                Scholarship Program
+              </p>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-
+        <div className="relative w-full max-w-xl mt-4 lg:mt-0">
+          <input
+            className="w-full h-12 pl-14 pr-12 py-3 border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1eb2a6] focus:border-[#1eb2a6] transition-all duration-300 ease-in-out rounded-lg text-lg placeholder-gray-500 text-gray-800"
+            placeholder="Search by scholarship name"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+          <SearchIcon className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500 text-xl" />
+          {keyword && (
+            <IoMdClose
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-500 cursor-pointer text-xl hover:text-red-500 transition-colors"
+              onClick={() => setKeyword("")}
+            />
+          )}
         </div>
       </div>
 
-      <div className="flex px-10 gap-5">
+      <div className="flex flex-col lg:flex-row px-5 lg:px-10 gap-5 mb-10">
+        <div className="w-full lg:w-[400px]">
+          <div className="bg-white p-5 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Filters
+            </h3>
+            <p>You can narrow your search with the filters below.</p>
 
-        <div className="w-[200px] lg:w-[250px] mt-10">
-          <span className="bg-[#1eb2a6] w-full mx-auto mb-3 rounded-full h-[3px] block"></span>
-          <Accordion defaultExpanded>
-            <AccordionSummary
-              expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              <div className="flex items-center gap-3">
-                <FaDollarSign className="text-[#1eb2a6] text-lg lg:text-xl" />
-                <p className="font-semibold text-md lg:text-lg text-gray-800">Amount</p>
+            <div className="mt-5 mb-5">
+              <div className="flex items-center gap-3 mb-3">
+                <FaDollarSign className="text-[#1eb2a6] text-xl" />
+                <p className="font-medium text-gray-800">Amount</p>
               </div>
-            </AccordionSummary>
-            <AccordionDetails>
               <Box sx={{ width: "100%", padding: "0px 10px" }}>
                 <Slider
                   aria-label="Scholarship Amount"
@@ -170,65 +167,88 @@ const ScholarshipProgram = () => {
                   }
                   valueLabelDisplay="auto"
                   valueLabelFormat={(value: number) =>
-                    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
+                    new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(value)
                   }
                   marks={[
-                    { value: 0, label: '$0' },
-                    { value: 50000, label: 'Max' },
+                    { value: 0, label: "$0" },
+                    { value: 50000, label: "Max" },
                   ]}
                   disableSwap
+                  sx={{
+                    color: "#1eb2a6",
+                    "& .MuiSlider-thumb": {
+                      backgroundColor: "#1eb2a6",
+                      "&:hover, &.Mui-focusVisible": {
+                        boxShadow: "0px 0px 0px 8px rgba(30, 178, 166, 0.16)",
+                      },
+                    },
+                    "& .MuiSlider-rail": {
+                      backgroundColor: "#e0e0e0",
+                    },
+                  }}
                 />
               </Box>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion defaultExpanded>
-            <AccordionSummary
-              expandIcon={<HiOutlineChevronDown className="text-[#1eb2a6] text-2xl" />}
-              aria-controls="panel2-content"
-              id="panel2-header"
-            >
-              <div className="flex items-center gap-3">
-                <FaCalendar className="text-[#1eb2a6] text-lg lg:text-xl" />
-                <p className="font-semibold text-md lg:text-lg text-gray-800">Deadline</p>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <FaCalendar className="text-[#1eb2a6] text-xl" />
+                <p className="font-medium text-gray-800">Deadline</p>
                 <FaInfoCircle
-                  className="text-gray-600 cursor-pointer"
-                  title="The date you filter must be less than the deadline date of that scholarship."
+                  className="text-gray-500 text-sm cursor-pointer"
+                  title="Filter scholarships with deadlines on or before the selected date."
                 />
               </div>
-
-            </AccordionSummary>
-            <AccordionDetails>
-              <div className="flex items-center mb-5 border border-zinc-950 rounded-sm relative bg-white">
-                <FaCalendar className="w-[20px] h-[20px] ml-3 text-[#1eb2a6]" />
+              <div className="relative">
                 <input
+                  type="date"
                   value={scholarshipDeadline}
                   onChange={(e) => setScholarshipDeadline(e.target.value)}
-                  className="w-[85%] lg:w-full outline-none py-[13px] pl-[16px] pr-[32px]"
-                  type="date"
+                  className="w-full mb-4 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1eb2a6] focus:outline-none text-gray-800 placeholder-gray-400 transition duration-200"
+                  placeholder="Select a deadline"
                 />
               </div>
-            </AccordionDetails>
-          </Accordion>
+            </div>
+          </div>
         </div>
 
-
-        <menu className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between items-start gap-10 mt-10 my-8  px-12">
+        <menu className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
             <ScholarshipProgramSkeleton />
           ) : error ? (
-            <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
+            <p className="text-center text-2xl font-semibold text-red-600 col-span-full">
               Error loading scholarship programs.
             </p>
           ) : data.length === 0 ? (
-            <p className="text-center text-[2rem] font-semibold md:col-span-3 lg:col-span-4">
+            <p className="text-center text-2xl font-semibold text-gray-600 col-span-full">
               No data found matching your search.
             </p>
           ) : (
-            data.map((scholarship: any) => (
-              <li key={scholarship.id}>
-                <Card {...scholarship} />
-              </li>
-            ))
+            <>
+              {paginatedData.map((scholarship: any) => (
+                <li key={scholarship.id}>
+                  <Card {...scholarship} />
+                </li>
+              ))}
+              <div className="col-span-full mt-5 flex justify-center">
+                {Array.from({ length: totalDataPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePageExpertsChange(index + 1)}
+                    className={`mx-1 px-4 py-2 rounded-lg ${
+                      currentPage === index + 1
+                        ? "bg-[#419f97] text-white"
+                        : "bg-gray-200 text-black"
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </menu>
       </div>

@@ -1,29 +1,34 @@
 import { useEffect, useState } from "react";
-import * as Dialog from "@radix-ui/react-dialog";
 import axios from "axios";
 import { BASE_URL } from "@/constants/api";
 import { useSelector } from "react-redux";
-import ReviewList from "./reviewList";
-import { formatDate } from "@/lib/date-formatter";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
-import ScreenSpinner from "@/components/ScreenSpinner";
-import { notification } from "antd";
-import { getAllReviewMilestonesByScholarship } from "@/services/ApiServices/reviewMilestoneService";
-import { z } from "zod";
+
+import { formatNaturalDate } from "@/lib/dateUtils";
+import formatCurrency from "@/lib/currency-formatter";
+import { Link } from "react-router-dom";
 
 type ApprovalItem = {
   id: number;
+  applicantId: number;
   applicantName: string;
   scholarshipProgramId: number;
   scholarshipName: string;
+  scholarshipImage?: string;
+  scholarshipDeadline?: string;
+  scholarshipAmount?: string;
   university: string;
   appliedDate: string;
   status: "Reviewing" | "Approved" | "Rejected";
   details: string;
   documentUrl?: string;
+  applicationDocs?: {
+    applicationId: number;
+    type: string;
+    name: string;
+    fileUrl: string;
+  }[];
   applicationReviews?: {
     id: number;
     description: string;
@@ -31,24 +36,16 @@ type ApprovalItem = {
     expertId: number;
     status: string;
   }[];
+  updatedAt: string;
 };
-
-const expertReviewSchema = z.object({
-  score: z.string(),
-  description: z.string(),
-})
 
 const ApprovalList: React.FC = () => {
   const user = useSelector((state: any) => state.token.user);
-  const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
-  const [selectedReview, setSelectedReview] = useState<any>(null);
+
   const [loading, setLoading] = useState(false);
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [score, setScore] = useState<number | string>("");
-  const [comment, setComment] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const fetchApplicationReview = async () => {
     setLoading(true);
@@ -65,23 +62,30 @@ const ApprovalList: React.FC = () => {
             `${BASE_URL}/api/accounts/${app.applicantId}`
           );
           const scholarshipResponse = await axios.get(
-            `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgramId}`
+            `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgram.id}`
           );
-
+          console.log("Scholarship Program:", app.scholarshipProgram);
           return {
             id: app.id,
             applicantName: applicantResponse.data.username,
-            scholarshipProgramId: app.scholarshipProgramId,
-            scholarshipName: scholarshipResponse.data.data.name,
+            scholarshipProgramId: app.scholarshipProgram.id,
+            scholarshipName: app.scholarshipProgram.name,
+            scholarshipImage: app.scholarshipProgram.imageUrl,
+            scholarshipDeadline: app.scholarshipProgram.deadline,
+            scholarshipAmount: app.scholarshipProgram.scholarshipAmount,
             university: scholarshipResponse.data.data.university.name,
             appliedDate: app.appliedDate,
             status: app.status,
             details: scholarshipResponse.data.data.description,
             documentUrl: app.applicationDocuments?.[0]?.fileUrl,
             applicationReviews: app.applicationReviews,
+            updatedAt: app.updatedAt,
+            applicationDocuments: app.applicationDocuments,
           };
         })
       );
+      console.log("rawApplications", rawApplications);
+      console.log("detailedApplications", detailedApplications);
 
       setApplications(detailedApplications);
     } catch (err) {
@@ -96,198 +100,50 @@ const ApprovalList: React.FC = () => {
     fetchApplicationReview();
   }, [user.id]);
 
-  const handleRowClick = (item: ApprovalItem, review: any) => {
-    /*const review = item.applicationReviews?.filter((review) => review.expertId == user.id)
-            if(!review) return;
-            const isScored = review.some(
-              (review) => review.score !== null && review.score !== undefined && review.score > 0
-            ) || false;
-            console.log("isScore", isScored);*/
-    if (review.expertId != user.id) return;
-    const isScored =
-      review.score !== null && review.score !== undefined && review.score > 0;
-    console.log("isScore", isScored);
-
-    const score = review.score !== undefined ? review.score : "Not Scored";
-    console.log("Score", score);
-    if (isScored) {
-      notification.info({
-        message:
-          "This application has already been scored. You cannot score it again.",
-      });
-      return; // Prevent opening dialog
-    }
-    setSelectedItem(item);
-    setSelectedReview(review);
-    setScore("");
-    setComment("");
-    window.open(item.documentUrl, "_blank");
-  };
-
-  const handleApprove = async (id: number) => {
-    try {
-      await axios.put(`${BASE_URL}/api/applications/${id}`, {
-        status: "Approved",
-      });
-      setApplications((prev) =>
-        prev.map((app) =>
-          app.id === id ? { ...app, status: "Approved" } : app
-        )
-      );
-    } catch (error) {
-      console.error("Failed to approve application:", error);
-    }
-  };
-
-  const handleReject = async (id: number) => {
-    try {
-      await axios.put(`${BASE_URL}/api/applications/${id}`, {
-        status: "Rejected",
-      });
-      setApplications((prev) =>
-        prev.map((app) =>
-          app.id === id ? { ...app, status: "Rejected" } : app
-        )
-      );
-    } catch (error) {
-      console.error("Failed to reject application:", error);
-    }
-  };
-
-  // const handleScoreSubmit = async () => {
-  //   setIsLoading(true);
-
-  //   if (!selectedItem || !selectedReview || score === "") return;
-  //   const reviewId = selectedReview.id;
-  //   if (!reviewId) {
-  //     console.error("Review ID not found.");
-  //     return;
-  //   }
-  //   if (!selectedItem) return null;
-  //   const reviewMilestone = await getAllReviewMilestonesByScholarship(
-  //     selectedItem.scholarshipProgramId
-  //   );
-  //   console.log("reviewmilestone", reviewMilestone);
-  //   const currentDate = new Date();
-  //   let isReview = true;
-  //   reviewMilestone?.data.forEach((review: any) => {
-  //     if (
-  //       new Date(review.fromDate) < currentDate &&
-  //       new Date(review.toDate) > currentDate
-  //     ) {
-  //       if (review.description.toLowerCase() === "application review") {
-  //         isReview = true;
-  //       } else {
-  //         isReview = false;
-  //       }
-  //     }
-  //   });
-  //   const numericScore = Number(score);
-  //   try {
-  //     const payload = {
-  //       applicationReviewId: reviewId,
-  //       comment,
-  //       isPassed: numericScore >= 50,
-  //       score: Number(score),
-  //       isFirstReview: isReview,
-  //     };
-  //     await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
-  //     console.log("Review submitted successfully:", payload);
-  //     notification.success({ message: "Review submitted successfully" });
-  //     setIsLoading(false);
-  //     setSelectedItem(null);
-  //     fetchApplicationReview();
-  //     setScore("");
-  //     setComment("");
-  //   } catch (error) {
-  //     console.error("Failed to submit review:", error);
-  //     notification.error({ message: "Failed to submit review" });
-  //   }
-  // };
-  const handleScoreSubmit = async () => {
-  
-    if (!selectedItem || !selectedReview || score === "") {
-        notification.error({ message: "Please input a score" });
-        return;
-    }
-    setIsLoading(true);
-    try {
-      // Validate form data using Zod schema
-      expertReviewSchema.parse({
-        score: score.toString(),
-        description: comment,
-      });
-  
-      // If validation passes, continue with your review submission logic
-      const reviewId = selectedReview.id;
-      if (!reviewId) {
-        console.error("Review ID not found.");
-        return;
-      }
-  
-      const reviewMilestone = await getAllReviewMilestonesByScholarship(
-        selectedItem.scholarshipProgramId
-      );
-      console.log("reviewmilestone", reviewMilestone);
-  
-      const currentDate = new Date();
-      let isReview = true;
-      reviewMilestone?.data.forEach((review: any) => {
-        if (
-          new Date(review.fromDate) < currentDate &&
-          new Date(review.toDate) > currentDate
-        ) {
-          if (review.description.toLowerCase() === "application review") {
-            isReview = true;
-          } else {
-            isReview = false;
-          }
-        }
-      });
-  
-      const numericScore = Number(score);
-      const payload = {
-        applicationReviewId: reviewId,
-        comment,
-        isPassed: numericScore >= 50,
-        score: numericScore,
-        isFirstReview: isReview,
-      };
-      await axios.put(`${BASE_URL}/api/applications/reviews/result`, payload);
-      console.log("Review submitted successfully:", payload);
-      notification.success({ message: "Review submitted successfully" });
-      setIsLoading(false);
-      setSelectedItem(null);
-      fetchApplicationReview();
-      setScore("");
-      setComment("");
-    } catch (error) {
-      
-      if (error instanceof z.ZodError) {
-        
-        const errorMessage = error.errors.map((err) => err.message).join(", ");
-        notification.error({ message: `Validation failed: ${errorMessage}` });
-      } else {
-        notification.error({ message: "Failed to submit review" });
-      }
-      setIsLoading(false);
-    }
-  };
-  
-
   const filteredApplications = applications.filter((app) =>
     [app.applicantName, app.scholarshipName, app.university].some((field) =>
       field.toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
 
+  const groupedApplications = filteredApplications
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )
+    .reduce((acc, app) => {
+      if (!acc[app.scholarshipProgramId]) {
+        acc[app.scholarshipProgramId] = [];
+      }
+      acc[app.scholarshipProgramId].push(app);
+      return acc;
+    }, {} as Record<string, ApprovalItem[]>);
+
+  console.log("GROUP", groupedApplications);
+
+  // Sắp xếp lại các nhóm dựa trên appliedDate của ứng dụng đầu tiên trong mỗi nhóm
+  const sortedGroupedApplications = Object.entries(groupedApplications).sort(
+    ([, appsA], [, appsB]) => {
+      const latestUpdatedAtA = Math.max(
+        ...appsA.map((app) => new Date(app.updatedAt).getTime())
+      );
+      const latestUpdatedAtB = Math.max(
+        ...appsB.map((app) => new Date(app.updatedAt).getTime())
+      );
+
+      return latestUpdatedAtB - latestUpdatedAtA;
+    }
+  );
+
+  console.log("Sort", sortedGroupedApplications);
+
   return (
     <Tabs.Content value="review" className="pt-4">
       <div className="grid grid-cols-12 gap-4 p-4">
         <div className="col-start-1 col-end-13 space-y-6">
-          <h1 className="text-3xl font-bold">Approval List</h1>
+          <h1 className="text-3xl font-bold">Awaiting Review List</h1>
 
-          <input
+          <Input
             type="text"
             placeholder="Search by applicant, scholarship, or university..."
             value={searchQuery}
@@ -300,94 +156,70 @@ const ApprovalList: React.FC = () => {
           {loading ? (
             <p className="text-center text-lg">Loading...</p>
           ) : (
-            <ReviewList
-              applications={filteredApplications}
-              onRowClick={handleRowClick}
-              onApprove={handleApprove}
-              onReject={handleReject}
-              document={selectedItem?.documentUrl}
-            />
-          )}
-
-          <Dialog.Root
-            open={!!selectedItem}
-            onOpenChange={() => setSelectedItem(null)}
-          >
-            <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-              <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-md">
-                {selectedItem && (
-                  <div>
-                    <Dialog.Title className="text-2xl font-bold">
-                      {selectedItem.scholarshipName}
-                    </Dialog.Title>
-                    <Dialog.Description className="mt-2 text-sm text-gray-600">
-                      {selectedItem.details}
-                    </Dialog.Description>
-
-                    <div className="mt-4">
-                      <p>
-                        <strong>Applicant:</strong> {selectedItem.applicantName}
-                      </p>
-                      <p>
-                        <strong>University:</strong> {selectedItem.university}
-                      </p>
-                      <p>
-                        <strong>Applied On:</strong>{" "}
-                        {formatDate(selectedItem.appliedDate)}
-                      </p>
-                    </div>
-
-                    {/* {selectedItem.documentUrl && (
-                      <a
-                        href={selectedItem.documentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-lg"
-                      >
-                        View Document
-                      </a>
-                    )} */}
-
-                    {/* Add form for scoring */}
-                    <div className="mt-4">
-                      <Label className="block text-sm font-medium text-gray-700">
-                        Score
-                      </Label>
-                      <Input
-                        type="number"
-                        value={score}
-                        onChange={(e) => setScore(e.target.value)}
-                        className="w-full h-full p-3 mt-2 border border-gray-300 rounded-lg"
-                        placeholder="Enter score (1-100)"
-                        min={1}
-                        max={100}
-                      />
-
-                      <Label className="block text-sm font-medium text-gray-700 mt-4">
-                        Comment
-                      </Label>
-                      <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
-                        placeholder="Enter comment"
-                      />
-
-                      <Button
-                        onClick={handleScoreSubmit}
-                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg"
-                        // disabled={score === "" || comment === "" || Number(score) < 1 || Number(score) > 100}
-                      >
-                        Submit Review
-                      </Button>
+            sortedGroupedApplications.map(([scholarshipId, apps]) => (
+              <div key={scholarshipId}>
+                <Link
+                  to={`/expert/review-application/scholarshipProgram/${apps[0]?.scholarshipProgramId}`}
+                >
+                  <div className="w-full flex items-center justify-between bg-white rounded-lg shadow-lg p-4 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                    <div className="flex items-start gap-4">
+                      <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center">
+                        <img
+                          src={apps[0]?.scholarshipImage}
+                          alt="Scholarship Logo"
+                          className="rounded-md object-cover"
+                        />
+                      </div>
+                      <div className="space-y-6">
+                        <div className="flex gap-4">
+                          <h2 className="text-xl font-semibold">
+                            {
+                              apps.find(
+                                (app: any) =>
+                                  app.scholarshipProgramId == scholarshipId
+                              )?.scholarshipName
+                            }
+                          </h2>
+                        </div>
+                        <div className="flex items-center gap-6 mt-2 text-sm text-gray-500">
+                          <div className="flex flex-col">
+                            <h3 className="text-sm font-semibold">Deadline</h3>
+                            <span className="text-sm text-black font-semibold">
+                              {apps[0]?.scholarshipDeadline
+                                ? formatNaturalDate(apps[0].scholarshipDeadline)
+                                : "No deadline available"}
+                            </span>
+                          </div>
+                          <div className="flex flex-col">
+                            <h3 className="text-sm font-semibold">Award</h3>
+                            <span className="text-sm text-black font-semibold">
+                              {apps[0]?.scholarshipAmount &&
+                              !isNaN(Number(apps[0]?.scholarshipAmount))
+                                ? `$${formatCurrency(
+                                    Number(apps[0]?.scholarshipAmount),
+                                    "USD"
+                                  )}`
+                                : "No award available"}
+                            </span>
+                          </div>
+                          <div className="flex flex-col">
+                            <h3 className="text-sm font-semibold">
+                              Updated At
+                            </h3>
+                            <span className="text-sm text-black font-semibold">
+                              {apps[0]?.appliedDate
+                                ? formatNaturalDate(apps[0].appliedDate)
+                                : "No updated date available"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-              </Dialog.Content>
-            </Dialog.Portal>
-            {isLoading && <ScreenSpinner />}
-          </Dialog.Root>
+                </Link>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </Tabs.Content>

@@ -9,6 +9,7 @@ import MajorManagement from "./Dashboard/pages/MajorManagement";
 import CategoryManagement from "./Dashboard/pages/CategoryManagement";
 import UniversityManagement from "./Dashboard/pages/UniversityManagement";
 import AccountAwaitingApproval from "./Dashboard/pages/AccountAwaitingApproval";
+import ScholarshipAwaitingApproval from "./Dashboard/pages/ScholarshipAwaitingApproval";
 
 const privateRoutes: RouteObject[] = [
   {
@@ -37,11 +38,15 @@ const privateRoutes: RouteObject[] = [
   },
   {
     path: RouteNames.UNIVERSITY_MANAGEMENT,
-    element: <UniversityManagement/>,
+    element: <UniversityManagement />,
   },
   {
     path: RouteNames.ACCOUNT_AWAITING_APPROVAL,
-    element: <AccountAwaitingApproval/>,
+    element: <AccountAwaitingApproval />,
+  },
+  {
+    path: RouteNames.SCHOLARSHIP_AWAITING_APPROVAL,
+    element: <ScholarshipAwaitingApproval />,
   }
 ];
 const publicRoutes: RouteObject[] = [

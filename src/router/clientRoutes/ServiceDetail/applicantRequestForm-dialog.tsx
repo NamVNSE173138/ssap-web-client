@@ -9,7 +9,7 @@ import { uploadFile } from "@/services/ApiServices/testService";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoText, IoPricetag, IoCard, IoClose, IoInformationCircle } from "react-icons/io5";
+import { IoWalletOutline, IoCashOutline, IoCloudUpload, IoText, IoPricetag, IoCard, IoClose, IoInformationCircle, IoList } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { FaExclamationTriangle, FaTimes, FaWallet } from "react-icons/fa";
 import RouteNames from "@/constants/routeNames";
@@ -46,7 +46,7 @@ const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalPro
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const navigate = useNavigate();
   const [isContractOpen, setContractOpen] = useState(false);
-
+  const [showSuggest, setShowSuggest] = useState(false);
 
   useEffect(() => {
     const fetchScholarships = async () => {
@@ -180,9 +180,9 @@ const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalPro
       <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-xl h-[95%] w-[90%] md:w-[60%] transform transition-all scale-95 hover:scale-100 overflow-y-auto">
-            <DialogTitle className="text-2xl font-semibold flex items-center gap-3 relative">
+            <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
               <IoIosPaper className="text-3xl text-blue-500" />
-              <span>Request Service</span>
+              <span className="font-bold">CREATE REQUEST</span>
               <button
                 onClick={handleClose}
                 className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition"
@@ -227,12 +227,52 @@ const RequestFormModal = ({ isOpen, handleClose, services }: RequestFormModalPro
                     placeholder="Provide a brief description"
                   />
                   <div
-                    className={`text-sm mt-1 ${description.length > 200 ? 'text-red-500' : 'text-gray-500'
+                    className={`text-sm mt-1 ${description.length > 200 ? "text-red-500" : "text-gray-500"
                       }`}
                   >
                     {description.length}/{200}
                   </div>
+                  <div className="flex items-center justify-between mt-3">
+                    <label className="text-gray-700 font-medium flex items-center gap-2">
+                      <IoList className="text-blue-500" />
+                      <div className="text-gray-400">(Suggest description)</div>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowSuggest(!showSuggest)} // Toggle state
+                      className="text-blue-500 hover:underline text-sm"
+                    >
+                      {showSuggest ? "Hide Suggestions" : "Show Suggestions"}
+                    </button>
+                  </div>
+                  {showSuggest && ( // Hiển thị form nếu state showSuggest là true
+                    <div className="max-w-7xl mx-auto p-6 bg-[rgba(219,216,216,0.95)] shadow-lg rounded-md mt-3 transition-all">
+                      <ul className="space-y-2">
+                        {[
+                          "Provide feedback to refine my CV for a specific job application.",
+                          "Help me translate an academic essay into fluent English.",
+                          "Assist with writing a compelling essay for my scholarship application.",
+                          "Review my application documents to ensure they are error-free and impactful.",
+                          "Prepare me for an upcoming interview with personalized coaching.",
+                          "Draft a strong and persuasive recommendation letter for a scholarship.",
+                          "Support me in finding scholarships tailored to my background and goals.",
+                          "Proofread my research paper to enhance clarity and grammar.",
+                          "Guide me in developing a personalized scholarship strategy for maximum success.",
+                          "Offer insights into financial aid options to cover tuition costs.",
+                        ].map((suggestion, index) => (
+                          <li
+                            key={index}
+                            className="cursor-pointer text-blue-500 hover:underline"
+                            onClick={() => setDescription(suggestion)} // Cập nhật state khi chọn gợi ý
+                          >
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
+
 
                 <div className="mb-5">
                   <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">

@@ -1,12 +1,16 @@
 import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
-import { BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import RouteNames from "@/constants/routeNames";
 import { getAllAccounts } from "@/services/ApiServices/accountService";
-import { List } from "@mui/material";
+import { Button, List, Paper } from "@mui/material";
 import { Breadcrumb } from "antd";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { useEffect, useState } from "react";
-import { FaUsers, FaEye, FaPhoneAlt, FaEnvelope, FaSpinner } from "react-icons/fa"; // Added icons for better UX
+import { FaUsers, FaSpinner } from "react-icons/fa";
+import { IoIosEye } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 const ProviderList = () => {
@@ -35,53 +39,129 @@ const ProviderList = () => {
 
   const renderProviders = () => (
     <div className="space-y-6 bg-gradient-to-r from-blue-100 to-grey-300 p-8 rounded-lg shadow-2xl">
-  <div className="flex items-center justify-center mb-6">
-    <h2 className="flex items-center text-3xl font-semibold text-gray-800 bg-gradient-to-r from-blue-400 to-blue-400 p-4 rounded-lg shadow-xl">
-      <FaUsers className="mr-3 text-white text-2xl" />
-      <span className="text-white">Providers List</span>
-    </h2>
-  </div>
-
-  <div className="flex justify-center">
-    <div className="space-y-4 w-4/5">
-      {/* Table Header */}
-      <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-400 to-blue-400 text-white font-semibold rounded-lg shadow-md">
-        <p className="w-1/12 text-center">No.</p>
-        <p className="w-3/12">Provider Name</p>
-        <p className="w-4/12">Email</p>
-        <p className="w-2/12">Phone</p>
-        <p className="w-2/12">Action</p>
+      <div className="flex items-center justify-center mb-6">
+        <h2 className="flex items-center text-3xl font-semibold text-gray-800 bg-gradient-to-r from-blue-400 to-blue-400 p-4 rounded-lg shadow-xl">
+          <FaUsers className="mr-3 text-white text-2xl" />
+          <span className="text-white">Providers List</span>
+        </h2>
       </div>
 
-      {/* Providers List */}
-      {providers.map((provider, index) => (
+      <Paper
+        elevation={3}
+        style={{
+          padding: "20px",
+          borderRadius: "10px",
+          backgroundColor: "#fafafa",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        {/* Table Header */}
         <div
-          key={provider.id}
-          className="flex justify-between items-center p-4 bg-white border-2 border-gray-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform transition duration-300"
+          style={{
+            display: "flex",
+            fontWeight: "bold",
+            backgroundColor: "#f1f1f1",
+            padding: "10px",
+            borderRadius: "8px",
+            marginBottom: "10px",
+          }}
         >
-          <p className="w-1/12 text-center text-gray-800">{index + 1}</p>
-          <p className="w-3/12 text-gray-800 font-medium">{provider.username}</p>
-          <p className="w-4/12 text-gray-800">
-            <FaEnvelope className="inline mr-2 text-cyan-500" />
-            {provider.email || "Not Available"}
-          </p>
-          <p className="w-2/12 text-gray-800">
-            <FaPhoneAlt className="inline mr-2 text-green-500" />
-            {provider.phoneNumber || "Not Available"}
-          </p>
-          <Link
-            to={RouteNames.PROVIDER_INFORMATION.replace(":id", provider.id)}
-            className="w-2/12 text-blue-600 font-medium underline hover:text-blue-800 transition"
-          >
-            <FaEye className="mr-2 inline text-xl text-blue-500" />
-            View Services
-          </Link>
+          <div style={{ flex: "1", marginLeft: "20px" }}>No.</div>
+          <div style={{ flex: "2" }}>Provider Name</div>
+          <div style={{ flex: "2" }}>Email</div>
+          <div style={{ flex: "2" }}>Phone</div>
+          <div style={{ flex: "2" }}>Action</div>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
 
+        {/* Providers List */}
+        {providers.map((provider, index) => (
+          <div
+            key={provider.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px",
+              backgroundColor: "#ffffff",
+              border: "2px solid #e0e0e0",
+              borderRadius: "8px",
+              marginBottom: "10px",
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0px 4px 12px rgba(0, 0, 0, 0.2)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+          >
+            <div
+              style={{
+                flex: "1",
+                marginLeft: "20px",
+                color: "#333",
+                fontWeight: "500",
+              }}
+            >
+              {index + 1}
+            </div>
+            <div style={{ flex: "2", fontWeight: "500", color: "#333" }}>
+              {provider.username}
+            </div>
+            <div style={{ flex: "2", color: "#555" }}>
+              <span
+                style={{
+                  color: "#0099cc",
+                  marginRight: "8px",
+                  fontWeight: "500",
+                }}
+              >
+                📧
+              </span>
+              {provider.email || "Not Available"}
+            </div>
+            <div style={{ flex: "2", color: "#555" }}>
+              <span
+                style={{
+                  color: "#00cc66",
+                  marginRight: "8px",
+                  fontWeight: "500",
+                }}
+              >
+                📞
+              </span>
+              {provider.phoneNumber || "Not Available"}
+            </div>
+            <div style={{ flex: "2" }}>
+              <Button
+                onClick={() =>
+                  (window.location.href =
+                    RouteNames.PROVIDER_INFORMATION.replace(":id", provider.id))
+                }
+                style={{
+                  backgroundColor: "#1e88e5",
+                  color: "#fff",
+                  padding: "6px 12px",
+                  borderRadius: "5px",
+                  fontWeight: "500",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1565c0")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1e88e5")
+                }
+              >
+                <IoIosEye style={{ marginRight: "8px" }} />
+                View Services
+              </Button>
+            </div>
+          </div>
+        ))}
+      </Paper>
+    </div>
   );
 
   if (loading) {
@@ -104,11 +184,15 @@ const ProviderList = () => {
           <Breadcrumb>
             <BreadcrumbList className="text-white">
               <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">Home</Link>
+                <Link to="/" className="md:text-xl text-lg">
+                  Home
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <Link to="/services" className="md:text-xl text-lg">Services</Link>
+                <Link to="/services" className="md:text-xl text-lg">
+                  Services
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>

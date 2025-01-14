@@ -5,17 +5,17 @@ import { BASE_URL } from "@/constants/api";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { notification } from "antd";
 import { z } from "zod";
+import { FaUser, FaPhoneAlt, FaEnvelope, FaLock, FaMapMarkerAlt, FaImage, FaGraduationCap } from 'react-icons/fa'
 
 interface ExpertFormProps {
   onSubmit: (formData: any) => Promise<void>;
   initialData: any;
   handelUploadFile: any;
-  // success: any;
 }
 
 const expertFormSchema = z.object({
   name: z.string().min(1, { message: "Please enter name of expert" }),
-  major: z.string().nonempty({ message: "Major is required" }),
+  major: z.string().min(1, { message: "Major is required" }),
   email: z.string().email({ message: "Invalid email address" }),
   phoneNumber: z
     .string()
@@ -92,19 +92,10 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
     if (!validateForm()) return;
 
     setIsLoading(true);
-
-    // await onSubmit(formData);
-    // setFormData(initialData);
-    // setIsLoading(false);
-    // if (success) {
-    //   notification.success({ message: "Expert is created successfully!" });
-    // } else {
-    //   notification.error({ message: "Fail to create expert!" });
-    // }
     try {
       await onSubmit(formData);
       notification.success({ message: "Expert is created successfully!" });
-      setFormData(initialData); 
+      setFormData(initialData);
     } catch (error) {
       notification.error({ message: "Failed to create expert!" });
     } finally {
@@ -115,114 +106,156 @@ const ExpertForm: React.FC<ExpertFormProps> = ({
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-semibold">Name:</label>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-            
-          />
-          {validationErrors.name && (
-            <p className="text-red-500 text-sm">{validationErrors.name}</p>
-          )}
+        <div className="mt-5">
+          <div className="flex space-x-6">
+            {/* Left Section */}
+            <div className="flex-1 space-y-4 ml-16">
+              <div className="w-5/6">
+                <label className="block font-semibold flex items-center">
+                  <FaUser className="mr-2" />
+                  Name
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <Input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="border p-2 rounded w-full"
+                />
+                {validationErrors.name && (
+                  <p className="text-red-500 text-sm">{validationErrors.name}</p>
+                )}
+              </div>
+
+              <div className="w-5/6">
+                <label className="block font-semibold flex items-center">
+                  <FaGraduationCap className="mr-2" />
+                  Major
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <select
+                  name="major"
+                  value={formData.major}
+                  onChange={handleInputChange}
+                  className="border p-2 rounded w-full"
+                >
+                  <option value="">Select a major</option>
+                  {loading ? (
+                    <option disabled>Loading majors...</option>
+                  ) : error ? (
+                    <option disabled>{error}</option>
+                  ) : (
+                    majors.map((major) => (
+                      <option key={major.id} value={major.name}>
+                        {major.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {validationErrors.major && (
+                  <p className="text-red-500 text-sm">{validationErrors.major}</p>
+                )}
+              </div>
+
+              <div className="w-5/6">
+                <label className=" font-semibold flex items-center">
+                  <FaEnvelope className="mr-2" />
+                  Email
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <Input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="border p-2 rounded w-full"
+                />
+                {validationErrors.email && (
+                  <p className="text-red-500 text-sm">{validationErrors.email}</p>
+                )}
+              </div>
+
+              <div className="w-5/6">
+                <label className="block font-semibold flex items-center">
+                  <FaImage className="mr-2" />
+                  Avatar URL
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handelUploadFile}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex-1 space-y-4">
+              <div className="w-5/6">
+                <label className="block font-semibold flex items-center">
+                  <FaPhoneAlt className="mr-2" />
+                  Phone Number
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <Input
+                  type="text"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  className="border p-2 rounded w-full"
+                />
+                {validationErrors.phoneNumber && (
+                  <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
+                )}
+              </div>
+
+              <div className="w-5/6">
+                <label className="block font-semibold flex items-center">
+                  <FaLock className="mr-2" />
+                  Password
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <Input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="border p-2 rounded w-full"
+                />
+                {validationErrors.password && (
+                  <p className="text-red-500 text-sm">{validationErrors.password}</p>
+                )}
+              </div>
+
+              <div className="w-5/6">
+                <label className="block font-semibold flex items-center">
+                  <FaMapMarkerAlt className="mr-2" />
+                  Address
+                  <span className="text-red-500 text-sm font-normal">*</span>
+                </label>
+                <Input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="border p-2 rounded w-full"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block font-semibold">Major:</label>
-          <select
-            name="major"
-            value={formData.major}
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-            
+
+        {/* Submit Button */}
+        <div className="flex justify-end mt-4 mr-10">
+          <button
+            type="submit"
+            className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
           >
-            <option value="">Select a major</option>
-            {loading ? (
-              <option disabled>Loading majors...</option>
-            ) : error ? (
-              <option disabled>{error}</option>
-            ) : (
-              majors.map((major) => (
-                <option key={major.id} value={major.name}>
-                  {major.name}
-                </option>
-              ))
-            )}
-          </select>
-          {validationErrors.major && (
-            <p className="text-red-500 text-sm">{validationErrors.major}</p>
-          )}
+            Submit
+          </button>
         </div>
-        <div>
-          <label className="block font-semibold">Email:</label>
-          <Input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-            
-          />
-          {validationErrors.email && (
-            <p className="text-red-500 text-sm">{validationErrors.email}</p>
-          )}
-        </div>
-        <div>
-          <label className="block font-semibold">Phone Number:</label>
-          <Input
-            type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-            
-          />
-          {validationErrors.phoneNumber && (
-            <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
-          )}
-        </div>
-        <div>
-          <label className="block font-semibold">Password:</label>
-          <Input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-          />
-          {validationErrors.password && (
-            <p className="text-red-500 text-sm">{validationErrors.password}</p>
-          )}
-        </div>
-        <div>
-          <label className="block font-semibold">Address:
-          <span className="text-red-500 text-sm font-normal">(* Optional)</span>
-          </label>
-          <Input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Avatar URL: <span className="text-red-500 text-sm font-normal">(* Optional)</span></label>
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handelUploadFile}
-            className="border p-2 rounded w-full"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-[#1eb2a6] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
-        >
-          Submit
-        </button>
       </form>
       {isLoading && <ScreenSpinner />}
     </>

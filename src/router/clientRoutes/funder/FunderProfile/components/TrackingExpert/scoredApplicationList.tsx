@@ -12,6 +12,14 @@ const ScoredList = () => {
   const [applications, setApplications] = useState<Record<number, any[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const statusColor: any = {
+    Submitted: "blue",
+    Approved: "green",
+    Rejected: "red",
+    Failed: "red",
+    Reviewing: "yellow",
+    Passed:"green",
+  };
 
   useEffect(() => {
     const fetchFunderExpertsAndApplications = async () => {
@@ -32,9 +40,9 @@ const ScoredList = () => {
         // Step 2: Fetch Assigned Applications for Each Expert
         const applicationsPromises = fetchedExperts.map((expert: any) =>
           axios
-            .get(`${BASE_URL}/api/experts/${expert.id}/assigned-applications`)
+            .get(`${BASE_URL}/api/experts/${expert.expertId}/assigned-applications`)
             .then((res) => ({
-              expertId: expert.id,
+              expertId: expert.expertId,
               data: res.data.data,
             }))
         );
@@ -91,7 +99,7 @@ const ScoredList = () => {
         <div className="max-h-100 overflow-auto">
           <div className="grid grid-cols-6 gap-4 min-w-full">
             <div className="sticky top-0 bg-gray-100 font-semibold p-2 border-b">
-              Username
+              Name
             </div>
             <div className="sticky top-0 bg-gray-100 font-semibold p-2 border-b">
               Apply Date
@@ -111,21 +119,26 @@ const ScoredList = () => {
 
             {/* Render sorted applications */}
             {experts.map((expert) =>
-              applications[expert.id]?.map((application) => (
+              applications[expert.expertId]?.map((application) => (
                 <React.Fragment key={application.id}>
-                  <div className="p-2 border-b">{application.id}</div>
+                  <div className="p-2 border-b">{application.applicantName}</div>
                   <div className="p-2 border-b">
                     {formatDate(application.appliedDate)}
                   </div>
                   <div className="p-2 border-b">
-                    {application.scholarshipProgramId}
+                    {application.scholarshipName}
                   </div>
                   <div className="p-2 border-b">{expert.name}</div>
                   <div className="p-2 border-b">
                     {application.applicationReviews[0]?.score}
                   </div>
                   <div className="p-2 border-b">
-                    {application.applicationReviews[0]?.status}
+                    <span className={`relative inline-flex items-center justify-center h-3 w-3 rounded-full bg-${statusColor[application.applicationReviews[0]?.status]}-500`}>
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${statusColor[application.applicationReviews[0]?.status]}-500 opacity-75`}></span>
+                    </span>
+                    <span className={`text-${statusColor[application.applicationReviews[0]?.status]}-500 font-medium ml-2`}>
+                      {application.applicationReviews[0]?.status}
+                    </span>
                   </div>
                 </React.Fragment>
               ))

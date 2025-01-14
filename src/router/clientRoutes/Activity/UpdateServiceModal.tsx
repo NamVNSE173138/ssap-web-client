@@ -95,7 +95,7 @@ const EditServiceModal = ({ isOpen, setIsOpen, fetchServices, serviceData }: Edi
             className="bg-white p-8 rounded-lg shadow-2xl w-1/2 max-h-[80vh] overflow-y-auto animate__animated animate__fadeIn"
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-3xl font-semibold text-blue-600">Edit Service</h3>
+              <h3 className="text-3xl font-semibold text-blue-600">Edit {serviceData.name}</h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-2xl hover:text-red-500 transition-colors"

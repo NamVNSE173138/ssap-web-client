@@ -35,6 +35,8 @@ import ApplicationReview from "./Expert/ExpertProfile";
 import ExpertProfile from "./Expert/ExpertProfile";
 import TrackingExpert from "./funder/FunderProfile/components/TrackingExpert";
 import UserGuide from "./UserGuide";
+import AddExpertToScholarship from "./AddExpertToScholarship/add-expert-to-scholarship";
+import ReviewList from "./Expert/ExpertProfile/components/ReviewSection/reviewList";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -187,6 +189,10 @@ const funderRoutes: RouteObject[] = [
     path: RouteNames.TRACKING_EXPERT,
     element: <TrackingExpert />,
   },
+  {
+    path: RouteNames.ADD_EXPERT_TO_SCHOLARSHIP,
+    element: <AddExpertToScholarship />,
+  },
 ];
 
 const expertRoutes: RouteObject[] = [
@@ -197,6 +203,10 @@ const expertRoutes: RouteObject[] = [
   {
     path: RouteNames.TRACKING_EXPERT,
     element: <TrackingExpert />,
+  },
+  {
+    path: RouteNames.REVIEW_SCORE_LIST,
+    element: <ReviewList />,
   },
 ];
 

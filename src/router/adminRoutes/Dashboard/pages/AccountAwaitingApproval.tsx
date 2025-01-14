@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { getFunderProfile } from "@/services/ApiServices/funderService";
 import { AccountActiveEmail, SendNotificationAndEmailReject } from "@/services/ApiServices/notification";
 import { notification } from "antd";
 import { getAllAccounts, updateAccount } from "@/services/ApiServices/accountService";
+import { Paper } from "@mui/material";
 
 type AccountWithRole = {
     id: string;
@@ -31,7 +32,6 @@ interface AccountWithDetails extends AccountWithRole {
     providerDocuments?: { name: string, type: string, fileUrl: string }[];
     funderDocuments?: { name: string, type: string, fileUrl: string }[];
 }
-
 
 const AccountAwaitingApproval = () => {
     const [activeTab, setActiveTab] = useState("providers");
@@ -147,68 +147,120 @@ const AccountAwaitingApproval = () => {
     };
 
     const renderTable = (data: AccountWithDetails[], _isProvider: boolean) => (
-        <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-4 ml-0">
-            <table className="min-w-full text-left border-collapse">
-                <thead>
-                    <tr className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
-                        <th className="px-6 py-3 border-b text-sm font-medium">No</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">ID</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Avatar</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Email</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Organization Name</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Contact Person</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Documents</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Status</th>
-                        <th className="px-6 py-3 border-b text-sm font-medium">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((user, index) => (
-                        <tr key={user.id} className="hover:bg-gray-50 transition-all duration-200">
-                            <td className="px-6 py-4 border-b text-sm">{index + 1}</td>
-                            <td className="px-6 py-4 border-b text-sm">{user.accountId}</td>
-                            <td className="px-6 py-4 border-b text-sm">
-                                <img src={user.avatarUrl || "https://github.com/shadcn.png"} alt="avatar" className="w-12 h-12 rounded-full" />
-                            </td>
-                            <td className="px-6 py-4 border-b text-sm">{user.email}</td>
-                            <td className="px-6 py-4 border-b text-sm">{user.organizationName}</td>
-                            <td className="px-6 py-4 border-b text-sm">{user.contactPersonName}</td>
-                            <td className="px-6 py-4 border-b text-sm">
-                                <ul className="list-disc pl-4">
-                                    {(user.providerDocuments || user.funderDocuments)?.map((doc, idx) => (
-                                        <li key={idx} className="text-blue-600 hover:underline text-sm">
-                                            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
-                                                {doc.name} - {doc.type}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </td>
-                            <td className="px-6 py-4 border-b text-sm">
-                                <span className={`px-2 py-1 rounded-md text-white ${user.status === "Active" ? "bg-green-500" : user.status === "Pending" ? "bg-yellow-500" : "bg-red-500"}`}>
-                                    {user.status}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4 border-b text-sm">
-                                <Button onClick={() => handleApprove(user)} className="bg-green-500 text-white hover:bg-green-600 mr-2 flex items-center">
-                                    <AiOutlineCheckCircle className="inline-block mr-2" />
+        <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
+            {/* Header Row */}
+            <div
+                style={{
+                    display: 'flex',
+                    fontWeight: 'bold',
+                    backgroundColor: '#f1f1f1',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    marginBottom: '10px',
+                }}
+            >
+                <div style={{ flex: 0.5 }}>No</div>
+                <div style={{ flex: 0.5 }}>ID</div>
+                <div style={{ flex: 1 }}>Avatar</div>
+                <div style={{ flex: 2.5, marginRight:'20px' }}>Email</div>
+                <div style={{ flex: 1.5, marginRight:'20px' }}>Organization Name</div>
+                <div style={{ flex: 1, marginRight:'20px' }}>Contact Name</div>
+                <div style={{ flex: 2.5, marginRight:'20px' }}>Documents</div>
+                <div style={{ flex: 1, marginRight:'20px' }}>Status</div>
+                <div style={{ flex: 2.5, marginRight:'20px' }}>Actions</div>
+            </div>
+
+            {/* Data Rows */}
+            {data.map((user, index) => (
+                <React.Fragment key={user.id}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            padding: '10px',
+                            cursor: 'pointer',
+                            backgroundColor: '#fff',
+                            borderBottom: '1px solid #ddd',
+                            transition: 'background-color 0.3s',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+                    >
+                        <div style={{ flex: 0.5 }}>{index + 1}</div>
+                        <div style={{ flex: 0.5 }}>{user.accountId}</div>
+                        <div style={{ flex: 1 }}>
+                            <img
+                                src={user.avatarUrl || 'https://github.com/shadcn.png'}
+                                alt="avatar"
+                                style={{ width: '48px', height: '48px', borderRadius: '50%' }}
+                            />
+                        </div>
+                        <div style={{ flex: 2.5, marginRight:'20px' }}>{user.email}</div>
+                        <div style={{ flex: 1.5, marginRight:'20px' }}>{user.organizationName}</div>
+                        <div style={{ flex: 1, marginRight:'20px' }}>{user.contactPersonName}</div>
+                        <div style={{ flex: 2.5, marginRight:'20px' }}>
+                            <ul>
+                                {(user.providerDocuments || user.funderDocuments)?.map((doc, idx) => (
+                                    <li key={idx} style={{ fontSize: '14px' }}>
+                                        <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
+                                            {doc.name} - {doc.type}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={{ flex: 1, marginRight:'20px' }}>
+                            <span
+                                style={{
+                                    display: 'inline-block',
+                                    padding: '5px 10px',
+                                    borderRadius: '12px',
+                                    backgroundColor: user.status === 'Active' ? '#4CAF50' : user.status === 'Pending' ? '#FFEB3B' : '#F44336',
+                                    color: '#fff',
+                                }}
+                            >
+                                {user.status}
+                            </span>
+                        </div>
+                        <div style={{ flex: 2.5 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <Button
+                                    onClick={() => handleApprove(user)}
+                                    style={{
+                                        backgroundColor: 'green',
+                                        color: 'white',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <AiOutlineCheckCircle style={{ marginRight: '8px' }} />
                                     Approve
                                 </Button>
-                                <Button onClick={() => handleReject(user)} className="bg-red-500 text-white hover:bg-red-600 flex items-center mt-2">
-                                    <FaTimesCircle className="inline-block mr-2" />
+                                <Button
+                                    onClick={() => handleReject(user)}
+                                    style={{
+                                        backgroundColor: 'red',
+                                        color: 'white',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <FaTimesCircle style={{ marginRight: '8px' }} />
                                     Need Upload More
                                 </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </div>
+                    </div>
+                </React.Fragment>
+            ))}
+        </Paper>
+
     );
 
 
     return (
-        <div className="w-full max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+        <div className="">
             <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <Tabs.List className="flex justify-center space-x-6 mb-6">
                     <Tabs.Trigger
