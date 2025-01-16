@@ -70,33 +70,6 @@ const TrackingExpert = () => {
     fetchExperts();
   }, []);
 
-  // const handleFormSubmit = async (formData: any) => {
-  //   setError(null);
-  //   setSuccess(false);
-  //   try {
-  //     const imageUrl = await uploadFile(imageFile);
-  //     if (imageUrl && imageUrl.data) {
-  //       formData.avatarUrl = imageUrl.data.toString();
-  //     }
-
-  //     console.log("EXPERT", formData);
-
-  //     const response = await axios.post(`${BASE_URL}/api/experts`, formData, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-
-  //     console.log("Response:", response.data);
-  //     setSuccess(true);
-
-  //     fetchExperts();
-  //   } catch (err: any) {
-  //     console.error("Error:", err.response?.data || err.message);
-  //     setError(err.response?.data?.message || "An error occurred");
-  //   }
-  // };
-
   const handleFormSubmit = async (formData: any) => {
     setError(null);
     try {
