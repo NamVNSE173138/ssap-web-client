@@ -49,7 +49,7 @@ const AuthSection = () => {
     <Tabs.Content value="password" className="pt-4">
       <h2 className="text-3xl text-black font-bold mb-6">Change Password</h2>
       <form className="space-y-6">
-        <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+        <div className="max-w-6xl mx-auto p-6 border-2 border-gray-200 rounded-md">
           {/* Old Password */}
           <div>
             <label
