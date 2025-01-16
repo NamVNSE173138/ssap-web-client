@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
+import { AiOutlinePlusCircle } from "react-icons/ai";
 import { Spin, Modal, Input, Button, notification, Table } from "antd";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -25,7 +25,6 @@ const Wallet = () => {
   const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isUpdateBankModalOpen, setIsUpdateBankModalOpen] = useState(false);
-  const [isModalWithdrawOpen, setIsModalWithdrawOpen] = useState(false);
   const [accountNameError, setAccountNameError] = useState("");
   const [accountNumberError, setAccountNumberError] = useState("");
 
@@ -65,14 +64,6 @@ const Wallet = () => {
 
   const handleAddMoneyClick = () => {
     setIsModalOpen(true);
-  };
-
-  const handleWithdrawClick = () => {
-    setIsModalWithdrawOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalWithdrawOpen(false);
   };
 
   const handleAddMoney = async () => {
@@ -240,12 +231,12 @@ const Wallet = () => {
   ];
 
   return (
-    <div className="flex w-full">
-      <div className="flex flex-col items-center p-5 h-full w-full bg-white">
-        <h1 className="text-3xl font-semibold text-blue-700 mb-4">Wallet</h1>
+    <div className="flex w-full justify-center">
+      <div className="flex flex-col items-center p-10 bg-white rounded-xl w-full">
+        {/* <h1 className="text-4xl font-semibold text-[#1eb2a6] mb-8">Wallet</h1> */}
 
         {error ? (
-          <div className="w-full lg:w-2/3 bg-blue-500 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform hover:scale-105">
+          <div className="w-full bg-[#1eb2a6] text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-6 transition-transform">
             <Button
               onClick={() => setIsOpenDialog(true)}
               className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white"
@@ -255,14 +246,26 @@ const Wallet = () => {
           </div>
         ) : (
           <>
-            <div className="w-full lg:w-2/3 bg-blue-600 text-white p-6 rounded-lg shadow-xl flex flex-col items-center mb-5 transition-transform">
-              <h2 className="text-2xl">Balance</h2>
-              <p className="text-5xl font-bold mt-2">
-                ${(walletData?.data.balance).toLocaleString("en-US")}
-              </p>
+            <div className="w-full bg-teal-100 text-[#1eb2a6] p-6 rounded-xl flex flex-col md:flex-row items-center justify-between mb-6">
+              <div>
+                <p className="text-5xl font-extrabold mt-2">
+                  ${(walletData?.data.balance).toLocaleString("en-US")}
+                </p>
+                <h2 className="text-xl font-semibold mt-4">
+                  Current SSAP Wallet Balance
+                </h2>
+              </div>
+              <button
+                onClick={handleAddMoneyClick}
+                className="flex items-center gap-2 mt-4 md:mt-0 bg-[#1eb2a6] text-white px-6 py-3 rounded-lg shadow-md hover:bg-teal-700 transition duration-200 ease-in-out"
+              >
+                <AiOutlinePlusCircle size={24} />
+                <span className="font-semibold">Add Money to Wallet</span>
+              </button>
             </div>
-            <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-lg mb-5">
-              <h2 className="text-lg font-semibold text-blue-600 mb-2">
+
+            <div className="w-full bg-white p-6 rounded-lg shadow-lg mb-6">
+              <h2 className="text-lg font-semibold text-[#1eb2a6] mb-2">
                 Bank Account Information
               </h2>
               <p>
@@ -276,25 +279,15 @@ const Wallet = () => {
               {!walletData?.bankAccountName && (
                 <Button
                   onClick={() => setIsUpdateBankModalOpen(true)}
-                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="mt-4 bg-[#1eb2a6] hover:bg-[#17a595] text-white"
                 >
                   Update Bank Information
                 </Button>
               )}
             </div>
 
-            <div className="w-full lg:w-2/3 flex justify-around mb-5">
-              <button
-                onClick={handleAddMoneyClick}
-                className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-500 transition duration-200 ease-in-out transform hover:scale-105"
-              >
-                <AiOutlinePlusCircle size={24} />
-                <span className="font-semibold">Add balance</span>
-              </button>
-            </div>
-
-            <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-lg mb-5">
-              <h2 className="text-lg font-semibold text-blue-600 mb-2">
+            <div className="w-full bg-white p-6 rounded-lg shadow-lg mb-6">
+              <h2 className="text-lg font-semibold text-[#1eb2a6] mb-2">
                 Transaction History
               </h2>
               <Table
@@ -308,27 +301,11 @@ const Wallet = () => {
         )}
       </div>
 
-      {isModalWithdrawOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-1/3 text-center">
-            <h2 className="font-semibold text-xl mb-4">
-              Thank you for using our service!
-            </h2>
-            <p>Good luck!</p>
-            <button
-              onClick={closeModal}
-              className="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
       <Modal
         title="Update Bank Information"
         open={isUpdateBankModalOpen}
         onCancel={() => setIsUpdateBankModalOpen(false)}
+        centered
         footer={[
           <Button
             key="cancel"
@@ -341,14 +318,14 @@ const Wallet = () => {
             key="update"
             type="primary"
             onClick={handleUpdateBankInformation}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-[#1eb2a6] hover:bg-[#17a595] text-white"
           >
             Update
           </Button>,
         ]}
       >
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">
+          <label className="text-[#1eb2a6] font-semibold">
             Bank Account Name:
           </label>
           <Input
@@ -370,7 +347,7 @@ const Wallet = () => {
           </div>
         </div>
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">
+          <label className="text-[#1eb2a6] font-semibold">
             Bank Account Number:
           </label>
           <Input
@@ -395,7 +372,9 @@ const Wallet = () => {
 
       <Modal
         title={
-          <h2 className="text-xl font-semibold text-blue-600">Create Wallet</h2>
+          <h2 className="text-xl font-semibold text-[#1eb2a6]">
+            Create Wallet
+          </h2>
         }
         open={isOpenDialog}
         onCancel={() => setIsOpenDialog(false)}
@@ -411,14 +390,14 @@ const Wallet = () => {
             key="create"
             type="primary"
             onClick={handleCreateWallet}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-[#1eb2a6] hover:bg-[#17a595] text-white"
           >
             Create
           </Button>,
         ]}
       >
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">
+          <label className="text-[#1eb2a6] font-semibold">
             Bank Account Name:
           </label>
           <Input
@@ -441,7 +420,7 @@ const Wallet = () => {
           </div>
         </div>
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">
+          <label className="text-[#1eb2a6] font-semibold">
             Bank Account Number:
           </label>
           <Input
@@ -467,12 +446,13 @@ const Wallet = () => {
 
       <Modal
         title={
-          <h2 className="text-xl font-semibold text-blue-600">
+          <h2 className="text-xl font-semibold text-[#1eb2a6]">
             Add Money to Wallet
           </h2>
         }
         open={isModalOpen}
         onCancel={handleCancel}
+        centered
         footer={[
           <Button
             key="cancel"
@@ -485,7 +465,7 @@ const Wallet = () => {
             key="add"
             type="primary"
             onClick={handleAddMoney}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-[#1eb2a6] hover:bg-[#17a595] text-white"
             disabled={!addAmount}
           >
             Add
@@ -493,7 +473,7 @@ const Wallet = () => {
         ]}
       >
         <div className="mb-4">
-          <label className="text-blue-600 font-semibold">Amount:</label>
+          <label className="text-[#1eb2a6] font-semibold">Amount:</label>
           <Input
             type="number"
             placeholder="Enter amount to add"

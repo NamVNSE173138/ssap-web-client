@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { Button, Paper, Tab, Tabs } from "@mui/material";
+import * as Tabss from "@radix-ui/react-tabs";
 import {
   FaSpinner,
   FaUserTie,
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
-import ScholarshipProgramBackground from "@/components/footer/components/ScholarshipProgramImage";
 import { getRequestsByApplicantId } from "@/services/ApiServices/requestService";
 import { getAllAccounts } from "@/services/ApiServices/accountService";
 import { IoIosEye } from "react-icons/io";
@@ -234,37 +228,7 @@ const RequestHistory = () => {
   }
 
   return (
-    <div>
-      <div className="relative">
-        <ScholarshipProgramBackground />
-        <div className="absolute top-0 bg-black/15 left-0 w-full h-full flex flex-col justify-between items-start p-[40px] z-10">
-          <Breadcrumb>
-            <BreadcrumbList className="text-black">
-              <BreadcrumbItem>
-                <Link to="/" className="md:text-xl text-lg">
-                  Home
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <Link
-                  to="/services"
-                  className="text-black md:text-xl font-medium text-lg"
-                >
-                  Services
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <p className="text-black md:text-xl text-lg font-semibold">
-                  History
-                </p>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </div>
-
+    <Tabss.Content value="services-history">
       <div className="mt-6">
         <Tabs
           value={activeTab}
@@ -278,10 +242,10 @@ const RequestHistory = () => {
         </Tabs>
       </div>
 
-      <div className="mt-6 p-6 bg-white rounded-lg shadow-md flex justify-center">
+      <div className="mt-6 p-6 bg-white flex justify-center">
         {renderProviders()}
       </div>
-    </div>
+    </Tabss.Content>
   );
 };
 

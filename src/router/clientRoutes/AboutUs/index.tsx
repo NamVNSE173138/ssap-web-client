@@ -129,30 +129,6 @@ const AboutUs = () => {
           }}
         ></div>
       </div>
-
-      <div style={{ marginTop: "40px" }}>
-        <button
-          style={{
-            backgroundColor: "#007BFF",
-            color: "#fff",
-            padding: "18px 35px",
-            border: "none",
-            borderRadius: "12px",
-            cursor: "pointer",
-            fontSize: "20px",
-            boxShadow: "0 6px 12px rgba(0, 123, 255, 0.3)",
-            transition: "all 0.3s ease",
-            fontWeight: "600",
-            letterSpacing: "1px",
-            outline: "none",
-          }}
-          onMouseOver={(e: any) => (e.target.style.backgroundColor = "#0056b3")}
-          onMouseOut={(e: any) => (e.target.style.backgroundColor = "#007BFF")}
-          onClick={handleApplyNowClick}
-        >
-          Apply Now
-        </button>
-      </div>
     </div>
   );
 };
