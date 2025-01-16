@@ -64,7 +64,6 @@ const ApprovalList: React.FC = () => {
           const scholarshipResponse = await axios.get(
             `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgram.id}`
           );
-          console.log("Scholarship Program:", app.scholarshipProgram);
           return {
             id: app.id,
             applicantName: applicantResponse.data.username,
@@ -84,8 +83,6 @@ const ApprovalList: React.FC = () => {
           };
         })
       );
-      console.log("rawApplications", rawApplications);
-      console.log("detailedApplications", detailedApplications);
 
       setApplications(detailedApplications);
     } catch (err) {
@@ -119,9 +116,6 @@ const ApprovalList: React.FC = () => {
       return acc;
     }, {} as Record<string, ApprovalItem[]>);
 
-  console.log("GROUP", groupedApplications);
-
-  // Sắp xếp lại các nhóm dựa trên appliedDate của ứng dụng đầu tiên trong mỗi nhóm
   const sortedGroupedApplications = Object.entries(groupedApplications).sort(
     ([, appsA], [, appsB]) => {
       const latestUpdatedAtA = Math.max(
@@ -134,8 +128,6 @@ const ApprovalList: React.FC = () => {
       return latestUpdatedAtB - latestUpdatedAtA;
     }
   );
-
-  console.log("Sort", sortedGroupedApplications);
 
   return (
     <Tabs.Content value="review" className="pt-4">
