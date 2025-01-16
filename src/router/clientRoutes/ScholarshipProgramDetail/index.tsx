@@ -100,12 +100,13 @@ const ScholarshipProgramDetail = () => {
   const [funderName, setFunderName] = useState<any>();
 
   const [selectedTab, setSelectedTab] = useState(0);
+  const [isProfileValid, setIsProfileValid] = useState<boolean>(false);
   const submittingApplications = applicants?.filter(
     (application: any) =>
       (application.status === "Submitted" ||
         application.status === "Rejected" ||
         application.status === "Reviewing") &&
-      new Date(application.updatedAt) < new Date(data!.deadline)
+      new Date(application.updatedAt) < new Date(data!.deadline),
   );
 
   const winnersApplications = applicants?.filter(
@@ -113,7 +114,7 @@ const ScholarshipProgramDetail = () => {
       application.status === "Approved" ||
       application.status === "Awarded" ||
       application.status === "NeedExtend" ||
-      new Date(application.updatedAt) > new Date(data!.deadline)
+      new Date(application.updatedAt) > new Date(data!.deadline),
   );
 
   const statusColor: any = {
@@ -129,21 +130,21 @@ const ScholarshipProgramDetail = () => {
     useState(1);
   const [currentTabPageForWinners, setCurrentTabPageForWinners] = useState(1);
   const totalTabPagesForSubmitting = Math.ceil(
-    submittingApplications?.length / ITEMS_PER_PAGE
+    submittingApplications?.length / ITEMS_PER_PAGE,
   );
   const totalTabPagesForWinners = Math.ceil(
-    winnersApplications?.length / ITEMS_PER_PAGE
+    winnersApplications?.length / ITEMS_PER_PAGE,
   );
 
   const paginatedTabData =
     selectedTab === 0
       ? submittingApplications?.slice(
           (currentTabPageForSubmitting - 1) * ITEMS_PER_PAGE,
-          currentTabPageForSubmitting * ITEMS_PER_PAGE
+          currentTabPageForSubmitting * ITEMS_PER_PAGE,
         )
       : winnersApplications?.slice(
           (currentTabPageForWinners - 1) * ITEMS_PER_PAGE,
-          currentTabPageForWinners * ITEMS_PER_PAGE
+          currentTabPageForWinners * ITEMS_PER_PAGE,
         );
 
   const handleTabPageChange = (page: number) => {
@@ -158,12 +159,48 @@ const ScholarshipProgramDetail = () => {
   const totalExpertPages = Math.ceil(_experts?.length / ITEMS_PER_PAGE);
   const paginatedExpert = _experts?.slice(
     (currentPageExpert - 1) * ITEMS_PER_PAGE,
-    currentPageExpert * ITEMS_PER_PAGE
+    currentPageExpert * ITEMS_PER_PAGE,
   );
 
   const handlePageExpertsChange = (page: number) => {
     setCurrentPageExpert(page);
   };
+
+  const checkApplicantProfile = async () => {
+    try {
+      const response = await getApplicantProfileById(Number(user?.id));
+      var profile = response.data;
+      var profileSkills = profile.applicantSkills.map(
+        (skill: any) => skill.name,
+      );
+      var scholarshipSkills = data?.major.skills.map(
+        (skill: any) => skill.name,
+      );
+
+      console.log("Profile skills", profileSkills);
+      console.log("Scholarship skills", scholarshipSkills);
+
+      if (scholarshipSkills && profileSkills.length < scholarshipSkills.length)
+        return false;
+
+      const isValid = scholarshipSkills?.every((skill: any) =>
+        profileSkills.includes(skill),
+      );
+
+      if (isValid) {
+        setIsProfileValid(true);
+      } else {
+        setIsProfileValid(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsProfileValid(false);
+    }
+  };
+
+  useEffect(() => {
+    checkApplicantProfile();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -173,7 +210,7 @@ const ScholarshipProgramDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.statusCode === 200) {
@@ -185,13 +222,15 @@ const ScholarshipProgramDetail = () => {
         if (user) {
           const application = await getApplicationByApplicantIdAndScholarshipId(
             parseInt(user?.id),
-            response.data.data.id
+            response.data.data.id,
           );
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(
             response.data.data.id
           );
           await fetchApplicants(Number(id)),
+            await fetchReviewMilestones(Number(id)),
+            await fetchExpertsByScholarshipId();
             await fetchReviewMilestones(Number(id)),
             await fetchExpertsByScholarshipId();
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
@@ -220,6 +259,8 @@ const ScholarshipProgramDetail = () => {
     fetchData();
   }, [id]);
 
+  useEffect(() => {});
+
   const fetchApplicants = async (scholarshipId: number) => {
     try {
       setApplicationLoading(true);
@@ -244,7 +285,7 @@ const ScholarshipProgramDetail = () => {
                 fullName, // Gán fullName từ API
               },
             };
-          })
+          }),
         );
 
         setApplicants(applicantsWithFullName);
@@ -414,8 +455,8 @@ const ScholarshipProgramDetail = () => {
                       data.status === "Open"
                         ? "bg-green-100 text-green-700"
                         : data.status === "Closed"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-yellow-100 text-yellow-700"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {data.status}
@@ -463,14 +504,24 @@ const ScholarshipProgramDetail = () => {
                         existingApplication.length === 0 &&
                         data.status !== "FINISHED" &&
                         new Date(data.deadline) > new Date() && (
-                          <Button
-                            onClick={() =>
-                              navigate(`/scholarship-program/${id}/application`)
-                            }
-                            className="text-lg lg:text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f]"
-                          >
-                            Apply now
-                          </Button>
+                          <div>
+                            <Button
+                              disabled={!isProfileValid}
+                              onClick={() =>
+                                navigate(
+                                  `/scholarship-program/${id}/application`,
+                                )
+                              }
+                              className="text-lg lg:text-xl w-full h-full bg-[#1eb2a6] hover:bg-[#179d8f]"
+                            >
+                              Apply now
+                            </Button>
+                            {!isProfileValid && (
+                              <p className="px-2 rounded-sm text-blue-500 bg-blue-200 mt-2">
+                                * Please update your profile skills.
+                              </p>
+                            )}
+                          </div>
                         )}
                       {existingApplication &&
                         existingApplication.length > 0 && (
@@ -480,7 +531,7 @@ const ScholarshipProgramDetail = () => {
                               <Button
                                 onClick={() =>
                                   navigate(
-                                    `/funder/application/${existingApplication[0].id}`
+                                    `/funder/application/${existingApplication[0].id}`,
                                   )
                                 }
                                 className="text-lg lg:text-xl w-full bg-yellow-500 h-full"
@@ -1395,7 +1446,7 @@ const ScholarshipProgramDetail = () => {
           fetchApplications={async () => {
             if (!selectedExpert) return;
             const response = await axios.get(
-              `${BASE_URL}/api/experts/${selectedExpert.id}/assigned-applications`
+              `${BASE_URL}/api/experts/${selectedExpert.id}/assigned-applications`,
             );
             return response.data.data || [];
           }}
