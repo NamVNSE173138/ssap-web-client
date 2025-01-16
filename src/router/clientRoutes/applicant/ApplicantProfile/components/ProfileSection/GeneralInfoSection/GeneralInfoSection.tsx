@@ -66,7 +66,7 @@ const GeneralInfoSection = (props: any) => {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <div className="mt-4 w-full text-sm space-y-2 cursor-pointer hover:ring-2 hover:ring-green-500 p-4 rounded-md shadow-sm border">
+        <div className="bg-white mt-4 w-full text-sm space-y-2 cursor-pointer hover:ring-2 hover:ring-green-500 p-4 rounded-md shadow-sm border">
           <p>
             <strong>Birthdate:</strong> {formatNaturalDate(profile.birthDate)}
           </p>

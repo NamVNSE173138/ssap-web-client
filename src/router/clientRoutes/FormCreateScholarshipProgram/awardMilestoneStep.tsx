@@ -231,7 +231,7 @@ const AwardMilestoneStep = ({
     <>
       <div>
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          <h2 className="text-3xl font-bold text-blue-700 mb-8 pb-4">
             Payment Milestones
           </h2>
           <h2 className="text-xl font-bold text-black mb-5 ml-5">

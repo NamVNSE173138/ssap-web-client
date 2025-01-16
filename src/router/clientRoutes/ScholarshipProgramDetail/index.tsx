@@ -226,9 +226,11 @@ const ScholarshipProgramDetail = () => {
           );
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(
-            response.data.data.id,
+            response.data.data.id
           );
           await fetchApplicants(Number(id)),
+            await fetchReviewMilestones(Number(id)),
+            await fetchExpertsByScholarshipId();
             await fetchReviewMilestones(Number(id)),
             await fetchExpertsByScholarshipId();
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
@@ -396,7 +398,7 @@ const ScholarshipProgramDetail = () => {
   if (_loading) return <Spinner size="large" />;
 
   return (
-    <div className="bg-gray-50 mb-10">
+    <div className="bg-white mb-10">
       <Breadcrumb className="p-10">
         <BreadcrumbList className="text-[#000]">
           <BreadcrumbItem>
@@ -422,8 +424,8 @@ const ScholarshipProgramDetail = () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <section className="bg-gray-50 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
-        <div className="max-w-7xl mx-auto p-8 shadow-lg rounded-md">
+      <section className="bg-white px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+        <div className="mx-auto rounded-md">
           <div className="max-w-[100%] mx-auto">
             <section className="w-full max-w-none flex flex-col lg:flex-row justify-between items-center mx-auto py-6 lg:py-6 gap-6 lg:gap-10">
               {/* Left Section */}
@@ -434,7 +436,7 @@ const ScholarshipProgramDetail = () => {
                 <img
                   // src={data.imageUrl}
                   src="https://wallpapers.com/images/hd/harvard-university-gilman-hall-q5t2pnf1jbwhg6hk.jpg"
-                  className="w-[100%] h-[300px] sm:w-[100%] sm:h-[300px] lg:h-[400px] lg:w-[100%] bg-white object-cover rounded-md"
+                  className="w-[100%] h-[300px] sm:w-[100%] sm:h-[300px] lg:h-[500px] lg:w-[100%] bg-white object-cover rounded-md"
                   alt="Scholarship Image"
                 />
               </div>
@@ -903,530 +905,513 @@ const ScholarshipProgramDetail = () => {
         <br></br>
 
         {isApplicant == "Funder" && data.funderId == user.id && (
-          <div>
-            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-              <div className="max-w-[1216px] mx-auto">
-                <div className="mb-6 px-4 sm:px-6 xl:px-0">
-                  <div className="relative flex items-center gap-3">
-                    <div className="p-2 bg-[#1eb2a6] rounded-full">
-                      <FaCalendarAlt className="w-6 h-6 text-white" />
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                      Review Milestone
-                    </h2>
+          <div className="mt-6">
+            <div className="mx-auto mt-6">
+              <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                <div className="relative flex items-center gap-3">
+                  <div className="p-2 bg-[#1eb2a6] rounded-full">
+                    <FaCalendarAlt className="w-6 h-6 text-white" />
                   </div>
-                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                    Review Milestone
+                  </h2>
                 </div>
-                <br />
-                <List sx={{ pt: 0 }}>
-                  {reviewMilestoneLoading ? (
-                    <Spinner />
-                  ) : !reviewMilestones || reviewMilestones.length === 0 ? (
-                    <p className="p-10 text-center text-gray-500 font-semibold text-xl">
-                      No review milestones for this scholarship
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                      {reviewMilestones.map((milestone: any) => (
-                        <Paper
-                          elevation={3}
-                          key={milestone.id}
-                          className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
-                        >
-                          {/* Title */}
-                          <p className="font-bold text-2xl text-gray-900 mb-2">
-                            {milestone.description}
-                          </p>
+                <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+              </div>
+              <br />
+              <List sx={{ pt: 0 }}>
+                {reviewMilestoneLoading ? (
+                  <Spinner />
+                ) : !reviewMilestones || reviewMilestones.length === 0 ? (
+                  <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+                    No review milestones for this scholarship
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                    {reviewMilestones.map((milestone: any) => (
+                      <Paper
+                        elevation={3}
+                        key={milestone.id}
+                        className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
+                      >
+                        {/* Title */}
+                        <p className="font-bold text-2xl text-gray-900 mb-2">
+                          {milestone.description}
+                        </p>
 
-                          {/* Date Range */}
-                          <div className="flex flex-col gap-2 w-full">
-                            <div className="flex justify-between">
-                              <p className="text-gray-600 font-semibold">
-                                Start Date:
-                              </p>
-                              <p className="text-gray-700">
-                                {format(
-                                  new Date(milestone.fromDate),
-                                  "MM/dd/yyyy",
-                                )}
-                              </p>
-                            </div>
-                            <div className="flex justify-between">
-                              <p className="text-gray-600 font-semibold">
-                                End Date:
-                              </p>
-                              <p className="text-gray-700">
-                                {format(
-                                  new Date(milestone.toDate),
-                                  "MM/dd/yyyy",
-                                )}
-                              </p>
-                            </div>
+                        {/* Date Range */}
+                        <div className="flex flex-col gap-2 w-full">
+                          <div className="flex justify-between">
+                            <p className="text-gray-600 font-semibold">
+                              Start Date:
+                            </p>
+                            <p className="text-gray-700">
+                              {format(
+                                new Date(milestone.fromDate),
+                                "MM/dd/yyyy"
+                              )}
+                            </p>
                           </div>
-
-                          {/* Divider */}
-                          <div className="w-full h-[1px] bg-gray-300 my-2"></div>
-                        </Paper>
-                      ))}
-                    </div>
-                  )}
-                </List>
-              </div>
-            </div>
-
-            <br></br>
-            <br></br>
-
-            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-              <div className="max-w-[1216px] mx-auto">
-                <div className="mb-6 px-4 sm:px-6 xl:px-0">
-                  <div className="relative flex items-center gap-3">
-                    <div className="p-2 bg-[#1eb2a6] rounded-full">
-                      <FaUsers className="w-6 h-6 text-white" />
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                      Applied Applicants
-                    </h2>
-                  </div>
-                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
-                </div>
-
-                {Array.isArray(applicants) && applicants.length !== 0 && (
-                  <button
-                    onClick={() =>
-                      navigate(`/funder/choose-winners/${data.id}`)
-                    }
-                    className="flex mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
-                  >
-                    <IoIosAddCircleOutline className="text-2xl" />
-                    <span className="text-lg font-medium">Choose Winners</span>
-                  </button>
-                )}
-                <br />
-
-                {/* Tabs */}
-                <Tabs
-                  value={selectedTab}
-                  onChange={(_, newValue) => setSelectedTab(newValue)}
-                  aria-label="Applications Tabs"
-                  className="bg-white shadow-sm"
-                  indicatorColor="primary"
-                  textColor="inherit"
-                  centered
-                >
-                  <Tab
-                    label="Submitting Applications"
-                    sx={{
-                      textTransform: "none",
-                      color: "blue",
-                      fontWeight: "bold",
-                    }}
-                  />
-                  <Tab
-                    label="Winners Applications"
-                    sx={{
-                      textTransform: "none",
-                      color: "green",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </Tabs>
-
-                {/* Paper */}
-                <Paper
-                  elevation={3}
-                  style={{
-                    padding: "20px",
-                    borderRadius: "10px",
-                    backgroundColor: "#fafafa",
-                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  {/* Table Header */}
-                  <div
-                    style={{
-                      display: "flex",
-                      fontWeight: "bold",
-                      backgroundColor: "#f1f1f1",
-                      padding: "10px",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <div style={{ flex: 0.5 }}>#</div>
-                    <div style={{ flex: 1 }}>Avatar</div>
-                    <div style={{ flex: 1 }}>Name</div>
-                    <div style={{ flex: 1 }}>Status</div>
-                    <div style={{ flex: 1 }}>Applied At</div>
-                    <div style={{ flex: 1 }}>Actions</div>
-                  </div>
-
-                  {/* Applicants List */}
-                  {applicationLoading ? (
-                    <Spinner />
-                  ) : paginatedTabData?.length > 0 ? (
-                    paginatedTabData.map((app: any, index: number) => (
-                      <div
-                        key={app.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          backgroundColor: "#f9f9f9",
-                          padding: "10px",
-                          borderRadius: "8px",
-                          marginBottom: "10px",
-                          transition: "background-color 0.3s ease",
-                        }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor = "#e3f2fd")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor = "#f9f9f9")
-                        }
-                      >
-                        {/* Cột số thứ tự */}
-                        <div style={{ flex: 0.5 }}>{index + 1}</div>
-
-                        <div style={{ flex: 1 }}>
-                          <img
-                            src={
-                              app.applicant.avatarUrl ||
-                              "/path/to/default-avatar.jpg"
-                            }
-                            style={{
-                              width: "40px",
-                              height: "40px",
-                              borderRadius: "50%",
-                              objectFit: "cover",
-                              border: "2px solid #0369a1",
-                            }}
-                          />
+                          <div className="flex justify-between">
+                            <p className="text-gray-600 font-semibold">
+                              End Date:
+                            </p>
+                            <p className="text-gray-700">
+                              {format(new Date(milestone.toDate), "MM/dd/yyyy")}
+                            </p>
+                          </div>
                         </div>
 
-                        {/* Cột tên ứng viên */}
-                        <div style={{ flex: 1 }}>{app.applicant.fullName}</div>
-
-                        {/* Cột status */}
-                        <div
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <span className="relative flex justify-center items-center gap-2">
-                            {/* Hiệu ứng nhấp nháy */}
-                            <span className="relative flex h-3 w-3">
-                              <span
-                                className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${
-                                  statusColor[app.status]
-                                }-500 opacity-75`}
-                              ></span>
-                              <span
-                                className={`relative inline-flex rounded-full h-3 w-3 bg-${
-                                  statusColor[app.status]
-                                }-500`}
-                              ></span>
-                            </span>
-
-                            {/* Tên trạng thái */}
-                            <span
-                              className={`text-${
-                                statusColor[app.status]
-                              }-500 font-medium`}
-                            >
-                              {app.status}
-                            </span>
-                          </span>
-                        </div>
-
-                        {/* Cột ngày nộp */}
-                        <div style={{ flex: 1 }}>
-                          {app.appliedDate
-                            ? format(new Date(app.appliedDate), "MM/dd/yyyy")
-                            : "N/A"}
-                        </div>
-
-                        {/* Cột actions */}
-                        <div style={{ flex: 1 }}>
-                          <Button
-                            onClick={() =>
-                              navigate(`/funder/application/${app.id}`)
-                            }
-                            style={{
-                              backgroundColor: "#1e88e5",
-                              color: "#fff",
-                              padding: "6px 12px",
-                              borderRadius: "5px",
-                            }}
-                          >
-                            <IoIosEye style={{ marginRight: "8px" }} />
-                            View application
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-center text-gray-500 font-semibold">
-                      No applicants available.
-                    </p>
-                  )}
-                  <div
-                    style={{
-                      marginTop: "20px",
-                      marginBottom: "10px",
-                      display: "flex",
-                      justifyContent: "end",
-                    }}
-                  >
-                    {selectedTab === 0
-                      ? Array.from(
-                          { length: totalTabPagesForSubmitting },
-                          (_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleTabPageChange(index + 1)}
-                              style={{
-                                margin: "0 5px",
-                                padding: "5px 10px",
-                                backgroundColor:
-                                  currentTabPageForSubmitting === index + 1
-                                    ? "#419f97"
-                                    : "#f1f1f1",
-                                color:
-                                  currentTabPageForSubmitting === index + 1
-                                    ? "white"
-                                    : "black",
-                                border: "none",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              {index + 1}
-                            </button>
-                          ),
-                        )
-                      : Array.from(
-                          { length: totalTabPagesForWinners },
-                          (_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleTabPageChange(index + 1)}
-                              style={{
-                                margin: "0 5px",
-                                padding: "5px 10px",
-                                backgroundColor:
-                                  currentTabPageForWinners === index + 1
-                                    ? "#419f97"
-                                    : "#f1f1f1",
-                                color:
-                                  currentTabPageForWinners === index + 1
-                                    ? "white"
-                                    : "black",
-                                border: "none",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              {index + 1}
-                            </button>
-                          ),
-                        )}
-                  </div>
-                </Paper>
-              </div>
-            </div>
-
-            <br></br>
-            <br></br>
-
-            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
-              <div className="max-w-[1216px] mx-auto">
-                <div className="mb-6 px-4 sm:px-6 xl:px-0">
-                  <div className="relative flex items-center gap-3">
-                    <div className="p-2 bg-[#1eb2a6] rounded-full">
-                      <FaCalendarAlt className="w-6 h-6 text-white" />
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                      Expert List for this scholarship
-                    </h2>
-                  </div>
-                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
-                </div>
-
-                <div className="flex justify-end mb-5">
-                  <button
-                    onClick={() =>
-                      navigate(`/funder/add-expert-to-scholarship/${id}`)
-                    }
-                    className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
-                  >
-                    <IoIosAddCircleOutline className="text-2xl" />
-                    <span className="text-lg font-medium">Invite Experts</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleAssignExpertDialog()}
-                    className="flex ml-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
-                  >
-                    <IoIosAddCircleOutline className="text-2xl" />
-                    <span className="text-lg font-medium">Assign Experts</span>
-                  </button>
-                </div>
-
-                {/* Experts Section */}
-                <Paper
-                  elevation={3}
-                  style={{
-                    padding: "20px",
-                    borderRadius: "10px",
-                    backgroundColor: "#fafafa",
-                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      fontWeight: "bold",
-                      backgroundColor: "#f1f1f1",
-                      padding: "10px",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <div style={{ flex: 0.5 }}>#</div>
-                    <div style={{ flex: 0.5 }}>Avatar</div>
-                    <div style={{ flex: 0.75 }}>Name</div>
-                    <div style={{ flex: 1 }}>Email</div>
-                    <div style={{ flex: 0.75 }}>Phone</div>
-                    <div style={{ flex: 1.5 }}>Major</div>
-                    <div style={{ flex: 0.5 }}>Action</div>
-                  </div>
-
-                  {/* Expert Cards */}
-                  {expertLoading ? (
-                    <Spinner />
-                  ) : (
-                    paginatedExpert?.map((expert: any, index: any) => (
-                      <div
-                        key={expert.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          backgroundColor: "#f9f9f9",
-                          padding: "10px",
-                          borderRadius: "8px",
-                          marginBottom: "10px",
-                          transition: "background-color 0.3s ease",
-                        }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor = "#e3f2fd")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor = "#f9f9f9")
-                        }
-                      >
-                        {/* Cột số thứ tự */}
-                        <div style={{ flex: 0.5 }}>
-                          {(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}
-                        </div>
-
-                        <div style={{ flex: 0.5 }}>
-                          <img
-                            src={
-                              expert.avatarUrl || "/path/to/default-avatar.jpg"
-                            }
-                            style={{
-                              width: "40px",
-                              height: "40px",
-                              borderRadius: "50%",
-                              objectFit: "cover",
-                              border: "2px solid #0369a1",
-                            }}
-                          />
-                        </div>
-
-                        {/* Cột tên chuyên gia */}
-                        <div style={{ flex: 0.75 }}>
-                          <span
-                            style={{ fontWeight: "bold", color: "#0369a1" }}
-                          >
-                            {expert.name}
-                          </span>
-                        </div>
-
-                        <div style={{ flex: 1 }}>
-                          <span
-                            style={{ fontWeight: "bold", color: "#0369a1" }}
-                          >
-                            {expert.email}
-                          </span>
-                        </div>
-
-                        <div style={{ flex: 0.75 }}>
-                          <span
-                            style={{ fontWeight: "bold", color: "#0369a1" }}
-                          >
-                            {expert.phoneNumber}
-                          </span>
-                        </div>
-
-                        {/* Cột major */}
-                        <div style={{ flex: 1.5 }}>
-                          <span
-                            style={{ fontWeight: "bold", color: "#0369a1" }}
-                          >
-                            {expert.major || "N/a"}
-                          </span>
-                        </div>
-
-                        <div style={{ flex: 0.5 }}>
-                          <FaTrashAlt
-                            style={{
-                              cursor: "pointer",
-                              color: "#e57373",
-                              fontSize: "1.5rem",
-                            }}
-                            onClick={() => handleRemoveExperts(expert.expertId)}
-                          />
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  <div
-                    style={{
-                      marginTop: "20px",
-                      marginBottom: "10px",
-                      display: "flex",
-                      justifyContent: "end",
-                    }}
-                  >
-                    {Array.from({ length: totalExpertPages }, (_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handlePageExpertsChange(index + 1)}
-                        style={{
-                          margin: "0 5px",
-                          padding: "5px 10px",
-                          backgroundColor:
-                            currentPageExpert === index + 1
-                              ? "#419f97"
-                              : "#f1f1f1",
-                          color:
-                            currentPageExpert === index + 1 ? "white" : "black",
-                          border: "none",
-                          borderRadius: "5px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {index + 1}
-                      </button>
+                        {/* Divider */}
+                        <div className="w-full h-[1px] bg-gray-300 my-2"></div>
+                      </Paper>
                     ))}
                   </div>
-                </Paper>
+                )}
+              </List>
+            </div>
+
+            <br></br>
+            <br></br>
+
+            <div className="mx-auto mt-6">
+              <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                <div className="relative flex items-center gap-3">
+                  <div className="p-2 bg-[#1eb2a6] rounded-full">
+                    <FaUsers className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                    Applied Applicants
+                  </h2>
+                  {Array.isArray(applicants) && applicants.length !== 0 && (
+                    <button
+                      onClick={() =>
+                        navigate(`/funder/choose-winners/${data.id}`)
+                      }
+                      className="flex mr-6 items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95 ml-auto"
+                    >
+                      <IoIosAddCircleOutline className="text-2xl" />
+                      <span className="text-lg font-medium">
+                        Choose Winners
+                      </span>
+                    </button>
+                  )}
+                </div>
+                <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
               </div>
+
+              {/* Tabs */}
+              <Tabs
+                value={selectedTab}
+                onChange={(_, newValue) => setSelectedTab(newValue)}
+                aria-label="Applications Tabs"
+                className="bg-white shadow-sm"
+                indicatorColor="primary"
+                textColor="inherit"
+                centered
+              >
+                <Tab
+                  label="Submitting Applications"
+                  sx={{
+                    textTransform: "none",
+                    color: "blue",
+                    fontWeight: "bold",
+                  }}
+                />
+                <Tab
+                  label="Winners Applications"
+                  sx={{
+                    textTransform: "none",
+                    color: "green",
+                    fontWeight: "bold",
+                  }}
+                />
+              </Tabs>
+
+              {/* Paper */}
+              <Paper
+                elevation={3}
+                style={{
+                  padding: "20px",
+                  borderRadius: "10px",
+                  backgroundColor: "#fafafa",
+                  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                {/* Table Header */}
+                <div
+                  style={{
+                    display: "flex",
+                    fontWeight: "bold",
+                    backgroundColor: "#f1f1f1",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <div style={{ flex: 0.5 }}>No</div>
+                  <div style={{ flex: 1 }}>Avatar</div>
+                  <div style={{ flex: 1 }}>Name</div>
+                  <div style={{ flex: 1 }}>Status</div>
+                  <div style={{ flex: 1 }}>Applied At</div>
+                  <div style={{ flex: 1 }}>Actions</div>
+                </div>
+
+                {/* Applicants List */}
+                {applicationLoading ? (
+                  <Spinner />
+                ) : paginatedTabData?.length > 0 ? (
+                  paginatedTabData.map((app: any, index: number) => (
+                    <div
+                      key={app.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        backgroundColor: "#f9f9f9",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#e3f2fd")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                      }
+                    >
+                      {/* Cột số thứ tự */}
+                      <div style={{ flex: 0.5 }}>{index + 1}</div>
+
+                      <div style={{ flex: 1 }}>
+                        <img
+                          src={
+                            app.applicant.avatarUrl ||
+                            "/path/to/default-avatar.jpg"
+                          }
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "2px solid #0369a1",
+                          }}
+                        />
+                      </div>
+
+                      {/* Cột tên ứng viên */}
+                      <div style={{ flex: 1 }}>{app.applicant.fullName}</div>
+
+                      {/* Cột status */}
+                      <div
+                        style={{
+                          flex: 1,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span className="relative flex justify-center items-center gap-2">
+                          {/* Hiệu ứng nhấp nháy */}
+                          <span className="relative flex h-3 w-3">
+                            <span
+                              className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${
+                                statusColor[app.status]
+                              }-500 opacity-75`}
+                            ></span>
+                            <span
+                              className={`relative inline-flex rounded-full h-3 w-3 bg-${
+                                statusColor[app.status]
+                              }-500`}
+                            ></span>
+                          </span>
+
+                          {/* Tên trạng thái */}
+                          <span
+                            className={`text-${
+                              statusColor[app.status]
+                            }-500 font-medium`}
+                          >
+                            {app.status}
+                          </span>
+                        </span>
+                      </div>
+
+                      {/* Cột ngày nộp */}
+                      <div style={{ flex: 1 }}>
+                        {app.appliedDate
+                          ? format(new Date(app.appliedDate), "MM/dd/yyyy")
+                          : "N/A"}
+                      </div>
+
+                      {/* Cột actions */}
+                      <div style={{ flex: 1 }}>
+                        <Button
+                          onClick={() =>
+                            navigate(`/funder/application/${app.id}`)
+                          }
+                          style={{
+                            backgroundColor: "#1e88e5",
+                            color: "#fff",
+                            padding: "6px 12px",
+                            borderRadius: "5px",
+                          }}
+                        >
+                          <IoIosEye style={{ marginRight: "8px" }} />
+                          View application
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 font-semibold">
+                    No applicants available.
+                  </p>
+                )}
+                <div
+                  style={{
+                    marginTop: "20px",
+                    marginBottom: "10px",
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                >
+                  {selectedTab === 0
+                    ? Array.from(
+                        { length: totalTabPagesForSubmitting },
+                        (_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleTabPageChange(index + 1)}
+                            style={{
+                              margin: "0 5px",
+                              padding: "5px 10px",
+                              backgroundColor:
+                                currentTabPageForSubmitting === index + 1
+                                  ? "#419f97"
+                                  : "#f1f1f1",
+                              color:
+                                currentTabPageForSubmitting === index + 1
+                                  ? "white"
+                                  : "black",
+                              border: "none",
+                              borderRadius: "5px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {index + 1}
+                          </button>
+                        )
+                      )
+                    : Array.from(
+                        { length: totalTabPagesForWinners },
+                        (_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleTabPageChange(index + 1)}
+                            style={{
+                              margin: "0 5px",
+                              padding: "5px 10px",
+                              backgroundColor:
+                                currentTabPageForWinners === index + 1
+                                  ? "#419f97"
+                                  : "#f1f1f1",
+                              color:
+                                currentTabPageForWinners === index + 1
+                                  ? "white"
+                                  : "black",
+                              border: "none",
+                              borderRadius: "5px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {index + 1}
+                          </button>
+                        )
+                      )}
+                </div>
+              </Paper>
+            </div>
+
+            <br></br>
+            <br></br>
+
+            <div className="mx-auto mt-6">
+              <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#1eb2a6] rounded-full">
+                      <FaCalendarAlt className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                      Expert List
+                    </h2>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() =>
+                        navigate(`/funder/add-expert-to-scholarship/${id}`)
+                      }
+                      className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
+                    >
+                      <IoIosAddCircleOutline className="text-2xl" />
+                      <span className="text-lg font-medium">
+                        Invite Experts
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleAssignExpertDialog()}
+                      className="flex items-center gap-3 bg-blue-500 text-white hover:bg-[#1eb2a6] hover:text-white transition-all duration-300 px-5 py-2 rounded-lg shadow-md active:scale-95"
+                    >
+                      <IoIosAddCircleOutline className="text-2xl" />
+                      <span className="text-lg font-medium">
+                        Assign Experts
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+              </div>
+
+              {/* Experts Section */}
+              <Paper
+                elevation={3}
+                style={{
+                  padding: "20px",
+                  borderRadius: "10px",
+                  backgroundColor: "#fafafa",
+                  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    fontWeight: "bold",
+                    backgroundColor: "#f1f1f1",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    marginBottom: "10px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div style={{ flex: "1 1 100px" }}>No</div>
+                  <div style={{ flex: "1 1 100px" }}>Avatar</div>
+                  <div style={{ flex: "1 1 150px" }}>Name</div>
+                  <div style={{ flex: "1 1 200px" }}>Email</div>
+                  <div style={{ flex: "1 1 150px" }}>Phone</div>
+                  <div style={{ flex: "1 1 250px" }}>Major</div>
+                  <div style={{ flex: "1 1 100px" }}>Action</div>
+                </div>
+
+                {/* Expert Cards */}
+                {expertLoading ? (
+                  <Spinner />
+                ) : (
+                  paginatedExpert?.map((expert: any, index: any) => (
+                    <div
+                      key={expert.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        backgroundColor: "#f9f9f9",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        transition: "background-color 0.3s ease",
+                        flexWrap: "wrap",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#e3f2fd")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                      }
+                    >
+                      <div style={{ flex: "1 1 100px" }}>
+                        {(currentPageExpert - 1) * ITEMS_PER_PAGE + index + 1}
+                      </div>
+                      <div style={{ flex: "1 1 100px" }}>
+                        <img
+                          src={
+                            expert.avatarUrl || "/path/to/default-avatar.jpg"
+                          }
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "2px solid #0369a1",
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: "1 1 150px" }}>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.name}
+                        </span>
+                      </div>
+                      <div style={{ flex: "1 1 200px" }}>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.email}
+                        </span>
+                      </div>
+                      <div style={{ flex: "1 1 150px" }}>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.phoneNumber}
+                        </span>
+                      </div>
+                      <div style={{ flex: "1 1 250px" }}>
+                        <span style={{ fontWeight: "bold", color: "#0369a1" }}>
+                          {expert.major || "N/a"}
+                        </span>
+                      </div>
+                      <div style={{ flex: "1 1 100px" }}>
+                        <FaTrashAlt
+                          style={{
+                            cursor: "pointer",
+                            color: "#e57373",
+                            fontSize: "1.5rem",
+                          }}
+                          onClick={() => handleRemoveExperts(expert.expertId)}
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                {/* Pagination */}
+                <div
+                  style={{
+                    marginTop: "20px",
+                    marginBottom: "10px",
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                >
+                  {Array.from({ length: totalExpertPages }, (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePageExpertsChange(index + 1)}
+                      style={{
+                        margin: "0 5px",
+                        padding: "5px 10px",
+                        backgroundColor:
+                          currentPageExpert === index + 1
+                            ? "#419f97"
+                            : "#f1f1f1",
+                        color:
+                          currentPageExpert === index + 1 ? "white" : "black",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              </Paper>
             </div>
           </div>
         )}

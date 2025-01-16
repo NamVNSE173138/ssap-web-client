@@ -512,7 +512,7 @@ const ReviewList: React.FC = () => {
       >
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray p-6 rounded-lg shadow-lg max-w-[800px] w-full">
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg max-w-[800px] w-full">
             {selectedItem && (
               <div>
                 <Dialog.Title className="text-2xl font-bold text-black">

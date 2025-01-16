@@ -130,7 +130,7 @@ const ApplicationHistorySection = (_props: any) => {
             <Link
               key={application.id}
               to={`/scholarship-program/${application.scholarshipProgram.id}`}
-              className="w-full flex items-center justify-between bg-white rounded-lg shadow-lg p-4 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-2xl animate-fadeIn"
+              className="w-full flex items-center justify-between bg-white rounded-lg shadow-md hover:bg-teal-100 p-4 border border-gray-200 transform transition duration-300 animate-fadeIn"
             >
               <div className="flex items-start gap-4">
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center">

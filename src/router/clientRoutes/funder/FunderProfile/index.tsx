@@ -105,7 +105,7 @@ const FunderProfile = () => {
         (document, index) => ({
           ...document, // Spread the existing properties of the document
           fileUrl: documentUrls[index] || document.fileUrl, // Update the fileUrl with the new URL (preserving existing if undefined)
-        }),
+        })
       );
 
       const postData = {
@@ -192,7 +192,7 @@ const FunderProfile = () => {
   }
 
   return (
-    <div className="w-full max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="w-full mx-auto rounded-lg">
       <Tabs.Root
         defaultValue={activeTab}
         value={activeTab}
@@ -202,19 +202,22 @@ const FunderProfile = () => {
       >
         <Tabs.List
           aria-label="Funder Profile Tabs"
-          className="flex flex-col w-1/4 border-r border-gray-200 space-y-2 pr-4"
+          className="flex flex-col w-full md:w-1/6 p-6 border-r md:border-r border-gray-400 space-y-4 pr-2 md:space-y-4 md:pr-4"
         >
+          <div className="text-xl font-semibold text-gray-800">
+            Account Settings
+          </div>
           <Tabs.Trigger
             value="account"
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+            className="flex items-center gap-2 text-gray-700 hover:text-[#1eb2a6] focus:outline-none data-[state=active]:text-[#1eb2a6] data-[state=active]:font-bold"
           >
             <AiOutlineUser className="text-lg" />
-            My Account
+            Profile
           </Tabs.Trigger>
 
           <Tabs.Trigger
             value="activity"
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+            className="flex items-center gap-2 text-gray-700 hover:text-[#1eb2a6] focus:outline-none data-[state=active]:text-[#1eb2a6] data-[state=active]:font-bold"
           >
             <FaClipboardList className="text-lg" />
             Scholarship Programs
@@ -222,7 +225,7 @@ const FunderProfile = () => {
 
           <Tabs.Trigger
             value="password"
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+            className="flex items-center gap-2 text-gray-700 hover:text-[#1eb2a6] focus:outline-none data-[state=active]:text-[#1eb2a6] data-[state=active]:font-bold"
           >
             <AiOutlineLock className="text-lg" />
             Authentication
@@ -230,14 +233,14 @@ const FunderProfile = () => {
 
           <Tabs.Trigger
             value="expert"
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+            className="flex items-center gap-2 text-gray-700 hover:text-[#1eb2a6] focus:outline-none data-[state=active]:text-[#1eb2a6] data-[state=active]:font-bold"
           >
             <AiOutlineContacts className="text-lg" />
-            Expert
+            Manage Expert
           </Tabs.Trigger>
         </Tabs.List>
 
-        <div className="w-3/4 pl-6">
+        <div className="w-full md:w-5/6 p-6">
           <AccountSection
             getStatusBadge={getStatusBadge}
             funderData={funderData}
