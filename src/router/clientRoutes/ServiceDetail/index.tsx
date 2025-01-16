@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Breadcrumb,
@@ -20,9 +20,10 @@ import {
 import AccountApplicantDialog from "./applicantrequests-dialog";
 import { uploadFile } from "@/services/ApiServices/testService";
 import {
+  FaAddressBook,
+  FaDollarSign,
   FaEdit,
   FaExclamationTriangle,
-  FaPlus,
   FaRedo,
   FaStar,
   FaTimes,
@@ -33,7 +34,6 @@ import {
 import { NotifyProviderNewRequest } from "@/services/ApiServices/notification";
 import { getAccountWallet } from "@/services/ApiServices/accountService";
 import { transferMoney } from "@/services/ApiServices/paymentService";
-import { FaInfoCircle, FaDollarSign, FaUser } from "react-icons/fa";
 import { Button, Dialog, DialogTitle, Paper, Tab, Tabs } from "@mui/material";
 import { IoIosEye, IoIosPaper } from "react-icons/io";
 import {
@@ -52,6 +52,8 @@ import EditServiceModal from "../Activity/UpdateServiceModal";
 import ServiceContractDialog from "./ServiceContractDialog";
 import { notification } from "antd";
 import { format } from "date-fns";
+import ServiceBanner from "../../../assets/service_banner.jpg";
+import { getProviderProfile } from "@/services/ApiServices/providerService";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -65,30 +67,6 @@ interface ServiceType {
   status: string;
   providerId: string;
 }
-
-const fedbacks = [
-  {
-    name: "Alice Johnson",
-    comment:
-      "Excellent service! The provider was professional and delivered beyond expectations.",
-    rating: 5,
-    date: "2025-01-12",
-  },
-  {
-    name: "Michael Smith",
-    comment:
-      "Great experience. Highly recommend this provider for quality and timely service.",
-    rating: 4,
-    date: "2025-01-10",
-  },
-  {
-    name: "Emily Davis",
-    comment:
-      "The service was exactly what I needed. Would definitely use again!",
-    rating: 5,
-    date: "2025-01-08",
-  },
-];
 
 const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
   return (
@@ -127,6 +105,7 @@ const ConfirmationDialog = ({ isOpen, onClose, onConfirm }: any) => {
 
 const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const { id } = serviceId ?? useParams<{ id: string }>();
+  const [providerData, setProviderData] = useState<any>(null);
   const [serviceData, setServiceData] = useState<ServiceType | null>(null);
   const [applicants, setApplicants] = useState<any>(null);
   const [applicantDialogOpen, setApplicantDialogOpen] =
@@ -156,10 +135,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const [averageRating, setAverageRating] = useState<number>(0);
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
-  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setConfirmationDialogOpen] =
     useState<boolean>(false);
-  // const [requestData, setRequestData] = useState<any>(null);
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [isContractOpen, setContractOpen] = useState(false);
@@ -204,8 +181,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
       try {
         const applications = await getRequestsByService(id);
         const requestApplicant = applications.data;
-        console.log(applications);
-        console.log(requestApplicant);
+
         setRequestApplicants({
           pending: requestApplicant.filter(
             (app: any) => app.status === "Pending"
@@ -215,19 +191,32 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
           ),
         });
       } catch (error: any) {
-        console.log(error);
+        console.error("Error fetching applicants:", error);
       }
     };
+
     fetchApplicants();
   }, [id]);
 
-  const fetchService = async () => {
+  const fetchService = useCallback(async () => {
     try {
-      const data = await getServiceById(Number(id));
-      setServiceData(data.data);
-      const feedbacks = data.data.feedbacks || [];
-      console.log(feedbacks);
-      if (feedbacks && feedbacks.length > 0) {
+      setLoading(true);
+
+      // Fetch data for service, scholarships, and provider profile
+      const [serviceResponse, scholarshipResponse] = await Promise.all([
+        getServiceById(Number(id)),
+        getAllScholarshipProgram(),
+      ]);
+
+      const serviceData = serviceResponse.data;
+      setServiceData(serviceData);
+
+      // Now that serviceData is available, we can fetch provider details
+      const providerResponse = await getProviderProfile(serviceData.providerId);
+      setProviderData(providerResponse.data);
+
+      const feedbacks = serviceData.feedbacks || [];
+      if (feedbacks.length > 0) {
         const totalRating = feedbacks.reduce(
           (acc: number, feedback: any) => acc + (feedback.rating || 0),
           0
@@ -237,29 +226,25 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         setAverageRating(totalRating / count);
         setFeedbackCount(count);
       }
-      const response = await fetchApplicants(data.data.id);
-      console.log(response);
-      setExistingRequestId(response);
-      if (response.length == 0) {
-        setCanEdit(true);
-      } else {
-        console.log("Hrllo");
 
-        setCanEdit(false);
-      }
+      const applicantsResponse = await getRequestsByService(serviceData.id);
+      const existingRequests = applicantsResponse.data;
+      setExistingRequestId(existingRequests);
 
-      const scholarshipResponse = await getAllScholarshipProgram();
+      setCanEdit(existingRequests.length === 0);
+
       setScholarships(scholarshipResponse.data.items);
     } catch (err) {
+      console.error("Error fetching service:", err);
       setError((err as Error).message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchService();
-  }, [id, user]);
+  }, [fetchService]);
 
   const openEditDialog = () => {
     setEditData(serviceData);
@@ -269,14 +254,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
   const closeEditDialog = () => {
     setEditDialogOpen(false);
     setEditData(null);
-  };
-
-  const handleFeedbackClick = () => {
-    setIsFeedbackDialogOpen(true);
-  };
-
-  const handleCloseFeedbackDialog = () => {
-    setIsFeedbackDialogOpen(false);
   };
 
   const handleOpenContract = () => {
@@ -476,6 +453,8 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     }
   };
 
+  console.log(providerData);
+
   if (loading) return <Spinner size="large" />;
   if (error)
     return <p className="text-center text-xl font-semibold">{error}</p>;
@@ -488,10 +467,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
     <div>
       {isDialogOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 transform transition-all scale-95 hover:scale-100">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] md:w-[60%] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 transform transition-all scale-200">
             <div className="mb-5 flex justify-between items-center">
               <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-blue-600">
-                <IoIosPaper className="text-3xl text-blue-500 mr-3" />
+                <IoIosPaper className="text-3xl text-blue-500" />
                 <span className="font-bold">
                   Request for {serviceData.name}
                 </span>
@@ -538,7 +517,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                   </button>
                 </div>
                 {showSuggest && ( // Hiển thị form nếu state showSuggest là true
-                  <div className="max-w-7xl mx-auto p-6 bg-[rgba(219,216,216,0.95)] shadow-lg rounded-md mt-3">
+                  <div className="max-w-7xl mx-auto p-6 bg-gray-50 shadow-lg rounded-md mt-3">
                     <ul className="space-y-2">
                       {[
                         "Provide feedback to refine my CV for a specific job application.",
@@ -555,7 +534,10 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                         <li
                           key={index}
                           className="cursor-pointer text-blue-500 hover:underline"
-                          onClick={() => setDescription(suggestion)}
+                          onClick={() => {
+                            setDescription(suggestion);
+                            setShowSuggest(false);
+                          }}
                         >
                           {suggestion}
                         </li>
@@ -700,151 +682,6 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         </div>
       )}
 
-      {isFeedbackDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] md:w-[60%]">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-[#1eb2a6]">
-                Feedback Details
-              </h2>
-            </div>
-
-            {feedbacks.length > 0 ? (
-              <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                <thead>
-                  <tr className="bg-gray-100 text-gray-700">
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "5%" }}
-                    >
-                      #
-                    </th>{" "}
-                    {/* Chiếm 0.5 */}
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "20%" }}
-                    >
-                      Applicant Name
-                    </th>{" "}
-                    {/* Chiếm 2 */}
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "10%" }}
-                    >
-                      Rating
-                    </th>{" "}
-                    {/* Chiếm 1 */}
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "20%" }}
-                    >
-                      Comment
-                    </th>{" "}
-                    {/* Chiếm 2 */}
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "15%" }}
-                    >
-                      Date
-                    </th>{" "}
-                    {/* Chiếm 1 */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {feedbacks.map((feedback, index) => (
-                    <tr key={index} className="border-t hover:bg-gray-50">
-                      <td className="p-4" style={{ width: "5%" }}>
-                        {index + 1}
-                      </td>{" "}
-                      {/* Chiếm 0.5 */}
-                      <td className="p-4" style={{ width: "20%" }}>
-                        {feedback.name || "********"}
-                      </td>{" "}
-                      {/* Chiếm 2 */}
-                      <td
-                        className="p-4 flex items-center"
-                        style={{ width: "10%" }}
-                      >
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar
-                            key={i}
-                            color={i < feedback.rating ? "#FFB800" : "#ddd"}
-                            size={18}
-                          />
-                        ))}
-                      </td>{" "}
-                      {/* Chiếm 1 */}
-                      <td className="p-4" style={{ width: "20%" }}>
-                        {feedback.content}
-                      </td>{" "}
-                      {/* Chiếm 2 */}
-                      <td className="p-4" style={{ width: "15%" }}>
-                        {new Date(feedback.feedbackDate).toLocaleDateString(
-                          "en-US"
-                        )}
-                      </td>{" "}
-                      {/* Chiếm 1 */}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                <thead>
-                  <tr className="bg-gray-100 text-gray-700">
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "5%" }}
-                    >
-                      #
-                    </th>
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "20%" }}
-                    >
-                      Applicant Name
-                    </th>
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "10%" }}
-                    >
-                      Rating
-                    </th>
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "20%" }}
-                    >
-                      Comment
-                    </th>
-                    <th
-                      className="p-4 text-left font-semibold"
-                      style={{ width: "15%" }}
-                    >
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colSpan={5} className="p-4 text-center text-gray-600">
-                      No feedback available.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            )}
-            <div className="mt-4 text-right">
-              <button
-                onClick={handleCloseFeedbackDialog}
-                className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 transition-all"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/*Header Section*/}
       <div className="relative">
         {/* <ScholarshipProgramBackground /> */}
@@ -878,58 +715,133 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
         </div>
       </div>
 
-      <section className="bg-gray-50 py-10">
-        <div className="container mx-auto px-6">
+      <section className="bg-white py-10">
+        <div className="container mx-auto">
           {/*Content Section*/}
-          <div className="flex justify-center py-10">
-            <div className="w-11/12 md:w-4/5 bg-white shadow-lg rounded-xl p-10 space-y-6">
-              {/*Header Section*/}
-              <div className={isProvider ? "w-2/3" : ""}>
-                <div className="lg:flex-col items-center flex-row flex gap-[20px]">
-                  <div>
-                    <p className="text-black text-5xl lg:line-clamp-3 line-clamp-5 font-bold ">
+          <div className="flex justify-center pt-10">
+            <div className="bg-white p-10 space-y-6">
+              {/* Header Section */}
+              <div>
+                <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6">
+                  <div className="flex-1">
+                    <p className="text-black text-5xl font-bold leading-tight break-words">
                       {serviceData.name}
                     </p>
                   </div>
-                  <div className="flex flex-col items gap-2">
-                    <div className="flex items-center gap-2">
-                      <FaStar color="yellow" size={20} />
-                      <p
-                        className="text-yellow-500 cursor-pointer underline hover:text-yellow-400 transition-all"
-                        onClick={handleFeedbackClick}
-                      >
-                        {averageRating.toFixed(1)} ({feedbackCount}{" "}
-                        {feedbackCount === 1 ? "review" : "reviews"})
+                </div>
+              </div>
+
+              {/* Provider Information with Type, Price, and Actions */}
+              <div className="flex flex-col lg:flex-row lg:justify-between gap-6">
+                <div className="flex flex-col gap-6">
+                  {/* Rectangle Image */}
+                  <div className="w-full">
+                    <img
+                      src={ServiceBanner}
+                      alt="Service Banner"
+                      className="w-full h-100 object-cover rounded-xl shadow-md"
+                    />
+                  </div>
+                  {/* Provider Info */}
+                  <div className="flex flex-col md:flex-row gap-6 items-start mt-4">
+                    <img
+                      src={providerData.avatar}
+                      alt="Provider Avatar"
+                      className="w-30 h-30 rounded-full object-cover shadow-md"
+                    />
+                    <div className="flex flex-col space-y-3">
+                      <div className="flex items-center gap-4">
+                        <h2 className="text-3xl font-bold text-gray-800">
+                          {providerData.username}
+                        </h2>
+                        <button
+                          onClick={() =>
+                            (window.location.href = `/provider-information/${serviceData.providerId}`)
+                          }
+                          className="bg-[#1eb2a6] hover:bg-teal-400 text-white text-sm font-medium px-4 py-1 rounded-md shadow-sm transition duration-200"
+                        >
+                          View
+                        </button>
+                      </div>
+                      <p className="text-lg font-medium text-gray-600">
+                        Service Provider
                       </p>
+                      {/* <p className="text-gray-700">
+                        Experienced service provider with over 10 years of
+                        expertise in delivering high-quality services to clients
+                        worldwide. Passionate about solving problems and
+                        creating value.
+                      </p> */}
                     </div>
                   </div>
                 </div>
+                {/* Type, Price, and Actions */}
+                <div className="flex flex-col justify-around items-start lg:items-start gap-6 lg:w-[40%] p-6 rounded-xl border-gray-200 border-2 h-full">
+                  <div className="space-y-4">
+                    <p className="font-bold text-3xl text-black mb-4">
+                      Service Details
+                    </p>
+                    <span
+                      className={`px-3 py-1 rounded-md text-base sm:text-lg font-medium ${
+                        serviceData.status === "Active"
+                          ? "bg-green-100 text-green-700"
+                          : serviceData.status === "Inactive"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {serviceData.status}
+                    </span>
+                    <p className="text-lg text-gray-600 font-semibold">
+                      {serviceData.description}
+                    </p>
+                  </div>
 
-                <div className="text-center flex h-[50px] mt-[26px]">
-                  <div className="flex justify-between w-full gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <FaAddressBook className="text-[#1eb2a6]" size={24} />
+                      <p className="text-lg font-semibold text-gray-700">
+                        Type:{" "}
+                        <span className="font-normal ml-2">
+                          {serviceData.type}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaDollarSign className="text-[#1eb2a6]" size={24} />
+                      <p className="text-lg font-semibold text-gray-700">
+                        Price:{" "}
+                        <span className="font-normal ml-2">
+                          ${serviceData.price.toLocaleString()}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="w-full flex flex-wrap gap-4 items-end">
                     {showButtons && (
                       <>
                         {isApplicant ? (
                           requestStatus === "Finished" ? (
                             <button
                               onClick={handleRequestNow}
-                              className="flex items-center justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                              className="flex items-center justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-xl px-6 py-2 transition duration-300"
                             >
                               <FaRedo className="mr-2" /> Request Again
                             </button>
                           ) : (
                             <button
                               onClick={handleRequestNow}
-                              className="flex items-center mb-3 justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
+                              className="flex items-center justify-center w-full bg-[#1eb2a6] hover:bg-blue-500 text-white text-lg font-semibold rounded-xl px-6 py-2 transition duration-300"
                             >
-                              <FaPlus className="mr-2" /> Request Now
+                              Book Service
                             </button>
                           )
                         ) : !isFunder && isProvider ? (
                           <>
                             <button
                               onClick={() => openEditDialog()}
-                              className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
+                              className={`flex items-center justify-center w-full text-lg font-semibold rounded-xl px-6 py-2 transition duration-300 ${
                                 !canEdit
                                   ? "bg-gray-500 text-gray-300 cursor-not-allowed"
                                   : "bg-yellow-500 hover:bg-yellow-400 text-white"
@@ -943,15 +855,9 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                             >
                               <FaEdit className="mr-2" /> Edit
                             </button>
-                            {/* <button
-                          onClick={handleOpenApplicantDialog}
-                          className="flex items-center justify-center w-full bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-full px-6 py-2 transition duration-300"
-                        >
-                          <FaEye className="mr-2" /> View Request
-                        </button> */}
                             <button
                               onClick={() => setConfirmationDialogOpen(true)}
-                              className={`flex items-center justify-center w-full text-lg font-semibold rounded-full px-6 py-2 transition duration-300 ${
+                              className={`flex items-center justify-center w-full text-lg font-semibold rounded-xl px-6 py-2 transition duration-300 ${
                                 !canEdit
                                   ? "bg-gray-500 text-gray-300 cursor-not-allowed"
                                   : "bg-red-600 hover:bg-red-500 text-white"
@@ -975,31 +881,12 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                 </div>
               </div>
 
-              {/* Provider Information */}
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <img
-                  src="https://via.placeholder.com/100"
-                  alt="Provider Avatar"
-                  className="w-24 h-24 rounded-full object-cover shadow-md"
-                />
-                <div className="flex flex-col space-y-3">
-                  <h2 className="text-2xl font-bold text-gray-800">John Doe</h2>
-                  <p className="text-sm font-medium text-gray-600">
-                    Senior Service Provider
-                  </p>
-                  <p className="text-gray-700">
-                    Experienced service provider with over 10 years of expertise
-                    in delivering high-quality services to clients worldwide.
-                    Passionate about solving problems and creating value.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              {/* Metrics Section */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center py-10">
                 <div>
                   <div className="flex items-center justify-center">
-                    <FaStar color="yellow" size={24} />
-                    <p className="text-3xl font-bold text-[#ffff00] ml-2">
+                    <FaStar color="#facc15" size={24} />
+                    <p className="text-3xl font-bold text-yellow-400 ml-2">
                       {averageRating.toFixed(1)}
                     </p>
                   </div>
@@ -1026,12 +913,11 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
               </div>
 
               {/* Other Services */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800">
                   Other Services
                 </h3>
                 <ul className="space-y-4">
-                  {/* Service Item */}
                   <li className="p-4 border rounded-lg hover:shadow-lg transition duration-300">
                     <h4 className="text-lg font-semibold text-gray-800">
                       Service 1
@@ -1060,41 +946,62 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                     </p>
                   </li>
                 </ul>
-              </div>
+              </div> */}
 
               {/* Feedback Section */}
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800">
-                  {feedbackCount} reviews
+                  Reviews ({feedbackCount})
                 </h3>
-                <ul className="space-y-6">
-                  {fedbacks.map((feedback, index) => (
-                    <li
-                      key={index}
-                      className="p-4 bg-white rounded-lg shadow-md border border-gray-200"
-                    >
-                      <div className="flex justify-between items-center">
-                        <p className="text-sm font-medium text-gray-800">
-                          {feedback.name}
-                        </p>
-                        <p className="text-xs text-gray-500">{feedback.date}</p>
-                      </div>
-                      <div className="flex items-center space-x-1 mt-1">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <FaStar
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < feedback.rating
-                                ? "text-yellow-400"
-                                : "text-gray-300"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-gray-700 mt-2">{feedback.comment}</p>
-                    </li>
-                  ))}
-                </ul>
+                {feedbacks.length > 0 ? (
+                  <ul className="space-y-6">
+                    {feedbacks.map((feedback, index) => (
+                      <li
+                        key={index}
+                        className="p-4 bg-white rounded-lg shadow-md border border-gray-200 flex flex-col sm:flex-row sm:items-start sm:space-x-4"
+                      >
+                        <img
+                          src={feedback.avatarUrl || "/placeholder-avatar.png"}
+                          alt="Avatar"
+                          className="w-16 h-16 rounded-full border border-gray-300 flex-shrink-0"
+                        />
+                        <div className="flex-1">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <div>
+                              <p className="text-sm font-medium text-gray-800">
+                                {feedback.applicantId}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(
+                                  feedback.feedbackDate
+                                ).toLocaleDateString("en-US")}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-1 mt-2 sm:mt-0">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <FaStar
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < feedback.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-gray-700 mt-4 sm:mt-2">
+                            {feedback.content}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-600 text-left mt-4 sm:mt-8">
+                    No feedbacks yet. Be the first to leave a review!
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -1104,7 +1011,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
 
           {user.role == "Provider" && (
             <div className="flex justify-center">
-              <div className="w-11/12 md:w-4/5 bg-white shadow-xl rounded-2xl p-10 space-y-6">
+              <div className="w-full bg-white p-10 space-y-6">
                 {/* Tiêu đề */}
                 <div>
                   <div className="relative flex items-center gap-4">

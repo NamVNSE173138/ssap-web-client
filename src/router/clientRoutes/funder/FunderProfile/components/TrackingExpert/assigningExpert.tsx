@@ -38,6 +38,7 @@ const AssigningExpert = () => {
         );
 
         const results = await Promise.all(applicationsPromises);
+        console.log("results", results);
 
         const applicationsMap: Record<number, any[]> = {};
         results.forEach((result) => {
@@ -77,15 +78,15 @@ const AssigningExpert = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <p>Major: {expert.major}</p>
-                {applications[expert.id]?.length > 0 ? (
+                {applications[expert.expertId]?.length > 0 ? (
                   <ul className="mt-4 space-y-2">
-                    {applications[expert.id].map((app) => (
+                    {applications[expert.expertId].map((app) => (
                       <li
                         key={app.id}
                         className="p-2 border rounded-lg bg-gray-100"
                       >
                         <p>
-                          <strong>Application ID:</strong> {app.id}
+                          <strong>Applicant Name:</strong> {app.applicantName}
                         </p>
                         <p>
                           <strong>Status:</strong> {app.status}

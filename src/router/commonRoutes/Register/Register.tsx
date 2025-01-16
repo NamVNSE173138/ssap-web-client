@@ -101,7 +101,22 @@ const formSchema = z.object({
     .optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  birthDate: z.string().optional(),
+  // birthDate: z.string().optional(),
+  birthDate: z
+    .string()
+    .min(1, { message: "Birthdate is required" })
+    .refine((value) => {
+      const today = new Date();
+      const birthDate = new Date(value);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const dayDiff = today.getDate() - birthDate.getDate();
+
+      return (
+        age > 17 ||
+        (age === 17 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))
+      );
+    }, "You must be at least 17 years old."),
   gender: z.string().optional(),
   nationality: z.string().optional(),
   ethnicity: z.string().optional(),
@@ -135,11 +150,13 @@ const Register = () => {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [_showEducationForm, setShowEducationForm] = useState(false);
+  const [school, setSchool] = useState<any[]>([]);
 
   const getSchool = async () => {
     try {
       const response = await getAllUniversities();
       const schoolNames = response.data.map((school: any) => school.name);
+      setSchool(schoolNames)
       console.log(schoolNames);
     } catch (error) {
       console.log("Error fetching universities:", error);
@@ -1161,11 +1178,24 @@ const Register = () => {
                               <label className="block text-gray-700 font-medium mb-2">
                                 School
                               </label>
-                              <input
+                              {/* <input
                                 {...register("education.school")}
                                 placeholder="Enter your school"
                                 className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
-                              />
+                              /> */}
+                              <select
+                                {...register("education.school", {
+                                  required: "Please select a school",
+                                })}
+                                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1eb2a6]"
+                              >
+                                <option value="">Select a school</option>
+                                {school.map((school: any, index: any) => (
+                                  <option key={index} value={school}>
+                                    {school}
+                                  </option>
+                                ))}
+                              </select>
                               {errors.education?.school && (
                                 <p className="text-red-500 text-sm mt-1">
                                   {errors.education.school.message}

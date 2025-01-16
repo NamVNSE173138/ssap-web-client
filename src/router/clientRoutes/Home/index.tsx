@@ -13,6 +13,7 @@ import { BsFillSuitcaseLgFill, BsRulers, BsTerminal } from "react-icons/bs";
 import { GoLaw } from "react-icons/go";
 import { getAllMajors } from "@/services/ApiServices/majorService";
 import BackgroundImage from "./components/Carousel";
+import { Button } from "@/components/ui/button";
 
 const Home = () => {
   const [majors, setMajors] = useState<any>(null);
@@ -104,23 +105,25 @@ const Home = () => {
             </p>
           </div>
           <div className="pt-8 md:pt-10">
-            <button
-              className="h-14 w-full md:w-auto text-white font-semibold text-md md:text-base lg:text-xl py-3 px-6 rounded-full transition"
-              style={{
-                background: "linear-gradient(45deg, #1eb2a6, #12d7b5)",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              }}
-              onMouseOver={(e: any) => {
-                e.target.style.background =
-                  "linear-gradient(45deg, #0d9d87, #10bba1)";
-              }}
-              onMouseOut={(e: any) => {
-                e.target.style.background =
-                  "linear-gradient(45deg, #1eb2a6, #12d7b5)";
-              }}
-            >
-              Find Scholarship
-            </button>
+            <Link to="/scholarship-program">
+              <Button
+                className="h-14 w-full md:w-auto text-white font-semibold text-md md:text-base lg:text-xl py-3 px-6 rounded-full transition"
+                style={{
+                  background: "linear-gradient(45deg, #1eb2a6, #12d7b5)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                }}
+                onMouseOver={(e: any) => {
+                  e.target.style.background =
+                    "linear-gradient(45deg, #0d9d87, #10bba1)";
+                }}
+                onMouseOut={(e: any) => {
+                  e.target.style.background =
+                    "linear-gradient(45deg, #1eb2a6, #12d7b5)";
+                }}
+              >
+                Find Scholarship
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

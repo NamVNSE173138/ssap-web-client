@@ -93,7 +93,7 @@ const Header = () => {
               <span className="text-white text-lg lg:text-xl font-medium">
                 {user?.username}
                 <p className="text-white text-sm lg:text-sm font-normal opacity-80">
-                  Role: {user?.role}
+                  {user?.role}
                 </p>
               </span>
             </div>
@@ -140,7 +140,7 @@ const Header = () => {
           </button>
         </div>
         <div
-          className={`absolute top-20 left-0 w-full bg-[#1eb2a6] z-40 ${
+          className={`absolute top-20 left-0 w-full bg-transparent z-40 ${
             navbarOpen ? "block" : "hidden"
           } md:static md:flex md:items-center md:justify-between md:w-auto md:order-1`}
           id="navbar-user"

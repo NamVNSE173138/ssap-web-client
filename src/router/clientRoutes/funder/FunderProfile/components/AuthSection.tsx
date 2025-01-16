@@ -8,7 +8,7 @@ const AuthSection = (_props: any) => {
         Password & Authentication
       </h2>
       <form className="space-y-6">
-        <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+        <div className="max-w-5xl mx-auto p-6 shadow-md rounded-md">
           {/* Old Password */}
           <div>
             <label
