@@ -93,7 +93,7 @@ const Header = () => {
               <span className="text-white text-lg lg:text-xl font-medium">
                 {user?.username}
                 <p className="text-white text-sm lg:text-sm font-normal opacity-80">
-                  Role: {user?.role}
+                  {user?.role}
                 </p>
               </span>
             </div>

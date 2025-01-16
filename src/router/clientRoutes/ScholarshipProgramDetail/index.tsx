@@ -392,9 +392,9 @@ const ScholarshipProgramDetail = () => {
                   {data.name}
                 </p>
                 <img
-                  // src={data.imageUrl}
-                  src="https://wallpapers.com/images/hd/harvard-university-gilman-hall-q5t2pnf1jbwhg6hk.jpg"
-                  className="w-[100%] h-[300px] sm:w-[100%] sm:h-[300px] lg:h-[400px] lg:w-[100%] bg-white object-cover rounded-md"
+                  src={data.imageUrl}
+                  // src="https://wallpapers.com/images/hd/harvard-university-gilman-hall-q5t2pnf1jbwhg6hk.jpg"
+                  className="w-[100%] h-[300px] sm:w-[100%] sm:h-[300px] lg:h-[400px] lg:w-[100%] bg-white object-contain rounded-md"
                   alt="Scholarship Image"
                 />
               </div>

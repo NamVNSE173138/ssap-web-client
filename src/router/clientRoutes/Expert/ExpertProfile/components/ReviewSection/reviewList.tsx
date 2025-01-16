@@ -70,13 +70,15 @@ const ReviewList: React.FC = () => {
     [key: string]: number;
   }>({});
 
+  console.log("select", selectedReview);
+
   const calculateTotalScore = () => {
     if (!selectedItem?.criteria) return 0;
 
     const totalWeightedScore = selectedItem.criteria.reduce(
       (acc, criterion) => {
-        const criterionScore = criteriaScores[criterion.name] || 0; // Lấy điểm cho tiêu chí (mặc định 0 nếu không có)
-        return acc + (criterionScore * parseFloat(criterion.percentage)) / 100; // Nhân với phần trăm
+        const criterionScore = criteriaScores[criterion.name] || 0;
+        return acc + (criterionScore * parseFloat(criterion.percentage)) / 100;
       },
       0
     );
@@ -97,8 +99,6 @@ const ReviewList: React.FC = () => {
     }));
   };
 
-  console.log("select", selectedItem);
-
   const handleRowClick = (item: ApprovalItem, review: any) => {
     if (review.expertId != user.id) return;
 
@@ -114,7 +114,6 @@ const ReviewList: React.FC = () => {
     }
     setSelectedItem(item);
     setSelectedReview(review);
-    // window.open(item.documentUrl, "_blank");
   };
 
   const fetchApplicationReview = async () => {
@@ -125,15 +124,8 @@ const ReviewList: React.FC = () => {
         `${BASE_URL}/api/experts/${user.id}/assigned-applications`
       );
       const expertAssign = response.data.data;
-      console.log("API response:", expertAssign);
 
       const scholarshipId = id;
-
-      // const scholarshipResponse = await axios.get(
-      //   `${BASE_URL}/api/scholarship-programs/${expertAssign[2].scholarshipProgramId}`
-      //   // `${BASE_URL}/api/scholarship-programs/${applications[0].scholarshipProgramId}`
-      // );
-      // console.log("ScPL", scholarshipResponse.data.data);
 
       const detailedApplications = await Promise.all(
         expertAssign
@@ -142,12 +134,9 @@ const ReviewList: React.FC = () => {
             const applicantResponse = await axios.get(
               `${BASE_URL}/api/accounts/${app.applicantId}`
             );
-            console.log("APpppppppppppp", applicantResponse.data);
             const scholarshipResponse = await axios.get(
               `${BASE_URL}/api/scholarship-programs/${app.scholarshipProgramId}`
-              // `${BASE_URL}/api/scholarship-programs/${applications[0].scholarshipProgramId}`
             );
-            console.log("ScPL", scholarshipResponse.data.data);
             return {
               id: app.id,
               applicantName: app.applicantName,
@@ -170,7 +159,6 @@ const ReviewList: React.FC = () => {
           })
       );
       setApplications(detailedApplications);
-      console.log("detail", detailedApplications);
     } catch (err) {
       setError("Failed to fetch applications. Please try again.");
       console.error(err);
@@ -184,7 +172,7 @@ const ReviewList: React.FC = () => {
   }, [user.id]);
 
   const handleScoreSubmit = async () => {
-    const totalScore = calculateTotalScore(); // Tính total score
+    const totalScore = calculateTotalScore();
     setScore(totalScore);
 
     if (!selectedItem || !selectedReview || totalScore === "") {
@@ -238,11 +226,9 @@ const ReviewList: React.FC = () => {
     }
   };
   return (
-    <div className="space-y-8">
-      <div className="overflow-auto bg-white shadow rounded-lg">
-        <h1 className="text-lg p-4 text-green-700">
-          Review Milestone: Application Review
-        </h1>
+    <div className="space-y-8 p-5">
+      <div className="overflow-auto bg-white shadow-3 rounded-lg p-6">
+        <h1 className="text-xl font-semibold text-green-700 mb-4">Application Review</h1>
         <table className="w-full table-auto border-collapse">
           <thead className="bg-gray-100">
             <tr>
@@ -362,10 +348,8 @@ const ReviewList: React.FC = () => {
         </table>
       </div>
 
-      <div className="overflow-auto bg-white shadow rounded-lg">
-        <h1 className="text-lg p-4 text-green-700">
-          Review Milestone: Interview
-        </h1>
+      <div className="overflow-auto bg-white shadow-3 rounded-lg p-6">
+        <h1 className="text-xl font-semibold mb-4 text-green-700">Interview</h1>
         <table className="w-full table-auto border-collapse">
           <thead className="bg-gray-100">
             <tr>
@@ -460,21 +444,6 @@ const ReviewList: React.FC = () => {
                           </td>
                           <td className="p-4 text-sm">
                             <div className="flex items-center space-x-2">
-                              {/* <Button
-                                className={`w-full h-full ${
-                                  isScored
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-blue-500 text-white"
-                                }`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (!isScored) handleRowClick(item, review);
-                                }}
-                                // disabled={isScored}
-                              >
-                                
-                                Review Document
-                              </Button> */}
                               <Button
                                 className={`w-full h-full ${
                                   isScored
@@ -516,7 +485,7 @@ const ReviewList: React.FC = () => {
             {selectedItem && (
               <div>
                 <Dialog.Title className="text-2xl font-bold text-black">
-                  Application Review
+                  {selectedReview.description}
                 </Dialog.Title>
                 <Dialog.Description className="mt-2 text-sm text-gray-600">
                   {" "}
