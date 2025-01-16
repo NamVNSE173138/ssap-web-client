@@ -177,7 +177,7 @@ const ProviderInformation = () => {
 
       <section className="bg-white py-12 rounded-lg">
         <div className="container mx-auto px-6">
-          <div className="flex items-center gap-8 mb-10 bg-blue-500 p-8 rounded-lg shadow-lg">
+          <div className="flex items-center gap-8 mb-10 bg-teal-500 p-8 rounded-xl">
             <img
               src={providerData?.avatarUrl || "https://github.com/shadcn.png"}
               alt="Provider Avatar"
@@ -204,26 +204,30 @@ const ProviderInformation = () => {
           {/* Services Section */}
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-3xl font-semibold text-gray-800 flex items-center gap-2">
-              <FaServicestack className="text-blue-500" />
+              <FaServicestack className="text-teal-500" />
               Services Provided
             </h3>
             <button
               disabled={!user || user?.role !== "Applicant"}
               onClick={handleRequestForm}
-              className={`flex justify-center items-center border-1 border-gray-300 shadow-lg transition-all duration-300 gap-4 px-8 py-4 rounded-xl transform ${
+              className={`group flex justify-center items-center border-1 border-gray-300 shadow-lg transition-all duration-300 gap-4 px-8 py-4 rounded-xl transform ${
                 !user
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-white hover:bg-[#1eb2a6] hover:text-white"
+                  : "bg-white text-teal-600 hover:bg-[#1eb2a6] hover:text-white"
               }`}
             >
               <IoIosPaper
                 className={`text-3xl transition-all ease-in-out transform ${
-                  !user ? "text-gray-500" : "text-blue-500"
+                  !user
+                    ? "text-gray-500"
+                    : "text-teal-600 group-hover:text-white"
                 }`}
               />
               <p
                 className={`text-xl font-semibold ${
-                  !user ? "text-gray-500" : "text-blue-600"
+                  !user
+                    ? "text-gray-500"
+                    : "text-teal-600 group-hover:text-white"
                 }`}
               >
                 Request Form

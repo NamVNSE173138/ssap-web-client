@@ -69,7 +69,7 @@ const ProfileSection = () => {
       console.log("PDF Blob:", pdfBlob);
 
       const url = window.URL.createObjectURL(
-        new Blob([pdfBlob], { type: "application/pdf" }),
+        new Blob([pdfBlob], { type: "application/pdf" })
       );
 
       const link = document.createElement("a");
@@ -137,7 +137,7 @@ const ProfileSection = () => {
           </div>
           <button
             onClick={handleExportPDF}
-            className="self-start px-4 py-2 mt-4 bg-green-500 text-white rounded-md hover:bg-green-600"
+            className="self-start px-4 py-2 mt-4 bg-[#1eb2a6] text-white rounded-md hover:bg-green-600"
           >
             Export Profile
           </button>
