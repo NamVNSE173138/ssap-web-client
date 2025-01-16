@@ -16,7 +16,7 @@ const AuthSection = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     const payload = {
-      email: user.email,
+      email: user?.email,
       oldPassword: form.oldPassword,
       newPassword: form.newPassword,
     };
