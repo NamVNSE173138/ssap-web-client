@@ -8,9 +8,9 @@ const ScholarshipProgramBackground = () => {
     <section>
       <img
         src={
-          location.pathname === "/services"
-            ? ServicesImage
-            : ScholarshipProgramImage
+          location.pathname === "/scholarship-program"
+            ? ScholarshipProgramImage
+            : ServicesImage
         }
         alt="bg_footer"
         className="h-[300px] lg:h-[55vh] object-cover w-full"
