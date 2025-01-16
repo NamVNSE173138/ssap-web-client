@@ -68,6 +68,7 @@ const ScholarshipProgramDetail = () => {
   const [authorized, setAuthorized] = useState<string | null>(null);
   const [_loading, setLoading] = useState<boolean>(true);
   const [reviewMilestoneLoading, setReviewMilestoneLoading] = useState<boolean>(true);
+  const [awardMilestoneLoading, setAwardMilestoneLoading] = useState<boolean>(true);
   const [applicationLoading, setApplicationLoading] = useState<boolean>(true);
   const [expertLoading, setExpertLoading] = useState<boolean>(true);
 
@@ -192,6 +193,7 @@ const ScholarshipProgramDetail = () => {
           );
           await fetchApplicants(Number(id)),
           await fetchReviewMilestones(Number(id)),
+          await fetchAwardMilestones(Number(id)),
           await fetchExpertsByScholarshipId()
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
@@ -257,22 +259,6 @@ const ScholarshipProgramDetail = () => {
     }
   };
 
-  const fetchAwardMilestones = async (scholarshipId: number) => {
-    try {
-      const response = await getAwardMilestoneByScholarship(scholarshipId);
-      //console.log(response);
-      if (response.statusCode == 200) {
-        setAwardMilestones(response.data);
-      } else {
-        setError("Failed to get award milestones");
-      }
-    } catch (error) {
-      setError((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const fetchExpertsByScholarshipId = async () => {
     try {
       setExpertLoading(true);
@@ -304,6 +290,23 @@ const ScholarshipProgramDetail = () => {
       setError((error as Error).message);
     } finally {
       setReviewMilestoneLoading(false);
+    }
+  };
+
+  const fetchAwardMilestones = async (scholarshipId: number) => {
+    try {
+      setAwardMilestoneLoading(true);
+      const response = await getAwardMilestoneByScholarship(scholarshipId);
+      //console.log(response);
+      if (response.statusCode == 200) {
+        setAwardMilestones(response.data);
+      } else {
+        setError("Failed to get applicants");
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setAwardMilestoneLoading(false);
     }
   };
 
@@ -450,7 +453,7 @@ const ScholarshipProgramDetail = () => {
                   Deadline:{" "}
                   <span className="font-normal ml-2">
                     {data.deadline
-                      ? format(new Date(data.createdAt), "MM/dd/yyyy")
+                      ? format(new Date(data.deadline), "MM/dd/yyyy")
                       : "Not specified"}
                   </span>
                 </p>
@@ -910,6 +913,87 @@ const ScholarshipProgramDetail = () => {
                                   new Date(milestone.toDate),
                                   "MM/dd/yyyy"
                                 )}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Divider */}
+                          <div className="w-full h-[1px] bg-gray-300 my-2"></div>
+                        </Paper>
+                      ))}
+                    </div>
+                  ))}
+                </List>
+              </div>
+            </div>
+
+            <br></br>
+            <br></br>
+
+            <div className="max-w-7xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] shadow-lg rounded-md">
+              <div className="max-w-[1216px] mx-auto">
+                <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                  <div className="relative flex items-center gap-3">
+                    <div className="p-2 bg-[#1eb2a6] rounded-full">
+                      <FaCalendarAlt className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                      Award Milestone
+                    </h2>
+                  </div>
+                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
+                </div>
+                <br />
+                <List sx={{ pt: 0 }}>
+                  {awardMilestoneLoading ? (
+                    <Spinner />
+                  ) : (!awardMilestones || awardMilestones.length === 0 ? (
+                    <p className="p-10 text-center text-gray-500 font-semibold text-xl">
+                      No award milestones for this scholarship
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                      {awardMilestones.map((milestone: any, index: number) => (
+                        <Paper
+                          elevation={3}
+                          key={milestone.id}
+                          className="p-6 flex flex-col gap-4 justify-between items-start rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-white to-gray-50 border border-gray-200"
+                        >
+                          {/* Title */}
+                          <p className="font-bold text-2xl text-gray-900 mb-2">
+                            {"Award Milestone "+(index+1)}
+                          </p>
+
+                          {/* Date Range */}
+                          <div className="flex flex-col gap-2 w-full">
+                            <div className="flex justify-between">
+                              <p className="text-gray-600 font-semibold">
+                                Start Date:
+                              </p>
+                              <p className="text-gray-700">
+                                {format(
+                                  new Date(milestone.fromDate),
+                                  "MM/dd/yyyy"
+                                )}
+                              </p>
+                            </div>
+                            <div className="flex justify-between">
+                              <p className="text-gray-600 font-semibold">
+                                End Date:
+                              </p>
+                              <p className="text-gray-700">
+                                {format(
+                                  new Date(milestone.toDate),
+                                  "MM/dd/yyyy"
+                                )}
+                              </p>
+                            </div>
+                            <div className="flex justify-between">
+                              <p className="text-gray-600 font-semibold">
+                                Amount:
+                              </p>
+                              <p className="text-green-700 font-semibold">
+                                {`$${milestone.amount.toLocaleString("en-US")}`}
                               </p>
                             </div>
                           </div>

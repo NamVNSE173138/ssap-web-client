@@ -194,7 +194,7 @@ const ReviewList: React.FC = () => {
     setIsLoading(true);
     try {
       expertReviewSchema.parse({
-        score: score.toString(),
+        score: totalScore.toString(),
         description: comment,
       });
 
@@ -212,7 +212,7 @@ const ReviewList: React.FC = () => {
         isReview = false;
       }
 
-      const numericScore = Number(score);
+      const numericScore = Number(totalScore);
       const payload = {
         applicationReviewId: reviewId,
         comment,
@@ -226,10 +226,12 @@ const ReviewList: React.FC = () => {
       setSelectedItem(null);
       await fetchApplicationReview();
       setScore("");
+      setCriteriaScores({});
       setComment("");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
+        console.log(score)
         notification.error({ message: `Validation failed: ${errorMessage}` });
       } else {
         notification.error({ message: "Failed to submit review" });
