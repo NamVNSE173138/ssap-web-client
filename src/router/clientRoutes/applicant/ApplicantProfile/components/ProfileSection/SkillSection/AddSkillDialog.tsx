@@ -91,7 +91,7 @@ const AddSkillDialog = (props: any) => {
                   </label>
                   <select
                     name="name"
-                    value={skill.type || ""}
+                    value={skill.name || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md"
                   >
