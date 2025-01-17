@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Link } from "react-router-dom";
@@ -228,7 +228,7 @@ const RequestHistory = () => {
   }
 
   return (
-    <Tabss.Content value="services-history">
+    <Fragment>
       <div className="mt-6">
         <Tabs
           value={activeTab}
@@ -245,7 +245,7 @@ const RequestHistory = () => {
       <div className="mt-6 p-6 bg-white flex justify-center">
         {renderProviders()}
       </div>
-    </Tabss.Content>
+    </Fragment>
   );
 };
 

@@ -969,7 +969,7 @@ const ServiceDetails = ({ showButtons = true, serviceId = null }: any) => {
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                             <div>
                               <p className="text-sm font-medium text-gray-800">
-                                {feedback.applicantId}
+                                ********
                               </p>
                               <p className="text-xs text-gray-500">
                                 {new Date(
