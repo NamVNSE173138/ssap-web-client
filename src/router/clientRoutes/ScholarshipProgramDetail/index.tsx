@@ -67,8 +67,10 @@ const ScholarshipProgramDetail = () => {
   const [data, setData] = useState<ScholarshipProgramType | null>(null);
   const [authorized, setAuthorized] = useState<string | null>(null);
   const [_loading, setLoading] = useState<boolean>(true);
-  const [reviewMilestoneLoading, setReviewMilestoneLoading] = useState<boolean>(true);
-  const [awardMilestoneLoading, setAwardMilestoneLoading] = useState<boolean>(true);
+  const [reviewMilestoneLoading, setReviewMilestoneLoading] =
+    useState<boolean>(true);
+  const [awardMilestoneLoading, setAwardMilestoneLoading] =
+    useState<boolean>(true);
   const [applicationLoading, setApplicationLoading] = useState<boolean>(true);
   const [expertLoading, setExpertLoading] = useState<boolean>(true);
 
@@ -177,6 +179,8 @@ const ScholarshipProgramDetail = () => {
         (skill: any) => skill.name,
       );
 
+      console.log("Scholarship data", data);
+      console.log("Major", data?.major);
       console.log("Profile skills", profileSkills);
       console.log("Scholarship skills", scholarshipSkills);
 
@@ -197,10 +201,6 @@ const ScholarshipProgramDetail = () => {
       setIsProfileValid(false);
     }
   };
-
-  useEffect(() => {
-    checkApplicantProfile();
-  }, []);
 
   const fetchData = async () => {
     try {
@@ -226,12 +226,12 @@ const ScholarshipProgramDetail = () => {
           );
           setExistingApplication(application.data);
           const award = await getAwardMilestoneByScholarship(
-            response.data.data.id
+            response.data.data.id,
           );
           await fetchApplicants(Number(id)),
-          await fetchReviewMilestones(Number(id)),
-          await fetchAwardMilestones(Number(id)),
-          await fetchExpertsByScholarshipId()
+            await fetchReviewMilestones(Number(id)),
+            await fetchAwardMilestones(Number(id)),
+            await fetchExpertsByScholarshipId();
           if (application.data[0].status == ApplicationStatus.NeedExtend) {
             award.data.forEach((milestone: any) => {
               if (
@@ -258,7 +258,11 @@ const ScholarshipProgramDetail = () => {
     fetchData();
   }, [id]);
 
-  useEffect(() => {});
+  useEffect(() => {
+    if (data) {
+      checkApplicantProfile();
+    }
+  }, [data]);
 
   const fetchApplicants = async (scholarshipId: number) => {
     try {
@@ -948,7 +952,7 @@ const ScholarshipProgramDetail = () => {
                             <p className="text-gray-700">
                               {format(
                                 new Date(milestone.fromDate),
-                                "MM/dd/yyyy"
+                                "MM/dd/yyyy",
                               )}
                             </p>
                           </div>
@@ -975,23 +979,23 @@ const ScholarshipProgramDetail = () => {
             <br></br>
 
             <div className="mt-6">
-            <div className="mx-auto mt-6">
-              <div className="mb-6 px-4 sm:px-6 xl:px-0">
-                <div className="relative flex items-center gap-3">
-                  <div className="p-2 bg-[#1eb2a6] rounded-full">
-                    <FaCalendarAlt className="w-6 h-6 text-white" />
+              <div className="mx-auto mt-6">
+                <div className="mb-6 px-4 sm:px-6 xl:px-0">
+                  <div className="relative flex items-center gap-3">
+                    <div className="p-2 bg-[#1eb2a6] rounded-full">
+                      <FaCalendarAlt className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                      Award Milestone
+                    </h2>
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                    Award Milestone
-                  </h2>
+                  <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
                 </div>
-                <div className="bg-[#1eb2a6] w-12 h-1 rounded-full mt-3 transition-all duration-300 ease-in-out"></div>
-              </div>
-              <br />
+                <br />
                 <List sx={{ pt: 0 }}>
                   {awardMilestoneLoading ? (
                     <Spinner />
-                  ) : (!awardMilestones || awardMilestones.length === 0 ? (
+                  ) : !awardMilestones || awardMilestones.length === 0 ? (
                     <p className="p-10 text-center text-gray-500 font-semibold text-xl">
                       No award milestones for this scholarship
                     </p>
@@ -1005,7 +1009,7 @@ const ScholarshipProgramDetail = () => {
                         >
                           {/* Title */}
                           <p className="font-bold text-2xl text-gray-900 mb-2">
-                            {"Award Milestone "+(index+1)}
+                            {"Award Milestone " + (index + 1)}
                           </p>
 
                           {/* Date Range */}
@@ -1017,7 +1021,7 @@ const ScholarshipProgramDetail = () => {
                               <p className="text-gray-700">
                                 {format(
                                   new Date(milestone.fromDate),
-                                  "MM/dd/yyyy"
+                                  "MM/dd/yyyy",
                                 )}
                               </p>
                             </div>
@@ -1028,7 +1032,7 @@ const ScholarshipProgramDetail = () => {
                               <p className="text-gray-700">
                                 {format(
                                   new Date(milestone.toDate),
-                                  "MM/dd/yyyy"
+                                  "MM/dd/yyyy",
                                 )}
                               </p>
                             </div>
@@ -1047,7 +1051,7 @@ const ScholarshipProgramDetail = () => {
                         </Paper>
                       ))}
                     </div>
-                  ))}
+                  )}
                 </List>
               </div>
             </div>
@@ -1282,7 +1286,7 @@ const ScholarshipProgramDetail = () => {
                           >
                             {index + 1}
                           </button>
-                        )
+                        ),
                       )
                     : Array.from(
                         { length: totalTabPagesForWinners },
@@ -1308,7 +1312,7 @@ const ScholarshipProgramDetail = () => {
                           >
                             {index + 1}
                           </button>
-                        )
+                        ),
                       )}
                 </div>
               </Paper>
