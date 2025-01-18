@@ -82,18 +82,6 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
         `${BASE_URL}/api/applications/get-by-scholarship/${scholarshipId}`
       );
       setApplications(response.data.data || []);
-      setValue(
-        response.data.data.reduce((acc: any, application: any) => {
-          acc[application.id] = [];
-          return acc;
-        }, {})
-      );
-      setChangedValue(
-        response.data.data.reduce((acc: any, application: any) => {
-          acc[application.id] = [];
-          return acc;
-        }, {})
-      );
 
       setReviewingExperts(
         response.data.data.reduce((acc: any, application: any) => {
@@ -173,6 +161,18 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
           );
         }
         setApplications(applications);
+        setValue(
+            applications.reduce((acc: any, application: any) => {
+              acc[application.id] = [];
+              return acc;
+            }, {})
+          );
+          setChangedValue(
+            applications.reduce((acc: any, application: any) => {
+              acc[application.id] = [];
+              return acc;
+            }, {})
+          );
 
         for (const application of applications) {
           const reviewingExpertIds = application.applicationReviews
@@ -546,7 +546,6 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                   }}
                   onClick={() => {
                     //Check if there is no changes
-                    //console.log(value)
                     if (
                       Object.values(changedValue).every(
                         (value) => Array.isArray(value) && value.length === 0
@@ -559,10 +558,10 @@ const AssignExpertDialog = ({ open, onClose, scholarshipId }: any) => {
                     }
                     if (selectedReviewMilestone.description === "Interview") {
                       if (
-                        Object.values(value).every(
+                        Object.values(value).some(
                           (value) =>
                             Array.isArray(value) &&
-                            (value.length < 2 || value.length % 2 == 0)
+                            (value.length < 2 || value.length % 2 == 0) 
                         )
                       ) {
                         notification.error({
