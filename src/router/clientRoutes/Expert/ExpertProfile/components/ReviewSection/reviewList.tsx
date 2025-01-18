@@ -264,7 +264,7 @@ const ReviewList: React.FC = () => {
             {applications && applications.length === 0 ? (
               <tr>
                 <td colSpan={8} className="p-4 text-center text-gray-500">
-                  No applicants to review
+                  Loading...
                 </td>
               </tr>
             ) : Array.isArray(applications) && applications.length > 0 ? (
@@ -386,7 +386,7 @@ const ReviewList: React.FC = () => {
             {applications && applications.length === 0 ? (
               <tr>
                 <td colSpan={8} className="p-4 text-center text-gray-500">
-                  No applicants to review
+                  Loading...
                 </td>
               </tr>
             ) : Array.isArray(applications) && applications.length > 0 ? (
