@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ScreenSpinner from "@/components/ScreenSpinner";
 import { z } from "zod";
+import Spinner from "@/components/Spinner";
 
 type ApprovalItem = {
   id: number;
@@ -58,7 +59,7 @@ const expertReviewSchema = z.object({
 const ReviewList: React.FC = () => {
   const [applications, setApplications] = useState<ApprovalItem[]>([]);
   const user = useSelector((state: any) => state.token.user);
-  const [_loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [_error, setError] = useState<string | null>(null);
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -261,6 +262,9 @@ const ReviewList: React.FC = () => {
             </tr>
           </thead>
           <tbody>
+          {loading ? <td colSpan={8}>
+                <Spinner className=""/>
+          </td> : (<>
             {applications && applications.length === 0 ? (
               <tr>
                 <td colSpan={8} className="p-4 text-center text-gray-500">
@@ -345,6 +349,7 @@ const ReviewList: React.FC = () => {
                   No data available
                 </td>
               </tr>
+            )}</>
             )}
           </tbody>
         </table>
@@ -383,6 +388,9 @@ const ReviewList: React.FC = () => {
             </tr>
           </thead>
           <tbody>
+            {loading ? <td colSpan={8}>
+                <Spinner className=""/>
+              </td> : (<>
             {applications && applications.length === 0 ? (
               <tr>
                 <td colSpan={8} className="p-4 text-center text-gray-500">
@@ -473,7 +481,8 @@ const ReviewList: React.FC = () => {
                   No data available
                 </td>
               </tr>
-            )}
+            )}</>
+           )}
           </tbody>
         </table>
       </div>
