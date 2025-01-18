@@ -113,40 +113,6 @@ const FirstReview: React.FC<FirstReviewProps> = ({ scholarshipId, token }) => {
                         <FaEye /> View Details
                       </Button>
 
-                      <Link
-                        target="_blank"
-                        to={`/profile/{winner.applicant.id}`}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          size="small"
-                          style={{
-                            fontSize: "14px",
-                            padding: "6px 12px", // Giảm padding
-                            borderRadius: "8px",
-                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                            transition: "transform 0.2s, box-shadow 0.2s",
-                          }}
-                          onMouseEnter={(e) =>
-                          (e.currentTarget.style.boxShadow =
-                            "0px 4px 8px rgba(0, 0, 0, 0.1)")
-                          }
-                          onMouseLeave={(e) =>
-                          (e.currentTarget.style.boxShadow =
-                            "0px 2px 4px rgba(0, 0, 0, 0.1)")
-                          }
-                        >
-                          <FaUserAlt className="mr-2" />
-                          View Profile
-                        </Button>
-                      </Link>
                     </div>
                   </td>
 

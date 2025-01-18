@@ -9,7 +9,6 @@ import {
 import ProfileSection from "./components/ProfileSection/ProfileSection";
 import ApplicationHistorySection from "./components/ApplicationHistorySection/ApplicationHistorySection";
 import AuthSection from "./components/PasswordSection/AuthSection";
-import RequestHistory from "../../RequestServiceHistory";
 import { useSearchParams } from "react-router-dom";
 
 const ApplicantProfile = () => {
@@ -70,7 +69,6 @@ const ApplicantProfile = () => {
         <div className="w-full md:w-5/6 p-6">
           <ProfileSection />
           <ApplicationHistorySection />
-          <RequestHistory />
           <AuthSection />
         </div>
       </Tabs.Root>
